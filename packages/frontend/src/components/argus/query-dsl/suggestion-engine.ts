@@ -179,7 +179,7 @@ function getFieldSuggestions(
   if (context.isNegated) {
     if (prefix === '' || 'has'.startsWith(prefix)) {
       results.push({
-        label: 'not has',
+        label: 'has not',
         insertText: 'has:',
         category: 'field',
         fieldCategory: 'logic',
@@ -199,11 +199,11 @@ function getFieldSuggestions(
     if (
       prefix === '' ||
       '!has'.startsWith(prefix) ||
-      'not has'.startsWith(prefix) ||
+      'has not'.startsWith(prefix) ||
       'not'.startsWith(prefix)
     ) {
       results.push({
-        label: 'not has',
+        label: 'has not',
         insertText: '!has:',
         category: 'field',
         fieldCategory: 'logic',
@@ -261,7 +261,7 @@ function getFieldSuggestions(
   // This ensures 'AND', 'OR', exact field names, etc. appear first.
   if (prefix !== '') {
     const targetMatch =
-      context.isNegated && prefix === 'has' ? 'not has' : prefix;
+      context.isNegated && prefix === 'has' ? 'has not' : prefix;
     const exactMatchIndex = results.findIndex(
       (item) => item.label.toLowerCase() === targetMatch
     );
@@ -744,7 +744,7 @@ export function isIncompleteQuery(text: string): boolean {
     lower === 'not' ||
     lower === 'has' ||
     lower === '!has' ||
-    lower === 'not has' ||
+    lower === 'has not' ||
     lower === 'and' ||
     lower === 'or'
   ) {

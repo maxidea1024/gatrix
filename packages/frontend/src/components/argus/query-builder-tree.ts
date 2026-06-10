@@ -246,12 +246,18 @@ export function conditionToSql(cond: Condition): string {
     if (cond.field === 'has') expr = `${cond.value} IS NOT NULL`;
     else if (cond.field === '!has') expr = `${cond.value} IS NULL`;
     else {
-      // Multi-value → IN clause
+      // Multi-value → IN clause (or simple = for single value)
       const multi = resolveValues(cond);
       if (multi) {
-        const inList = multi.map(esc).join(', ');
-        const op = cond.operator === '!=' ? 'NOT IN' : 'IN';
-        expr = `${cond.field} ${op} (${inList})`;
+        if (multi.length === 1) {
+          // Single value: use simple equality
+          const op = cond.operator === '!=' ? '!=' : '=';
+          expr = `${cond.field} ${op} ${esc(multi[0])}`;
+        } else {
+          const inList = multi.map(esc).join(', ');
+          const op = cond.operator === '!=' ? 'NOT IN' : 'IN';
+          expr = `${cond.field} ${op} (${inList})`;
+        }
       } else {
         const fm: Record<string, (x: string) => string> = {
           contains: (x) => `ILIKE ${esc(`%${x}%`)}`,

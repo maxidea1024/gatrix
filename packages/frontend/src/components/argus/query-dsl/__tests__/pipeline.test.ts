@@ -114,10 +114,10 @@ describe('Spec 9.3: Cursor Context', () => {
 // ─── Spec 11.1: Context-specific suggestions ───────────────────────────────
 
 describe('Spec 11.1: Suggestions per context', () => {
-  it('FIELD context → field list (includes has/not has and parens)', () => {
+  it('FIELD context → field list (includes has/has not and parens)', () => {
     const { suggestions } = pipeline('');
     expect(suggestions.length).toBeGreaterThan(0);
-    // Most suggestions are 'field', but has/not has and paren operators are also included
+    // Most suggestions are 'field', but has/has not and paren operators are also included
     expect(suggestions.some((s) => s.category === 'field')).toBe(true);
   });
 
@@ -227,14 +227,14 @@ describe('Spec 11.1: Suggestions per context', () => {
     expect(hasSeSuggestions.some((s) => s.label === 'level')).toBe(false);
   });
 
-  it('negated prefix (e.g. !has) suggests "not has" and not "has"', () => {
+  it('negated prefix (e.g. !has) suggests "has not" and not "has"', () => {
     const { suggestions } = pipeline('!has', 4);
     const hasSug = suggestions.find((s) => s.label === 'has');
-    const notHasSug = suggestions.find((s) => s.label === 'not has');
+    const notHasSug = suggestions.find((s) => s.label === 'has not');
 
     expect(hasSug).toBeUndefined();
     expect(notHasSug).toBeDefined();
-    expect(notHasSug!.insertText).toBe('has:'); // should be 'has:' since ! is already typed
+    expect(notHasSug!.insertText).toBe('has:');
   });
 });
 

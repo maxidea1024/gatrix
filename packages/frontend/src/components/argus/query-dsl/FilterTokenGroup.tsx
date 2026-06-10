@@ -42,6 +42,12 @@ export interface FilterTokenGroupProps {
   selectedValues?: Set<string>;
   /** Called when a value pill tag is removed */
   onValueTagRemove?: (chipId: string, value: string) => void;
+  /** Index of the pill tag currently highlighted via keyboard (-1 = none) */
+  highlightedPillIdx?: number;
+  /** Called when ArrowLeft/Right changes the highlighted pill index */
+  onPillNavigate?: (chipId: string, newIdx: number) => void;
+  /** Called when Backspace/Delete pressed on a highlighted pill */
+  onPillDelete?: (chipId: string, pillIdx: number) => void;
 }
 
 /** Ref handle to access individual token DOM elements */
@@ -70,6 +76,9 @@ export const FilterTokenGroup = forwardRef<
     onValueInputBlur,
     selectedValues,
     onValueTagRemove,
+    highlightedPillIdx = -1,
+    onPillNavigate,
+    onPillDelete,
   },
   ref
 ) {
@@ -123,30 +132,39 @@ export const FilterTokenGroup = forwardRef<
       );
     }
 
-    // Multi-value: "debug or info" style (Sentry pattern)
+    // Multi-value: show first value + count badge
     if (chip.values && chip.values.length > 1) {
-      const joiner = chip.operator === '!=' ? 'and' : 'or';
       return (
         <>
-          {chip.values.map((v, i) => (
-            <React.Fragment key={v}>
-              <span>{v}</span>
-              {i < chip.values!.length - 1 && (
-                <Typography
-                  component="span"
-                  sx={{
-                    mx: 0.5,
-                    fontSize: '0.7rem',
-                    fontWeight: 500,
-                    opacity: 0.5,
-                    fontStyle: 'italic',
-                  }}
-                >
-                  {joiner}
-                </Typography>
-              )}
-            </React.Fragment>
-          ))}
+          <span
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              minWidth: 0,
+            }}
+          >
+            {chip.values[0]}
+          </span>
+          <Typography
+            component="span"
+            sx={{
+              ml: 0.5,
+              px: 0.5,
+              py: 0,
+              borderRadius: '8px',
+              fontSize: '0.6rem',
+              fontWeight: 700,
+              lineHeight: '16px',
+              flexShrink: 0,
+              backgroundColor: isDark
+                ? 'rgba(251,191,36,0.2)'
+                : 'rgba(217,119,6,0.15)',
+              color: isDark ? '#fbbf24' : '#d97706',
+            }}
+          >
+            +{chip.values.length - 1}
+          </Typography>
         </>
       );
     }
@@ -261,7 +279,7 @@ export const FilterTokenGroup = forwardRef<
           onPartClick(chip.id, 'field', e.currentTarget)
         }
       >
-        {chip.field === '!has' ? 'not has' : chip.field}
+        {chip.field === '!has' ? 'has not' : chip.field}
       </Box>
 
       {/* Operator token — hidden for has/!has */}
@@ -295,63 +313,77 @@ export const FilterTokenGroup = forwardRef<
         >
           {/* Existing values as pill tags (Sentry style) */}
           {selectedValues &&
-            Array.from(selectedValues).map((v) => (
-              <Box
-                key={v}
-                component="span"
-                onMouseDown={(e: React.MouseEvent) => {
-                  // Prevent blur on the inline input when clicking anywhere on a pill
-                  e.preventDefault();
-                }}
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '2px',
-                  px: 0.5,
-                  py: 0,
-                  borderRadius: '3px',
-                  fontSize: '0.75rem',
-                  backgroundColor: isDark
-                    ? 'rgba(251,191,36,0.15)'
-                    : 'rgba(217,119,6,0.10)',
-                  color: valueColor,
-                  maxWidth: 120,
-                  lineHeight: 1.4,
-                }}
-              >
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {v}
-                </span>
+            Array.from(selectedValues).map((v, pillIdx) => {
+              const isHighlighted = highlightedPillIdx === pillIdx;
+              return (
                 <Box
+                  key={v}
                   component="span"
                   onMouseDown={(e: React.MouseEvent) => {
+                    // Prevent blur on the inline input when clicking anywhere on a pill
                     e.preventDefault();
-                    e.stopPropagation();
-                    onValueTagRemove?.(chip.id, v);
                   }}
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 14,
-                    height: 14,
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    opacity: 0.5,
-                    '&:hover': { opacity: 1, bgcolor: 'rgba(255,255,255,0.1)' },
-                    flexShrink: 0,
+                    gap: '2px',
+                    px: 0.5,
+                    py: 0,
+                    borderRadius: '3px',
+                    fontSize: '0.75rem',
+                    backgroundColor: isHighlighted
+                      ? isDark
+                        ? 'rgba(124,138,255,0.25)'
+                        : 'rgba(92,107,192,0.20)'
+                      : isDark
+                        ? 'rgba(251,191,36,0.15)'
+                        : 'rgba(217,119,6,0.10)',
+                    color: valueColor,
+                    maxWidth: 120,
+                    lineHeight: 1.4,
+                    border: isHighlighted
+                      ? `1px solid ${isDark ? 'rgba(124,138,255,0.6)' : 'rgba(92,107,192,0.5)'}`
+                      : '1px solid transparent',
+                    transition: 'border 0.1s, background-color 0.1s',
                   }}
                 >
-                  <CloseIcon sx={{ fontSize: 10, pointerEvents: 'none' }} />
+                  <span
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {v}
+                  </span>
+                  <Box
+                    component="span"
+                    onMouseDown={(e: React.MouseEvent) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onValueTagRemove?.(chip.id, v);
+                    }}
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 14,
+                      height: 14,
+                      borderRadius: '50%',
+                      cursor: 'pointer',
+                      opacity: 0.5,
+                      '&:hover': {
+                        opacity: 1,
+                        bgcolor: 'rgba(255,255,255,0.1)',
+                      },
+                      flexShrink: 0,
+                    }}
+                  >
+                    <CloseIcon sx={{ fontSize: 10, pointerEvents: 'none' }} />
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              );
+            })}
           {/* Text input for adding new values */}
           <input
             ref={valueInputRef}
@@ -365,16 +397,28 @@ export const FilterTokenGroup = forwardRef<
                 e.preventDefault();
                 return;
               }
-              // Backspace on empty input → remove last pill
+              const isEmpty = (editingValueText ?? '') === '';
+              const pillCount = selectedValues?.size ?? 0;
+              const cursorAtStart = (e.target as HTMLInputElement).selectionStart === 0;
+              // ArrowLeft when cursor is at start with pills → select last pill
               if (
-                e.key === 'Backspace' &&
-                (editingValueText ?? '') === '' &&
-                selectedValues &&
-                selectedValues.size > 0
+                e.key === 'ArrowLeft' &&
+                cursorAtStart &&
+                pillCount > 0 &&
+                highlightedPillIdx === -1
               ) {
                 e.preventDefault();
-                const lastVal = Array.from(selectedValues).pop();
-                if (lastVal) onValueTagRemove?.(chip.id, lastVal);
+                onPillNavigate?.(chip.id, pillCount - 1);
+                return;
+              }
+              // Backspace on empty input → select last pill first (if not already selected)
+              if (e.key === 'Backspace' && isEmpty && pillCount > 0) {
+                e.preventDefault();
+                if (highlightedPillIdx >= 0) {
+                  onPillDelete?.(chip.id, highlightedPillIdx);
+                } else {
+                  onPillNavigate?.(chip.id, pillCount - 1);
+                }
                 return;
               }
               onValueInputKeyDown?.(chip.id, e);
@@ -450,9 +494,9 @@ export const FilterTokenGroup = forwardRef<
             component="span"
             sx={{
               ...tokenStyle('value'),
+              display: 'inline-flex',
+              alignItems: 'center',
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
               maxWidth: 240,
               minWidth: 0,
             }}

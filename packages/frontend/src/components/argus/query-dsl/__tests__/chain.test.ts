@@ -141,10 +141,10 @@ describe('Chained autocomplete: empty → level → info', () => {
       expect(firstLogicIdx).toBeGreaterThan(lastDataFieldIdx);
     }
 
-    // Verify relative ordering of operators is has -> not has -> (
+    // Verify relative ordering of operators is has -> has not -> (
     const labels = suggestions.map((s) => s.label);
     const hasIdx = labels.indexOf('has');
-    const notHasIdx = labels.indexOf('not has');
+    const notHasIdx = labels.indexOf('has not');
     const openParenIdx = labels.indexOf('(');
 
     expect(hasIdx).toBeDefined();

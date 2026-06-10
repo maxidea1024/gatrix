@@ -46,6 +46,7 @@ import {
   ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import SafeTooltip from '@/components/common/SafeTooltip';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { QueryHighlighter } from './QueryHighlighter';
 import { queryToChips } from './query-dsl/useFilterChips';
@@ -595,165 +596,199 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
           }}
         >
           {/* Drag grip */}
-          <DragIcon
-            className="drag-grip"
-            sx={{
-              fontSize: 14,
-              color: 'text.disabled',
-              opacity: 0.2,
-              cursor: 'grab',
-              flexShrink: 0,
-            }}
-          />
+          <SafeTooltip
+            title={t('argus.builder.dragToReorder', 'Drag to reorder')}
+            placement="top"
+          >
+            <DragIcon
+              className="drag-grip"
+              sx={{
+                fontSize: 14,
+                color: 'text.disabled',
+                opacity: 0.2,
+                cursor: 'grab',
+                flexShrink: 0,
+              }}
+            />
+          </SafeTooltip>
 
           {/* NOT toggle */}
-          <Box
-            onClick={() => update(filter.id, { negated: !filter.negated })}
-            sx={{
-              fontSize: '0.5rem',
-              fontWeight: 800,
-              letterSpacing: '0.04em',
-              px: 0.5,
-              py: 0.1,
-              borderRadius: '3px',
-              minWidth: 26,
-              textAlign: 'center',
-              cursor: 'pointer',
-              userSelect: 'none',
-              flexShrink: 0,
-              color: filter.negated
-                ? theme.palette.error.main
-                : alpha(theme.palette.text.disabled, 0.35),
-              backgroundColor: filter.negated
-                ? alpha(theme.palette.error.main, 0.1)
-                : 'transparent',
-              border: `1px solid ${filter.negated ? alpha(theme.palette.error.main, 0.4) : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}`,
-              transition: 'all 0.12s',
-              '&:hover': {
-                color: theme.palette.error.main,
-                backgroundColor: alpha(theme.palette.error.main, 0.08),
-              },
-            }}
+          <SafeTooltip
+            title={t('argus.builder.toggleNot', 'Toggle NOT')}
+            placement="top"
           >
-            NOT
-          </Box>
+            <Box
+              onClick={() => update(filter.id, { negated: !filter.negated })}
+              sx={{
+                fontSize: '0.5rem',
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                px: 0.5,
+                py: 0.1,
+                borderRadius: '3px',
+                minWidth: 26,
+                textAlign: 'center',
+                cursor: 'pointer',
+                userSelect: 'none',
+                flexShrink: 0,
+                color: filter.negated
+                  ? theme.palette.error.main
+                  : alpha(theme.palette.text.disabled, 0.35),
+                backgroundColor: filter.negated
+                  ? alpha(theme.palette.error.main, 0.1)
+                  : 'transparent',
+                border: `1px solid ${filter.negated ? alpha(theme.palette.error.main, 0.4) : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}`,
+                transition: 'all 0.12s',
+                '&:hover': {
+                  color: theme.palette.error.main,
+                  backgroundColor: alpha(theme.palette.error.main, 0.08),
+                },
+              }}
+            >
+              NOT
+            </Box>
+          </SafeTooltip>
 
           {/* Field select */}
-          <Select
-            size="small"
-            displayEmpty
-            value={filter.field || ''}
-            onChange={(e) => {
-              const newField = e.target.value;
-              // Clear value/values when field changes to avoid stale data
-              update(filter.id, {
-                field: newField,
-                value: '',
-                values: undefined,
-              });
-              if (newField !== 'has' && newField !== '!has')
-                loadField(newField);
-            }}
-            sx={{
-              minWidth: 100,
-              height: 26,
-              fontSize: '0.7rem',
-              '& .MuiSelect-select': { py: 0.3 },
-            }}
-            MenuProps={{
-              PaperProps: { sx: { maxHeight: 250, fontSize: '0.7rem' } },
-            }}
+          <SafeTooltip
+            title={filter.field === '!has' ? 'has not' : filter.field || ''}
+            placement="top"
           >
-            <MenuItem value="" disabled sx={{ display: 'none' }}>
-              field…
-            </MenuItem>
-            <ListSubheader
+            <Select
+              size="small"
+              displayEmpty
+              value={filter.field || ''}
+              onChange={(e) => {
+                const newField = e.target.value;
+                // Clear value/values when field changes to avoid stale data
+                update(filter.id, {
+                  field: newField,
+                  value: '',
+                  values: undefined,
+                });
+                if (newField !== 'has' && newField !== '!has')
+                  loadField(newField);
+              }}
               sx={{
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                lineHeight: '24px',
-                color: 'text.disabled',
-                letterSpacing: '0.06em',
+                width: 160,
+                height: 26,
+                fontSize: '0.7rem',
+                '& .MuiSelect-select': {
+                  py: 0.3,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                },
+              }}
+              MenuProps={{
+                PaperProps: { sx: { maxHeight: 250, fontSize: '0.7rem' } },
               }}
             >
-              OPERATORS
-            </ListSubheader>
-            <MenuItem
-              value="has"
-              sx={{ fontSize: '0.7rem', fontWeight: 600, gap: 0.5 }}
-            >
-              <CategoryBadge category="has" isDark={isDark} />
-              has
-            </MenuItem>
-            <MenuItem
-              value="!has"
-              sx={{ fontSize: '0.7rem', fontWeight: 600, gap: 0.5 }}
-            >
-              <CategoryBadge category="has" isDark={isDark} />
-              not has
-            </MenuItem>
-            <Divider sx={{ my: 0.3 }} />
-            <ListSubheader
-              sx={{
-                fontSize: '0.55rem',
-                fontWeight: 700,
-                lineHeight: '24px',
-                color: 'text.disabled',
-                letterSpacing: '0.06em',
-              }}
-            >
-              FIELDS
-            </ListSubheader>
-            {sortedFields.map((f) => {
-              const fc = config.fields.find((x) => x.key === f);
-              return (
-                <MenuItem
-                  key={f}
-                  value={f}
-                  sx={{ fontSize: '0.7rem', gap: 0.5 }}
-                >
-                  <CategoryBadge
-                    category={fc?.category || 'custom'}
-                    isDark={isDark}
-                  />
-                  {f}
-                  {facets[f]?.length > 0 && (
-                    <Typography
-                      component="span"
-                      sx={{
-                        ml: 'auto',
-                        pl: 1,
-                        fontSize: '0.55rem',
-                        color: 'text.disabled',
-                      }}
-                    >
-                      ({facets[f].length})
-                    </Typography>
-                  )}
-                </MenuItem>
-              );
-            })}
-          </Select>
+              <MenuItem value="" disabled sx={{ display: 'none' }}>
+                {t('argus.builder.fieldPlaceholder', 'field…')}
+              </MenuItem>
+              <ListSubheader
+                sx={{
+                  fontSize: '0.55rem',
+                  fontWeight: 700,
+                  lineHeight: '24px',
+                  color: 'text.disabled',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                OPERATORS
+              </ListSubheader>
+              <MenuItem
+                value="has"
+                sx={{ fontSize: '0.7rem', fontWeight: 600, gap: 0.5 }}
+              >
+                <CategoryBadge category="has" isDark={isDark} />
+                has
+              </MenuItem>
+              <MenuItem
+                value="!has"
+                sx={{ fontSize: '0.7rem', fontWeight: 600, gap: 0.5 }}
+              >
+                <CategoryBadge category="has" isDark={isDark} />
+                has not
+              </MenuItem>
+              <Divider sx={{ my: 0.3 }} />
+              <ListSubheader
+                sx={{
+                  fontSize: '0.55rem',
+                  fontWeight: 700,
+                  lineHeight: '24px',
+                  color: 'text.disabled',
+                  letterSpacing: '0.06em',
+                }}
+              >
+                FIELDS
+              </ListSubheader>
+              {sortedFields.map((f) => {
+                const fc = config.fields.find((x) => x.key === f);
+                return (
+                  <MenuItem
+                    key={f}
+                    value={f}
+                    sx={{ fontSize: '0.7rem', gap: 0.5 }}
+                  >
+                    <CategoryBadge
+                      category={fc?.category || 'custom'}
+                      isDark={isDark}
+                    />
+                    {f}
+                    {facets[f]?.length > 0 && (
+                      <Typography
+                        component="span"
+                        sx={{
+                          ml: 'auto',
+                          pl: 1,
+                          fontSize: '0.55rem',
+                          color: 'text.disabled',
+                        }}
+                      >
+                        ({facets[f].length})
+                      </Typography>
+                    )}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </SafeTooltip>
 
           {/* Operator select — hidden for has/!has */}
           {!isHas && ops.length > 0 && (
-            <Select
-              size="small"
-              value={filter.operator || '='}
-              onChange={(e) => update(filter.id, { operator: e.target.value })}
-              sx={{
-                minWidth: 80,
-                height: 26,
-                fontSize: '0.7rem',
-                '& .MuiSelect-select': { py: 0.3 },
-              }}
+            <SafeTooltip
+              title={
+                ops.find((o) => o.op === filter.operator)?.label ||
+                filter.operator ||
+                ''
+              }
+              placement="top"
             >
-              {ops.map((o) => (
-                <MenuItem key={o.op} value={o.op} sx={{ fontSize: '0.7rem' }}>
-                  {o.label}
-                </MenuItem>
-              ))}
-            </Select>
+              <Select
+                size="small"
+                value={filter.operator || '='}
+                onChange={(e) =>
+                  update(filter.id, { operator: e.target.value })
+                }
+                sx={{
+                  width: 120,
+                  height: 26,
+                  fontSize: '0.7rem',
+                  '& .MuiSelect-select': { py: 0.3 },
+                }}
+              >
+                {ops.map((o) => (
+                  <MenuItem key={o.op} value={o.op} sx={{ fontSize: '0.7rem' }}>
+                    {o.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </SafeTooltip>
           )}
 
           {/* Value — field-type-specific inputs */}
@@ -807,7 +842,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                     values: e.target.value ? [e.target.value] : [],
                   })
                 }
-                placeholder="value…"
+                placeholder={t('argus.builder.valuePlaceholder', 'value…')}
                 InputProps={{ sx: { height: 26, fontSize: '0.7rem' } }}
                 sx={{ flex: 1, minWidth: 80 }}
               />
@@ -833,7 +868,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder="value…"
+                    placeholder={t('argus.builder.valuePlaceholder', 'value…')}
                     InputProps={{
                       ...params.InputProps,
                       sx: {
@@ -894,21 +929,31 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
           )}
 
           {/* Duplicate */}
-          <GroupActionButton
-            size="small"
-            actionColor="info"
-            onClick={() => duplicate(filter.id)}
+          <SafeTooltip
+            title={t('argus.builder.duplicateRule', 'Duplicate Rule')}
+            placement="top"
           >
-            <CopyIcon sx={{ fontSize: 12 }} />
-          </GroupActionButton>
+            <GroupActionButton
+              size="small"
+              actionColor="info"
+              onClick={() => duplicate(filter.id)}
+            >
+              <CopyIcon sx={{ fontSize: 12 }} />
+            </GroupActionButton>
+          </SafeTooltip>
           {/* Delete */}
-          <GroupActionButton
-            size="small"
-            actionColor="error"
-            onClick={() => remove(filter.id)}
+          <SafeTooltip
+            title={t('argus.builder.deleteRule', 'Delete Rule')}
+            placement="top"
           >
-            <CloseIcon sx={{ fontSize: 12 }} />
-          </GroupActionButton>
+            <GroupActionButton
+              size="small"
+              actionColor="error"
+              onClick={() => remove(filter.id)}
+            >
+              <CloseIcon sx={{ fontSize: 12 }} />
+            </GroupActionButton>
+          </SafeTooltip>
         </Box>
       </Box>
     );
@@ -935,13 +980,18 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
         {/* Group header */}
         <GroupHeader>
           {/* NOT badge for group */}
-          <NotBadge
-            isNegated={group.negated}
-            isDark={isDark}
-            onClick={() => update(group.id, { negated: !group.negated })}
+          <SafeTooltip
+            title={t('argus.builder.toggleNot', 'Toggle NOT')}
+            placement="top"
           >
-            NOT
-          </NotBadge>
+            <NotBadge
+              isNegated={group.negated}
+              isDark={isDark}
+              onClick={() => update(group.id, { negated: !group.negated })}
+            >
+              NOT
+            </NotBadge>
+          </SafeTooltip>
 
           {/* AND/OR toggle chip */}
           <ConnectorChip
@@ -1001,7 +1051,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 <ListItemIcon sx={{ minWidth: 24 }}>
                   <CategoryBadge category="has" isDark={isDark} />
                 </ListItemIcon>
-                {f === '!has' ? 'not has' : f}
+                {f === '!has' ? 'has not' : f}
               </MenuItem>
             ))}
             <Divider sx={{ my: 0.3 }} />
@@ -1062,21 +1112,31 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
           {/* Duplicate / Delete group (non-root) */}
           {!isRoot && (
             <>
-              <GroupActionButton
-                size="small"
-                actionColor="info"
-                onClick={() => duplicate(group.id)}
-                sx={{ ml: 0.3 }}
+              <SafeTooltip
+                title={t('argus.builder.duplicateGroup', 'Duplicate Group')}
+                placement="top"
               >
-                <CopyIcon sx={{ fontSize: 12 }} />
-              </GroupActionButton>
-              <GroupActionButton
-                size="small"
-                actionColor="error"
-                onClick={() => remove(group.id)}
+                <GroupActionButton
+                  size="small"
+                  actionColor="info"
+                  onClick={() => duplicate(group.id)}
+                  sx={{ ml: 0.3 }}
+                >
+                  <CopyIcon sx={{ fontSize: 12 }} />
+                </GroupActionButton>
+              </SafeTooltip>
+              <SafeTooltip
+                title={t('argus.builder.deleteGroup', 'Delete Group')}
+                placement="top"
               >
-                <CloseIcon sx={{ fontSize: 12 }} />
-              </GroupActionButton>
+                <GroupActionButton
+                  size="small"
+                  actionColor="error"
+                  onClick={() => remove(group.id)}
+                >
+                  <CloseIcon sx={{ fontSize: 12 }} />
+                </GroupActionButton>
+              </SafeTooltip>
             </>
           )}
         </GroupHeader>
@@ -1238,7 +1298,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 onClick={undo}
                 disabled={!canUndo}
                 isDisabled={!canUndo}
-                title="Undo (Ctrl+Z)"
+                title={t('argus.builder.undo', 'Undo (Ctrl+Z)')}
               >
                 <UndoIcon sx={{ fontSize: 14 }} />
               </UndoRedoBtn>
@@ -1247,7 +1307,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 onClick={redo}
                 disabled={!canRedo}
                 isDisabled={!canRedo}
-                title="Redo (Ctrl+Y)"
+                title={t('argus.builder.redo', 'Redo (Ctrl+Y)')}
               >
                 <RedoIcon sx={{ fontSize: 14 }} />
               </UndoRedoBtn>
@@ -1255,7 +1315,11 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             <FullscreenButton
               size="small"
               onClick={() => setIsFullscreen((f) => !f)}
-              title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              title={
+                isFullscreen
+                  ? t('argus.builder.exitFullscreen', 'Exit Fullscreen')
+                  : t('argus.builder.fullscreen', 'Fullscreen')
+              }
             >
               {isFullscreen ? (
                 <FullscreenExitIcon sx={{ fontSize: 16 }} />
@@ -1263,9 +1327,14 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 <FullscreenIcon sx={{ fontSize: 16 }} />
               )}
             </FullscreenButton>
-            <IconButton size="small" onClick={onClose}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
+            <SafeTooltip
+              title={t('argus.builder.close', 'Close')}
+              placement="bottom"
+            >
+              <IconButton size="small" onClick={onClose}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </SafeTooltip>
           </HeaderRight>
         </HeaderBar>
 

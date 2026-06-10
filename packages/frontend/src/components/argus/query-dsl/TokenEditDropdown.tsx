@@ -816,7 +816,7 @@ function HasFieldSelector({
   );
 }
 
-// ─── Has Toggle Menu (has ↔ not has) ─────────────────────────────────────────
+// ─── Has Toggle Menu (has ↔ has not) ─────────────────────────────────────────
 
 function HasToggleMenu({
   currentField,
@@ -829,7 +829,7 @@ function HasToggleMenu({
 }) {
   const options = [
     { key: 'has', label: 'has' },
-    { key: '!has', label: 'not has' },
+    { key: '!has', label: 'has not' },
   ];
 
   return (

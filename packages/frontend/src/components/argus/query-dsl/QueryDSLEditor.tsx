@@ -185,6 +185,7 @@ export function QueryDSLEditor({
   const [logicalMenu, setLogicalMenu] = useState<{
     chipId: string;
     anchorEl: HTMLElement;
+    highlightIdx: number;
   } | null>(null);
   const tokenGroupRefs = useRef<Map<string, FilterTokenGroupHandle>>(new Map());
   const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() =>
@@ -194,6 +195,7 @@ export function QueryDSLEditor({
   // ─── Inline value editing state ──────────────────────────────────
   const [inlineValueText, setInlineValueText] = useState('');
   const [popoverHighlightIdx, setPopoverHighlightIdx] = useState(-1);
+  const [highlightedPillIdx, setHighlightedPillIdx] = useState(-1);
   const originalValueRef = useRef<{ value: string; values: string[] }>({
     value: '',
     values: [],
@@ -529,6 +531,7 @@ export function QueryDSLEditor({
     chipEditingRef.current = false;
     setInlineValueText('');
     setPopoverHighlightIdx(-1);
+    setHighlightedPillIdx(-1);
     skipDeleteOnCloseRef.current = true;
     suppressDropdownRef.current = true;
     requestAnimationFrame(() => inputRef.current?.focus());
@@ -596,6 +599,7 @@ export function QueryDSLEditor({
     (_chipId: string, text: string) => {
       setInlineValueText(text);
       setPopoverHighlightIdx(-1);
+      setHighlightedPillIdx(-1);
       inlineValueDirtyRef.current = true;
     },
     []
@@ -671,6 +675,7 @@ export function QueryDSLEditor({
         value: newVals[0] ?? '',
         values: newVals,
       });
+      setHighlightedPillIdx(-1);
       // Cancel any pending blur
       if (blurTimeoutRef.current) {
         clearTimeout(blurTimeoutRef.current);
@@ -684,11 +689,87 @@ export function QueryDSLEditor({
     [chips, updateChip]
   );
 
+  /** Navigate between pill tags via keyboard */
+  const handlePillNavigate = useCallback((chipId: string, newIdx: number) => {
+    if (newIdx === -1) {
+      // Return focus to input
+      setHighlightedPillIdx(-1);
+      requestAnimationFrame(() => {
+        tokenGroupRefs.current.get(chipId)?.focusValueInput();
+      });
+    } else {
+      setHighlightedPillIdx(newIdx);
+    }
+  }, []);
+
+  /** Delete a pill tag at specific index via keyboard */
+  const handlePillDelete = useCallback(
+    (chipId: string, pillIdx: number) => {
+      const chip = chips.find((c) => c.id === chipId);
+      const vals = chip?.values ?? [];
+      if (pillIdx < 0 || pillIdx >= vals.length) return;
+      const newVals = vals.filter((_, i) => i !== pillIdx);
+      updateChip(chipId, {
+        value: newVals[0] ?? '',
+        values: newVals,
+      });
+      // Adjust highlight: stay at same index or move back
+      if (newVals.length === 0) {
+        setHighlightedPillIdx(-1);
+      } else if (pillIdx >= newVals.length) {
+        setHighlightedPillIdx(newVals.length - 1);
+      } else {
+        setHighlightedPillIdx(pillIdx);
+      }
+      // Cancel any pending blur
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+        blurTimeoutRef.current = null;
+      }
+      // Keep input focused
+      requestAnimationFrame(() => {
+        tokenGroupRefs.current.get(chipId)?.focusValueInput();
+      });
+    },
+    [chips, updateChip]
+  );
+
   /** Handle inline input key events */
   const handleInlineValueKeyDown = useCallback(
     (chipId: string, e: React.KeyboardEvent) => {
       // IME composing → skip
       if (e.nativeEvent.isComposing) return;
+
+      // ── Pill tag keyboard navigation (when a pill is selected) ──
+      if (highlightedPillIdx >= 0) {
+        const editedChip = chips.find((c) => c.id === chipId);
+        const pillCount = editedChip?.values?.length ?? 0;
+
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          if (highlightedPillIdx > 0) {
+            setHighlightedPillIdx(highlightedPillIdx - 1);
+          }
+          return;
+        }
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          if (highlightedPillIdx < pillCount - 1) {
+            setHighlightedPillIdx(highlightedPillIdx + 1);
+          } else {
+            // Last pill → return to input
+            setHighlightedPillIdx(-1);
+          }
+          return;
+        }
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+          e.preventDefault();
+          handlePillDelete(chipId, highlightedPillIdx);
+          return;
+        }
+        // Any other key → deselect pill, fall through to normal key handling
+        setHighlightedPillIdx(-1);
+      }
 
       const editedChip = chips.find((c) => c.id === chipId);
       const editedField = getFieldByKey(editedChip?.field ?? '', config);
@@ -804,7 +885,9 @@ export function QueryDSLEditor({
       config,
       normalizedFacets,
       popoverHighlightIdx,
+      highlightedPillIdx,
       handleInlineCheckboxToggle,
+      handlePillDelete,
       commitInlineEdit,
       revertInlineEdit,
       updateChip,
@@ -1448,7 +1531,11 @@ export function QueryDSLEditor({
               `[data-chip-id="${token.chipId}"]`
             ) as HTMLElement;
             if (chipEl) {
-              setLogicalMenu({ chipId: token.chipId, anchorEl: chipEl });
+              setLogicalMenu({
+                chipId: token.chipId,
+                anchorEl: chipEl,
+                highlightIdx: logicalChip?.label === 'OR' ? 1 : 0,
+              });
             }
           }
         }
@@ -2042,6 +2129,7 @@ export function QueryDSLEditor({
                       setLogicalMenu({
                         chipId: chip.id,
                         anchorEl: e.currentTarget as HTMLElement,
+                        highlightIdx: chip.label === 'OR' ? 1 : 0,
                       });
                     }}
                   >
@@ -2125,6 +2213,11 @@ export function QueryDSLEditor({
                       : undefined
                   }
                   onValueTagRemove={handleValueTagRemove}
+                  highlightedPillIdx={
+                    editingToken?.chipId === chip.id ? highlightedPillIdx : -1
+                  }
+                  onPillNavigate={handlePillNavigate}
+                  onPillDelete={handlePillDelete}
                 />
               );
             })}
@@ -2275,6 +2368,8 @@ export function QueryDSLEditor({
           onClose={() => setLogicalMenu(null)}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+          disableAutoFocus={false}
+          disableEnforceFocus
           slotProps={{
             paper: {
               sx: {
@@ -2290,24 +2385,26 @@ export function QueryDSLEditor({
         >
           <List
             dense
-            sx={{ py: 0.5 }}
-            autoFocus
+            sx={{ py: 0.5, outline: 'none' }}
+            tabIndex={0}
+            ref={(el: HTMLUListElement | null) => {
+              // Auto-focus the list when Popover opens
+              if (el) requestAnimationFrame(() => el.focus());
+            }}
             onKeyDown={(e) => {
               const ops = ['AND', 'OR'] as const;
-              const chipForNav = logicalMenu
-                ? chips.find((c) => c.id === logicalMenu.chipId)
-                : null;
-              const curIdx = ops.indexOf(
-                (chipForNav?.label as 'AND' | 'OR') ?? 'AND'
-              );
               if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
                 e.preventDefault();
-                const nextIdx = curIdx === 0 ? 1 : 0;
                 if (logicalMenu) {
-                  updateChip(logicalMenu.chipId, { label: ops[nextIdx] });
+                  const nextIdx = logicalMenu.highlightIdx === 0 ? 1 : 0;
+                  setLogicalMenu({ ...logicalMenu, highlightIdx: nextIdx });
                 }
               } else if (e.key === 'Enter' || e.key === 'Tab') {
                 e.preventDefault();
+                if (logicalMenu) {
+                  const selected = ops[logicalMenu.highlightIdx];
+                  updateChip(logicalMenu.chipId, { label: selected });
+                }
                 setLogicalMenu(null);
               } else if (e.key === 'Escape') {
                 e.preventDefault();
@@ -2315,7 +2412,8 @@ export function QueryDSLEditor({
               }
             }}
           >
-            {['AND', 'OR'].map((op) => {
+            {['AND', 'OR'].map((op, idx) => {
+              const isHighlighted = logicalMenu?.highlightIdx === idx;
               const chipForMenu = logicalMenu
                 ? chips.find((c) => c.id === logicalMenu.chipId)
                 : null;
@@ -2329,7 +2427,7 @@ export function QueryDSLEditor({
                     }
                     setLogicalMenu(null);
                   }}
-                  selected={isCurrent}
+                  selected={isHighlighted}
                   sx={{
                     py: 0.5,
                     px: 1.5,
@@ -2344,7 +2442,7 @@ export function QueryDSLEditor({
                     primary={op}
                     primaryTypographyProps={{
                       fontSize: '0.8rem',
-                      fontWeight: isCurrent ? 600 : 400,
+                      fontWeight: isHighlighted ? 600 : 400,
                     }}
                   />
                   {isCurrent && (

@@ -325,10 +325,10 @@ export const QuerySuggestionDropdown = forwardRef<
       }));
     }
     if (activeTab === 'all') {
-      // Show has/not has in All tab, but exclude AND/OR/parens
+      // Show has/has not in All tab, but exclude AND/OR/parens
       return suggestions.filter((s) => {
         if (s.fieldCategory !== 'logic') return true;
-        // Keep has/not has (they have insertText starting with 'has:' or '!has:')
+        // Keep has/has not (they have insertText starting with 'has:' or '!has:')
         const insert = (s.insertText ?? '').toLowerCase();
         return insert.startsWith('has:') || insert.startsWith('!has:');
       });
@@ -1016,11 +1016,11 @@ function renderSuggestionLabel(
     return <span>{getOpLabel(item.label, item.fieldType ?? 'string')}</span>;
   }
 
-  // has / not has operators: show with operator styling
+  // has / has not operators: show with operator styling
   if (
     item.label === 'has' ||
     item.label === '!has' ||
-    item.label === 'not has'
+    item.label === 'has not'
   ) {
     return (
       <span
