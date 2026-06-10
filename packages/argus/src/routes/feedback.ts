@@ -360,6 +360,81 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     }
   );
 
+  // ─── Get single feedback detail by ID (lazy loading) ───
+  app.get(
+    '/feedback/:projectId/detail/:feedbackId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, feedbackId } = request.params as {
+        projectId: string;
+        feedbackId: string;
+      };
+
+
+      try {
+        const result = await optic.rawQuery({
+          query: `SELECT
+            feedback_id, event_id, email, name, message, contact_email,
+            timestamp AS submitted_at, url,
+            status, assigned_to, is_spam, attachments,
+            environment, release, source, tags,
+            browser, browser_version, os, os_version, device,
+            user_id, locale, is_read, category, sentiment
+          FROM argus.user_feedback
+          WHERE project_id = {projectId:String} AND feedback_id = {feedbackId:String}
+          LIMIT 1`,
+          params: { projectId: String(projectId), feedbackId },
+        });
+
+        const rows = result.data as any[];
+        if (rows.length === 0) {
+          return reply.code(404).send({ error: 'Feedback not found' });
+        }
+
+        const item = rows[0];
+
+        // Enrich with issue info
+        let issueInfo: { id: number; title: string; status: string } | null = null;
+        try {
+          await ensureIssueLinkTable();
+          const linkRow = await db('g_argus_feedback_issue_links')
+            .select('issue_id')
+            .where({ project_id: projectId, feedback_id: feedbackId })
+            .first();
+
+          const issueId = linkRow?.issue_id;
+          if (issueId) {
+            const issueRow = await db('g_argus_issues')
+              .select('id', 'title', 'status')
+              .where('id', issueId)
+              .first();
+            if (issueRow) {
+              issueInfo = { id: issueRow.id, title: issueRow.title, status: issueRow.status };
+            }
+          }
+        } catch {
+          /* ignore enrichment errors */
+        }
+
+        return reply.send({
+          data: {
+            ...item,
+            issue_id: issueInfo?.id || null,
+            issue_title: issueInfo?.title || null,
+            issue_status: issueInfo?.status || null,
+            attachments: item.attachments || [],
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to get feedback detail', {
+          projectId,
+          feedbackId,
+          error: String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get feedback detail' });
+      }
+    }
+  );
+
   // Get feedbacks linked to a specific issue
   app.get(
     '/feedback/:projectId/by-issue/:issueId',

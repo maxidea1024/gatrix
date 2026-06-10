@@ -131,8 +131,8 @@ const FeedbackStatsBar: React.FC<FeedbackStatsBarProps> = ({
         emptyMessage={t('argus.feedback.noFeedback', 'No feedback data')}
         onZoom={onZoom}
         storagePrefix="argus_feedback_volume"
-        showChartTypeToggle={false}
-        showCompactToggle={false}
+        showChartTypeToggle
+        showCompactToggle
         mb={1.5}
       />
     </Collapse>

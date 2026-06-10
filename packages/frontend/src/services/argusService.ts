@@ -799,6 +799,22 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
+  async getFeedbackDetail(
+    projectId: number | string,
+    feedbackId: string,
+    signal?: AbortSignal
+  ): Promise<ArgusFeedbackItem | null> {
+    try {
+      const response = await argusApi.get(
+        `${ARGUS_BASE}/feedback/${projectId}/detail/${feedbackId}`,
+        { signal }
+      );
+      return response.data?.data || response.data || null;
+    } catch {
+      return null;
+    }
+  }
+
   async getFeedbackFilterOptions(
     projectId: number | string,
     period?: string

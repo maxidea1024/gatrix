@@ -543,8 +543,6 @@ export default async function logsRoutes(app: FastifyInstance) {
         logId: string;
       };
 
-      // FIXME: UI 로딩 테스트를 위해 임의로 넣어둔 2초 딜레이입니다. 반드시 제거하세요.
-      await new Promise((r) => setTimeout(r, 2000));
 
       try {
         const sql = `

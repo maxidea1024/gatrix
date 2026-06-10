@@ -136,8 +136,8 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
       emptyMessage={t('argus.issues.noVolumeData', 'No event data')}
       onZoom={onDateRangeSelect ? handleZoom : undefined}
       storagePrefix="argus_issue_volume"
-      showChartTypeToggle={false}
-      showCompactToggle={false}
+      showChartTypeToggle
+      showCompactToggle
       skeletonColor={theme.palette.error.main}
       mb={1.5}
     />

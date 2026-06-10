@@ -42,6 +42,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 
 import argusService, {
   ArgusFeedbackResponse,
+  ArgusFeedbackItem,
   ArgusIssue,
 } from '@/services/argusService';
 import { rbacService } from '@/services/rbacService';
@@ -150,8 +151,46 @@ const ArgusFeedbackPage: React.FC = () => {
   const total = data?.total || 0;
   const summary = data?.summary;
   const selectedFbId = urlState.fb;
-  const selectedItem =
-    items.find((i) => i.feedback_id === selectedFbId) || null;
+
+  // ─── Lazy-loaded detail ───
+  const [selectedItem, setSelectedItem] = useState<ArgusFeedbackItem | null>(null);
+  const [selectedItemLoading, setSelectedItemLoading] = useState(false);
+  const expectedFbIdRef = useRef<string | null>(null);
+
+  // ─── Lazy-load feedback detail on selection change ───
+  useEffect(() => {
+    const fbId = selectedFbId || null;
+    expectedFbIdRef.current = fbId;
+
+    if (!fbId) {
+      setSelectedItem(null);
+      setSelectedItemLoading(false);
+      return;
+    }
+
+    setSelectedItem(null);
+    setSelectedItemLoading(true);
+
+    const abortController = new AbortController();
+
+    argusService
+      .getFeedbackDetail(projectId, fbId, abortController.signal)
+      .then((detail) => {
+        if (expectedFbIdRef.current === fbId) {
+          setSelectedItem(detail);
+          setSelectedItemLoading(false);
+        }
+      })
+      .catch(() => {
+        if (expectedFbIdRef.current === fbId) {
+          setSelectedItemLoading(false);
+        }
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [selectedFbId, projectId]);
 
   const page = parseInt(urlState.page, 10) || 1;
   const [rowsPerPage, setRowsPerPage] = useState(() => {
@@ -429,7 +468,16 @@ const ArgusFeedbackPage: React.FC = () => {
   const handleRefresh = useCallback(() => {
     fetchData();
     fetchFacets();
-  }, [fetchData, fetchFacets]);
+    // Also refetch detail if one is currently selected
+    const fbId = expectedFbIdRef.current;
+    if (fbId) {
+      argusService.getFeedbackDetail(projectId, fbId).then((detail) => {
+        if (expectedFbIdRef.current === fbId) {
+          setSelectedItem(detail);
+        }
+      });
+    }
+  }, [fetchData, fetchFacets, projectId]);
 
   useEffect(() => {
     fetchData();
@@ -1043,21 +1091,28 @@ const ArgusFeedbackPage: React.FC = () => {
         />
 
         {/* ─── RIGHT: Detail Panel ─── */}
-        {selectedItem ? (
-          <FeedbackDetailPanel
-            selectedItem={selectedItem}
-            isDark={isDark}
-            projectId={projectId}
-            members={members}
-            linkedIssueDetail={linkedIssueDetail}
-            onUpdateStatus={handleUpdateStatus}
-            onMarkSpam={handleMarkSpam}
-            onAssignFeedback={handleAssignFeedback}
-            onUnlinkIssue={handleUnlinkIssue}
-            onOpenCreateIssue={handleOpenCreateIssue}
-            onOpenLinkIssue={handleOpenLinkIssue}
-            onAddFilter={handleAddFilter}
-          />
+        {selectedFbId || selectedItemLoading ? (
+          <PageContentLoader
+            loading={selectedItemLoading}
+            sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+          >
+            {selectedItem && (
+              <FeedbackDetailPanel
+                selectedItem={selectedItem}
+                isDark={isDark}
+                projectId={projectId}
+                members={members}
+                linkedIssueDetail={linkedIssueDetail}
+                onUpdateStatus={handleUpdateStatus}
+                onMarkSpam={handleMarkSpam}
+                onAssignFeedback={handleAssignFeedback}
+                onUnlinkIssue={handleUnlinkIssue}
+                onOpenCreateIssue={handleOpenCreateIssue}
+                onOpenLinkIssue={handleOpenLinkIssue}
+                onAddFilter={handleAddFilter}
+              />
+            )}
+          </PageContentLoader>
         ) : (
           items.length > 0 &&
           !loading && (

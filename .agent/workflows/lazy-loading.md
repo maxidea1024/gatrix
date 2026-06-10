@@ -1,3 +1,7 @@
+---
+description: Lazy loading patterns and implementation guide
+---
+
 # Lazy Loading 원칙
 
 이 프로젝트는 **Lazy Loading을 기본 원칙**으로 합니다.
