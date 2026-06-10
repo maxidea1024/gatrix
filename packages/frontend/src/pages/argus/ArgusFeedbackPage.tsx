@@ -153,7 +153,9 @@ const ArgusFeedbackPage: React.FC = () => {
   const selectedFbId = urlState.fb;
 
   // ─── Lazy-loaded detail ───
-  const [selectedItem, setSelectedItem] = useState<ArgusFeedbackItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ArgusFeedbackItem | null>(
+    null
+  );
   const [selectedItemLoading, setSelectedItemLoading] = useState(false);
   const expectedFbIdRef = useRef<string | null>(null);
 

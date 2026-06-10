@@ -543,7 +543,6 @@ export default async function logsRoutes(app: FastifyInstance) {
         logId: string;
       };
 
-
       try {
         const sql = `
           SELECT log_id, trace_id, span_id, issue_id, timestamp, level, logger_name,

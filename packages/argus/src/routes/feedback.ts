@@ -369,7 +369,6 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         feedbackId: string;
       };
 
-
       try {
         const result = await optic.rawQuery({
           query: `SELECT
@@ -393,7 +392,8 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         const item = rows[0];
 
         // Enrich with issue info
-        let issueInfo: { id: number; title: string; status: string } | null = null;
+        let issueInfo: { id: number; title: string; status: string } | null =
+          null;
         try {
           await ensureIssueLinkTable();
           const linkRow = await db('g_argus_feedback_issue_links')
@@ -408,7 +408,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
               .where('id', issueId)
               .first();
             if (issueRow) {
-              issueInfo = { id: issueRow.id, title: issueRow.title, status: issueRow.status };
+              issueInfo = {
+                id: issueRow.id,
+                title: issueRow.title,
+                status: issueRow.status,
+              };
             }
           }
         } catch {
