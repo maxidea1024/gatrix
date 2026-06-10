@@ -408,7 +408,12 @@ export const ArgusSearchInput: React.FC<{
           }}
         >
           <SearchIcon
-            sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }}
+            sx={{
+              fontSize: 16,
+              color: 'text.disabled',
+              flexShrink: 0,
+              ml: 0.5,
+            }}
           />
 
           {/* Rendered chips */}
@@ -544,7 +549,16 @@ export const ArgusSearchInput: React.FC<{
             label: f,
             type: 'string' as const,
             searchable: true,
-            operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith'] as any,
+            operators: [
+              '=',
+              '!=',
+              'contains',
+              '!contains',
+              'startsWith',
+              '!startsWith',
+              'endsWith',
+              '!endsWith',
+            ] as any,
             category: 'log' as const,
             description: f,
           })),

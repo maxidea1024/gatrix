@@ -2115,9 +2115,7 @@ export function QueryDSLEditor({
                 }}
                 sx={{
                   p: 0.3,
-                  color: builderOpen
-                    ? 'primary.main'
-                    : 'text.disabled',
+                  color: builderOpen ? 'primary.main' : 'text.disabled',
                   transition: 'color 0.15s',
                 }}
               >

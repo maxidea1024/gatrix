@@ -36,16 +36,16 @@ interface ColoredSpan {
 
 function getDslColors(isDark: boolean) {
   return {
-    field: isDark ? '#ce93d8' : '#7b1fa2',     // purple
-    operator: isDark ? '#ffb74d' : '#ed6c02',   // orange (AND, OR, NOT)
-    funcOp: isDark ? '#64b5f6' : '#1565c0',     // blue (contains, starts_with)
-    string: isDark ? '#a5d6a7' : '#2e7d32',     // green
-    number: isDark ? '#90caf9' : '#1976d2',      // blue
-    colon: isDark ? '#e0e0e0' : '#616161',       // neutral
-    negation: isDark ? '#ef9a9a' : '#c62828',    // red (!)
-    paren: isDark ? '#b0bec5' : '#546e7a',       // grey
-    has: isDark ? '#80cbc4' : '#00695c',         // teal (has, !has)
-    text: isDark ? '#e0e0e0' : '#424242',        // default
+    field: isDark ? '#ce93d8' : '#7b1fa2', // purple
+    operator: isDark ? '#ffb74d' : '#ed6c02', // orange (AND, OR, NOT)
+    funcOp: isDark ? '#64b5f6' : '#1565c0', // blue (contains, starts_with)
+    string: isDark ? '#a5d6a7' : '#2e7d32', // green
+    number: isDark ? '#90caf9' : '#1976d2', // blue
+    colon: isDark ? '#e0e0e0' : '#616161', // neutral
+    negation: isDark ? '#ef9a9a' : '#c62828', // red (!)
+    paren: isDark ? '#b0bec5' : '#546e7a', // grey
+    has: isDark ? '#80cbc4' : '#00695c', // teal (has, !has)
+    text: isDark ? '#e0e0e0' : '#424242', // default
   };
 }
 
@@ -260,9 +260,7 @@ export const QueryHighlighter: React.FC<QueryHighlighterProps> = ({
       {showCopy && (
         <SafeTooltip
           title={
-            copied
-              ? t('common.copied', 'Copied!')
-              : t('common.copy', 'Copy')
+            copied ? t('common.copied', 'Copied!') : t('common.copy', 'Copy')
           }
         >
           <CopyButton

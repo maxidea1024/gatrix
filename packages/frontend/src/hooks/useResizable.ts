@@ -83,8 +83,7 @@ export function useResizable(options: UseResizableOptions): UseResizableReturn {
       e.preventDefault();
       e.stopPropagation();
       setIsResizing(true);
-      startPosRef.current =
-        direction === 'horizontal' ? e.clientX : e.clientY;
+      startPosRef.current = direction === 'horizontal' ? e.clientX : e.clientY;
       startSizeRef.current = size;
     },
     [direction, size]
@@ -94,8 +93,7 @@ export function useResizable(options: UseResizableOptions): UseResizableReturn {
     if (!isResizing) return;
 
     const onMouseMove = (e: MouseEvent) => {
-      const currentPos =
-        direction === 'horizontal' ? e.clientX : e.clientY;
+      const currentPos = direction === 'horizontal' ? e.clientX : e.clientY;
       const delta = currentPos - startPosRef.current;
       const newSize = clamp(startSizeRef.current + delta);
       setSizeState(newSize);

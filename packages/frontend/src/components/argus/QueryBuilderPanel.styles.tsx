@@ -88,7 +88,9 @@ export const UndoRedoGroup = styled(ButtonGroup)(({ theme }) => ({
     minWidth: 28,
     padding: '2px 4px',
     border: `1px solid ${theme.palette.divider}`,
-    '&:not(:last-of-type)': { borderRight: `1px solid ${theme.palette.divider}` },
+    '&:not(:last-of-type)': {
+      borderRight: `1px solid ${theme.palette.divider}`,
+    },
   },
 }));
 
@@ -111,7 +113,8 @@ export const FullscreenButton = styled(IconButton)({
 // ═════════════════════════════════════════════════════════════════════════════
 
 export const GroupBox = styled(Box, {
-  shouldForwardProp: (p) => !['isDark', 'isRoot', 'lineColor'].includes(p as string),
+  shouldForwardProp: (p) =>
+    !['isDark', 'isRoot', 'lineColor'].includes(p as string),
 })<{ isDark: boolean; isRoot: boolean; lineColor: string }>(
   ({ isDark, isRoot, lineColor }) => ({
     marginTop: 0,
@@ -120,13 +123,15 @@ export const GroupBox = styled(Box, {
       : {
           border: `1px solid ${isDark ? alpha(lineColor, 0.25) : alpha(lineColor, 0.2)}`,
           borderRadius: 8,
-          backgroundColor: isDark ? alpha(lineColor, 0.04) : alpha(lineColor, 0.03),
+          backgroundColor: isDark
+            ? alpha(lineColor, 0.04)
+            : alpha(lineColor, 0.03),
           paddingLeft: 8,
           paddingRight: 8,
           paddingTop: 5,
           paddingBottom: 3,
         }),
-  }),
+  })
 );
 
 export const GroupHeader = styled(Box)({
@@ -150,8 +155,12 @@ export const NotBadge = styled(Box, {
   textAlign: 'center' as const,
   cursor: 'pointer',
   userSelect: 'none' as const,
-  color: isNegated ? theme.palette.error.main : alpha(theme.palette.text.disabled, 0.3),
-  backgroundColor: isNegated ? alpha(theme.palette.error.main, 0.1) : 'transparent',
+  color: isNegated
+    ? theme.palette.error.main
+    : alpha(theme.palette.text.disabled, 0.3),
+  backgroundColor: isNegated
+    ? alpha(theme.palette.error.main, 0.1)
+    : 'transparent',
   border: `1px solid ${isNegated ? alpha(theme.palette.error.main, 0.4) : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}`,
   transition: 'all 0.12s',
   '&:hover': { color: theme.palette.error.main },
@@ -159,22 +168,24 @@ export const NotBadge = styled(Box, {
 
 export const ConnectorChip = styled(Box, {
   shouldForwardProp: (p) => !['isOr', 'primaryColor'].includes(p as string),
-})<{ isOr: boolean; primaryColor: string }>(({ theme, isOr, primaryColor }) => ({
-  fontSize: '0.6rem',
-  fontWeight: 800,
-  letterSpacing: '0.04em',
-  paddingLeft: 8,
-  paddingRight: 8,
-  paddingTop: 2,
-  paddingBottom: 2,
-  borderRadius: 4,
-  cursor: 'pointer',
-  userSelect: 'none' as const,
-  color: '#fff',
-  backgroundColor: isOr ? theme.palette.warning.main : primaryColor,
-  transition: 'all 0.12s',
-  '&:hover': { transform: 'scale(1.04)', filter: 'brightness(1.1)' },
-}));
+})<{ isOr: boolean; primaryColor: string }>(
+  ({ theme, isOr, primaryColor }) => ({
+    fontSize: '0.6rem',
+    fontWeight: 800,
+    letterSpacing: '0.04em',
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop: 2,
+    paddingBottom: 2,
+    borderRadius: 4,
+    cursor: 'pointer',
+    userSelect: 'none' as const,
+    color: '#fff',
+    backgroundColor: isOr ? theme.palette.warning.main : primaryColor,
+    transition: 'all 0.12s',
+    '&:hover': { transform: 'scale(1.04)', filter: 'brightness(1.1)' },
+  })
+);
 
 export const AddRuleButton = styled(Button)(({ theme }) => ({
   textTransform: 'none',
@@ -224,7 +235,10 @@ export const GroupActionButton = styled(IconButton, {
   opacity: 0.2,
   '&:hover': {
     opacity: 1,
-    color: actionColor === 'info' ? theme.palette.info.main : theme.palette.error.main,
+    color:
+      actionColor === 'info'
+        ? theme.palette.info.main
+        : theme.palette.error.main,
   },
 }));
 
@@ -243,7 +257,8 @@ export const ChildrenContainer = styled(Box, {
 // ═════════════════════════════════════════════════════════════════════════════
 
 export const FilterRow = styled(Box, {
-  shouldForwardProp: (p) => !['isDragging', 'lineColor', 'isDark'].includes(p as string),
+  shouldForwardProp: (p) =>
+    !['isDragging', 'lineColor', 'isDark'].includes(p as string),
 })<{ isDragging: boolean; lineColor: string; isDark: boolean }>(
   ({ isDragging, lineColor, isDark }) => ({
     display: 'flex',
@@ -262,7 +277,7 @@ export const FilterRow = styled(Box, {
       borderColor: alpha(lineColor, 0.4),
       boxShadow: `0 0 0 1px ${alpha(lineColor, 0.1)}`,
     },
-  }),
+  })
 );
 
 export const DragHandle = styled(Box)({
@@ -292,24 +307,26 @@ export const PreviewHeader = styled(Box)({
 
 export const PreviewModeToggle = styled(Box, {
   shouldForwardProp: (p) => !['isActive', 'primaryColor'].includes(p as string),
-})<{ isActive: boolean; primaryColor: string }>(({ isActive, primaryColor }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 2,
-  paddingLeft: 6,
-  paddingRight: 6,
-  paddingTop: 1,
-  paddingBottom: 1,
-  fontSize: '0.5rem',
-  fontWeight: 600,
-  borderRadius: 10,
-  cursor: 'pointer',
-  userSelect: 'none' as const,
-  color: isActive ? primaryColor : undefined,
-  backgroundColor: isActive ? alpha(primaryColor, 0.1) : 'transparent',
-  transition: 'all 0.15s',
-  '&:hover': { backgroundColor: alpha(primaryColor, 0.06) },
-}));
+})<{ isActive: boolean; primaryColor: string }>(
+  ({ isActive, primaryColor }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
+    paddingLeft: 6,
+    paddingRight: 6,
+    paddingTop: 1,
+    paddingBottom: 1,
+    fontSize: '0.5rem',
+    fontWeight: 600,
+    borderRadius: 10,
+    cursor: 'pointer',
+    userSelect: 'none' as const,
+    color: isActive ? primaryColor : undefined,
+    backgroundColor: isActive ? alpha(primaryColor, 0.1) : 'transparent',
+    transition: 'all 0.15s',
+    '&:hover': { backgroundColor: alpha(primaryColor, 0.06) },
+  })
+);
 
 export const PreviewContainer = styled(Box)({
   flex: 1,
@@ -362,9 +379,11 @@ export const EmptyGroupHint = styled(Box)({
 
 export const DropZone = styled(Box, {
   shouldForwardProp: (p) => !['isActive', 'primaryColor'].includes(p as string),
-})<{ isActive: boolean; primaryColor: string }>(({ isActive, primaryColor }) => ({
-  height: 8,
-  borderRadius: 4,
-  border: isActive ? `2px dashed ${primaryColor}` : '2px dashed transparent',
-  transition: 'border-color 0.1s',
-}));
+})<{ isActive: boolean; primaryColor: string }>(
+  ({ isActive, primaryColor }) => ({
+    height: 8,
+    borderRadius: 4,
+    border: isActive ? `2px dashed ${primaryColor}` : '2px dashed transparent',
+    transition: 'border-color 0.1s',
+  })
+);
