@@ -20,6 +20,7 @@ import {
   Close as CloseIcon,
   Timeline as TraceIcon,
   FilterList as FilterIcon,
+  Tune as TuneIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
   Save as SaveIcon,
@@ -31,7 +32,7 @@ import ArgusFilterBar, {
   defaultArgusFilterState,
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
-import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
+import QueryBuilderPanel from '@/components/argus/QueryBuilderPanel';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
@@ -179,9 +180,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   }, [urlState.queryId, savedQueries, currentQueryId]);
 
   // Search UI
-  const [builderAnchorEl, setBuilderAnchorEl] = useState<HTMLElement | null>(
-    null
-  );
+  const [builderOpen, setBuilderOpen] = useState(false);
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
@@ -606,40 +605,61 @@ const ArgusTraceExplorerPage: React.FC = () => {
                     setSearch('');
                     setUrlState({ q: '' });
                   }}
-                  sx={{ p: 0.2, mr: 0.5 }}
+                  sx={{ p: 0.2, flexShrink: 0 }}
                 >
                   <CloseIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               )}
-            </Box>
 
-            <Tooltip title={t('argus.builder.open', 'Open Query Builder')}>
-              <IconButton
-                size="small"
-                onClick={(e) => setBuilderAnchorEl(e.currentTarget)}
+              {/* Builder toggle — inside the search bar */}
+              <Box
                 sx={{
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                  borderRadius: '6px',
-                  height: 30,
-                  width: 30,
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.05)'
-                    : 'rgba(0,0,0,0.02)',
+                  borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  ml: 0.5,
+                  pl: 0.5,
+                  height: 18,
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
-                <FilterIcon sx={{ fontSize: 15 }} />
-              </IconButton>
-            </Tooltip>
+                <Tooltip title={t('argus.builder.open', 'Open Query Builder')}>
+                  <IconButton
+                    size="small"
+                    onClick={() => setBuilderOpen((prev) => !prev)}
+                    sx={{
+                      p: 0.3,
+                      color: builderOpen
+                        ? theme.palette.primary.main
+                        : 'text.disabled',
+                      transition: 'color 0.15s',
+                    }}
+                  >
+                    <TuneIcon sx={{ fontSize: 15 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
 
-            <ArgusQueryBuilder
-              fields={['op', 'status', 'domain', 'action']}
+            <QueryBuilderPanel
+              open={builderOpen}
+              onClose={() => setBuilderOpen(false)}
+              config={{
+                name: 'trace',
+                fields: ['op', 'status', 'domain', 'action'].map((f) => ({
+                  key: f,
+                  label: f,
+                  type: 'string' as const,
+                  searchable: true,
+                  operators: ['=', '!=', 'contains', '!contains'] as any,
+                  category: 'trace' as const,
+                  description: f,
+                })),
+              }}
               query={search}
               onApply={(q) => {
                 setSearch(q);
                 setUrlState({ q });
               }}
-              anchorEl={builderAnchorEl}
-              onClose={() => setBuilderAnchorEl(null)}
             />
 
             {/* Search Autocomplete */}

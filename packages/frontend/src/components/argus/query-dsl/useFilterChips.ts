@@ -227,8 +227,9 @@ export function chipToQueryPart(chip: FilterChip): string {
     return `${field}:${operator}("${escapeQuotes(value)}")`;
   }
 
-  // Multi-value operators: field:=(v1, v2), field:!=(v1, v2), field:contains(v1, v2)
-  if (chip.values && chip.values.length > 0) {
+  // Multi-value (in / not in): field:["v1", "v2"], field:!=["v1", "v2"]
+  // Only use array form when there are 2+ values; single value falls through below
+  if (chip.values && chip.values.length > 1) {
     const vals = chip.values;
     const quotedVals = vals.map((v) => `"${escapeQuotes(v)}"`).join(', ');
 

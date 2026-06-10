@@ -14,13 +14,12 @@ import {
   alpha,
   Tooltip,
   IconButton,
-  Popover,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
-import ArgusQueryBuilder from '@/components/argus/ArgusQueryBuilder';
-import { FilterList as FilterIcon } from '@mui/icons-material';
+import QueryBuilderPanel from '@/components/argus/QueryBuilderPanel';
+import { Tune as TuneIcon } from '@mui/icons-material';
 
 import SearchAutocompletePopover, {
   SearchAutocompletePopoverHandle,
@@ -55,9 +54,7 @@ export const ArgusSearchInput: React.FC<{
   const [searchFocused, setSearchFocused] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const autocompleteRef = useRef<SearchAutocompletePopoverHandle>(null);
-  const [builderAnchorEl, setBuilderAnchorEl] = useState<HTMLElement | null>(
-    null
-  );
+  const [builderOpen, setBuilderOpen] = useState(false);
 
   // Recent searches (persisted in localStorage)
   const RECENT_KEY = 'argus_recent_log_searches';
@@ -375,26 +372,17 @@ export const ArgusSearchInput: React.FC<{
   };
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+      {/* Search bar container — visual border wraps everything */}
       <Box
         ref={searchContainerRef}
-        onClick={() => inputRef.current?.focus()}
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 0.5,
-          flex: 1,
-          flexWrap: 'nowrap',
-          px: 1,
-          py: 0.3,
           borderRadius: '6px',
-          minWidth: 0,
           minHeight: 26,
-          overflowX: 'auto',
-          overflowY: 'hidden',
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
           transition: 'border-color 0.2s',
-          cursor: 'text',
           backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
           '&:focus-within': {
             borderColor: theme.palette.primary.main,
@@ -402,133 +390,171 @@ export const ArgusSearchInput: React.FC<{
           },
         }}
       >
-        <SearchIcon
-          sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }}
-        />
-
-        {/* Rendered chips */}
-        {chips.map((chip, i) => {
-          const cc = chipColor(chip);
-          if (chip.type === 'operator') {
-            return (
-              <Typography
-                key={i}
-                sx={{
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  px: 0.5,
-                  color: cc.color,
-                  userSelect: 'none',
-                }}
-              >
-                {chip.raw}
-              </Typography>
-            );
-          }
-          return (
-            <Chip
-              key={i}
-              size="small"
-              label={
-                chip.type === 'has'
-                  ? `has:${chip.value}`
-                  : `${chip.key}:${chip.value}`
-              }
-              onDelete={() => removeChip(i)}
-              sx={{
-                height: 22,
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                backgroundColor: cc.bg,
-                color: cc.color,
-                border: `1px solid ${cc.border}`,
-                '& .MuiChip-deleteIcon': {
-                  fontSize: 14,
-                  color: cc.color,
-                  opacity: 0.6,
-                  '&:hover': { opacity: 1 },
-                },
-              }}
-            />
-          );
-        })}
-
-        {/* Editable input for remainder */}
+        {/* Scrollable chips + input area */}
         <Box
-          component="input"
-          ref={inputRef}
-          value={remainder}
-          spellCheck={false}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            updateRemainder(e.target.value)
-          }
-          onKeyDown={handleSearchKey as any}
-          onFocus={() => setSearchFocused(true)}
-          placeholder={
-            chips.length === 0
-              ? t(
-                  'argus.discover.searchPlaceholder',
-                  'Search for events, users, tags (e.g. level:error OR browser:Chrome)'
-                )
-              : ''
-          }
-          style={{
-            flex: 1,
-            border: 'none',
-            outline: 'none',
-            backgroundColor: 'transparent',
-            color: 'inherit',
-            fontFamily: 'inherit',
-            fontSize: '0.85rem',
-            fontWeight: 500,
-            minWidth: 120,
-            padding: '6px 4px',
-          }}
-        />
-        {localSearch && (
-          <IconButton
-            size="small"
-            onClick={() => {
-              setLocalSearch('');
-              onSubmit('');
-              setSearchFocused(false);
-            }}
-            sx={{ p: 0.2, mr: 0.5, flexShrink: 0 }}
-          >
-            <CloseIcon sx={{ fontSize: 14 }} />
-          </IconButton>
-        )}
-      </Box>
-
-      <SafeTooltip title={t('argus.builder.open', 'Open Query Builder')}>
-        <IconButton
-          size="small"
-          onClick={(e) => setBuilderAnchorEl(e.currentTarget)}
+          onClick={() => inputRef.current?.focus()}
           sx={{
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-            borderRadius: '6px',
-            height: 30,
-            width: 30,
-            backgroundColor: isDark
-              ? 'rgba(255,255,255,0.05)'
-              : 'rgba(0,0,0,0.02)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            flex: 1,
+            flexWrap: 'nowrap',
+            px: 1,
+            py: 0.3,
+            minWidth: 0,
+            overflowX: 'auto',
+            overflowY: 'hidden',
+            cursor: 'text',
           }}
         >
-          <FilterIcon sx={{ fontSize: 15 }} />
-        </IconButton>
-      </SafeTooltip>
+          <SearchIcon
+            sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0, ml: 0.5 }}
+          />
 
-      <ArgusQueryBuilder
-        fields={fields}
+          {/* Rendered chips */}
+          {chips.map((chip, i) => {
+            const cc = chipColor(chip);
+            if (chip.type === 'operator') {
+              return (
+                <Typography
+                  key={i}
+                  sx={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    px: 0.5,
+                    color: cc.color,
+                    userSelect: 'none',
+                  }}
+                >
+                  {chip.raw}
+                </Typography>
+              );
+            }
+            return (
+              <Chip
+                key={i}
+                size="small"
+                label={
+                  chip.type === 'has'
+                    ? `has:${chip.value}`
+                    : `${chip.key}:${chip.value}`
+                }
+                onDelete={() => removeChip(i)}
+                sx={{
+                  height: 22,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  backgroundColor: cc.bg,
+                  color: cc.color,
+                  border: `1px solid ${cc.border}`,
+                  '& .MuiChip-deleteIcon': {
+                    fontSize: 14,
+                    color: cc.color,
+                    opacity: 0.6,
+                    '&:hover': { opacity: 1 },
+                  },
+                }}
+              />
+            );
+          })}
+
+          {/* Editable input for remainder */}
+          <Box
+            component="input"
+            ref={inputRef}
+            value={remainder}
+            spellCheck={false}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              updateRemainder(e.target.value)
+            }
+            onKeyDown={handleSearchKey as any}
+            onFocus={() => setSearchFocused(true)}
+            placeholder={
+              chips.length === 0
+                ? t(
+                    'argus.discover.searchPlaceholder',
+                    'Search for events, users, tags (e.g. level:error OR browser:Chrome)'
+                  )
+                : ''
+            }
+            style={{
+              flex: 1,
+              border: 'none',
+              outline: 'none',
+              backgroundColor: 'transparent',
+              color: 'inherit',
+              fontFamily: 'inherit',
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              minWidth: 120,
+              padding: '6px 4px',
+            }}
+          />
+          {localSearch && (
+            <IconButton
+              size="small"
+              onClick={() => {
+                setLocalSearch('');
+                onSubmit('');
+                setSearchFocused(false);
+              }}
+              sx={{ p: 0.2, flexShrink: 0 }}
+            >
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          )}
+        </Box>
+
+        {/* Builder toggle — pinned right, always visible */}
+        <Box
+          sx={{
+            borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+            px: 0.5,
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <SafeTooltip title={t('argus.builder.open', 'Open Query Builder')}>
+            <IconButton
+              size="small"
+              onClick={() => setBuilderOpen((prev) => !prev)}
+              sx={{
+                p: 0.3,
+                color: builderOpen
+                  ? theme.palette.primary.main
+                  : 'text.disabled',
+                transition: 'color 0.15s',
+              }}
+            >
+              <TuneIcon sx={{ fontSize: 15 }} />
+            </IconButton>
+          </SafeTooltip>
+        </Box>
+      </Box>
+
+      {/* Query Builder Panel (Dialog) */}
+      <QueryBuilderPanel
+        open={builderOpen}
+        onClose={() => setBuilderOpen(false)}
+        config={{
+          name: 'search',
+          fields: fields.map((f) => ({
+            key: f,
+            label: f,
+            type: 'string' as const,
+            searchable: true,
+            operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith', 'endsWith', '!endsWith'] as any,
+            category: 'log' as const,
+            description: f,
+          })),
+        }}
         query={localSearch}
         facets={mappedFacets}
-        activeFilters={activeFilters}
         onApply={(q) => {
           setLocalSearch(q);
           onSubmit(q);
         }}
-        anchorEl={builderAnchorEl}
-        onClose={() => setBuilderAnchorEl(null)}
       />
 
       {/* Search Autocomplete Popover */}

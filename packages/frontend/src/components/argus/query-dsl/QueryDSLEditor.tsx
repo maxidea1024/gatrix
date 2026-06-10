@@ -29,8 +29,10 @@ import {
   Search as SearchIcon,
   Close as CloseIcon,
   Check as CheckIcon,
+  Tune as TuneIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import SafeTooltip from '@/components/common/SafeTooltip';
 
 import type { DomainConfig, SuggestionItem } from './types';
 import { TokenType, EditorState } from './types';
@@ -63,6 +65,7 @@ import {
   removeRecentSearch,
   type RecentSearch,
 } from './recent-searches';
+import QueryBuilderPanel from '../QueryBuilderPanel';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -166,6 +169,7 @@ export function QueryDSLEditor({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isComposing, setIsComposing] = useState(false);
+  const [builderOpen, setBuilderOpen] = useState(false);
   // ─── Token navigation state ───────────────────────────────────────
   const [selectedTokenIdx, setSelectedTokenIdx] = useState(-1); // -1 = input focused
   const [editingToken, setEditingToken] = useState<{
@@ -2090,6 +2094,38 @@ export function QueryDSLEditor({
             </IconButton>
           )}
 
+          {/* Builder toggle — inside the search bar, always visible */}
+          <Box
+            sx={{
+              borderLeft: '1px solid',
+              borderColor: 'divider',
+              ml: 0.3,
+              pl: 0.3,
+              display: 'flex',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <SafeTooltip title={t('argus.builder.open', 'Open Query Builder')}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setBuilderOpen((prev) => !prev);
+                }}
+                sx={{
+                  p: 0.3,
+                  color: builderOpen
+                    ? 'primary.main'
+                    : 'text.disabled',
+                  transition: 'color 0.15s',
+                }}
+              >
+                <TuneIcon sx={{ fontSize: 15 }} />
+              </IconButton>
+            </SafeTooltip>
+          </Box>
+
           {/* Hidden mirror span for cursor position measurement */}
           <span
             ref={mirrorRef}
@@ -2105,6 +2141,22 @@ export function QueryDSLEditor({
             }}
           />
         </Box>
+
+        {/* Query Builder Panel (Dialog centered) */}
+        <QueryBuilderPanel
+          open={builderOpen}
+          onClose={() => setBuilderOpen(false)}
+          config={config}
+          query={chipsToQuery(chips)}
+          onApply={(q) => {
+            // Apply the built query: reset chips from query, trigger search
+            resetTo(queryToChips(q));
+            setInputValue('');
+            setShowDropdown(false);
+            setBuilderOpen(false);
+            onSearch(q);
+          }}
+        />
 
         {/* Suggestion dropdown */}
         {showDropdown &&
