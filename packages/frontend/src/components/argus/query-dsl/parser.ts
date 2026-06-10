@@ -348,7 +348,12 @@ class Parser {
       this.advance(); // consume ) or ]
     } else {
       const startPos = funcToken ? funcToken.start : fieldToken.end + 1;
-      this.addError(isBracket ? 'UNCLOSED_BRACKET' : 'UNCLOSED_PAREN', startPos, end, {});
+      this.addError(
+        isBracket ? 'UNCLOSED_BRACKET' : 'UNCLOSED_PAREN',
+        startPos,
+        end,
+        {}
+      );
     }
 
     return {
@@ -398,7 +403,12 @@ class Parser {
           end,
         };
       }
-      return this.parseMultiValueArgs(fieldToken, operator, funcToken, isBracket);
+      return this.parseMultiValueArgs(
+        fieldToken,
+        operator,
+        funcToken,
+        isBracket
+      );
     }
 
     const tok = this.current();

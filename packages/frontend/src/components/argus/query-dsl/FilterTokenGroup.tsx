@@ -294,49 +294,64 @@ export const FilterTokenGroup = forwardRef<
           }}
         >
           {/* Existing values as pill tags (Sentry style) */}
-          {selectedValues && Array.from(selectedValues).map((v) => (
-            <Box
-              key={v}
-              component="span"
-              onMouseDown={(e: React.MouseEvent) => {
-                // Prevent blur on the inline input when clicking anywhere on a pill
-                e.preventDefault();
-              }}
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '2px',
-                px: 0.5,
-                py: 0,
-                borderRadius: '3px',
-                fontSize: '0.75rem',
-                backgroundColor: isDark
-                  ? 'rgba(251,191,36,0.15)'
-                  : 'rgba(217,119,6,0.10)',
-                color: valueColor,
-                maxWidth: 120,
-                lineHeight: 1.4,
-              }}
-            >
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
+          {selectedValues &&
+            Array.from(selectedValues).map((v) => (
               <Box
+                key={v}
                 component="span"
                 onMouseDown={(e: React.MouseEvent) => {
+                  // Prevent blur on the inline input when clicking anywhere on a pill
                   e.preventDefault();
-                  e.stopPropagation();
-                  onValueTagRemove?.(chip.id, v);
                 }}
                 sx={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  width: 14, height: 14, borderRadius: '50%', cursor: 'pointer',
-                  opacity: 0.5, '&:hover': { opacity: 1, bgcolor: 'rgba(255,255,255,0.1)' },
-                  flexShrink: 0,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                  px: 0.5,
+                  py: 0,
+                  borderRadius: '3px',
+                  fontSize: '0.75rem',
+                  backgroundColor: isDark
+                    ? 'rgba(251,191,36,0.15)'
+                    : 'rgba(217,119,6,0.10)',
+                  color: valueColor,
+                  maxWidth: 120,
+                  lineHeight: 1.4,
                 }}
               >
-                <CloseIcon sx={{ fontSize: 10, pointerEvents: 'none' }} />
+                <span
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {v}
+                </span>
+                <Box
+                  component="span"
+                  onMouseDown={(e: React.MouseEvent) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onValueTagRemove?.(chip.id, v);
+                  }}
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    opacity: 0.5,
+                    '&:hover': { opacity: 1, bgcolor: 'rgba(255,255,255,0.1)' },
+                    flexShrink: 0,
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: 10, pointerEvents: 'none' }} />
+                </Box>
               </Box>
-            </Box>
-          ))}
+            ))}
           {/* Text input for adding new values */}
           <input
             ref={valueInputRef}
@@ -351,7 +366,12 @@ export const FilterTokenGroup = forwardRef<
                 return;
               }
               // Backspace on empty input → remove last pill
-              if (e.key === 'Backspace' && (editingValueText ?? '') === '' && selectedValues && selectedValues.size > 0) {
+              if (
+                e.key === 'Backspace' &&
+                (editingValueText ?? '') === '' &&
+                selectedValues &&
+                selectedValues.size > 0
+              ) {
                 e.preventDefault();
                 const lastVal = Array.from(selectedValues).pop();
                 if (lastVal) onValueTagRemove?.(chip.id, lastVal);
@@ -373,7 +393,8 @@ export const FilterTokenGroup = forwardRef<
               padding: 0,
               margin: 0,
               width: `${inputWidth}px`,
-              minWidth: selectedValues && selectedValues.size > 0 ? '20px' : '40px',
+              minWidth:
+                selectedValues && selectedValues.size > 0 ? '20px' : '40px',
               maxWidth: '300px',
             }}
           />
@@ -384,12 +405,33 @@ export const FilterTokenGroup = forwardRef<
             if (chip.values && chip.values.length > 1) {
               return (
                 <Box sx={{ fontSize: '0.7rem', lineHeight: 1.6, py: 0.3 }}>
-                  <Box sx={{ fontWeight: 600, opacity: 0.7, mb: 0.3, fontSize: '0.6rem' }}>
-                    {t('dsl.chip.valueCount', '{{count}} values', { count: chip.values.length })}
+                  <Box
+                    sx={{
+                      fontWeight: 600,
+                      opacity: 0.7,
+                      mb: 0.3,
+                      fontSize: '0.6rem',
+                    }}
+                  >
+                    {t('dsl.chip.valueCount', '{{count}} values', {
+                      count: chip.values.length,
+                    })}
                   </Box>
                   {chip.values.map((v, i) => (
-                    <Box key={v} sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
-                      <span style={{ opacity: 0.35, fontSize: '0.6rem', minWidth: 12, textAlign: 'right' }}>{i + 1}.</span>
+                    <Box
+                      key={v}
+                      sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}
+                    >
+                      <span
+                        style={{
+                          opacity: 0.35,
+                          fontSize: '0.6rem',
+                          minWidth: 12,
+                          textAlign: 'right',
+                        }}
+                      >
+                        {i + 1}.
+                      </span>
                       <span>{v}</span>
                     </Box>
                   ))}
