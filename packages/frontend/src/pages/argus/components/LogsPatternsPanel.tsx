@@ -9,6 +9,7 @@ import {
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import { formatRelativeTime } from '@/utils/dateFormat';
 
 export interface PatternEntry {
   pattern: string;
@@ -54,6 +55,7 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
         </Box>
       ) : patterns.length === 0 ? (
         <EmptyPlaceholder
+          variant="text"
           icon={<SearchIcon sx={{ fontSize: 48 }} />}
           message={t('argus.logs.patterns.noPatterns', 'No patterns found')}
           description={t(
@@ -140,7 +142,6 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                   <td
                     style={{
                       padding: '6px 10px',
-                      fontFamily: 'monospace',
                       fontSize: '0.70rem',
                       wordBreak: 'break-all',
                       opacity: 0.85,
@@ -174,7 +175,7 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                       color: 'text.secondary',
                     }}
                   >
-                    {p.last_seen ? new Date(p.last_seen).toLocaleString() : '-'}
+                    {p.last_seen ? formatRelativeTime(p.last_seen) : '-'}
                   </td>
                 </tr>
               ))}

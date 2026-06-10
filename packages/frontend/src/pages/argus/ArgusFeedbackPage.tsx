@@ -697,137 +697,59 @@ const ArgusFeedbackPage: React.FC = () => {
   const resolvedCount = summary?.resolved_count || 0;
   const spamCount = summary?.spam_count || 0;
 
-  // ─── Trend Chart ───
-  const chartRef = React.useRef<any>(null);
-  const [dragStart, setDragStart] = useState<number | null>(null);
-  const [dragEnd, setDragEnd] = useState<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-
+  // ─── Trend Chart — transformed for ArgusVolumeChart ───
   const trendLabelsRaw = useMemo(
     () => data?.trend?.map((d) => d.day) || [],
     [data]
   );
 
-  const trendChartData = useMemo(() => {
-    if (!data?.trend) return { labels: [], datasets: [] };
-    const barColors = data.trend.map((_, idx) => {
-      if (dragStart !== null && dragEnd !== null) {
-        const lo = Math.min(dragStart, dragEnd);
-        const hi = Math.max(dragStart, dragEnd);
-        if (idx >= lo && idx <= hi) return '#7c4dff';
-        return alpha('#7c4dff', 0.2);
-      }
-      return alpha('#7c4dff', 0.6);
-    });
-    return {
-      labels: data.trend.map((d) => {
-        try {
-          const dt = new Date(d.day);
-          return `${dt.getMonth() + 1}/${dt.getDate()}`;
-        } catch {
-          return d.day;
-        }
-      }),
-      datasets: [
-        {
-          label: t('argus.feedback.title'),
-          data: data.trend.map((d) => Number(d.count)),
-          backgroundColor: barColors,
-          borderColor: 'transparent',
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false as const,
-        },
-      ],
-    };
-  }, [data, t, dragStart, dragEnd]);
+  const { chartLabels, chartDatasets } = useMemo(() => {
+    if (!data?.trend || data.trend.length === 0)
+      return { chartLabels: [] as string[], chartDatasets: [] };
 
-  const getBarIndex = (e: React.MouseEvent<HTMLElement>) => {
-    const chart = chartRef.current;
-    if (!chart) return null;
-    const elements = chart.getElementsAtEventForMode(
-      e.nativeEvent,
-      'index',
-      { intersect: false },
-      false
-    );
-    if (elements.length > 0) return elements[0].index;
-    return null;
-  };
-
-  const handleChartMouseDown = (e: React.MouseEvent<HTMLElement>) => {
-    const idx = getBarIndex(e);
-    if (idx !== null) {
-      setDragStart(idx);
-      setDragEnd(idx);
-      setIsDragging(true);
-    }
-  };
-
-  const handleChartMouseMove = (e: React.MouseEvent<HTMLElement>) => {
-    if (!isDragging) return;
-    const idx = getBarIndex(e);
-    if (idx !== null) setDragEnd(idx);
-  };
-
-  const handleChartMouseUp = () => {
-    if (!isDragging || dragStart === null || dragEnd === null) {
-      setIsDragging(false);
-      return;
-    }
-    setIsDragging(false);
-    const lo = Math.min(dragStart, dragEnd);
-    const hi = Math.max(dragStart, dragEnd);
-    if (trendLabelsRaw.length > 0 && lo >= 0 && hi < trendLabelsRaw.length) {
-      const startDay = trendLabelsRaw[lo];
-      const endDay = trendLabelsRaw[hi];
+    const labels = data.trend.map((d) => {
       try {
-        const start = new Date(startDay);
-        const end = new Date(endDay);
-        end.setHours(23, 59, 59, 999);
-        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-          const ap = { start: start.toISOString(), end: end.toISOString() };
-          setUrlState({ period: `${ap.start}|${ap.end}`, page: '1', fb: '' });
-        }
+        const dt = new Date(d.day);
+        return `${dt.getMonth() + 1}/${dt.getDate()}`;
       } catch {
-        /* ignore */
+        return d.day;
       }
-    }
-  };
+    });
 
-  const handleChartReset = () => {
-    setDragStart(null);
-    setDragEnd(null);
-  };
-
-  const chartOpts = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 300 },
-      plugins: { legend: { display: false } },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            font: { size: 10 },
-            maxRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 15,
-          },
-        },
-        y: {
-          beginAtZero: true,
-          border: { display: false },
-          grid: {
-            color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-          },
-          ticks: { font: { size: 10 } },
-        },
+    const datasets = [
+      {
+        label: t('argus.feedback.title'),
+        data: data.trend.map((d) => Number(d.count)),
+        type: 'bar' as const,
+        color: '#7c4dff',
       },
-    }),
-    [isDark]
+    ];
+
+    return { chartLabels: labels, chartDatasets: datasets };
+  }, [data, t]);
+
+  const handleChartZoom = useCallback(
+    (startIdx: number, endIdx: number) => {
+      const lo = Math.min(startIdx, endIdx);
+      const hi = Math.max(startIdx, endIdx);
+      if (trendLabelsRaw.length > 0 && lo >= 0 && hi < trendLabelsRaw.length) {
+        try {
+          const start = new Date(trendLabelsRaw[lo]);
+          const end = new Date(trendLabelsRaw[hi]);
+          end.setHours(23, 59, 59, 999);
+          if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+            setUrlState({
+              period: `${start.toISOString()}|${end.toISOString()}`,
+              page: '1',
+              fb: '',
+            });
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+    },
+    [trendLabelsRaw, setUrlState]
   );
 
   const statCards = [
@@ -976,16 +898,9 @@ const ArgusFeedbackPage: React.FC = () => {
         statsCollapsed={statsCollapsed}
         loading={loading}
         statCards={statCards}
-        chartRef={chartRef}
-        trendChartData={trendChartData}
-        chartOpts={chartOpts}
-        isDragging={isDragging}
-        dragStart={dragStart}
-        dragEnd={dragEnd}
-        onChartMouseDown={handleChartMouseDown}
-        onChartMouseMove={handleChartMouseMove}
-        onChartMouseUp={handleChartMouseUp}
-        onChartReset={handleChartReset}
+        chartLabels={chartLabels}
+        chartDatasets={chartDatasets}
+        onZoom={handleChartZoom}
       />
 
       {/* Status Tabs */}

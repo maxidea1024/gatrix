@@ -19,13 +19,19 @@ interface EmptyPlaceholderProps {
   children?: React.ReactNode;
   /** Minimum height of the placeholder */
   minHeight?: number | string;
+  /**
+   * Display variant:
+   * - 'bordered' (default): dashed border container — for editable/interactive areas
+   * - 'text': no border/background — for read-only informational empty states
+   */
+  variant?: 'bordered' | 'text';
   /** Additional styles */
   sx?: any;
 }
 
 /**
  * Unified empty state placeholder for sections with no items yet.
- * Provides consistent styling: dashed border, slightly darker background,
+ * Provides consistent styling with optional dashed border,
  * centered text with optional add button.
  */
 const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
@@ -37,8 +43,11 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
   addButtonVariant = 'contained',
   children,
   minHeight,
+  variant = 'bordered',
   sx = {},
 }) => {
+  const isBordered = variant === 'bordered';
+
   return (
     <Box
       sx={{
@@ -50,9 +59,11 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         minHeight: minHeight,
         py: 3,
         px: 3,
-        border: '2px dashed',
-        borderColor: 'divider',
-        borderRadius: '4px',
+        ...(isBordered && {
+          border: '2px dashed',
+          borderColor: 'divider',
+          borderRadius: '4px',
+        }),
         ...sx,
       }}
     >

@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, Typography, Paper, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
-import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import argusService from '@/services/argusService';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { ArgusFilterState } from '@/components/argus/ArgusFilterBar';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import { BarChart as BarChartIcon } from '@mui/icons-material';
 
 interface IssueVolumeChartProps {
   projectId: string | number;
@@ -20,8 +18,8 @@ interface IssueVolumeChartProps {
 }
 
 /**
- * Bar chart showing issue event volume over time.
- * Supports click-drag selection to zoom into a date range.
+ * Issue volume chart — uses ArgusVolumeChart for consistent UX.
+ * Fetches its own data from the API.
  */
 const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
   projectId,
@@ -33,7 +31,6 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
 }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
-  const isDark = theme.palette.mode === 'dark';
 
   const [volumeData, setVolumeData] = useState<
     { day: string; count: number; issue_count: number }[]
@@ -64,8 +61,9 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
     fetchVolume();
   }, [fetchVolume]);
 
-  const { chartData, buckets } = useMemo(() => {
-    if (volumeData.length === 0) return { chartData: [], buckets: [] };
+  const { chartLabels, chartDatasets, buckets } = useMemo(() => {
+    if (volumeData.length === 0)
+      return { chartLabels: [], chartDatasets: [], buckets: [] };
 
     const mapped = volumeData.map((d) => {
       let label = d.day;
@@ -84,8 +82,21 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
       return { label, count: d.count };
     });
 
-    return { chartData: mapped, buckets: volumeData.map((d) => d.day) };
-  }, [volumeData, i18n.language]);
+    const datasets: ChartDataset[] = [
+      {
+        label: t('argus.issues.events', 'Events'),
+        data: mapped.map((d) => d.count),
+        type: 'bar',
+        color: theme.palette.error.main,
+      },
+    ];
+
+    return {
+      chartLabels: mapped.map((d) => d.label),
+      chartDatasets: datasets,
+      buckets: volumeData.map((d) => d.day),
+    };
+  }, [volumeData, i18n.language, t, theme.palette.error.main]);
 
   const handleZoom = useCallback(
     (startIndex: number, endIndex: number) => {
@@ -98,7 +109,6 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
           const startDate = new Date(buckets[startIdx]);
           let endDate = new Date(buckets[endIdx]);
 
-          // Add duration of one bucket to the end date
           if (buckets.length > 1) {
             const gap =
               new Date(buckets[1]).getTime() - new Date(buckets[0]).getTime();
@@ -118,57 +128,19 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
     [buckets, onDateRangeSelect]
   );
 
-  if (
-    !volumeLoading &&
-    (chartData.length === 0 || chartData.every((d) => d.count === 0))
-  ) {
-    return (
-      <Box sx={{ mb: 1.5 }}>
-        <EmptyPlaceholder
-          icon={<BarChartIcon sx={{ fontSize: 36 }} />}
-          message={t('argus.issues.noVolumeData', 'No event data')}
-          minHeight={144}
-        />
-      </Box>
-    );
-  }
-
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 1.5,
-        mb: 1.5,
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2,
-        position: 'relative',
-      }}
-    >
-      <Box sx={{ height: 120 }}>
-        {volumeLoading ? (
-          <ArgusChartSkeleton
-            type="bar"
-            height={120}
-            color={theme.palette.error.main}
-          />
-        ) : (
-          <InteractiveTimeSeriesChart
-            data={chartData}
-            type="bar"
-            height={120}
-            onZoom={onDateRangeSelect ? handleZoom : undefined}
-            datasets={[
-              {
-                label: t('argus.issues.events'),
-                data: chartData.map((d) => d.count),
-                type: 'bar',
-                color: theme.palette.error.main,
-              },
-            ]}
-          />
-        )}
-      </Box>
-    </Paper>
+    <ArgusVolumeChart
+      datasets={chartDatasets}
+      labels={chartLabels}
+      loading={volumeLoading}
+      emptyMessage={t('argus.issues.noVolumeData', 'No event data')}
+      onZoom={onDateRangeSelect ? handleZoom : undefined}
+      storagePrefix="argus_issue_volume"
+      showChartTypeToggle={false}
+      showCompactToggle={false}
+      skeletonColor={theme.palette.error.main}
+      mb={1.5}
+    />
   );
 };
 

@@ -155,15 +155,15 @@ export const getDragSelectPlugin = (
 
       // Selection overlay
       ctx.fillStyle = isDark
-        ? 'rgba(124, 77, 255, 0.12)'
-        : 'rgba(124, 77, 255, 0.08)';
+        ? 'rgba(124, 77, 255, 0.25)'
+        : 'rgba(124, 77, 255, 0.15)';
       ctx.fillRect(x1, yScale.top, x2 - x1, yScale.bottom - yScale.top);
 
       // Left and right edge lines
       ctx.strokeStyle = isDark
-        ? 'rgba(124, 77, 255, 0.6)'
-        : 'rgba(124, 77, 255, 0.5)';
-      ctx.lineWidth = 1.5;
+        ? 'rgba(124, 77, 255, 0.8)'
+        : 'rgba(124, 77, 255, 0.7)';
+      ctx.lineWidth = 2;
       ctx.setLineDash([]);
       ctx.beginPath();
       ctx.moveTo(x1, yScale.top);

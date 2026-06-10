@@ -29,9 +29,10 @@ import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { ArgusLogEntry } from '@/services/argusService';
 
 // Page-specific components
-import LogVolumeChart from './components/LogVolumeChart';
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import LogsToolbar from './components/LogsToolbar';
 import LogsTablePanel from './components/LogsTablePanel';
 import LogsAggregatePanel from './components/LogsAggregatePanel';
@@ -52,7 +53,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip, Legend);
 
 const ArgusLogsPage: React.FC = () => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
   const {
@@ -71,6 +72,7 @@ const ArgusLogsPage: React.FC = () => {
     dynamicAvailableColumns,
     selectedLogIndex,
     selectedLog,
+    selectedLogLoading,
     isRightPanelOpen,
     setIsRightPanelOpen,
     customFacetKeys,
@@ -140,6 +142,20 @@ const ArgusLogsPage: React.FC = () => {
   const [displayDensity, setDisplayDensity] = useState<
     'compact' | 'default' | 'expanded'
   >('default');
+
+  // Live tail selected log (separate from normal log selection)
+  const [liveTailSelectedLog, setLiveTailSelectedLog] =
+    useState<ArgusLogEntry | null>(null);
+
+  const handleLiveTailSelectLog = useCallback((log: ArgusLogEntry) => {
+    setLiveTailSelectedLog(log);
+  }, []);
+
+  // Effective selected log for the side panel based on active tab
+  const effectiveSelectedLog =
+    activeTab === 3 ? liveTailSelectedLog : selectedLog;
+  const effectiveIsRightPanelOpen =
+    activeTab === 3 ? liveTailSelectedLog !== null : isRightPanelOpen;
 
   const logContainerRef = useRef<HTMLDivElement>(null);
   const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
@@ -471,14 +487,102 @@ const ArgusLogsPage: React.FC = () => {
           }}
         >
           {/* Volume Chart - fixed at top */}
-          <Box sx={{ flexShrink: 0, pt: 2, pb: 1, px: 2 }}>
-            <LogVolumeChart
-              data={volume}
-              isDark={isDark}
-              period={currentPeriod}
-              onZoom={handleZoom}
-            />
-          </Box>
+          {(() => {
+            // Transform VolumePoint[] → labels + datasets for ArgusVolumeChart
+            const SEVERITY_ORDER = ['fatal', 'critical', 'error', 'warn', 'warning', 'info', 'debug', 'trace'];
+            const SEVERITY_COLORS: Record<string, string> = {
+              fatal: '#d32f2f', critical: '#d32f2f', error: '#f44336',
+              warn: '#ff9800', warning: '#ff9800', info: '#2196f3',
+              debug: '#9e9e9e', trace: '#607d8b',
+            };
+
+            const bucketSet = new Set<string>();
+            const levelSet = new Set<string>();
+            volume.forEach((p) => {
+              bucketSet.add(p.bucket);
+              levelSet.add(p.level?.toLowerCase() || 'unknown');
+            });
+            const sortedBuckets = [...bucketSet].sort();
+            const levels = [...levelSet].sort((a, b) => {
+              const ai = SEVERITY_ORDER.indexOf(a);
+              const bi = SEVERITY_ORDER.indexOf(b);
+              return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+            });
+
+            // Dedup levels sharing same color (warn/warning)
+            const deduped: { level: string; color: string }[] = [];
+            const seenColors = new Set<string>();
+            levels.forEach((lvl) => {
+              const color = SEVERITY_COLORS[lvl] || '#6b7280';
+              if (!seenColors.has(color)) {
+                seenColors.add(color);
+                deduped.push({ level: lvl, color });
+              }
+            });
+
+            // Lookup map
+            const lookup = new Map<string, Map<string, number>>();
+            volume.forEach((p) => {
+              const bkt = p.bucket;
+              const lvl = p.level?.toLowerCase() || 'unknown';
+              if (!lookup.has(bkt)) lookup.set(bkt, new Map());
+              const m = lookup.get(bkt)!;
+              m.set(lvl, (m.get(lvl) || 0) + (Number(p.count) || 0));
+            });
+
+            const chartLabels = sortedBuckets.map((b) => {
+              const d = new Date(b);
+              return d.toLocaleString(i18n.language || 'en-US', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
+              });
+            });
+
+            const chartDatasets = deduped.map(({ level, color }) => ({
+              label: level.charAt(0).toUpperCase() + level.slice(1),
+              data: sortedBuckets.map((bkt) => {
+                const m = lookup.get(bkt);
+                if (!m) return 0;
+                if (level === 'warn' || level === 'warning') {
+                  return (m.get('warn') || 0) + (m.get('warning') || 0);
+                }
+                return m.get(level) || 0;
+              }),
+              type: 'bar' as const,
+              color,
+            }));
+
+            const handleChartZoom = (startIdx: number, endIdx: number) => {
+              const si = Math.min(startIdx, endIdx);
+              const ei = Math.max(startIdx, endIdx);
+              if (sortedBuckets[si] && sortedBuckets[ei]) {
+                const startDate = new Date(sortedBuckets[si]);
+                let endDate = new Date(sortedBuckets[ei]);
+                if (sortedBuckets.length > 1) {
+                  const gap = new Date(sortedBuckets[1]).getTime() - new Date(sortedBuckets[0]).getTime();
+                  endDate = new Date(endDate.getTime() + gap);
+                } else {
+                  endDate = new Date(endDate.getTime() + 3600000);
+                }
+                handleZoom(startDate.toISOString(), endDate.toISOString());
+              }
+            };
+
+            return (
+              <Box sx={{ flexShrink: 0, pt: 2, pb: 1, px: 2 }}>
+                <ArgusVolumeChart
+                  datasets={chartDatasets}
+                  labels={chartLabels}
+                  loading={loading && volume.length === 0}
+                  title="count(logs)"
+                  emptyMessage={t('argus.logs.noLogData')}
+                  onZoom={handleChartZoom}
+                  storagePrefix="argus_log_volume"
+                  showLegend
+                  mb={0}
+                />
+              </Box>
+            );
+          })()}
 
           {/* Main Content Area (Fullscreen Wrapper) */}
           <Box
@@ -533,9 +637,9 @@ const ArgusLogsPage: React.FC = () => {
                 overflow: 'hidden',
                 minHeight: 0,
                 width: '100%',
-                ...(!logsFullscreen && {
-                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-                }),
+                border: `1px solid`,
+                borderColor: 'divider',
+                borderRadius: 2,
               }}
             >
               {/* Scrollable tab content */}
@@ -549,6 +653,7 @@ const ArgusLogsPage: React.FC = () => {
               >
                 {activeTab === 0 && logs.length === 0 && !loading && (
                   <EmptyPlaceholder
+                    variant="text"
                     icon={<SearchIcon sx={{ fontSize: 48 }} />}
                     message={t('argus.logs.noLogs', 'No logs found yet')}
                     description={t(
@@ -583,6 +688,7 @@ const ArgusLogsPage: React.FC = () => {
                   !aggLoading &&
                   (!aggData || aggData.topValues.length === 0) && (
                     <EmptyPlaceholder
+                      variant="text"
                       icon={<SearchIcon sx={{ fontSize: 48 }} />}
                       message={t(
                         'argus.logs.aggregatesTitle',
@@ -632,12 +738,14 @@ const ArgusLogsPage: React.FC = () => {
                     projectId={projectId}
                     searchDebounce={search}
                     isDark={isDark}
+                    onSelectLog={handleLiveTailSelectLog}
+                    selectedLogId={liveTailSelectedLog?.log_id}
                   />
                 )}
               </Box>
 
               {/* ── Splitter Handle + Right Side Panel ── */}
-              {isRightPanelOpen && (
+              {effectiveIsRightPanelOpen && (activeTab === 0 || activeTab === 3) && (
                 <>
                   <Box
                     onMouseDown={handlePanelSplitterMouseDown}
@@ -670,17 +778,23 @@ const ArgusLogsPage: React.FC = () => {
                     }}
                   />
                   <LogSidePanel
-                    log={selectedLog}
-                    open={isRightPanelOpen}
-                    onClose={handleCloseSidePanel}
-                    onPrev={handlePrevLog}
-                    onNext={handleNextLog}
+                    log={effectiveSelectedLog}
+                    loading={activeTab === 0 ? selectedLogLoading : false}
+                    open={effectiveIsRightPanelOpen}
+                    onClose={() => {
+                      if (activeTab === 3) {
+                        setLiveTailSelectedLog(null);
+                      } else {
+                        handleCloseSidePanel();
+                      }
+                    }}
+                    onPrev={activeTab === 0 ? handlePrevLog : undefined}
+                    onNext={activeTab === 0 ? handleNextLog : undefined}
                     onFilter={(key, val, exclude) => {
                       const r = dslEditorRef.current;
                       if (!r) return;
                       const current = r.getFieldValues(key);
                       if (exclude) {
-                        // For exclude, we don't add to existing — just set as NOT filter
                         r.upsertFieldChip(key, [val], '!=');
                       } else if (current.includes(val)) {
                         r.upsertFieldChip(
@@ -691,8 +805,9 @@ const ArgusLogsPage: React.FC = () => {
                         r.upsertFieldChip(key, [...current, val]);
                       }
                     }}
-                    hasPrev={selectedLogIndex !== null && selectedLogIndex > 0}
+                    hasPrev={activeTab === 0 && selectedLogIndex !== null && selectedLogIndex > 0}
                     hasNext={
+                      activeTab === 0 &&
                       selectedLogIndex !== null &&
                       selectedLogIndex < logs.length - 1
                     }

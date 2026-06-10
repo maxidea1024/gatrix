@@ -28,6 +28,7 @@ import argusService, { ArgusTraceDetail } from '@/services/argusService';
 import TraceWaterfall from '@/components/argus/TraceWaterfall';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 import { LogSidePanelProps } from './LogSidePanel/types';
 import { JsonTab } from './LogSidePanel/JsonTab';
@@ -41,6 +42,7 @@ import {
 
 const LogSidePanel: React.FC<LogSidePanelProps> = ({
   log,
+  loading = false,
   open,
   onClose,
   onPrev,
@@ -107,8 +109,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         .finally(() => setTraceLoading(false));
     }
   }, [tab, log?.trace_id, projectId, traceFetchedFor]);
-
-  if (!log) {
+  if (!log && !loading) {
     return (
       <Box
         sx={{
@@ -143,8 +144,8 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
     );
   }
 
-  const levelColor = SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e';
-  const formattedTime = formatWith(log.timestamp, 'YYYY-MM-DD HH:mm:ss.SSS');
+  const levelColor = log ? (SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e') : '#9e9e9e';
+  const formattedTime = log ? formatWith(log.timestamp, 'YYYY-MM-DD HH:mm:ss.SSS') : '';
 
   return (
     <Box
@@ -157,6 +158,9 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         flexDirection: 'column',
       }}
     >
+      <PageContentLoader loading={loading} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {log && (
+      <>
       <PanelHeader isDark={isDark}>
         <LevelChip
           label={log.level?.toUpperCase() || 'UNKNOWN'}
@@ -359,6 +363,9 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
           </Box>
         )}
       </Box>
+      </>
+      )}
+      </PageContentLoader>
     </Box>
   );
 };

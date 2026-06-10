@@ -1622,6 +1622,22 @@ class ArgusService {
     return response.data || { data: [], meta: { count: 0, hasMore: false } };
   }
 
+  async getLogDetail(
+    projectId: number | string,
+    logId: string,
+    signal?: AbortSignal
+  ): Promise<ArgusLogEntry | null> {
+    try {
+      const response = await argusApi.get(
+        `${ARGUS_BASE}/${projectId}/logs/detail/${logId}`,
+        { signal }
+      );
+      return response.data?.data || response.data || null;
+    } catch {
+      return null;
+    }
+  }
+
   async getLogFacets(
     projectId: number | string,
     period?: string,

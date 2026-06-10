@@ -44,7 +44,7 @@ const PageContentLoader: React.FC<PageContentLoaderProps> = ({
   loading,
   children,
   animationDuration = 350,
-  spinnerDelay = 1000,
+  spinnerDelay = 250,
   sx,
   skeleton,
 }) => {

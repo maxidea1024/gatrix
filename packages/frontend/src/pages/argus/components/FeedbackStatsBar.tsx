@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
   Paper,
-  Chip,
   Collapse,
   alpha,
   Tooltip,
 } from '@mui/material';
-import { Bar } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import {
   formatCompactNumber,
   formatWithCommas,
@@ -28,17 +28,11 @@ interface FeedbackStatsBarProps {
   statsCollapsed: boolean;
   loading: boolean;
   statCards: StatCard[];
-  /** Chart ref forwarded from parent for drag selection */
-  chartRef: React.MutableRefObject<any>;
-  trendChartData: any;
-  chartOpts: any;
-  isDragging: boolean;
-  dragStart: number | null;
-  dragEnd: number | null;
-  onChartMouseDown: (e: React.MouseEvent<HTMLElement>) => void;
-  onChartMouseMove: (e: React.MouseEvent<HTMLElement>) => void;
-  onChartMouseUp: () => void;
-  onChartReset: () => void;
+  /** Volume chart data: labels + datasets */
+  chartLabels: string[];
+  chartDatasets: ChartDataset[];
+  /** Drag-select zoom callback */
+  onZoom?: (startIndex: number, endIndex: number) => void;
 }
 
 const FeedbackStatsBar: React.FC<FeedbackStatsBarProps> = ({
@@ -46,16 +40,9 @@ const FeedbackStatsBar: React.FC<FeedbackStatsBarProps> = ({
   statsCollapsed,
   loading,
   statCards,
-  chartRef,
-  trendChartData,
-  chartOpts,
-  isDragging,
-  dragStart,
-  dragEnd,
-  onChartMouseDown,
-  onChartMouseMove,
-  onChartMouseUp,
-  onChartReset,
+  chartLabels,
+  chartDatasets,
+  onZoom,
 }) => {
   const { t } = useTranslation();
 
@@ -134,78 +121,20 @@ const FeedbackStatsBar: React.FC<FeedbackStatsBarProps> = ({
           </Paper>
         ))}
       </Box>
-      {/* Volume Chart */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 1.5,
-          mb: 1.5,
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: 2,
-          position: 'relative',
-        }}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 0.5,
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              fontSize: '0.68rem',
-              color: 'text.secondary',
-              fontWeight: 600,
-            }}
-          >
-            {t('argus.feedback.volumeChart')}
-          </Typography>
-          {dragStart !== null && dragEnd !== null && (
-            <Chip
-              label={t('argus.feedback.clearSelection')}
-              size="small"
-              onDelete={onChartReset}
-              sx={{
-                height: 18,
-                fontSize: '0.6rem',
-                '& .MuiChip-deleteIcon': { fontSize: 12 },
-              }}
-            />
-          )}
-        </Box>
-        <Box
-          sx={{ height: 80, cursor: 'crosshair', userSelect: 'none' }}
-          onMouseDown={onChartMouseDown}
-          onMouseMove={onChartMouseMove}
-          onMouseUp={onChartMouseUp}
-          onMouseLeave={() => {
-            if (isDragging) onChartMouseUp();
-          }}
-        >
-          <Bar
-            ref={chartRef}
-            data={trendChartData}
-            options={chartOpts as any}
-          />
-        </Box>
-        {isDragging && (
-          <Typography
-            variant="caption"
-            sx={{
-              position: 'absolute',
-              bottom: 4,
-              right: 8,
-              fontSize: '0.58rem',
-              color: 'text.disabled',
-            }}
-          >
-            {t('argus.feedback.dragToSelect')}
-          </Typography>
-        )}
-      </Paper>
+
+      {/* Volume Chart — unified ArgusVolumeChart */}
+      <ArgusVolumeChart
+        datasets={chartDatasets}
+        labels={chartLabels}
+        loading={loading && chartLabels.length === 0}
+        title={t('argus.feedback.volumeChart')}
+        emptyMessage={t('argus.feedback.noFeedback', 'No feedback data')}
+        onZoom={onZoom}
+        storagePrefix="argus_feedback_volume"
+        showChartTypeToggle={false}
+        showCompactToggle={false}
+        mb={1.5}
+      />
     </Collapse>
   );
 };

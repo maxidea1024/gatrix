@@ -151,7 +151,10 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
             color: isDark ? '#ccc' : '#555',
             font: { size: 11, family: 'monospace' },
             usePointStyle: true,
+            pointStyleWidth: 6,
             boxWidth: 6,
+            boxHeight: 6,
+            padding: 12,
           },
         },
         tooltip: {

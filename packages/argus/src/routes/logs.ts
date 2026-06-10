@@ -534,7 +534,51 @@ export default async function logsRoutes(app: FastifyInstance) {
     }
   );
 
-  // ?�?�?� Log Patterns (cluster similar log messages) ?�?�?�
+  // ─── Get single log detail by ID (lazy loading) ───
+  app.get(
+    '/:projectId/logs/detail/:logId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, logId } = request.params as {
+        projectId: string;
+        logId: string;
+      };
+
+      // FIXME: UI 로딩 테스트를 위해 임의로 넣어둔 2초 딜레이입니다. 반드시 제거하세요.
+      await new Promise((r) => setTimeout(r, 2000));
+
+      try {
+        const sql = `
+          SELECT log_id, trace_id, span_id, issue_id, timestamp, level, logger_name,
+                 message, body, service, environment, release, attributes
+          FROM argus.logs
+          WHERE project_id = {projectId:String} AND log_id = {logId:String}
+          LIMIT 1
+        `;
+        const params = {
+          projectId: String(projectId),
+          logId: String(logId),
+        };
+
+        const result = await optic.rawQuery({ query: sql, params });
+        const rows = result.data as any[];
+
+        if (rows.length === 0) {
+          return reply.code(404).send({ error: 'Log not found' });
+        }
+
+        return reply.send({ data: rows[0] });
+      } catch (error) {
+        logger.error('Failed to get log detail', {
+          projectId,
+          logId,
+          error: String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get log detail' });
+      }
+    }
+  );
+
+  // ─── Log Patterns (cluster similar log messages) ───
   app.get(
     '/:projectId/logs/patterns',
     async (request: FastifyRequest, reply: FastifyReply) => {

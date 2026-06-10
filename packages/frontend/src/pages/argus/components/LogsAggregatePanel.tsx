@@ -10,13 +10,25 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  ToggleButtonGroup,
+  ToggleButton,
   alpha,
+  useTheme,
 } from '@mui/material';
-import { ViewColumn as ViewIcon } from '@mui/icons-material';
-import { Bar } from 'react-chartjs-2';
+import {
+  ViewColumn as ViewIcon,
+  BarChart as BarChartIcon,
+  ShowChart as LineChartIcon,
+  StackedLineChart as AreaChartIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import SafeTooltip from '@/components/common/SafeTooltip';
+import InteractiveTimeSeriesChart, {
+  ChartDataset,
+} from '@/components/argus/InteractiveTimeSeriesChart';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 interface AggData {
   groupBy: string;
@@ -51,11 +63,17 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
   onGroupByChange,
   onAddFilter,
 }) => {
-  const { t } = useTranslation();
+  const theme = useTheme();
+  const { t, i18n } = useTranslation();
+  const [chartType, setChartType] = useLocalStorage<'bar' | 'line' | 'area'>(
+    'argus_agg_chart_type',
+    'bar'
+  );
 
   if (!aggLoading && (!aggData || aggData.topValues.length === 0)) {
     return (
       <EmptyPlaceholder
+        variant="text"
         icon={<ViewIcon sx={{ fontSize: 48 }} />}
         message={t('argus.logs.aggregatesTitle', 'Log Aggregates')}
         description={t(
@@ -135,100 +153,103 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
         {aggData && aggData.topValues.length > 0 && (
           <Box>
             {/* Stacked time series chart */}
-            {aggData.timeSeries.length > 0 && (
-              <Box sx={{ p: 2, pb: 1 }}>
-                <Typography
-                  sx={{
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                    color: 'text.secondary',
-                    mb: 1,
-                  }}
-                >
-                  {t('argus.logs.agg.countOverTime', 'Count over time')}
-                </Typography>
-                <Box sx={{ height: 150 }}>
-                  <Bar
-                    data={(() => {
-                      const groups = [
-                        ...new Set(
-                          aggData.timeSeries.map((d) => d.group_value)
-                        ),
-                      ];
-                      const buckets = [
-                        ...new Set(aggData.timeSeries.map((d) => d.bucket)),
-                      ].sort();
-                      const labels = buckets.map((b) => {
-                        const d = new Date(b);
-                        return d.toLocaleString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: false,
-                        });
-                      });
-                      const datasets = groups.map((g, gi) => ({
-                        label: g || '(empty)',
-                        data: buckets.map((b) => {
-                          const found = aggData.timeSeries.find(
-                            (d) => d.bucket === b && d.group_value === g
-                          );
-                          return found ? Number(found.count) : 0;
-                        }),
-                        backgroundColor: alpha(
-                          CHART_COLORS[gi % CHART_COLORS.length],
-                          0.7
-                        ),
-                        borderRadius: 1,
-                        barPercentage: 0.9,
-                        categoryPercentage: 0.92,
-                      }));
-                      return { labels, datasets };
-                    })()}
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      animation: { duration: 300 },
-                      plugins: {
-                        legend: {
-                          display: true,
-                          position: 'top',
-                          labels: { boxWidth: 10, font: { size: 10 } },
-                        },
-                        tooltip: { enabled: true },
-                      },
-                      scales: {
-                        x: {
-                          stacked: true,
-                          grid: { display: false },
-                          ticks: {
-                            font: { size: 9 },
-                            color: isDark ? '#555' : '#bbb',
-                            maxTicksLimit: 8,
-                          },
-                          border: { display: false },
-                        },
-                        y: {
-                          stacked: true,
-                          grid: {
-                            color: isDark
-                              ? 'rgba(255,255,255,0.03)'
-                              : 'rgba(0,0,0,0.04)',
-                          },
-                          ticks: {
-                            font: { size: 9 },
-                            color: isDark ? '#555' : '#bbb',
-                          },
-                          border: { display: false },
-                          beginAtZero: true,
-                        },
-                      },
+            {aggData.timeSeries.length > 0 && (() => {
+              const groups = [
+                ...new Set(
+                  aggData.timeSeries.map((d) => d.group_value)
+                ),
+              ];
+              const buckets = [
+                ...new Set(aggData.timeSeries.map((d) => d.bucket)),
+              ].sort();
+              const labels = buckets.map((b) => {
+                const d = new Date(b);
+                return d.toLocaleString(i18n.language || 'ko', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false,
+                });
+              });
+              const datasets: ChartDataset[] = groups.map((g, gi) => ({
+                label: g || '(empty)',
+                data: buckets.map((b) => {
+                  const found = aggData.timeSeries.find(
+                    (d) => d.bucket === b && d.group_value === g
+                  );
+                  return found ? Number(found.count) : 0;
+                }),
+                type: chartType,
+                color: CHART_COLORS[gi % CHART_COLORS.length],
+              }));
+              return (
+                <Box sx={{ p: 2, pb: 1 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      mb: 1,
                     }}
-                  />
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        color: 'text.secondary',
+                      }}
+                    >
+                      {t('argus.logs.agg.countOverTime', 'Count over time')}
+                    </Typography>
+                    <ToggleButtonGroup
+                      value={chartType}
+                      exclusive
+                      onChange={(_, v) => { if (v) setChartType(v); }}
+                      size="small"
+                      sx={{
+                        height: 24,
+                        '& .MuiToggleButton-root': {
+                          px: 0.75,
+                          py: 0,
+                          border: `1px solid`,
+                          borderColor: 'divider',
+                          '&.Mui-selected': {
+                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                            color: theme.palette.primary.main,
+                            borderColor: alpha(theme.palette.primary.main, 0.3),
+                          },
+                        },
+                      }}
+                    >
+                      <ToggleButton value="bar">
+                        <SafeTooltip title={t('argus.chart.bar', 'Bar')}>
+                          <BarChartIcon sx={{ fontSize: 16 }} />
+                        </SafeTooltip>
+                      </ToggleButton>
+                      <ToggleButton value="line">
+                        <SafeTooltip title={t('argus.chart.line', 'Line')}>
+                          <LineChartIcon sx={{ fontSize: 16 }} />
+                        </SafeTooltip>
+                      </ToggleButton>
+                      <ToggleButton value="area">
+                        <SafeTooltip title={t('argus.chart.area', 'Area')}>
+                          <AreaChartIcon sx={{ fontSize: 16 }} />
+                        </SafeTooltip>
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Box>
+                  <Box sx={{ height: 150 }}>
+                    <InteractiveTimeSeriesChart
+                      labels={labels}
+                      datasets={datasets}
+                      height={150}
+                      showLegend
+                    />
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              );
+            })()}
 
             {/* Top values table */}
             <Box sx={{ overflowX: 'auto' }}>

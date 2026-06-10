@@ -13,7 +13,11 @@ import {
   defaultArgusFilterState,
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
-import { VolumePoint } from '../components/LogVolumeChart';
+export interface VolumePoint {
+  bucket: string;
+  level: string;
+  count: number;
+}
 import { FacetGroup } from '@/components/argus/FacetSidebar';
 import { PatternEntry } from '../components/LogsPatternsPanel';
 
@@ -173,8 +177,49 @@ export function useArgusLogs() {
     const idx = logs.findIndex((l) => l.log_id === urlState.log);
     return idx >= 0 ? idx : null;
   }, [logs, urlState.log]);
-  const selectedLog =
-    selectedLogIndex !== null ? logs[selectedLogIndex] || null : null;
+
+  // Lazy-load log detail when selected
+  const [selectedLog, setSelectedLog] = useState<ArgusLogEntry | null>(null);
+  const [selectedLogLoading, setSelectedLogLoading] = useState(false);
+  const expectedLogIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const logId = urlState.log;
+    expectedLogIdRef.current = logId || null;
+
+    if (!logId) {
+      setSelectedLog(null);
+      setSelectedLogLoading(false);
+      return;
+    }
+
+    // Clear previous detail immediately to prevent stale data flash
+    setSelectedLog(null);
+    setSelectedLogLoading(true);
+
+    const abortController = new AbortController();
+
+    argusService
+      .getLogDetail(projectId, logId, abortController.signal)
+      .then((detail) => {
+        // Only update if this is still the expected log (guard against race)
+        if (expectedLogIdRef.current === logId) {
+          setSelectedLog(detail);
+          setSelectedLogLoading(false);
+        }
+      })
+      .catch(() => {
+        // Aborted or failed — only clear loading if still expected
+        if (expectedLogIdRef.current === logId) {
+          setSelectedLogLoading(false);
+        }
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [urlState.log, projectId]);
+
   const [isRightPanelOpen, setIsRightPanelOpen] = useLocalStorage(
     'argus_right_panel_open',
     false
@@ -570,10 +615,10 @@ export function useArgusLogs() {
     setPatternsLoading(false);
   }, [projectId, filters, search]);
 
-  // Auto-fetch patterns when switching to patterns tab
+  // Auto-fetch patterns when switching to patterns tab or on mount when already on tab 2
   useEffect(() => {
     if (activeTab === 2) fetchPatterns();
-  }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, fetchPatterns]);
 
   const handleSearchSubmit = useCallback(
     (val: string) => {
@@ -725,6 +770,7 @@ export function useArgusLogs() {
     dynamicAvailableColumns,
     selectedLogIndex,
     selectedLog,
+    selectedLogLoading,
     isRightPanelOpen,
     setIsRightPanelOpen,
     customFacetKeys,

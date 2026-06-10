@@ -1,16 +1,14 @@
-import React, { useMemo, useCallback, useRef } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Popover,
   useTheme,
   alpha,
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
-import { Bar } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
-import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 
 // ─── Constants ───
 
@@ -46,11 +44,13 @@ export const VolumeChart: React.FC<{
   isDark: boolean;
   period: string;
   onZoom?: (start: string, end: string) => void;
-}> = ({ data, isDark, onZoom }) => {
+}> = ({ data, onZoom }) => {
   const { t, i18n } = useTranslation();
-  const { sortedBuckets, chartData } = useMemo(() => {
+
+  const { sortedBuckets, chartLabels, chartDatasets } = useMemo(() => {
     if (data.length === 0)
-      return { sortedBuckets: [] as string[], chartData: null };
+      return { sortedBuckets: [] as string[], chartLabels: [] as string[], chartDatasets: [] };
+
     const bucketMap = new Map<string, number>();
     data.forEach((p) => {
       const count = Number(p.count) || 0;
@@ -59,6 +59,7 @@ export const VolumeChart: React.FC<{
     const sorted = [...bucketMap.entries()].sort((a, b) =>
       a[0].localeCompare(b[0])
     );
+
     const labels = sorted.map(([b]) => {
       const d = new Date(b);
       return d.toLocaleString(i18n.language || 'en', {
@@ -69,104 +70,56 @@ export const VolumeChart: React.FC<{
         hour12: false,
       });
     });
-    const values = sorted.map(([, c]) => c);
+
+    const datasets = [
+      {
+        label: t('argus.discover.volumeTitle', 'count(events)'),
+        data: sorted.map(([, c]) => c),
+        type: 'bar' as const,
+        color: '#7c4dff',
+      },
+    ];
+
     return {
       sortedBuckets: sorted.map(([b]) => b),
-      chartData: {
-        labels,
-        datasets: [
-          {
-            data: values,
-            backgroundColor: alpha('#7c4dff', 0.55),
-            hoverBackgroundColor: '#7c4dff',
-            borderRadius: 1,
-            barPercentage: 0.9,
-            categoryPercentage: 0.92,
-          },
-        ],
-      },
+      chartLabels: labels,
+      chartDatasets: datasets,
     };
-  }, [data]);
+  }, [data, i18n.language, t]);
 
-  const chartRef = useRef<any>(null);
-
-  const handleChartClick = useCallback(
-    (_event: any, elements: any[]) => {
-      if (!onZoom || sortedBuckets.length === 0 || elements.length === 0)
-        return;
-      const idx = elements[0].index;
-      const bucket = sortedBuckets[idx];
-      if (bucket) {
-        const start = new Date(bucket);
-        const end = new Date(start.getTime() + 3600_000);
+  const handleZoom = useCallback(
+    (startIdx: number, endIdx: number) => {
+      if (!onZoom) return;
+      const si = Math.min(startIdx, endIdx);
+      const ei = Math.max(startIdx, endIdx);
+      if (sortedBuckets[si] && sortedBuckets[ei]) {
+        const start = new Date(sortedBuckets[si]);
+        let end = new Date(sortedBuckets[ei]);
+        if (sortedBuckets.length > 1) {
+          const gap =
+            new Date(sortedBuckets[1]).getTime() -
+            new Date(sortedBuckets[0]).getTime();
+          end = new Date(end.getTime() + gap);
+        } else {
+          end = new Date(end.getTime() + 3600_000);
+        }
         onZoom(start.toISOString(), end.toISOString());
       }
     },
     [onZoom, sortedBuckets]
   );
 
-  if (!chartData)
-    return (
-      <EmptyPlaceholder
-        message={t('argus.discover.noEventData')}
-        minHeight={130}
-      />
-    );
-
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        mb: 2,
-        p: 2,
-        pt: 1.5,
-        borderRadius: 2,
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: '0.78rem',
-          fontWeight: 700,
-          mb: 1,
-          color: 'text.secondary',
-        }}
-      >
-        {t('argus.discover.volumeTitle', 'count(events)')}
-      </Typography>
-      <Box sx={{ height: 130, cursor: onZoom ? 'crosshair' : undefined }}>
-        <Bar
-          ref={chartRef}
-          data={chartData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: { duration: 300 },
-            onClick: handleChartClick,
-            plugins: { legend: { display: false }, tooltip: { enabled: true } },
-            scales: {
-              x: {
-                grid: { display: false },
-                ticks: {
-                  font: { size: 9 },
-                  color: isDark ? '#555' : '#bbb',
-                  maxTicksLimit: 8,
-                },
-                border: { display: false },
-              },
-              y: {
-                grid: {
-                  color: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)',
-                },
-                ticks: { font: { size: 9 }, color: isDark ? '#555' : '#bbb' },
-                border: { display: false },
-                beginAtZero: true,
-              },
-            },
-          }}
-        />
-      </Box>
-    </Paper>
+    <ArgusVolumeChart
+      datasets={chartDatasets}
+      labels={chartLabels}
+      emptyMessage={t('argus.discover.noEventData')}
+      title={t('argus.discover.volumeTitle', 'count(events)')}
+      onZoom={onZoom ? handleZoom : undefined}
+      storagePrefix="argus_discover_volume"
+      showChartTypeToggle={false}
+      showCompactToggle={false}
+    />
   );
 };
 

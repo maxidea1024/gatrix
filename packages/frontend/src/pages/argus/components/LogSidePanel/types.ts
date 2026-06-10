@@ -2,10 +2,11 @@ import { ArgusLogEntry } from '@/services/argusService';
 
 export interface LogSidePanelProps {
   log: ArgusLogEntry | null;
+  loading?: boolean;
   open: boolean;
   onClose: () => void;
-  onPrev: () => void;
-  onNext: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
   onFilter: (key: string, value: string, exclude: boolean) => void;
   hasPrev: boolean;
   hasNext: boolean;
