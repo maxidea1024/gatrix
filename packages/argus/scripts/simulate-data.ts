@@ -205,6 +205,23 @@ function dynamicTags(
     ]);
   if (Math.random() < 0.1)
     base['session.is_returning'] = randomPick(['true', 'false']);
+
+  // ── Number-type tags for testing numeric queries ──
+  // These appear frequently so number-type filters can be tested properly
+  base['response_time_ms'] = String(randomInt(5, 5000));
+  base['memory_usage_mb'] = String(randomInt(64, 4096));
+  if (Math.random() < 0.7)
+    base['cpu_percent'] = String(randomFloat(1, 99).toFixed(1));
+  if (Math.random() < 0.5)
+    base['error_count'] = String(randomInt(0, 50));
+  if (Math.random() < 0.4)
+    base['retry_count'] = String(randomInt(0, 5));
+  if (Math.random() < 0.3)
+    base['queue_depth'] = String(randomInt(0, 10000));
+  if (Math.random() < 0.3)
+    base['connection_count'] = String(randomInt(1, 500));
+  if (Math.random() < 0.5)
+    base['payload_size_bytes'] = String(randomInt(64, 1048576));
   return base;
 }
 

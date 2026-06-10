@@ -304,15 +304,17 @@ class Parser {
   private parseMultiValueArgs(
     fieldToken: Token,
     operator: QueryOperator,
-    funcToken?: Token
+    funcToken?: Token,
+    isBracket: boolean = false
   ): FilterExpression {
-    this.advance(); // consume (
+    this.advance(); // consume ( or [
 
     const values: (string | number | boolean)[] = [];
     let quoted = true; // default for array representation
+    const closingTokenType = isBracket ? TokenType.RBRACKET : TokenType.RPAREN;
 
     while (
-      this.current().type !== TokenType.RPAREN &&
+      this.current().type !== closingTokenType &&
       this.current().type !== TokenType.EOF
     ) {
       const valTok = this.current();
@@ -341,12 +343,12 @@ class Parser {
       this.pos > 0
         ? this.tokens[this.pos - 1].end
         : (funcToken?.end ?? fieldToken.end);
-    if (this.current().type === TokenType.RPAREN) {
+    if (this.current().type === closingTokenType) {
       end = this.current().end;
-      this.advance(); // consume )
+      this.advance(); // consume ) or ]
     } else {
       const startPos = funcToken ? funcToken.start : fieldToken.end + 1;
-      this.addError('UNCLOSED_PAREN', startPos, end, {});
+      this.addError(isBracket ? 'UNCLOSED_BRACKET' : 'UNCLOSED_PAREN', startPos, end, {});
     }
 
     return {
@@ -367,12 +369,15 @@ class Parser {
     operator: QueryOperator,
     funcToken?: Token
   ): FilterExpression {
-    if (this.current().type === TokenType.LPAREN) {
-      // Empty function call check, e.g. contains()
-      if (this.peek()?.type === TokenType.RPAREN) {
-        this.advance(); // consume (
+    const startType = this.current().type;
+    if (startType === TokenType.LPAREN || startType === TokenType.LBRACKET) {
+      const isBracket = startType === TokenType.LBRACKET;
+      const closingType = isBracket ? TokenType.RBRACKET : TokenType.RPAREN;
+      // Empty function call check, e.g. contains() or []
+      if (this.peek()?.type === closingType) {
+        this.advance(); // consume ( or [
         const end = this.current().end;
-        this.advance(); // consume )
+        this.advance(); // consume ) or ]
         if (funcToken) {
           this.addError('INCOMPLETE_FUNCTION', funcToken.start, funcToken.end, {
             op: funcToken.value,
@@ -393,7 +398,7 @@ class Parser {
           end,
         };
       }
-      return this.parseMultiValueArgs(fieldToken, operator, funcToken);
+      return this.parseMultiValueArgs(fieldToken, operator, funcToken, isBracket);
     }
 
     const tok = this.current();

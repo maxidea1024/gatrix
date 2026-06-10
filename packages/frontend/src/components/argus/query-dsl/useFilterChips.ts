@@ -130,7 +130,7 @@ function filterToChip(node: FilterExpression): FilterChip {
   // Populate values for multi-value operators
   if (node.values && node.values.length > 0) {
     chip.values = node.values.map(String);
-    chip.value = chip.values.join(', ');
+    chip.value = chip.values[0];
   }
   return chip;
 }
@@ -427,7 +427,7 @@ export function queryToChips(query: string): FilterChip[] {
             type: 'filter',
             field,
             operator,
-            value: values.join(', '),
+            value: values[0] ?? '',
             values,
             quoted: true,
           });
@@ -541,7 +541,7 @@ export function queryToChips(query: string): FilterChip[] {
           type: 'filter',
           field,
           operator: '=',
-          value: values.join(', '),
+          value: values[0] ?? '',
           values,
           quoted: true,
         });

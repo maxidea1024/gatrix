@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import { Box, Typography, IconButton, Tooltip, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
 import type { DomainConfig } from './types';
@@ -37,6 +38,10 @@ export interface FilterTokenGroupProps {
   onValueInputChange?: (chipId: string, text: string) => void;
   onValueInputKeyDown?: (chipId: string, e: React.KeyboardEvent) => void;
   onValueInputBlur?: (chipId: string) => void;
+  /** Currently selected values for pill tag display during inline editing */
+  selectedValues?: Set<string>;
+  /** Called when a value pill tag is removed */
+  onValueTagRemove?: (chipId: string, value: string) => void;
 }
 
 /** Ref handle to access individual token DOM elements */
@@ -63,10 +68,13 @@ export const FilterTokenGroup = forwardRef<
     onValueInputChange,
     onValueInputKeyDown,
     onValueInputBlur,
+    selectedValues,
+    onValueTagRemove,
   },
   ref
 ) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
   const chipContainerRef = useRef<HTMLDivElement>(null);
@@ -279,18 +287,74 @@ export const FilterTokenGroup = forwardRef<
             ...tokenStyle('value'),
             overflow: 'visible',
             cursor: 'text',
+            display: 'inline-flex',
+            flexWrap: 'wrap',
+            gap: '2px',
+            alignItems: 'center',
           }}
         >
+          {/* Existing values as pill tags (Sentry style) */}
+          {selectedValues && Array.from(selectedValues).map((v) => (
+            <Box
+              key={v}
+              component="span"
+              onMouseDown={(e: React.MouseEvent) => {
+                // Prevent blur on the inline input when clicking anywhere on a pill
+                e.preventDefault();
+              }}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2px',
+                px: 0.5,
+                py: 0,
+                borderRadius: '3px',
+                fontSize: '0.75rem',
+                backgroundColor: isDark
+                  ? 'rgba(251,191,36,0.15)'
+                  : 'rgba(217,119,6,0.10)',
+                color: valueColor,
+                maxWidth: 120,
+                lineHeight: 1.4,
+              }}
+            >
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
+              <Box
+                component="span"
+                onMouseDown={(e: React.MouseEvent) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onValueTagRemove?.(chip.id, v);
+                }}
+                sx={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: 14, height: 14, borderRadius: '50%', cursor: 'pointer',
+                  opacity: 0.5, '&:hover': { opacity: 1, bgcolor: 'rgba(255,255,255,0.1)' },
+                  flexShrink: 0,
+                }}
+              >
+                <CloseIcon sx={{ fontSize: 10, pointerEvents: 'none' }} />
+              </Box>
+            </Box>
+          ))}
+          {/* Text input for adding new values */}
           <input
             ref={valueInputRef}
             autoFocus
             value={editingValueText ?? ''}
-            placeholder="..."
+            placeholder={selectedValues && selectedValues.size > 0 ? '' : '...'}
             onChange={(e) => onValueInputChange?.(chip.id, e.target.value)}
             onKeyDown={(e) => {
               // Block Enter/Tab during IME composition
               if (isIME && (e.key === 'Enter' || e.key === 'Tab')) {
                 e.preventDefault();
+                return;
+              }
+              // Backspace on empty input → remove last pill
+              if (e.key === 'Backspace' && (editingValueText ?? '') === '' && selectedValues && selectedValues.size > 0) {
+                e.preventDefault();
+                const lastVal = Array.from(selectedValues).pop();
+                if (lastVal) onValueTagRemove?.(chip.id, lastVal);
                 return;
               }
               onValueInputKeyDown?.(chip.id, e);
@@ -309,7 +373,7 @@ export const FilterTokenGroup = forwardRef<
               padding: 0,
               margin: 0,
               width: `${inputWidth}px`,
-              minWidth: '40px',
+              minWidth: selectedValues && selectedValues.size > 0 ? '20px' : '40px',
               maxWidth: '300px',
             }}
           />
@@ -317,11 +381,23 @@ export const FilterTokenGroup = forwardRef<
       ) : (
         <Tooltip
           title={(() => {
-            const fullText =
-              chip.values && chip.values.length > 1
-                ? chip.values.join(chip.operator === '!=' ? ' and ' : ' or ')
-                : (chip.value ?? '');
-            return fullText.length > 30 ? fullText : '';
+            if (chip.values && chip.values.length > 1) {
+              return (
+                <Box sx={{ fontSize: '0.7rem', lineHeight: 1.6, py: 0.3 }}>
+                  <Box sx={{ fontWeight: 600, opacity: 0.7, mb: 0.3, fontSize: '0.6rem' }}>
+                    {t('dsl.chip.valueCount', '{{count}} values', { count: chip.values.length })}
+                  </Box>
+                  {chip.values.map((v, i) => (
+                    <Box key={v} sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
+                      <span style={{ opacity: 0.35, fontSize: '0.6rem', minWidth: 12, textAlign: 'right' }}>{i + 1}.</span>
+                      <span>{v}</span>
+                    </Box>
+                  ))}
+                </Box>
+              );
+            }
+            const text = chip.value ?? '';
+            return text.length > 30 ? text : '';
           })()}
           placement="top"
           enterDelay={300}

@@ -21,7 +21,7 @@ function pipeline(input: string, cursor?: number) {
   const ctx = resolveCursorContext(input, c, tokens);
   const textBeforeCursor = input.slice(0, c);
   const chips = queryToChips(textBeforeCursor);
-  const suggestions = getSuggestions(ctx, LOGS_CONFIG, MOCK_FACETS, 20, chips);
+  const suggestions = getSuggestions(ctx, LOGS_CONFIG, MOCK_FACETS, 100, chips);
   return { tokens, ctx, suggestions };
 }
 

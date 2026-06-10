@@ -407,11 +407,8 @@ export function QueryDSLEditor({
             values: [...(chip?.values ?? [])],
           };
           const isComposingChip = !!chip?.composingPart;
-          const textVal = isComposingChip
-            ? ''
-            : (chip?.values?.length ?? 0) > 0
-              ? chip!.values!.join(', ')
-              : (chip?.value ?? '');
+          // Existing values are shown as pill tags; input starts empty for new values
+          const textVal = '';
           setInlineValueText(textVal);
           setPopoverHighlightIdx(-1);
           inlineValueDirtyRef.current = false;
@@ -516,7 +513,10 @@ export function QueryDSLEditor({
   const inlineSelectedValues = useMemo(() => {
     if (!editingToken) return new Set<string>();
     const chip = chips.find((c) => c.id === editingToken.chipId);
-    return new Set(chip?.values?.filter((v) => v !== '') ?? []);
+    const vals = chip?.values?.filter((v) => v !== '') ?? [];
+    // Fallback: single-value chips may only have chip.value without chip.values
+    if (vals.length === 0 && chip?.value) return new Set([chip.value]);
+    return new Set(vals);
   }, [editingToken, chips]);
 
   /** Close inline editing and return focus to main input */
@@ -541,11 +541,19 @@ export function QueryDSLEditor({
     (chipId: string) => {
       let vals: string[];
       if (inlineValueDirtyRef.current) {
-        // User manually typed → parse from text (comma = separator)
-        vals = inlineValueText
-          .split(',')
-          .map((v) => v.trim())
-          .filter((v) => v !== '');
+        // User manually typed → treat entire text as single value (no comma splitting)
+        const trimmed = inlineValueText.trim();
+        const chip = chips.find((c) => c.id === chipId);
+        const existing = chip?.values?.filter((v) => v !== '') ?? [];
+        if (trimmed) {
+          if (!existing.includes(trimmed)) {
+            vals = [...existing, trimmed];
+          } else {
+            vals = existing.length > 0 ? existing : [trimmed];
+          }
+        } else {
+          vals = existing;
+        }
       } else {
         // Checkbox-only edits → use chip.values directly
         const chip = chips.find((c) => c.id === chipId);
@@ -553,13 +561,8 @@ export function QueryDSLEditor({
       }
 
       if (vals.length === 0) {
-        // Empty → revert
-        const orig = originalValueRef.current;
-        if (!orig.value && orig.values.length === 0) {
-          deleteChip(chipId);
-        } else {
-          updateChip(chipId, { value: orig.value, values: orig.values });
-        }
+        // All values removed → delete the chip
+        deleteChip(chipId);
         closeInlineEdit();
         return;
       }
@@ -643,7 +646,8 @@ export function QueryDSLEditor({
         valSet.add(value);
       }
       const newVals = Array.from(valSet);
-      setInlineValueText(newVals.join(', '));
+      // Don't update inline text — pill tags display the values
+      setInlineValueText('');
       // Real-time chip update
       updateChip(editingToken.chipId, {
         value: newVals[0] ?? '',
@@ -656,6 +660,28 @@ export function QueryDSLEditor({
       });
     },
     [editingToken, chips, updateChip]
+  );
+
+  /** Remove a value pill tag during inline editing */
+  const handleValueTagRemove = useCallback(
+    (chipId: string, value: string) => {
+      const chip = chips.find((c) => c.id === chipId);
+      const newVals = chip?.values?.filter((v) => v !== value) ?? [];
+      updateChip(chipId, {
+        value: newVals[0] ?? '',
+        values: newVals,
+      });
+      // Cancel any pending blur
+      if (blurTimeoutRef.current) {
+        clearTimeout(blurTimeoutRef.current);
+        blurTimeoutRef.current = null;
+      }
+      // Re-focus inline input
+      requestAnimationFrame(() => {
+        tokenGroupRefs.current.get(chipId)?.focusValueInput();
+      });
+    },
+    [chips, updateChip]
   );
 
   /** Handle inline input key events */
@@ -726,9 +752,10 @@ export function QueryDSLEditor({
         setPopoverHighlightIdx((prev) => Math.max(prev - 1, -1));
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        // If nothing is checked yet and a suggestion is highlighted, select it directly
         const currentChip = chips.find((c) => c.id === chipId);
         const currentVals = currentChip?.values?.filter((v) => v !== '') ?? [];
+
+        // If nothing is checked yet and a suggestion is highlighted, select it directly
         if (
           currentVals.length === 0 &&
           popoverHighlightIdx >= 0 &&
@@ -741,6 +768,18 @@ export function QueryDSLEditor({
             composingPart: undefined,
           });
           closeInlineEdit();
+        } else if (inlineValueText.trim() && currentVals.length > 0) {
+          // Typed text + existing values → add as new value (don't close editing)
+          const trimmed = inlineValueText.trim();
+          if (!currentVals.includes(trimmed)) {
+            updateChip(chipId, {
+              values: [...currentVals, trimmed],
+              value: currentVals[0],
+            });
+          }
+          setInlineValueText('');
+          inlineValueDirtyRef.current = false;
+          setPopoverHighlightIdx(-1);
         } else {
           commitInlineEdit(chipId);
         }
@@ -2080,6 +2119,12 @@ export function QueryDSLEditor({
                   onValueInputChange={handleInlineValueChange}
                   onValueInputKeyDown={handleInlineValueKeyDown}
                   onValueInputBlur={handleInlineValueBlur}
+                  selectedValues={
+                    editingToken?.chipId === chip.id
+                      ? inlineSelectedValues
+                      : undefined
+                  }
+                  onValueTagRemove={handleValueTagRemove}
                 />
               );
             })}
