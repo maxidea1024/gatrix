@@ -320,10 +320,11 @@ const ArgusTraceExplorerPage: React.FC = () => {
       if (e.key === 'Enter') {
         setUrlState({ q: search.trim() });
         setSearchFocused(false);
-        setTimeout(fetchAll, 10);
+        // No explicit fetchAll() — setUrlState triggers the
+        // search → fetchSpans/fetchAll → useEffect chain automatically.
       }
     },
-    [search, setUrlState, fetchAll]
+    [search, setUrlState]
   );
 
   const handleFilterChange = useCallback(

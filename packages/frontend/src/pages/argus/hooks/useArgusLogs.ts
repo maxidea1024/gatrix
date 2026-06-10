@@ -624,9 +624,10 @@ export function useArgusLogs() {
     (val: string) => {
       setSearch(val);
       setUrlState({ q: val });
-      setTimeout(() => fetchLogs(), 10);
+      // No explicit fetchLogs() here — setSearch triggers the
+      // fetchLogs → fetchAll → useEffect([fetchAll]) chain automatically.
     },
-    [setUrlState, fetchLogs]
+    [setUrlState]
   );
 
   // Side panel handlers

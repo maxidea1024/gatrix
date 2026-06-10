@@ -781,3 +781,51 @@ export default React.memo(MemoizedItem);
 ```
 
 > **핵심:** 부모 → 자식으로 전달하는 콜백은 **하나의 안정적 함수**로, 자식이 자신의 ID를 인자로 넘기는 구조를 사용합니다. 이렇게 하면 25개 아이템이 있어도 콜백 참조는 변하지 않아 `React.memo`가 정상 작동합니다.
+
+## State Update + Fetch: 절대로 setTimeout으로 fetch하지 마세요
+
+`setState` 직후에 `setTimeout(() => fetch(), N)`으로 데이터를 재조회하면 **stale closure race condition**이 발생합니다.
+
+### 왜 문제인가
+
+`useCallback`으로 생성된 `fetchData` 함수는 deps에 포함된 state를 **클로저로 캡처**합니다. `setState`를 호출해도 React 배치가 처리되기 전까지 이전 클로저가 유지됩니다.
+
+```tsx
+// ❌ Race condition 발생
+const handleSearch = useCallback((val: string) => {
+  setSearch(val);                    // ① React 배치 (아직 미처리)
+  setTimeout(() => fetchLogs(), 10); // ② stale closure — 이전 search=""로 호출
+}, [fetchLogs]);                     // fetchLogs는 이전 search를 캡처
+
+// 실행 순서:
+// 1. setTimeout 10ms 후: fetchLogs(search="") 실행 → 필터 없이 조회 ❌
+// 2. React 배치 처리: search 업데이트 → fetchLogs 재생성 → useEffect 실행 → 올바른 조회 ✅
+// 3. 두 요청이 경쟁 — stale 응답이 나중에 도착하면 올바른 결과를 덮어씌움 ❌
+```
+
+### 올바른 패턴
+
+이 프로젝트에서는 `fetch` 함수가 state를 deps로 가지고 있고, `useEffect`가 fetch 함수 변경을 감지하여 자동으로 재실행합니다. 따라서 **state만 업데이트하면 자동으로 fetch가 트리거**됩니다.
+
+```tsx
+// ✅ 올바른 패턴 — state 업데이트만 하면 자동으로 fetch 체인이 동작
+const handleSearch = useCallback((val: string) => {
+  setSearch(val);
+  setUrlState({ q: val });
+  // 명시적 fetch 불필요:
+  // setSearch → fetchLogs 재생성 (deps: [search])
+  //           → fetchAll 재생성 (deps: [fetchLogs])
+  //           → useEffect([fetchAll]) 실행
+}, [setUrlState]);
+```
+
+### 자동 fetch 체인 구조
+
+```
+setState(newValue)
+  → useCallback fetchData deps 변경 → fetchData 새 클로저 생성
+    → useCallback fetchAll deps 변경 → fetchAll 새 클로저 생성
+      → useEffect([fetchAll]) 트리거 → 올바른 state로 fetch 실행
+```
+
+> **핵심:** `setTimeout`, `requestAnimationFrame`, `queueMicrotask` 등으로 fetch를 지연 호출하지 마세요. React의 state → deps → effect 체인을 신뢰하세요. 이 체인이 없는 경우에도 setTimeout 대신 `useEffect`로 state 변경에 반응하도록 설계하세요.
