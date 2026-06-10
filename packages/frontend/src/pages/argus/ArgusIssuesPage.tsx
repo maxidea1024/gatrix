@@ -799,6 +799,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                   setCurrentPage(1);
                 }}
                 fetchFieldValues={fetchFieldValues}
+                initialFacets={facetData}
               />
             </Box>
             <FilterChipSelect

@@ -38,6 +38,7 @@ import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import ExploreActions from '@/components/argus/ExploreActions';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
+import { TRACES_CONFIG } from '@/components/argus/query-dsl/fields';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -251,6 +252,25 @@ const ArgusTraceExplorerPage: React.FC = () => {
       console.error('Failed to fetch span tags', err);
     }
   }, [projectId, currentPeriod]);
+
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      if (fieldKey === 'op' && tags.op) return tags.op.map((x) => x.value);
+      if (fieldKey === 'status' && tags.status) return tags.status.map((x) => x.value);
+      if (fieldKey === 'domain' && tags.domain) return tags.domain.map((x) => x.value);
+
+      if (fieldKey === 'environment') {
+        try {
+          const opts = await argusService.getFilterOptions(projectId, currentPeriod);
+          return opts.environments || [];
+        } catch {
+          return [];
+        }
+      }
+      return [];
+    },
+    [projectId, currentPeriod, tags]
+  );
 
   const fetchAggregates = useCallback(
     async (groupByVal?: string) => {
@@ -643,19 +663,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
             <QueryBuilderPanel
               open={builderOpen}
               onClose={() => setBuilderOpen(false)}
-              config={{
-                name: 'trace',
-                fields: ['op', 'status', 'domain', 'action'].map((f) => ({
-                  key: f,
-                  label: f,
-                  type: 'string' as const,
-                  searchable: true,
-                  operators: ['=', '!=', 'contains', '!contains'] as any,
-                  category: 'trace' as const,
-                  description: f,
-                })),
-              }}
+              config={TRACES_CONFIG}
               query={search}
+              facets={Object.fromEntries(
+                Object.entries(tags || {}).map(([k, list]) => [
+                  k,
+                  Array.isArray(list) ? list.map((item: any) => ({ value: item.value, count: Number(item.count || 0) })) : []
+                ])
+              )}
+              fetchFieldValues={fetchFieldValues}
               onApply={(q) => {
                 setSearch(q);
                 setUrlState({ q });

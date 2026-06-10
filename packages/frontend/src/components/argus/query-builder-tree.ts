@@ -11,8 +11,7 @@ import { chipToQueryPart } from './query-dsl/useFilterChips';
 // ═════════════════════════════════════════════════════════════════════════════
 
 let _treeId = 0;
-export const nextId = () =>
-  `cond_${++_treeId}_${Math.random().toString(36).slice(2, 5)}`;
+export const nextId = () => `cond_${++_treeId}_${Math.random().toString(36).slice(2, 5)}`;
 
 export interface FilterCondition {
   id: string;
@@ -40,25 +39,11 @@ export type Condition = FilterCondition | GroupCondition;
 // Factory helpers
 // ═════════════════════════════════════════════════════════════════════════════
 
-export function createFilter(
-  field = '',
-  operator = '=',
-  value = ''
-): FilterCondition {
-  return {
-    id: nextId(),
-    type: 'filter',
-    field,
-    operator,
-    value,
-    negated: false,
-  };
+export function createFilter(field = '', operator = '=', value = ''): FilterCondition {
+  return { id: nextId(), type: 'filter', field, operator, value, negated: false };
 }
 
-export function createGroup(
-  connector: 'AND' | 'OR' = 'AND',
-  children: Condition[] = []
-): GroupCondition {
+export function createGroup(connector: 'AND' | 'OR' = 'AND', children: Condition[] = []): GroupCondition {
   return { id: nextId(), type: 'group', connector, negated: false, children };
 }
 
@@ -86,11 +71,7 @@ interface ParseResult {
   connector: 'AND' | 'OR';
 }
 
-function parseLevel(
-  chips: FilterChip[],
-  start: number,
-  end: number
-): ParseResult {
+function parseLevel(chips: FilterChip[], start: number, end: number): ParseResult {
   const items: Condition[] = [];
   let connector: 'AND' | 'OR' = 'AND';
   let i = start;
@@ -100,8 +81,7 @@ function parseLevel(
 
     // Parentheses → sub-group
     if (c.type === 'paren' && c.label === '(') {
-      let depth = 1,
-        j = i + 1;
+      let depth = 1, j = i + 1;
       while (j < end && depth > 0) {
         if (chips[j].type === 'paren' && chips[j].label === '(') depth++;
         if (chips[j].type === 'paren' && chips[j].label === ')') depth--;
@@ -115,14 +95,9 @@ function parseLevel(
 
     // NOT
     if (c.type === 'logical' && c.label === 'NOT') {
-      if (
-        i + 1 < end &&
-        chips[i + 1].type === 'paren' &&
-        chips[i + 1].label === '('
-      ) {
+      if (i + 1 < end && chips[i + 1].type === 'paren' && chips[i + 1].label === '(') {
         // NOT (group)
-        let depth = 1,
-          j = i + 2;
+        let depth = 1, j = i + 2;
         while (j < end && depth > 0) {
           if (chips[j].type === 'paren' && chips[j].label === '(') depth++;
           if (chips[j].type === 'paren' && chips[j].label === ')') depth--;
@@ -136,10 +111,7 @@ function parseLevel(
         continue;
       }
       // NOT filter
-      if (
-        i + 1 < end &&
-        (chips[i + 1].type === 'filter' || !chips[i + 1].type)
-      ) {
+      if (i + 1 < end && (chips[i + 1].type === 'filter' || !chips[i + 1].type)) {
         const f = chipToFilter(chips[i + 1]);
         f.negated = true;
         items.push(f);
@@ -176,10 +148,7 @@ function chipToFilter(chip: FilterChip): FilterCondition {
   if (chip.values && chip.values.length > 1) {
     values = [...chip.values];
   } else if (chip.value && chip.value.includes(', ')) {
-    const parts = chip.value
-      .split(', ')
-      .map((v) => v.trim())
-      .filter(Boolean);
+    const parts = chip.value.split(', ').map((v) => v.trim()).filter(Boolean);
     if (parts.length > 1) values = parts;
   }
   return {
@@ -203,10 +172,7 @@ function resolveValues(cond: FilterCondition): string[] | null {
   if (cond.values && cond.values.length > 1) return cond.values;
   // Detect comma-separated values in the value string
   if (cond.value && cond.value.includes(', ')) {
-    const parts = cond.value
-      .split(', ')
-      .map((v) => v.trim())
-      .filter(Boolean);
+    const parts = cond.value.split(', ').map((v) => v.trim()).filter(Boolean);
     if (parts.length > 1) return parts;
   }
   return null;
@@ -236,8 +202,7 @@ export function conditionToDsl(cond: Condition): string {
   // Group
   const parts = cond.children.map(conditionToDsl).filter(Boolean);
   if (parts.length === 0) return '';
-  const inner =
-    parts.length === 1 ? parts[0] : `(${parts.join(` ${cond.connector} `)})`;
+  const inner = parts.length === 1 ? parts[0] : `(${parts.join(` ${cond.connector} `)})`;
   return cond.negated ? `NOT ${inner}` : inner;
 }
 
@@ -249,44 +214,48 @@ export function conditionToSql(cond: Condition): string {
   const esc = (s: string) => `'${s.replace(/'/g, "''")}'`;
 
   if (cond.type === 'filter') {
-    if (
-      !cond.field ||
-      (!cond.value && cond.field !== 'has' && cond.field !== '!has')
-    )
-      return '';
-    const not = cond.negated ? 'NOT ' : '';
+    if (!cond.field || (!cond.value && cond.field !== 'has' && cond.field !== '!has')) return '';
+    
+    let expr = '';
 
     // HAS / !HAS
-    if (cond.field === 'has') return `${not}${cond.value} IS NOT NULL`;
-    if (cond.field === '!has') return `${not}${cond.value} IS NULL`;
-
-    // Multi-value → IN clause
-    const multi = resolveValues(cond);
-    if (multi) {
-      const inList = multi.map(esc).join(', ');
-      const op = cond.operator === '!=' ? 'NOT IN' : 'IN';
-      return `${not}${cond.field} ${op} (${inList})`;
+    if (cond.field === 'has') expr = `${cond.value} IS NOT NULL`;
+    else if (cond.field === '!has') expr = `${cond.value} IS NULL`;
+    else {
+      // Multi-value → IN clause
+      const multi = resolveValues(cond);
+      if (multi) {
+        const inList = multi.map(esc).join(', ');
+        const op = cond.operator === '!=' ? 'NOT IN' : 'IN';
+        expr = `${cond.field} ${op} (${inList})`;
+      } else {
+        const fm: Record<string, (x: string) => string> = {
+          contains: (x) => `ILIKE ${esc(`%${x}%`)}`,
+          '!contains': (x) => `NOT ILIKE ${esc(`%${x}%`)}`,
+          startsWith: (x) => `ILIKE ${esc(`${x}%`)}`,
+          '!startsWith': (x) => `NOT ILIKE ${esc(`${x}%`)}`,
+          endsWith: (x) => `ILIKE ${esc(`%${x}`)}`,
+          '!endsWith': (x) => `NOT ILIKE ${esc(`%${x}`)}`,
+        };
+        if (fm[cond.operator]) expr = `${cond.field} ${fm[cond.operator](cond.value)}`;
+        else expr = `${cond.field} ${cond.operator} ${esc(cond.value)}`;
+      }
     }
 
-    const fm: Record<string, (x: string) => string> = {
-      contains: (x) => `ILIKE ${esc(`%${x}%`)}`,
-      '!contains': (x) => `NOT ILIKE ${esc(`%${x}%`)}`,
-      startsWith: (x) => `ILIKE ${esc(`${x}%`)}`,
-      '!startsWith': (x) => `NOT ILIKE ${esc(`${x}%`)}`,
-      endsWith: (x) => `ILIKE ${esc(`%${x}`)}`,
-      '!endsWith': (x) => `NOT ILIKE ${esc(`%${x}`)}`,
-    };
-    if (fm[cond.operator])
-      return `${not}${cond.field} ${fm[cond.operator](cond.value)}`;
-    return `${not}${cond.field} ${cond.operator} ${esc(cond.value)}`;
+    return cond.negated ? `NOT (${expr})` : expr;
   }
 
   // Group
   const parts = cond.children.map(conditionToSql).filter(Boolean);
   if (parts.length === 0) return '';
-  const not = cond.negated ? 'NOT ' : '';
-  if (parts.length === 1) return `${not}${parts[0]}`;
-  return `${not}(${parts.join(` ${cond.connector} `)})`;
+  if (parts.length === 1) return cond.negated ? `NOT (${parts[0]})` : parts[0];
+  return cond.negated ? `NOT (${parts.join(` ${cond.connector} `)})` : `(${parts.join(` ${cond.connector} `)})`;
+}
+
+// Helper: prefix first line with `first`, remaining lines with `rest`
+function prefixBlock(text: string, first: string, rest: string): string {
+  const lines = text.split('\n');
+  return lines.map((line, i) => (i === 0 ? first : rest) + line).join('\n');
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -294,108 +263,82 @@ export function conditionToSql(cond: Condition): string {
 // ═════════════════════════════════════════════════════════════════════════════
 
 export function conditionToDslPretty(cond: Condition): string {
-  return formatDslNode(cond, 0);
-}
+  const fmt = (c: Condition, depth: number): string[] => {
+    if (c.type === 'filter') {
+      return [conditionToDsl(c)];
+    }
+    const childLineGroups = c.children.map((ch) => fmt(ch, depth + 1)).filter((lines) => lines.length > 0);
+    if (childLineGroups.length === 0) return [];
 
-function formatDslNode(cond: Condition, depth: number): string {
-  if (cond.type === 'filter') {
-    if (!cond.field) return '';
-    const multi = resolveValues(cond);
-    const chip: FilterChip = {
-      id: cond.id,
-      type: 'filter',
-      field: cond.field,
-      operator: cond.operator,
-      value: multi ? multi[0] : cond.value,
-      values: multi ?? undefined,
-      quoted: cond.quoted,
-    };
-    const part = chipToQueryPart(chip);
-    return cond.negated ? `NOT ${part}` : part;
-  }
+    const out: string[] = [];
+    childLineGroups.forEach((lines, i) => {
+      const isFirst = i === 0;
+      const prefix = isFirst ? '' : `${c.connector} `;
+      const pad = ' '.repeat(prefix.length);
 
-  const parts = cond.children
-    .map((c) => formatDslNode(c, depth + 1))
-    .filter(Boolean);
-  if (parts.length === 0) return '';
-  if (parts.length === 1) {
-    const inner = parts[0];
-    return cond.negated ? `NOT ${inner}` : inner;
-  }
+      lines.forEach((line, j) => {
+        if (j === 0) out.push(`${prefix}${line.trimStart()}`);
+        else out.push(`${pad}${line.trimStart()}`);
+      });
+    });
 
-  const connector = cond.connector; // AND / OR
-  const pad = '  '.repeat(depth);
-  const lines = parts.map((p, i) => {
-    if (i === 0) return p;
-    return `${pad}${connector.padStart(4)} ${p}`;
-  });
-  const body = lines.join('\n');
-  if (depth > 0) {
-    return cond.negated ? `NOT (${body})` : `(${body})`;
-  }
-  return cond.negated ? `NOT (${body})` : body;
-}
-
-// ═════════════════════════════════════════════════════════════════════════════
-// Pretty-printed ClickHouse SQL (multi-line, aligned)
-// ═════════════════════════════════════════════════════════════════════════════
-
-export function conditionToSqlPretty(cond: Condition): string {
-  const sql = formatSqlNode(cond, 0);
-  return sql ? `WHERE ${sql}` : '';
-}
-
-function formatSqlNode(cond: Condition, depth: number): string {
-  const esc = (s: string) => `'${s.replace(/'/g, "''")}'`;
-
-  if (cond.type === 'filter') {
-    if (
-      !cond.field ||
-      (!cond.value && cond.field !== 'has' && cond.field !== '!has')
-    )
-      return '';
-    const not = cond.negated ? 'NOT ' : '';
-    if (cond.field === 'has') return `${not}${cond.value} IS NOT NULL`;
-    if (cond.field === '!has') return `${not}${cond.value} IS NULL`;
-
-    const multi = resolveValues(cond);
-    if (multi) {
-      const inList = multi.map(esc).join(', ');
-      const op = cond.operator === '!=' ? 'NOT IN' : 'IN';
-      return `${not}${cond.field} ${op} (${inList})`;
+    if (depth === 0) {
+      if (c.negated) {
+        return ['NOT (', ...out.map((l) => `  ${l}`), ')'];
+      }
+      return out;
     }
 
-    const fm: Record<string, (x: string) => string> = {
-      contains: (x) => `ILIKE ${esc(`%${x}%`)}`,
-      '!contains': (x) => `NOT ILIKE ${esc(`%${x}%`)}`,
-      startsWith: (x) => `ILIKE ${esc(`${x}%`)}`,
-      '!startsWith': (x) => `NOT ILIKE ${esc(`${x}%`)}`,
-      endsWith: (x) => `ILIKE ${esc(`%${x}`)}`,
-      '!endsWith': (x) => `NOT ILIKE ${esc(`%${x}`)}`,
-    };
-    if (fm[cond.operator])
-      return `${not}${cond.field} ${fm[cond.operator](cond.value)}`;
-    return `${not}${cond.field} ${cond.operator} ${esc(cond.value)}`;
-  }
+    if (c.negated) {
+      return ['NOT (', ...out.map((l) => `  ${l}`), ')'];
+    } else {
+      return ['(', ...out.map((l) => `  ${l}`), ')'];
+    }
+  };
 
-  const parts = cond.children
-    .map((c) => formatSqlNode(c, depth + 1))
-    .filter(Boolean);
-  if (parts.length === 0) return '';
-  const not = cond.negated ? 'NOT ' : '';
-  if (parts.length === 1) return `${not}${parts[0]}`;
+  const lines = fmt(cond, 0);
+  return lines.join('\n');
+}
 
-  const connector = cond.connector;
-  const pad = '      ' + '  '.repeat(depth); // align under WHERE
-  const lines = parts.map((p, i) => {
-    if (i === 0) return p;
-    return `${pad}${connector.padStart(4)} ${p}`;
-  });
-  const body = lines.join('\n');
-  if (depth > 0) {
-    return `${not}(${body})`;
-  }
-  return `${not}${body}`;
+
+
+export function conditionToSqlPretty(cond: Condition): string {
+  const fmt = (c: Condition, depth: number): string[] => {
+    if (c.type === 'filter') {
+      return [conditionToSql(c)];
+    }
+    const childLineGroups = c.children.map((ch) => fmt(ch, depth + 1)).filter((lines) => lines.length > 0);
+    if (childLineGroups.length === 0) return [];
+
+    const out: string[] = [];
+    childLineGroups.forEach((lines, i) => {
+      const isFirst = i === 0;
+      const prefix = isFirst ? '' : `${c.connector} `;
+      const pad = ' '.repeat(prefix.length);
+
+      lines.forEach((line, j) => {
+        if (j === 0) out.push(`${prefix}${line.trimStart()}`);
+        else out.push(`${pad}${line.trimStart()}`);
+      });
+    });
+
+    if (depth === 0) {
+      if (c.negated) {
+        return ['NOT (', ...out.map((l) => `  ${l}`), ')'];
+      }
+      return out;
+    }
+
+    if (c.negated) {
+      return ['NOT (', ...out.map((l) => `  ${l}`), ')'];
+    } else {
+      return ['(', ...out.map((l) => `  ${l}`), ')'];
+    }
+  };
+
+  const lines = fmt(cond, 0);
+  if (lines.length === 0) return '';
+  return `WHERE\n${lines.join('\n')}`;
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -409,10 +352,7 @@ export function cloneTree(cond: Condition): Condition {
 }
 
 /** Find and remove a condition by ID. Returns [newTree, removedItem]. */
-export function removeCondition(
-  root: GroupCondition,
-  id: string
-): [GroupCondition, Condition | null] {
+export function removeCondition(root: GroupCondition, id: string): [GroupCondition, Condition | null] {
   let removed: Condition | null = null;
 
   function walk(group: GroupCondition): GroupCondition {
@@ -440,7 +380,7 @@ export function insertCondition(
   root: GroupCondition,
   targetGroupId: string,
   condition: Condition,
-  index: number
+  index: number,
 ): GroupCondition {
   function walk(group: GroupCondition): GroupCondition {
     if (group.id === targetGroupId) {
@@ -448,12 +388,7 @@ export function insertCondition(
       children.splice(Math.min(index, children.length), 0, condition);
       return { ...group, children };
     }
-    return {
-      ...group,
-      children: group.children.map((c) =>
-        c.type === 'group' ? walk(c) : { ...c }
-      ),
-    };
+    return { ...group, children: group.children.map((c) => c.type === 'group' ? walk(c) : { ...c }) };
   }
   return walk(root);
 }
@@ -463,14 +398,13 @@ export function moveCondition(
   root: GroupCondition,
   conditionId: string,
   targetGroupId: string,
-  index: number
+  index: number,
 ): GroupCondition {
   const [withoutCond, removed] = removeCondition(root, conditionId);
   if (!removed) return root;
   const inserted = insertCondition(withoutCond, targetGroupId, removed, index);
   return pruneEmptyGroups(inserted);
 }
-
 /** Remove non-root groups that have no children after a move/delete. */
 export function pruneEmptyGroups(root: GroupCondition): GroupCondition {
   function walk(group: GroupCondition, isRoot: boolean): GroupCondition {
@@ -495,12 +429,11 @@ export function pruneEmptyGroups(root: GroupCondition): GroupCondition {
 export function updateCondition(
   root: GroupCondition,
   id: string,
-  patch: Partial<FilterCondition> | Partial<GroupCondition>
+  patch: Partial<FilterCondition> | Partial<GroupCondition>,
 ): GroupCondition {
   function walk(cond: Condition): Condition {
     if (cond.id === id) return { ...cond, ...patch } as Condition;
-    if (cond.type === 'group')
-      return { ...cond, children: cond.children.map(walk) };
+    if (cond.type === 'group') return { ...cond, children: cond.children.map(walk) };
     return { ...cond };
   }
   return walk(root) as GroupCondition;
@@ -511,7 +444,7 @@ export function addFilterToGroup(
   root: GroupCondition,
   groupId: string,
   field = '',
-  operator = '='
+  operator = '=',
 ): GroupCondition {
   const filter = createFilter(field, operator);
   return insertCondition(root, groupId, filter, Infinity);
@@ -520,7 +453,7 @@ export function addFilterToGroup(
 /** Add a sub-group to a group. */
 export function addGroupToGroup(
   root: GroupCondition,
-  groupId: string
+  groupId: string,
 ): GroupCondition {
   const group = createGroup('AND', []);
   return insertCondition(root, groupId, group, Infinity);
@@ -557,7 +490,7 @@ function deepClone(cond: Condition): Condition {
 /** Duplicate a condition (filter or group) right after itself in the same parent. */
 export function duplicateCondition(
   root: GroupCondition,
-  conditionId: string
+  conditionId: string,
 ): GroupCondition {
   function walk(group: GroupCondition): GroupCondition {
     const children: Condition[] = [];

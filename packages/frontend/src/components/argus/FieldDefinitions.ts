@@ -228,15 +228,33 @@ export const FIELD_DEFINITIONS: Record<string, FieldDefinition> = {
     category: 'trace',
     description: 'argus.search.field.traceId',
   },
+  'trace.id': {
+    type: 'string',
+    category: 'trace',
+    description: 'argus.search.field.traceId',
+    aliasFor: 'trace_id',
+  },
   span_id: {
     type: 'string',
     category: 'trace',
     description: 'argus.search.field.spanId',
   },
+  'span.id': {
+    type: 'string',
+    category: 'trace',
+    description: 'argus.search.field.spanId',
+    aliasFor: 'span_id',
+  },
   log_id: {
     type: 'string',
     category: 'trace',
     description: 'argus.search.field.logId',
+  },
+  'log.id': {
+    type: 'string',
+    category: 'trace',
+    description: 'argus.search.field.logId',
+    aliasFor: 'log_id',
   },
   issue_id: {
     type: 'number',

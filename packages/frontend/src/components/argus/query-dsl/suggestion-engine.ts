@@ -126,6 +126,26 @@ function getFieldSuggestions(
     .filter((f) => f.key.toLowerCase().startsWith(prefix) || prefix === '')
     .map((f) => fieldToSuggestion(f));
 
+  // Registered aliases (e.g. trace.id for trace_id)
+  if (config.aliases) {
+    for (const [aliasKey, canonicalKey] of Object.entries(config.aliases)) {
+      const canonicalField = fields.find((f) => f.key === canonicalKey);
+      if (!canonicalField) continue;
+      if (prefix === '' || aliasKey.toLowerCase().startsWith(prefix)) {
+        if (!results.some((r) => r.label.toLowerCase() === aliasKey.toLowerCase())) {
+          results.push({
+            label: aliasKey,
+            insertText: `${aliasKey}:`,
+            category: 'field',
+            description: canonicalField.description,
+            fieldType: canonicalField.type,
+            fieldCategory: canonicalField.category,
+          });
+        }
+      }
+    }
+  }
+
   // Dynamic fields from facets (e.g. game.shard, custom attributes)
   // Exclude 'has'/'!has' — they are special existence operators, not actual fields
   if (facets) {

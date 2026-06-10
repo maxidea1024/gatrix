@@ -77,6 +77,10 @@ export interface QueryDSLEditorProps {
   onChange?: (query: string) => void;
   /** Lazy-loading callback: fetches values for a specific field on demand */
   fetchFieldValues?: FetchFieldValues;
+  /** Pre-loaded facets from the page (e.g., discovered attribute facets).
+   *  These are seeded into the suggestion cache so dynamic fields like
+   *  game.shard, server.name appear in suggestions immediately. */
+  initialFacets?: Map<string, string[]> | Record<string, any>;
   placeholder?: string;
   maxSuggestions?: number;
 }
@@ -145,6 +149,7 @@ export function QueryDSLEditor({
   onSearch,
   onChange,
   fetchFieldValues,
+  initialFacets,
   placeholder,
   maxSuggestions = 20,
 }: QueryDSLEditorProps) {
@@ -265,7 +270,7 @@ export function QueryDSLEditor({
     getCachedFacetMap,
     ensureFieldValues,
     isFieldLoading,
-  } = useLazyFacets(fetchFieldValues);
+  } = useLazyFacets(fetchFieldValues, initialFacets);
 
   const normalizedFacets = getCachedFacetMap();
 
@@ -1396,13 +1401,16 @@ export function QueryDSLEditor({
             handlePartClick(token.chipId, token.part, el);
           }
         }
-        // Logical chip → open AND/OR selector menu
+        // Logical chip → open AND/OR selector menu (NOT chips are non-editable)
         if (token && token.part === 'logical') {
-          const chipEl = containerRef.current?.querySelector(
-            `[data-chip-id="${token.chipId}"]`
-          ) as HTMLElement;
-          if (chipEl) {
-            setLogicalMenu({ chipId: token.chipId, anchorEl: chipEl });
+          const logicalChip = chips.find((c) => c.id === token.chipId);
+          if (logicalChip?.label === 'AND' || logicalChip?.label === 'OR') {
+            const chipEl = containerRef.current?.querySelector(
+              `[data-chip-id="${token.chipId}"]`
+            ) as HTMLElement;
+            if (chipEl) {
+              setLogicalMenu({ chipId: token.chipId, anchorEl: chipEl });
+            }
           }
         }
         return;
@@ -1630,9 +1638,9 @@ export function QueryDSLEditor({
     if (chipEditingRef.current) return;
     // Clear token selection when input gains focus
     setSelectedTokenIdx(-1);
-    // Always show dropdown on focus
-    setShowDropdown(true);
-    setSelectedIndex(-1);
+    // Always show dropdown on focus (disabled — dropdown now opens via ArrowDown only)
+    // setShowDropdown(true);
+    // setSelectedIndex(-1);
     justFocusedRef.current = true;
   }, []);
 
@@ -1685,9 +1693,9 @@ export function QueryDSLEditor({
         commitPendingInput();
         return;
       }
-      // Re-click on already-focused input → toggle
-      setShowDropdown((prev) => !prev);
-      setSelectedIndex(-1);
+      // Re-click on already-focused input → toggle (disabled — dropdown now opens via ArrowDown only)
+      // setShowDropdown((prev) => !prev);
+      // setSelectedIndex(-1);
     },
     [inputValue, commitPendingInput]
   );
@@ -2146,6 +2154,10 @@ export function QueryDSLEditor({
           onClose={() => setBuilderOpen(false)}
           config={config}
           query={chipsToQuery(chips)}
+          facets={Object.fromEntries(
+            Array.from(normalizedFacets.entries()).map(([k, vals]) => [k, vals.map((v) => ({ value: v, count: 0 }))])
+          )}
+          fetchFieldValues={fetchFieldValues}
           onApply={(q) => {
             // Apply the built query: reset chips from query, trigger search
             resetTo(queryToChips(q));
@@ -2228,7 +2240,33 @@ export function QueryDSLEditor({
             },
           }}
         >
-          <List dense sx={{ py: 0.5 }}>
+          <List
+            dense
+            sx={{ py: 0.5 }}
+            autoFocus
+            onKeyDown={(e) => {
+              const ops = ['AND', 'OR'] as const;
+              const chipForNav = logicalMenu
+                ? chips.find((c) => c.id === logicalMenu.chipId)
+                : null;
+              const curIdx = ops.indexOf(
+                (chipForNav?.label as 'AND' | 'OR') ?? 'AND'
+              );
+              if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                const nextIdx = curIdx === 0 ? 1 : 0;
+                if (logicalMenu) {
+                  updateChip(logicalMenu.chipId, { label: ops[nextIdx] });
+                }
+              } else if (e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault();
+                setLogicalMenu(null);
+              } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setLogicalMenu(null);
+              }
+            }}
+          >
             {['AND', 'OR'].map((op) => {
               const chipForMenu = logicalMenu
                 ? chips.find((c) => c.id === logicalMenu.chipId)

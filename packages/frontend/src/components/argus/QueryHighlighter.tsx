@@ -160,7 +160,7 @@ function tokenizeSql(query: string, isDark: boolean): ColoredSpan[][] {
     }
 
     const parts = line.split(
-      /('(?:[^']|'')*')|((?:NOT\s+)?ILIKE|IS NOT NULL|\bWHERE\b|\bAND\b|\bOR\b|\bNOT\b|\bIN\b|\bBETWEEN\b|!=|>=|<=|[=><])/g
+      /('(?:[^']|'')*')|((?:NOT\s+)?ILIKE|IS\s+NOT\s+NULL|IS\s+NULL|\bWHERE\b|\bAND\b|\bOR\b|\bNOT\b|\bIN\b|\bBETWEEN\b|!=|>=|<=|[=><])/g
     );
 
     for (const part of parts) {
@@ -169,7 +169,7 @@ function tokenizeSql(query: string, isDark: boolean): ColoredSpan[][] {
       if (part.startsWith("'") && part.endsWith("'")) {
         spans.push({ text: part, color: colors.string });
       } else if (
-        /^(WHERE|AND|OR|NOT|IN|BETWEEN|IS NOT NULL)$/i.test(part.trim())
+        /^(WHERE|AND|OR|NOT|IN|BETWEEN|IS\s+NOT\s+NULL|IS\s+NULL)$/i.test(part.trim())
       ) {
         spans.push({ text: part, color: colors.keyword, bold: true });
       } else if (/^((?:NOT\s+)?ILIKE)$/i.test(part.trim())) {

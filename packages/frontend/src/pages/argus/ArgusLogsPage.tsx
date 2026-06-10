@@ -375,6 +375,7 @@ const ArgusLogsPage: React.FC = () => {
                   setUrlState({ q });
                 }}
                 fetchFieldValues={fetchFieldValues}
+                initialFacets={mappedFacets}
               />
             </Box>
           );

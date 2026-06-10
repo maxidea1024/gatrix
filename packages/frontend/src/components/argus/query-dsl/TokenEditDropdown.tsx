@@ -517,20 +517,12 @@ function ValueSuggestionList({
 }) {
   const listRef = useRef<HTMLUListElement>(null);
 
-  // Merge selectedValues (current chip values first) + staticValues + facet values, deduplicated
+  // Merge staticValues + facet values (stable order) + any selected values not in those lists
   const allValues = (() => {
     const seen = new Set<string>();
     const result: string[] = [];
 
-    // 1. Current chip values first (always show with checkmarks)
-    for (const sv of selectedValues) {
-      if (sv && !seen.has(sv)) {
-        seen.add(sv);
-        result.push(sv);
-      }
-    }
-
-    // 2. Static values + facet values
+    // 1. Static values + facet values in their original order (stable)
     const staticVals = fieldDef?.staticValues ?? [];
     const facetVals = facets?.get(chip.field ?? '') ?? [];
     for (const v of [...staticVals, ...facetVals]) {
@@ -539,6 +531,15 @@ function ValueSuggestionList({
         result.push(v);
       }
     }
+
+    // 2. Any currently selected values not already in the list (appended at end)
+    for (const sv of selectedValues) {
+      if (sv && !seen.has(sv)) {
+        seen.add(sv);
+        result.push(sv);
+      }
+    }
+
     return result;
   })();
 

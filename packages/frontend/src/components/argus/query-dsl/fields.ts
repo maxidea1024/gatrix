@@ -386,6 +386,20 @@ export function pickFields(
 const SHARED_ALIASES: Record<string, string> = {
   severity: 'level',
   logger: 'logger_name',
+  // Dot-notation aliases for underscore fields
+  'trace.id': 'trace_id',
+  'span.id': 'span_id',
+  'log.id': 'log_id',
+  'issue.id': 'issue_id',
+  'logger.name': 'logger_name',
+  'browser.name': 'browser_name',
+  'os.name': 'os_name',
+  'contact.email': 'contact_email',
+  'crash.free': 'crash_free',
+  traceid: 'trace_id',
+  spanid: 'span_id',
+  logid: 'log_id',
+  issueid: 'issue_id',
 };
 
 // ─── Domain Configs ──────────────────────────────────────────────────────────
@@ -539,6 +553,32 @@ export const RELEASES_CONFIG: DomainConfig = {
       },
     }
   ),
+  aliases: SHARED_ALIASES,
+};
+
+export const TRACES_CONFIG: DomainConfig = {
+  name: 'traces',
+  fields: pickFields(
+    [
+      'trace_id',
+      'span_id',
+      'transaction',
+      'duration',
+      'status',
+      'service',
+      'environment',
+      'release',
+      'timestamp',
+      'level',
+      'message',
+    ],
+    {
+      status: {
+        staticValues: ['ok', 'cancelled', 'unknown', 'invalid_argument', 'deadline_exceeded', 'internal'],
+      },
+    }
+  ),
+  aliases: SHARED_ALIASES,
 };
 
 // ─── Public API (DomainConfig-based) ─────────────────────────────────────────
@@ -570,5 +610,13 @@ export function isFieldInDomain(key: string, config: DomainConfig): boolean {
  * Resolve a field alias to its canonical key.
  */
 export function resolveAlias(key: string, config: DomainConfig): string {
-  return config.aliases?.[key] ?? key;
+  const lowerKey = key.toLowerCase();
+  if (config.aliases) {
+    for (const [alias, canonical] of Object.entries(config.aliases)) {
+      if (alias.toLowerCase() === lowerKey) {
+        return canonical;
+      }
+    }
+  }
+  return key;
 }

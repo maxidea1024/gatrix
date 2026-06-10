@@ -578,6 +578,7 @@ const ArgusDiscoverPage: React.FC = () => {
           onSearch={handleSearchChange}
           onChange={handleSearchChange}
           fetchFieldValues={fetchFieldValues}
+          initialFacets={facets}
           placeholder={t(
             'argus.discover.searchPlaceholder',
             'Search by event, user, or tag...'

@@ -337,6 +337,24 @@ export const QuerySuggestionDropdown = forwardRef<
     return suggestions.filter((s) => s.fieldCategory === activeTab);
   }, [suggestions, activeTab, showTabs, recentSearches]);
 
+  // Group filtered suggestions by fieldCategory for section headers
+  const grouped = useMemo(() => {
+    const map = new Map<string, SuggestionItem[]>();
+    for (const item of filteredSuggestions) {
+      const key = item.fieldCategory ?? item.category;
+      const list = map.get(key) ?? [];
+      list.push(item);
+      map.set(key, list);
+    }
+    return map;
+  }, [filteredSuggestions]);
+
+  // Flatten grouped map to match the actual render order.
+  // This ensures getItemAtIndex(n) returns the same item as the n-th rendered row.
+  const flatOrderedItems = useMemo(() => {
+    return Array.from(grouped.values()).flat();
+  }, [grouped]);
+
   useImperativeHandle(
     _tabNavHandleRef,
     () => ({
@@ -359,13 +377,13 @@ export const QuerySuggestionDropdown = forwardRef<
         onSelectedIndexChange?.(-1);
       },
       getItemAtIndex: (index: number) => {
-        return filteredSuggestions[index] ?? null;
+        return flatOrderedItems[index] ?? null;
       },
       getItemCount: () => {
-        return filteredSuggestions.length;
+        return flatOrderedItems.length;
       },
     }),
-    [showTabs, availableTabs, onSelectedIndexChange, filteredSuggestions]
+    [showTabs, availableTabs, onSelectedIndexChange, flatOrderedItems]
   );
 
   // Pre-compute tab counts
@@ -394,18 +412,6 @@ export const QuerySuggestionDropdown = forwardRef<
       item.scrollIntoView({ block: 'nearest' });
     }
   }, [selectedIndex]);
-
-  // Group filtered suggestions by fieldCategory for section headers
-  const grouped = useMemo(() => {
-    const map = new Map<string, SuggestionItem[]>();
-    for (const item of filteredSuggestions) {
-      const key = item.fieldCategory ?? item.category;
-      const list = map.get(key) ?? [];
-      list.push(item);
-      map.set(key, list);
-    }
-    return map;
-  }, [filteredSuggestions]);
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 

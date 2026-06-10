@@ -22,10 +22,48 @@ const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
  *
  * @param fetchFieldValues - Domain-specific callback to fetch values for a field.
  */
-export function useLazyFacets(fetchFieldValues?: FetchFieldValues) {
+export function useLazyFacets(
+  fetchFieldValues?: FetchFieldValues,
+  initialFacets?: Map<string, string[]> | Record<string, any>
+) {
   const cacheRef = useRef<Map<string, CacheEntry>>(new Map());
   const inflightRef = useRef<Map<string, Promise<string[]>>>(new Map());
   const [, forceRender] = useState(0);
+  const lastInitialFacetsRef = useRef<any>(undefined);
+
+  // Sync initialFacets into cache whenever it changes (e.g., discovered facets load asynchronously)
+  if (initialFacets && initialFacets !== lastInitialFacetsRef.current) {
+    lastInitialFacetsRef.current = initialFacets;
+    const now = Date.now();
+
+    const entries: [string, any[]][] = [];
+    if (initialFacets instanceof Map) {
+      for (const [key, val] of initialFacets.entries()) {
+        entries.push([key, val]);
+      }
+    } else if (typeof initialFacets === 'object') {
+      for (const [key, val] of Object.entries(initialFacets)) {
+        if (Array.isArray(val)) {
+          entries.push([key, val]);
+        }
+      }
+    }
+
+    for (const [key, rawValues] of entries) {
+      const values = rawValues.map((v) => {
+        if (v && typeof v === 'object' && 'value' in v) {
+          return String(v.value);
+        }
+        return String(v);
+      });
+
+      // Only seed if not already cached with fresh data (don't overwrite user-fetched values)
+      const existing = cacheRef.current.get(key);
+      if (!existing || (existing.values.length === 0 && values.length > 0)) {
+        cacheRef.current.set(key, { values, fetchedAt: now });
+      }
+    }
+  }
 
   /**
    * Get cached values for a field. Returns [] if not yet loaded.
