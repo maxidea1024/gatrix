@@ -105,7 +105,9 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
             gap: 2,
           }}
         >
-          <SearchIcon sx={{ fontSize: 48, color: 'text.disabled', opacity: 0.5 }} />
+          <SearchIcon
+            sx={{ fontSize: 48, color: 'text.disabled', opacity: 0.5 }}
+          />
           <Box sx={{ textAlign: 'center' }}>
             <Typography
               sx={{
@@ -150,7 +152,15 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
       ) : (
         <>
           {/* Active controls toolbar */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexShrink: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: 1,
+              flexShrink: 0,
+            }}
+          >
             {liveTailActive ? (
               <Button
                 variant="contained"
@@ -254,9 +264,13 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
                 </Typography>
                 <Chip
                   size="small"
-                  label={t('argus.logs.liveTail.received', '{{count}} received', {
-                    count: liveTailCount,
-                  })}
+                  label={t(
+                    'argus.logs.liveTail.received',
+                    '{{count}} received',
+                    {
+                      count: liveTailCount,
+                    }
+                  )}
                   sx={{ height: 20, fontSize: '0.65rem', ml: 0.5 }}
                 />
               </Box>
@@ -278,78 +292,82 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
               <EmptyPlaceholder
                 variant="text"
                 icon={<SearchIcon sx={{ fontSize: 48 }} />}
-                message={t('argus.logs.liveTail.waiting', '로그를 수신 대기 중입니다...')}
+                message={t(
+                  'argus.logs.liveTail.waiting',
+                  '로그를 수신 대기 중입니다...'
+                )}
                 sx={{ flex: 1 }}
               />
             ) : (
-          liveTailLogs.map((log, idx) => (
-            <Box
-              key={`${log.log_id}-${idx}`}
-              sx={{
-                display: 'flex',
-                gap: 1,
-                py: 0.3,
-                px: 0.5,
-                cursor: onSelectLog ? 'pointer' : undefined,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                backgroundColor:
-                  selectedLogId === log.log_id
-                    ? isDark
-                      ? 'rgba(124,77,255,0.12)'
-                      : 'rgba(124,77,255,0.08)'
-                    : undefined,
-                '&:hover': {
-                  backgroundColor:
-                    selectedLogId === log.log_id
-                      ? isDark
-                        ? 'rgba(124,77,255,0.16)'
-                        : 'rgba(124,77,255,0.12)'
-                      : isDark
-                        ? 'rgba(255,255,255,0.02)'
-                        : 'rgba(0,0,0,0.02)',
-                },
-              }}
-              onClick={() => onSelectLog?.(log)}
-            >
-              <Typography
-                sx={{
-                  fontSize: '0.65rem',
-                  color: 'text.disabled',
-                  flexShrink: 0,
-                  width: 75,
-                  fontFamily: 'monospace',
-                }}
-              >
-                {new Date(log.timestamp).toLocaleTimeString()}
-              </Typography>
-              <Chip
-                label={log.level}
-                size="small"
-                sx={{
-                  height: 16,
-                  fontSize: '0.58rem',
-                  fontWeight: 700,
-                  flexShrink: 0,
-                  backgroundColor: alpha(
-                    SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
-                    0.15
-                  ),
-                  color: SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
-                }}
-              />
-              <Typography
-                sx={{
-                  fontSize: '0.70rem',
-                  flex: 1,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}
-              >
-              {log.message || log.body}
-              </Typography>
-            </Box>
-          ))
+              liveTailLogs.map((log, idx) => (
+                <Box
+                  key={`${log.log_id}-${idx}`}
+                  sx={{
+                    display: 'flex',
+                    gap: 1,
+                    py: 0.3,
+                    px: 0.5,
+                    cursor: onSelectLog ? 'pointer' : undefined,
+                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                    backgroundColor:
+                      selectedLogId === log.log_id
+                        ? isDark
+                          ? 'rgba(124,77,255,0.12)'
+                          : 'rgba(124,77,255,0.08)'
+                        : undefined,
+                    '&:hover': {
+                      backgroundColor:
+                        selectedLogId === log.log_id
+                          ? isDark
+                            ? 'rgba(124,77,255,0.16)'
+                            : 'rgba(124,77,255,0.12)'
+                          : isDark
+                            ? 'rgba(255,255,255,0.02)'
+                            : 'rgba(0,0,0,0.02)',
+                    },
+                  }}
+                  onClick={() => onSelectLog?.(log)}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: '0.65rem',
+                      color: 'text.disabled',
+                      flexShrink: 0,
+                      width: 75,
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    {new Date(log.timestamp).toLocaleTimeString()}
+                  </Typography>
+                  <Chip
+                    label={log.level}
+                    size="small"
+                    sx={{
+                      height: 16,
+                      fontSize: '0.58rem',
+                      fontWeight: 700,
+                      flexShrink: 0,
+                      backgroundColor: alpha(
+                        SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
+                        0.15
+                      ),
+                      color:
+                        SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e',
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontSize: '0.70rem',
+                      flex: 1,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {log.message || log.body}
+                  </Typography>
+                </Box>
+              ))
             )}
           </Box>
         </>

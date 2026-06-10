@@ -489,11 +489,25 @@ const ArgusLogsPage: React.FC = () => {
           {/* Volume Chart - fixed at top */}
           {(() => {
             // Transform VolumePoint[] → labels + datasets for ArgusVolumeChart
-            const SEVERITY_ORDER = ['fatal', 'critical', 'error', 'warn', 'warning', 'info', 'debug', 'trace'];
+            const SEVERITY_ORDER = [
+              'fatal',
+              'critical',
+              'error',
+              'warn',
+              'warning',
+              'info',
+              'debug',
+              'trace',
+            ];
             const SEVERITY_COLORS: Record<string, string> = {
-              fatal: '#d32f2f', critical: '#d32f2f', error: '#f44336',
-              warn: '#ff9800', warning: '#ff9800', info: '#2196f3',
-              debug: '#9e9e9e', trace: '#607d8b',
+              fatal: '#d32f2f',
+              critical: '#d32f2f',
+              error: '#f44336',
+              warn: '#ff9800',
+              warning: '#ff9800',
+              info: '#2196f3',
+              debug: '#9e9e9e',
+              trace: '#607d8b',
             };
 
             const bucketSet = new Set<string>();
@@ -533,7 +547,11 @@ const ArgusLogsPage: React.FC = () => {
             const chartLabels = sortedBuckets.map((b) => {
               const d = new Date(b);
               return d.toLocaleString(i18n.language || 'en-US', {
-                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
               });
             });
 
@@ -558,7 +576,9 @@ const ArgusLogsPage: React.FC = () => {
                 const startDate = new Date(sortedBuckets[si]);
                 let endDate = new Date(sortedBuckets[ei]);
                 if (sortedBuckets.length > 1) {
-                  const gap = new Date(sortedBuckets[1]).getTime() - new Date(sortedBuckets[0]).getTime();
+                  const gap =
+                    new Date(sortedBuckets[1]).getTime() -
+                    new Date(sortedBuckets[0]).getTime();
                   endDate = new Date(endDate.getTime() + gap);
                 } else {
                   endDate = new Date(endDate.getTime() + 3600000);
@@ -745,76 +765,81 @@ const ArgusLogsPage: React.FC = () => {
               </Box>
 
               {/* ── Splitter Handle + Right Side Panel ── */}
-              {effectiveIsRightPanelOpen && (activeTab === 0 || activeTab === 3) && (
-                <>
-                  <Box
-                    onMouseDown={handlePanelSplitterMouseDown}
-                    sx={{
-                      width: '1px',
-                      flexShrink: 0,
-                      cursor: 'col-resize',
-                      bgcolor: isPanelDragging ? 'primary.main' : 'divider',
-                      position: 'relative',
-                      zIndex: 10,
-                      transition: 'background-color 0.15s, transform 0.15s',
-                      transformOrigin: 'center',
-                      ...(isPanelDragging && {
-                        bgcolor: 'primary.main',
-                        transform: 'scaleX(4)',
-                      }),
-                      '&::after': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        bottom: 0,
-                        left: '-5px',
-                        right: '-5px',
+              {effectiveIsRightPanelOpen &&
+                (activeTab === 0 || activeTab === 3) && (
+                  <>
+                    <Box
+                      onMouseDown={handlePanelSplitterMouseDown}
+                      sx={{
+                        width: '1px',
+                        flexShrink: 0,
                         cursor: 'col-resize',
-                      },
-                      '&:hover, &:active': {
-                        bgcolor: 'primary.main',
-                        transform: 'scaleX(4)',
-                      },
-                    }}
-                  />
-                  <LogSidePanel
-                    log={effectiveSelectedLog}
-                    loading={activeTab === 0 ? selectedLogLoading : false}
-                    open={effectiveIsRightPanelOpen}
-                    onClose={() => {
-                      if (activeTab === 3) {
-                        setLiveTailSelectedLog(null);
-                      } else {
-                        handleCloseSidePanel();
+                        bgcolor: isPanelDragging ? 'primary.main' : 'divider',
+                        position: 'relative',
+                        zIndex: 10,
+                        transition: 'background-color 0.15s, transform 0.15s',
+                        transformOrigin: 'center',
+                        ...(isPanelDragging && {
+                          bgcolor: 'primary.main',
+                          transform: 'scaleX(4)',
+                        }),
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          bottom: 0,
+                          left: '-5px',
+                          right: '-5px',
+                          cursor: 'col-resize',
+                        },
+                        '&:hover, &:active': {
+                          bgcolor: 'primary.main',
+                          transform: 'scaleX(4)',
+                        },
+                      }}
+                    />
+                    <LogSidePanel
+                      log={effectiveSelectedLog}
+                      loading={activeTab === 0 ? selectedLogLoading : false}
+                      open={effectiveIsRightPanelOpen}
+                      onClose={() => {
+                        if (activeTab === 3) {
+                          setLiveTailSelectedLog(null);
+                        } else {
+                          handleCloseSidePanel();
+                        }
+                      }}
+                      onPrev={activeTab === 0 ? handlePrevLog : undefined}
+                      onNext={activeTab === 0 ? handleNextLog : undefined}
+                      onFilter={(key, val, exclude) => {
+                        const r = dslEditorRef.current;
+                        if (!r) return;
+                        const current = r.getFieldValues(key);
+                        if (exclude) {
+                          r.upsertFieldChip(key, [val], '!=');
+                        } else if (current.includes(val)) {
+                          r.upsertFieldChip(
+                            key,
+                            current.filter((v) => v !== val)
+                          );
+                        } else {
+                          r.upsertFieldChip(key, [...current, val]);
+                        }
+                      }}
+                      hasPrev={
+                        activeTab === 0 &&
+                        selectedLogIndex !== null &&
+                        selectedLogIndex > 0
                       }
-                    }}
-                    onPrev={activeTab === 0 ? handlePrevLog : undefined}
-                    onNext={activeTab === 0 ? handleNextLog : undefined}
-                    onFilter={(key, val, exclude) => {
-                      const r = dslEditorRef.current;
-                      if (!r) return;
-                      const current = r.getFieldValues(key);
-                      if (exclude) {
-                        r.upsertFieldChip(key, [val], '!=');
-                      } else if (current.includes(val)) {
-                        r.upsertFieldChip(
-                          key,
-                          current.filter((v) => v !== val)
-                        );
-                      } else {
-                        r.upsertFieldChip(key, [...current, val]);
+                      hasNext={
+                        activeTab === 0 &&
+                        selectedLogIndex !== null &&
+                        selectedLogIndex < logs.length - 1
                       }
-                    }}
-                    hasPrev={activeTab === 0 && selectedLogIndex !== null && selectedLogIndex > 0}
-                    hasNext={
-                      activeTab === 0 &&
-                      selectedLogIndex !== null &&
-                      selectedLogIndex < logs.length - 1
-                    }
-                    width={panelWidth}
-                  />
-                </>
-              )}
+                      width={panelWidth}
+                    />
+                  </>
+                )}
             </Box>
           </Box>
         </Box>

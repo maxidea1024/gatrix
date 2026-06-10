@@ -1,11 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  Popover,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Popover, useTheme, alpha } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
@@ -49,7 +43,11 @@ export const VolumeChart: React.FC<{
 
   const { sortedBuckets, chartLabels, chartDatasets } = useMemo(() => {
     if (data.length === 0)
-      return { sortedBuckets: [] as string[], chartLabels: [] as string[], chartDatasets: [] };
+      return {
+        sortedBuckets: [] as string[],
+        chartLabels: [] as string[],
+        chartDatasets: [],
+      };
 
     const bucketMap = new Map<string, number>();
     data.forEach((p) => {

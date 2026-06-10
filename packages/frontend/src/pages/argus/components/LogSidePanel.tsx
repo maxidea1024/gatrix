@@ -144,8 +144,12 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
     );
   }
 
-  const levelColor = log ? (SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e') : '#9e9e9e';
-  const formattedTime = log ? formatWith(log.timestamp, 'YYYY-MM-DD HH:mm:ss.SSS') : '';
+  const levelColor = log
+    ? SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e'
+    : '#9e9e9e';
+  const formattedTime = log
+    ? formatWith(log.timestamp, 'YYYY-MM-DD HH:mm:ss.SSS')
+    : '';
 
   return (
     <Box
@@ -158,213 +162,235 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
         flexDirection: 'column',
       }}
     >
-      <PageContentLoader loading={loading} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-      {log && (
-      <>
-      <PanelHeader isDark={isDark}>
-        <LevelChip
-          label={log.level?.toUpperCase() || 'UNKNOWN'}
-          size="small"
-          levelColor={levelColor}
-        />
-        <Typography
-          sx={{
-            fontSize: '0.7rem',
-            color: 'text.secondary',
-            fontFamily: 'monospace',
-            flex: 1,
-          }}
-        >
-          {formattedTime}
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
-          <SafeTooltip
-            title={t('argus.logs.panel.prevLog', 'Previous log (↑)')}
-          >
-            <span>
-              <IconButton
-                size="small"
-                onClick={onPrev}
-                disabled={!hasPrev}
-                sx={{ p: 0.3 }}
-              >
-                <PrevIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </span>
-          </SafeTooltip>
-          <SafeTooltip title={t('argus.logs.panel.nextLog', 'Next log (↓)')}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={onNext}
-                disabled={!hasNext}
-                sx={{ p: 0.3 }}
-              >
-                <NextIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </span>
-          </SafeTooltip>
-        </Box>
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-        {log.trace_id && (
-          <SafeTooltip title={t('argus.logs.panel.viewTrace', 'View Trace')}>
-            <IconButton
-              size="small"
-              onClick={() =>
-                navigate(`/argus/performance?trace=${log.trace_id}`, {
-                  state: { allowBack: true },
-                })
-              }
-              sx={{ p: 0.3, color: theme.palette.primary.main }}
-            >
-              <TraceIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </SafeTooltip>
-        )}
-        <SafeTooltip title={t('argus.logs.panel.close', 'Close (Esc)')}>
-          <IconButton size="small" onClick={onClose} sx={{ p: 0.3 }}>
-            <CloseIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        </SafeTooltip>
-      </PanelHeader>
-
-      <MetadataBar isDark={isDark}>
-        {log.service && (
-          <Chip
-            label={log.service}
-            size="small"
-            variant="outlined"
-            sx={{ height: 20, fontSize: '0.62rem', fontWeight: 600 }}
-          />
-        )}
-        {log.environment && (
-          <Chip
-            label={log.environment}
-            size="small"
-            variant="outlined"
-            sx={{ height: 20, fontSize: '0.62rem' }}
-          />
-        )}
-        {log.release && (
-          <Chip
-            label={log.release}
-            size="small"
-            variant="outlined"
-            sx={{ height: 20, fontSize: '0.62rem' }}
-          />
-        )}
-      </MetadataBar>
-
-      <Tabs
-        value={tab}
-        onChange={(_, v) => setTab(v)}
-        sx={{
-          minHeight: 34,
-          flexShrink: 0,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          '& .MuiTab-root': {
-            minHeight: 34,
-            py: 0,
-            fontSize: '0.72rem',
-            fontWeight: 600,
-            textTransform: 'none',
-          },
-        }}
+      <PageContentLoader
+        loading={loading}
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
       >
-        <Tab label={t('argus.logs.panel.eventTab', 'Event')} />
-        <Tab label="JSON" />
-        {log.trace_id && (
-          <Tab label={t('argus.logs.panel.traceTab', 'Trace')} />
-        )}
-      </Tabs>
-
-      <Box sx={{ flex: 1, overflowY: 'auto' }}>
-        {tab === 0 && (
-          <EventTab log={log} isDark={isDark} onFilter={onFilter} />
-        )}
-        {tab === 1 && <JsonTab log={log} isDark={isDark} />}
-        {tab === 2 && log.trace_id && (
-          <Box
-            sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-          >
-            <TraceHeaderBar isDark={isDark}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <TraceIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-                <Typography
-                  sx={{
-                    fontSize: '0.72rem',
-                    color: 'text.secondary',
-                    fontFamily: 'monospace',
-                  }}
-                >
-                  {log.trace_id.slice(0, 16)}...
-                </Typography>
-                <CopyButton text={log.trace_id} size={12} sx={{ p: 0.2 }} />
-              </Box>
-              <Button
+        {log && (
+          <>
+            <PanelHeader isDark={isDark}>
+              <LevelChip
+                label={log.level?.toUpperCase() || 'UNKNOWN'}
                 size="small"
-                variant="outlined"
-                startIcon={<OpenIcon sx={{ fontSize: 12 }} />}
-                onClick={() =>
-                  navigate(`/argus/performance?trace=${log.trace_id}`, {
-                    state: { allowBack: true },
-                  })
-                }
+                levelColor={levelColor}
+              />
+              <Typography
                 sx={{
-                  textTransform: 'none',
-                  fontSize: '0.68rem',
-                  fontWeight: 600,
-                  borderRadius: '6px',
-                  py: 0.25,
-                  px: 1,
-                  borderColor: isDark
-                    ? 'rgba(255,255,255,0.12)'
-                    : 'rgba(0,0,0,0.12)',
+                  fontSize: '0.7rem',
+                  color: 'text.secondary',
+                  fontFamily: 'monospace',
+                  flex: 1,
                 }}
               >
-                {t('argus.logs.panel.viewFullTrace', 'View full trace')}
-              </Button>
-            </TraceHeaderBar>
-            <Box sx={{ flex: 1, overflow: 'auto', minHeight: 200 }}>
-              {traceLoading ? (
+                {formattedTime}
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                <SafeTooltip
+                  title={t('argus.logs.panel.prevLog', 'Previous log (↑)')}
+                >
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={onPrev}
+                      disabled={!hasPrev}
+                      sx={{ p: 0.3 }}
+                    >
+                      <PrevIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </span>
+                </SafeTooltip>
+                <SafeTooltip
+                  title={t('argus.logs.panel.nextLog', 'Next log (↓)')}
+                >
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={onNext}
+                      disabled={!hasNext}
+                      sx={{ p: 0.3 }}
+                    >
+                      <NextIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </span>
+                </SafeTooltip>
+              </Box>
+              <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+              {log.trace_id && (
+                <SafeTooltip
+                  title={t('argus.logs.panel.viewTrace', 'View Trace')}
+                >
+                  <IconButton
+                    size="small"
+                    onClick={() =>
+                      navigate(`/argus/performance?trace=${log.trace_id}`, {
+                        state: { allowBack: true },
+                      })
+                    }
+                    sx={{ p: 0.3, color: theme.palette.primary.main }}
+                  >
+                    <TraceIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </SafeTooltip>
+              )}
+              <SafeTooltip title={t('argus.logs.panel.close', 'Close (Esc)')}>
+                <IconButton size="small" onClick={onClose} sx={{ p: 0.3 }}>
+                  <CloseIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </SafeTooltip>
+            </PanelHeader>
+
+            <MetadataBar isDark={isDark}>
+              {log.service && (
+                <Chip
+                  label={log.service}
+                  size="small"
+                  variant="outlined"
+                  sx={{ height: 20, fontSize: '0.62rem', fontWeight: 600 }}
+                />
+              )}
+              {log.environment && (
+                <Chip
+                  label={log.environment}
+                  size="small"
+                  variant="outlined"
+                  sx={{ height: 20, fontSize: '0.62rem' }}
+                />
+              )}
+              {log.release && (
+                <Chip
+                  label={log.release}
+                  size="small"
+                  variant="outlined"
+                  sx={{ height: 20, fontSize: '0.62rem' }}
+                />
+              )}
+            </MetadataBar>
+
+            <Tabs
+              value={tab}
+              onChange={(_, v) => setTab(v)}
+              sx={{
+                minHeight: 34,
+                flexShrink: 0,
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                '& .MuiTab-root': {
+                  minHeight: 34,
+                  py: 0,
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  textTransform: 'none',
+                },
+              }}
+            >
+              <Tab label={t('argus.logs.panel.eventTab', 'Event')} />
+              <Tab label="JSON" />
+              {log.trace_id && (
+                <Tab label={t('argus.logs.panel.traceTab', 'Trace')} />
+              )}
+            </Tabs>
+
+            <Box sx={{ flex: 1, overflowY: 'auto' }}>
+              {tab === 0 && (
+                <EventTab log={log} isDark={isDark} onFilter={onFilter} />
+              )}
+              {tab === 1 && <JsonTab log={log} isDark={isDark} />}
+              {tab === 2 && log.trace_id && (
                 <Box
                   sx={{
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    py: 8,
+                    flexDirection: 'column',
+                    height: '100%',
                   }}
                 >
-                  <CircularProgress size={24} />
-                </Box>
-              ) : traceData ? (
-                <TraceWaterfall trace={traceData} isDark={isDark} />
-              ) : (
-                <Box sx={{ py: 6, textAlign: 'center' }}>
-                  <TraceIcon
-                    sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }}
-                  />
-                  <Typography
-                    sx={{ fontSize: '0.82rem', fontWeight: 600, mb: 0.5 }}
-                  >
-                    {t('argus.logs.panel.traceNotFound', 'Trace not found')}
-                  </Typography>
-                  <Typography
-                    sx={{ fontSize: '0.72rem', color: 'text.secondary' }}
-                  >
-                    {t(
-                      'argus.logs.panel.traceNotFoundDesc',
-                      'The trace data may have expired or is not available.'
+                  <TraceHeaderBar isDark={isDark}>
+                    <Box
+                      sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+                    >
+                      <TraceIcon
+                        sx={{ fontSize: 14, color: 'text.disabled' }}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: '0.72rem',
+                          color: 'text.secondary',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {log.trace_id.slice(0, 16)}...
+                      </Typography>
+                      <CopyButton
+                        text={log.trace_id}
+                        size={12}
+                        sx={{ p: 0.2 }}
+                      />
+                    </Box>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<OpenIcon sx={{ fontSize: 12 }} />}
+                      onClick={() =>
+                        navigate(`/argus/performance?trace=${log.trace_id}`, {
+                          state: { allowBack: true },
+                        })
+                      }
+                      sx={{
+                        textTransform: 'none',
+                        fontSize: '0.68rem',
+                        fontWeight: 600,
+                        borderRadius: '6px',
+                        py: 0.25,
+                        px: 1,
+                        borderColor: isDark
+                          ? 'rgba(255,255,255,0.12)'
+                          : 'rgba(0,0,0,0.12)',
+                      }}
+                    >
+                      {t('argus.logs.panel.viewFullTrace', 'View full trace')}
+                    </Button>
+                  </TraceHeaderBar>
+                  <Box sx={{ flex: 1, overflow: 'auto', minHeight: 200 }}>
+                    {traceLoading ? (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          py: 8,
+                        }}
+                      >
+                        <CircularProgress size={24} />
+                      </Box>
+                    ) : traceData ? (
+                      <TraceWaterfall trace={traceData} isDark={isDark} />
+                    ) : (
+                      <Box sx={{ py: 6, textAlign: 'center' }}>
+                        <TraceIcon
+                          sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }}
+                        />
+                        <Typography
+                          sx={{ fontSize: '0.82rem', fontWeight: 600, mb: 0.5 }}
+                        >
+                          {t(
+                            'argus.logs.panel.traceNotFound',
+                            'Trace not found'
+                          )}
+                        </Typography>
+                        <Typography
+                          sx={{ fontSize: '0.72rem', color: 'text.secondary' }}
+                        >
+                          {t(
+                            'argus.logs.panel.traceNotFoundDesc',
+                            'The trace data may have expired or is not available.'
+                          )}
+                        </Typography>
+                      </Box>
                     )}
-                  </Typography>
+                  </Box>
                 </Box>
               )}
             </Box>
-          </Box>
+          </>
         )}
-      </Box>
-      </>
-      )}
       </PageContentLoader>
     </Box>
   );

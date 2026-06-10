@@ -153,103 +153,107 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
         {aggData && aggData.topValues.length > 0 && (
           <Box>
             {/* Stacked time series chart */}
-            {aggData.timeSeries.length > 0 && (() => {
-              const groups = [
-                ...new Set(
-                  aggData.timeSeries.map((d) => d.group_value)
-                ),
-              ];
-              const buckets = [
-                ...new Set(aggData.timeSeries.map((d) => d.bucket)),
-              ].sort();
-              const labels = buckets.map((b) => {
-                const d = new Date(b);
-                return d.toLocaleString(i18n.language || 'ko', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: false,
+            {aggData.timeSeries.length > 0 &&
+              (() => {
+                const groups = [
+                  ...new Set(aggData.timeSeries.map((d) => d.group_value)),
+                ];
+                const buckets = [
+                  ...new Set(aggData.timeSeries.map((d) => d.bucket)),
+                ].sort();
+                const labels = buckets.map((b) => {
+                  const d = new Date(b);
+                  return d.toLocaleString(i18n.language || 'ko', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  });
                 });
-              });
-              const datasets: ChartDataset[] = groups.map((g, gi) => ({
-                label: g || '(empty)',
-                data: buckets.map((b) => {
-                  const found = aggData.timeSeries.find(
-                    (d) => d.bucket === b && d.group_value === g
-                  );
-                  return found ? Number(found.count) : 0;
-                }),
-                type: chartType,
-                color: CHART_COLORS[gi % CHART_COLORS.length],
-              }));
-              return (
-                <Box sx={{ p: 2, pb: 1 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      mb: 1,
-                    }}
-                  >
-                    <Typography
+                const datasets: ChartDataset[] = groups.map((g, gi) => ({
+                  label: g || '(empty)',
+                  data: buckets.map((b) => {
+                    const found = aggData.timeSeries.find(
+                      (d) => d.bucket === b && d.group_value === g
+                    );
+                    return found ? Number(found.count) : 0;
+                  }),
+                  type: chartType,
+                  color: CHART_COLORS[gi % CHART_COLORS.length],
+                }));
+                return (
+                  <Box sx={{ p: 2, pb: 1 }}>
+                    <Box
                       sx={{
-                        fontSize: '0.72rem',
-                        fontWeight: 700,
-                        color: 'text.secondary',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        mb: 1,
                       }}
                     >
-                      {t('argus.logs.agg.countOverTime', 'Count over time')}
-                    </Typography>
-                    <ToggleButtonGroup
-                      value={chartType}
-                      exclusive
-                      onChange={(_, v) => { if (v) setChartType(v); }}
-                      size="small"
-                      sx={{
-                        height: 24,
-                        '& .MuiToggleButton-root': {
-                          px: 0.75,
-                          py: 0,
-                          border: `1px solid`,
-                          borderColor: 'divider',
-                          '&.Mui-selected': {
-                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                            color: theme.palette.primary.main,
-                            borderColor: alpha(theme.palette.primary.main, 0.3),
+                      <Typography
+                        sx={{
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          color: 'text.secondary',
+                        }}
+                      >
+                        {t('argus.logs.agg.countOverTime', 'Count over time')}
+                      </Typography>
+                      <ToggleButtonGroup
+                        value={chartType}
+                        exclusive
+                        onChange={(_, v) => {
+                          if (v) setChartType(v);
+                        }}
+                        size="small"
+                        sx={{
+                          height: 24,
+                          '& .MuiToggleButton-root': {
+                            px: 0.75,
+                            py: 0,
+                            border: `1px solid`,
+                            borderColor: 'divider',
+                            '&.Mui-selected': {
+                              bgcolor: alpha(theme.palette.primary.main, 0.1),
+                              color: theme.palette.primary.main,
+                              borderColor: alpha(
+                                theme.palette.primary.main,
+                                0.3
+                              ),
+                            },
                           },
-                        },
-                      }}
-                    >
-                      <ToggleButton value="bar">
-                        <SafeTooltip title={t('argus.chart.bar', 'Bar')}>
-                          <BarChartIcon sx={{ fontSize: 16 }} />
-                        </SafeTooltip>
-                      </ToggleButton>
-                      <ToggleButton value="line">
-                        <SafeTooltip title={t('argus.chart.line', 'Line')}>
-                          <LineChartIcon sx={{ fontSize: 16 }} />
-                        </SafeTooltip>
-                      </ToggleButton>
-                      <ToggleButton value="area">
-                        <SafeTooltip title={t('argus.chart.area', 'Area')}>
-                          <AreaChartIcon sx={{ fontSize: 16 }} />
-                        </SafeTooltip>
-                      </ToggleButton>
-                    </ToggleButtonGroup>
+                        }}
+                      >
+                        <ToggleButton value="bar">
+                          <SafeTooltip title={t('argus.chart.bar', 'Bar')}>
+                            <BarChartIcon sx={{ fontSize: 16 }} />
+                          </SafeTooltip>
+                        </ToggleButton>
+                        <ToggleButton value="line">
+                          <SafeTooltip title={t('argus.chart.line', 'Line')}>
+                            <LineChartIcon sx={{ fontSize: 16 }} />
+                          </SafeTooltip>
+                        </ToggleButton>
+                        <ToggleButton value="area">
+                          <SafeTooltip title={t('argus.chart.area', 'Area')}>
+                            <AreaChartIcon sx={{ fontSize: 16 }} />
+                          </SafeTooltip>
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </Box>
+                    <Box sx={{ height: 150 }}>
+                      <InteractiveTimeSeriesChart
+                        labels={labels}
+                        datasets={datasets}
+                        height={150}
+                        showLegend
+                      />
+                    </Box>
                   </Box>
-                  <Box sx={{ height: 150 }}>
-                    <InteractiveTimeSeriesChart
-                      labels={labels}
-                      datasets={datasets}
-                      height={150}
-                      showLegend
-                    />
-                  </Box>
-                </Box>
-              );
-            })()}
+                );
+              })()}
 
             {/* Top values table */}
             <Box sx={{ overflowX: 'auto' }}>

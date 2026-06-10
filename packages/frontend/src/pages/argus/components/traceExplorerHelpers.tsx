@@ -44,7 +44,11 @@ export const SpanVolumeChart: React.FC<{
 
   const { sortedBuckets, chartLabels, chartDatasets } = useMemo(() => {
     if (data.length === 0)
-      return { sortedBuckets: [] as string[], chartLabels: [] as string[], chartDatasets: [] };
+      return {
+        sortedBuckets: [] as string[],
+        chartLabels: [] as string[],
+        chartDatasets: [],
+      };
 
     const bucketMap = new Map<string, number>();
     data.forEach((p) => {
