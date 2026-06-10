@@ -363,15 +363,7 @@ const ArgusFeedbackPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [
-    projectId,
-    filters,
-    page,
-    rowsPerPage,
-    search,
-    statusTab,
-    sortOrder,
-  ]);
+  }, [projectId, filters, page, rowsPerPage, search, statusTab, sortOrder]);
 
   const [facetGroups, setFacetGroups] = useState<FacetGroup[]>([]);
   const [facetsLoading, setFacetsLoading] = useState(false);
@@ -387,7 +379,10 @@ const ArgusFeedbackPage: React.FC = () => {
       };
 
       const keys = [
-        { key: 'environment', label: t('argus.issues.environment', 'Environment') },
+        {
+          key: 'environment',
+          label: t('argus.issues.environment', 'Environment'),
+        },
         { key: 'release', label: t('argus.issues.release', 'Release') },
         { key: 'browser', label: t('argus.issues.browser', 'Browser') },
         { key: 'os', label: t('argus.issues.os', 'OS') },
@@ -681,8 +676,6 @@ const ArgusFeedbackPage: React.FC = () => {
     },
     []
   );
-
-
 
   // Lazy-fetch linked issue detail
   const [linkedIssueDetail, setLinkedIssueDetail] = useState<ArgusIssue | null>(
@@ -1046,9 +1039,16 @@ const ArgusFeedbackPage: React.FC = () => {
             const fieldKey = mapping[key] || key;
             const current = r.getFieldValues(fieldKey);
             if (current.includes(value)) {
-              r.upsertFieldChip(fieldKey, current.filter((v) => v !== value));
+              r.upsertFieldChip(
+                fieldKey,
+                current.filter((v) => v !== value)
+              );
             } else {
-              r.upsertFieldChip(fieldKey, [...current, value], exclude ? '!=' : '=');
+              r.upsertFieldChip(
+                fieldKey,
+                [...current, value],
+                exclude ? '!=' : '='
+              );
             }
           }}
           collapsed={facetCollapsed}

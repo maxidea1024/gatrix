@@ -982,84 +982,84 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
       >
         {/* Group header — hidden when root group is empty (EmptyPlaceholder has its own buttons) */}
         {!(isRoot && group.children.length === 0) && (
-        <GroupHeader>
-          {/* NOT badge for group */}
-          <SafeTooltip
-            title={t('argus.builder.toggleNot', 'Toggle NOT')}
-            placement="top"
-          >
-            <NotBadge
-              isNegated={group.negated}
-              isDark={isDark}
-              onClick={() => update(group.id, { negated: !group.negated })}
+          <GroupHeader>
+            {/* NOT badge for group */}
+            <SafeTooltip
+              title={t('argus.builder.toggleNot', 'Toggle NOT')}
+              placement="top"
             >
-              NOT
-            </NotBadge>
-          </SafeTooltip>
-
-          {/* AND/OR toggle chip */}
-          <ConnectorChip
-            isOr={group.connector === 'OR'}
-            primaryColor={primary}
-            onClick={() =>
-              update(group.id, {
-                connector: group.connector === 'AND' ? 'OR' : 'AND',
-              })
-            }
-          >
-            {group.connector}
-          </ConnectorChip>
-
-          {/* +Rule — click opens field picker */}
-          <AddRuleButton
-            size="small"
-            startIcon={<AddIcon sx={{ fontSize: 10 }} />}
-            sx={{ ml: 'auto' }}
-            onClick={(e) =>
-              setRuleMenuAnchor({ groupId: group.id, el: e.currentTarget })
-            }
-          >
-            {t('argus.builder.addRule', 'Rule')}
-          </AddRuleButton>
-          <AddGroupButton
-            size="small"
-            startIcon={<AddIcon sx={{ fontSize: 10 }} />}
-            onClick={() => addGroup(group.id)}
-          >
-            {t('argus.builder.addGroup', 'Group')}
-          </AddGroupButton>
-
-          {/* Duplicate / Delete group (non-root) */}
-          {!isRoot && (
-            <>
-              <SafeTooltip
-                title={t('argus.builder.duplicateGroup', 'Duplicate Group')}
-                placement="top"
+              <NotBadge
+                isNegated={group.negated}
+                isDark={isDark}
+                onClick={() => update(group.id, { negated: !group.negated })}
               >
-                <GroupActionButton
-                  size="small"
-                  actionColor="info"
-                  onClick={() => duplicate(group.id)}
-                  sx={{ ml: 0.3 }}
+                NOT
+              </NotBadge>
+            </SafeTooltip>
+
+            {/* AND/OR toggle chip */}
+            <ConnectorChip
+              isOr={group.connector === 'OR'}
+              primaryColor={primary}
+              onClick={() =>
+                update(group.id, {
+                  connector: group.connector === 'AND' ? 'OR' : 'AND',
+                })
+              }
+            >
+              {group.connector}
+            </ConnectorChip>
+
+            {/* +Rule — click opens field picker */}
+            <AddRuleButton
+              size="small"
+              startIcon={<AddIcon sx={{ fontSize: 10 }} />}
+              sx={{ ml: 'auto' }}
+              onClick={(e) =>
+                setRuleMenuAnchor({ groupId: group.id, el: e.currentTarget })
+              }
+            >
+              {t('argus.builder.addRule', 'Rule')}
+            </AddRuleButton>
+            <AddGroupButton
+              size="small"
+              startIcon={<AddIcon sx={{ fontSize: 10 }} />}
+              onClick={() => addGroup(group.id)}
+            >
+              {t('argus.builder.addGroup', 'Group')}
+            </AddGroupButton>
+
+            {/* Duplicate / Delete group (non-root) */}
+            {!isRoot && (
+              <>
+                <SafeTooltip
+                  title={t('argus.builder.duplicateGroup', 'Duplicate Group')}
+                  placement="top"
                 >
-                  <CopyIcon sx={{ fontSize: 12 }} />
-                </GroupActionButton>
-              </SafeTooltip>
-              <SafeTooltip
-                title={t('argus.builder.deleteGroup', 'Delete Group')}
-                placement="top"
-              >
-                <GroupActionButton
-                  size="small"
-                  actionColor="error"
-                  onClick={() => remove(group.id)}
+                  <GroupActionButton
+                    size="small"
+                    actionColor="info"
+                    onClick={() => duplicate(group.id)}
+                    sx={{ ml: 0.3 }}
+                  >
+                    <CopyIcon sx={{ fontSize: 12 }} />
+                  </GroupActionButton>
+                </SafeTooltip>
+                <SafeTooltip
+                  title={t('argus.builder.deleteGroup', 'Delete Group')}
+                  placement="top"
                 >
-                  <CloseIcon sx={{ fontSize: 12 }} />
-                </GroupActionButton>
-              </SafeTooltip>
-            </>
-          )}
-        </GroupHeader>
+                  <GroupActionButton
+                    size="small"
+                    actionColor="error"
+                    onClick={() => remove(group.id)}
+                  >
+                    <CloseIcon sx={{ fontSize: 12 }} />
+                  </GroupActionButton>
+                </SafeTooltip>
+              </>
+            )}
+          </GroupHeader>
         )}
 
         {/* Field picker menu — outside GroupHeader so it works from EmptyPlaceholder too */}
@@ -1109,7 +1109,8 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
           {(() => {
             const q = fieldSearch.toLowerCase();
             const specialFields = ['has', '!has'].filter(
-              (f) => !q || f.includes(q) || (f === '!has' && 'has not'.includes(q))
+              (f) =>
+                !q || f.includes(q) || (f === '!has' && 'has not'.includes(q))
             );
             const filteredFields = sortedFields.filter(
               (f) => !q || f.toLowerCase().includes(q)
@@ -1199,7 +1200,10 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                   </>
                 )}
                 {specialFields.length === 0 && filteredFields.length === 0 && (
-                  <MenuItem disabled sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}>
+                  <MenuItem
+                    disabled
+                    sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}
+                  >
                     {t('argus.builder.noFieldMatch', 'No matching fields')}
                   </MenuItem>
                 )}
@@ -1246,7 +1250,10 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                       size="small"
                       startIcon={<AddIcon sx={{ fontSize: 10 }} />}
                       onClick={(e) =>
-                        setRuleMenuAnchor({ groupId: group.id, el: e.currentTarget })
+                        setRuleMenuAnchor({
+                          groupId: group.id,
+                          el: e.currentTarget,
+                        })
                       }
                     >
                       {t('argus.builder.addRule', 'Rule')}
@@ -1270,9 +1277,10 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                     py: 1.5,
                     width: '100%',
                     border: '1px dashed',
-                    borderColor: drag.dropTargetId === group.id && drag.dropIndex === 0
-                      ? primary
-                      : 'divider',
+                    borderColor:
+                      drag.dropTargetId === group.id && drag.dropIndex === 0
+                        ? primary
+                        : 'divider',
                     borderRadius: '4px',
                     backgroundColor:
                       drag.dropTargetId === group.id && drag.dropIndex === 0
@@ -1537,8 +1545,8 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
               </Box>
             )}
           </PreviewHeader>
-          {!previewCollapsed && (
-            isValid ? (
+          {!previewCollapsed &&
+            (isValid ? (
               <PreviewContainer>
                 <QueryHighlighter
                   query={previewMode === 'dsl' ? dslPreview : sqlPreview}
@@ -1552,8 +1560,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 mode={previewMode}
                 isDark={isDark}
               />
-            )
-          )}
+            ))}
 
           {/* Actions */}
           <ActionsRow>

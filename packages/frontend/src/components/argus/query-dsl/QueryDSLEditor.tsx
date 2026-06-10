@@ -155,20 +155,22 @@ function useChipHistory(initial: FilterChip[] | (() => FilterChip[])) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export const QueryDSLEditor = forwardRef<QueryDSLEditorHandle, QueryDSLEditorProps>(
-  function QueryDSLEditor(
-    {
-      config,
-      initialQuery = '',
-      onSearch,
-      onChange,
-      fetchFieldValues,
-      initialFacets,
-      placeholder,
-      maxSuggestions = 20,
-    },
-    ref
-  ) {
+export const QueryDSLEditor = forwardRef<
+  QueryDSLEditorHandle,
+  QueryDSLEditorProps
+>(function QueryDSLEditor(
+  {
+    config,
+    initialQuery = '',
+    onSearch,
+    onChange,
+    fetchFieldValues,
+    initialFacets,
+    placeholder,
+    maxSuggestions = 20,
+  },
+  ref
+) {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -313,7 +315,9 @@ export const QueryDSLEditor = forwardRef<QueryDSLEditorHandle, QueryDSLEditorPro
           return;
         }
         setChips((prev) => {
-          const existing = prev.find((c) => c.type === 'filter' && c.field === field);
+          const existing = prev.find(
+            (c) => c.type === 'filter' && c.field === field
+          );
           let next: FilterChip[];
           if (existing) {
             next = prev.map((c) =>
@@ -322,7 +326,9 @@ export const QueryDSLEditor = forwardRef<QueryDSLEditorHandle, QueryDSLEditorPro
                     ...c,
                     value: values[0],
                     values,
-                    operator: operator ?? (values.length > 1 ? 'IN' : c.operator ?? '='),
+                    operator:
+                      operator ??
+                      (values.length > 1 ? 'IN' : (c.operator ?? '=')),
                   }
                 : c
             );
@@ -361,9 +367,14 @@ export const QueryDSLEditor = forwardRef<QueryDSLEditorHandle, QueryDSLEditorPro
         });
       },
       getFieldValues(field: string): string[] {
-        const chip = chips.find((c) => c.type === 'filter' && c.field === field);
+        const chip = chips.find(
+          (c) => c.type === 'filter' && c.field === field
+        );
         if (!chip) return [];
-        return chip.values?.filter((v) => v !== '') ?? (chip.value ? [chip.value] : []);
+        return (
+          chip.values?.filter((v) => v !== '') ??
+          (chip.value ? [chip.value] : [])
+        );
       },
     }),
     [chips, setChips, onSearch]
@@ -2551,8 +2562,7 @@ export const QueryDSLEditor = forwardRef<QueryDSLEditorHandle, QueryDSLEditorPro
       </Box>
     </ClickAwayListener>
   );
-  }
-);
+});
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

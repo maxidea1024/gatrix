@@ -387,8 +387,6 @@ const ArgusLogsPage: React.FC = () => {
         }
       />
 
-
-
       {/* ── Body: Sidebar + Content split ── */}
       <Box
         sx={{
@@ -410,7 +408,10 @@ const ArgusLogsPage: React.FC = () => {
               if (!ref) return;
               const current = ref.getFieldValues(key);
               if (current.includes(value)) {
-                ref.upsertFieldChip(key, current.filter((v) => v !== value));
+                ref.upsertFieldChip(
+                  key,
+                  current.filter((v) => v !== value)
+                );
               } else {
                 ref.upsertFieldChip(key, [...current, value]);
               }
@@ -682,7 +683,10 @@ const ArgusLogsPage: React.FC = () => {
                         // For exclude, we don't add to existing — just set as NOT filter
                         r.upsertFieldChip(key, [val], '!=');
                       } else if (current.includes(val)) {
-                        r.upsertFieldChip(key, current.filter((v) => v !== val));
+                        r.upsertFieldChip(
+                          key,
+                          current.filter((v) => v !== val)
+                        );
                       } else {
                         r.upsertFieldChip(key, [...current, val]);
                       }

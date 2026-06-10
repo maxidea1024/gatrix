@@ -615,7 +615,10 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                       >
                         <IconButton
                           size="small"
-                          title={t('argus.feedback.addToFilter', 'Add to filter')}
+                          title={t(
+                            'argus.feedback.addToFilter',
+                            'Add to filter'
+                          )}
                           onClick={() =>
                             onAddFilter(
                               row.field!,
@@ -636,7 +639,10 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                         </IconButton>
                         <IconButton
                           size="small"
-                          title={t('argus.feedback.excludeFromFilter', 'Exclude from filter')}
+                          title={t(
+                            'argus.feedback.excludeFromFilter',
+                            'Exclude from filter'
+                          )}
                           onClick={() =>
                             onAddFilter(
                               row.field!,

@@ -800,8 +800,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         }
       />
 
-
-
       {/* ── Body: Sidebar + Content split ── */}
       <Box
         sx={{
@@ -821,7 +819,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               if (!r) return;
               const current = r.getFieldValues(key);
               if (current.includes(value)) {
-                r.upsertFieldChip(key, current.filter((v) => v !== value));
+                r.upsertFieldChip(
+                  key,
+                  current.filter((v) => v !== value)
+                );
               } else {
                 r.upsertFieldChip(key, [...current, value]);
               }

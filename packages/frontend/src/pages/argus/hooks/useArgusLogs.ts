@@ -575,7 +575,6 @@ export function useArgusLogs() {
     if (activeTab === 2) fetchPatterns();
   }, [activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
   const handleSearchSubmit = useCallback(
     (val: string) => {
       setSearch(val);
@@ -640,7 +639,6 @@ export function useArgusLogs() {
     },
     [setUrlState]
   );
-
 
   // ─── Saved Query Handlers ───
   const handleSaveQuery = async (finalName: string) => {
