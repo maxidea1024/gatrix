@@ -399,7 +399,8 @@ export const FilterTokenGroup = forwardRef<
               }
               const isEmpty = (editingValueText ?? '') === '';
               const pillCount = selectedValues?.size ?? 0;
-              const cursorAtStart = (e.target as HTMLInputElement).selectionStart === 0;
+              const cursorAtStart =
+                (e.target as HTMLInputElement).selectionStart === 0;
               // ArrowLeft when cursor is at start with pills → select last pill
               if (
                 e.key === 'ArrowLeft' &&
