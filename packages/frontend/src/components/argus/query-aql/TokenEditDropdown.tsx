@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // TokenEditDropdown — Unified editing dropdown for filter token parts
 // Handles field, operator, and value editing via Popover
 // Extracted from FilterTokenChip's FieldMenu, OperatorMenu, ValueEditor
@@ -198,7 +198,19 @@ export function TokenEditDropdown({
       )}
       {type === 'operator' && (
         <OperatorMenu
-          field={getFieldByKey(chip.field ?? '', config)}
+          field={
+            chip.aggregateFunc
+              ? ({
+                  key: chip.aggregateFunc,
+                  label: chip.aggregateFunc,
+                  type: 'number',
+                  category: 'log',
+                  operators: ['>', '>=', '<', '<=', '!='],
+                  searchable: false,
+                  description: '',
+                } as QueryField)
+              : getFieldByKey(chip.field ?? '', config)
+          }
           currentOperator={chip.operator ?? '='}
           onSelect={handleOperatorSelect}
           isDark={isDark}
