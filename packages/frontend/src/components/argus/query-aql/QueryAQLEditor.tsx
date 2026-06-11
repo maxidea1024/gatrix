@@ -483,7 +483,7 @@ export const QueryAQLEditor = forwardRef<
       updates: Partial<
         Pick<
           FilterChip,
-          'field' | 'operator' | 'value' | 'values' | 'composingPart' | 'label'
+          'field' | 'operator' | 'value' | 'values' | 'composingPart' | 'label' | 'aggregateFunc' | 'aggregateArgs'
         >
       >
     ) => {

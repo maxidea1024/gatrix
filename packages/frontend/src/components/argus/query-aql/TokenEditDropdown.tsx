@@ -181,11 +181,20 @@ export function TokenEditDropdown({
         },
       }}
     >
-      {type === 'field' && !isHasChip && (
+      {type === 'field' && !isHasChip && !chip.aggregateFunc && (
         <FieldMenu
           config={config}
           currentField={chip.field ?? ''}
           onSelect={handleFieldSelect}
+          isDark={isDark}
+        />
+      )}
+      {type === 'field' && chip.aggregateFunc && (
+        <AggregateFieldMenu
+          config={config}
+          chip={chip}
+          onUpdate={onUpdate}
+          onClose={onClose}
           isDark={isDark}
         />
       )}
@@ -877,5 +886,122 @@ function HasToggleMenu({
         );
       })}
     </List>
+  );
+}
+
+// ─── Aggregate Field Menu (change aggregate function) ────────────────────────
+
+function AggregateFieldMenu({
+  config,
+  chip,
+  onUpdate,
+  onClose,
+  isDark,
+}: {
+  config: DomainConfig;
+  chip: FilterChip;
+  onUpdate: (updates: Partial<FilterChip>) => void;
+  onClose: () => void;
+  isDark: boolean;
+}) {
+  const [search, setSearch] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const aggregates = config.aggregates ?? [];
+  const currentFunc = chip.aggregateFunc ?? '';
+
+  useEffect(() => {
+    requestAnimationFrame(() => searchRef.current?.focus());
+  }, []);
+
+  const filtered = aggregates.filter(
+    (agg) =>
+      !search || agg.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <Box sx={{ maxHeight: 280, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
+        <InputBase
+          inputRef={searchRef}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search aggregates…"
+          fullWidth
+          sx={{
+            fontSize: '0.8rem',
+            px: 1,
+            py: 0.3,
+            borderRadius: '6px',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+          }}
+        />
+      </Box>
+      <List dense sx={{ overflow: 'auto', py: 0.5 }}>
+        {filtered.map((agg) => {
+          const isCurrent = agg.name === currentFunc;
+          const label = agg.args.length === 0
+            ? `${agg.name}()`
+            : `${agg.name}(field)`;
+          return (
+            <ListItemButton
+              key={agg.name}
+              onClick={() => {
+                const needsArgs = agg.args.length > 0;
+                const hasCurrentArgs = chip.aggregateArgs && chip.aggregateArgs.length > 0;
+                onUpdate({
+                  aggregateFunc: agg.name,
+                  // Keep args if new function also takes args, clear if zero-arg
+                  aggregateArgs: needsArgs
+                    ? (hasCurrentArgs ? chip.aggregateArgs : undefined)
+                    : [],
+                });
+                onClose();
+              }}
+              sx={{
+                py: 0.5,
+                px: 1.5,
+                backgroundColor: isCurrent
+                  ? isDark
+                    ? 'rgba(0,188,212,0.12)'
+                    : 'rgba(0,151,167,0.08)'
+                  : 'transparent',
+              }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  fontSize: '8px',
+                  fontWeight: 700,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  color: '#4dd0e1',
+                  backgroundColor: isDark
+                    ? 'rgba(0,188,212,0.12)'
+                    : 'rgba(0,151,167,0.10)',
+                  borderRadius: '3px',
+                  px: '3px',
+                  py: '1px',
+                  mr: 1,
+                  lineHeight: 1.3,
+                  minWidth: 16,
+                  textAlign: 'center',
+                }}
+              >
+                Σ
+              </Box>
+              <ListItemText
+                primary={label}
+                primaryTypographyProps={{
+                  fontSize: '0.8rem',
+                  fontWeight: isCurrent ? 600 : 400,
+                }}
+              />
+              {isCurrent && (
+                <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+              )}
+            </ListItemButton>
+          );
+        })}
+      </List>
+    </Box>
   );
 }

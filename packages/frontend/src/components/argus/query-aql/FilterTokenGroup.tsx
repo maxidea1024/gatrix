@@ -94,7 +94,7 @@ export const FilterTokenGroup = forwardRef<
   const valueInputRef = useRef<HTMLInputElement>(null);
 
   const field = getFieldByKey(chip.field ?? '', domain);
-  const fieldType = field?.type ?? 'string';
+  const fieldType = chip.type === 'aggregate' ? 'number' : (field?.type ?? 'string');
   const opLabel = getOpLabel(chip.operator ?? '=', fieldType);
   const isHasChip = chip.field === 'has' || chip.field === '!has';
   const isAggregateChip = chip.type === 'aggregate';
