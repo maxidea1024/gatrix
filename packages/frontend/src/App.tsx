@@ -544,7 +544,7 @@ const AppContent: React.FC = () => {
                       autoHideDuration={3000}
                       anchorOrigin={{
                         vertical: 'bottom',
-                        horizontal: 'center',
+                        horizontal: 'right',
                       }}
                       classes={{
                         containerRoot: 'snackbar-container-root',
