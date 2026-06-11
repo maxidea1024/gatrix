@@ -438,7 +438,7 @@ export const QuerySuggestionDropdown = forwardRef<
         top: '100%',
         left: dropdownLeft,
         mt: '2px',
-        minWidth: 360,
+        minWidth: 380,
         maxWidth: 480,
         borderRadius: '8px',
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
@@ -458,6 +458,12 @@ export const QuerySuggestionDropdown = forwardRef<
             gap: 0,
             borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             px: '4px',
+            overflowX: 'auto',
+            msOverflowStyle: 'none',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
           }}
         >
           {availableTabs.map((tab) => {
@@ -493,6 +499,8 @@ export const QuerySuggestionDropdown = forwardRef<
                   display: 'flex',
                   alignItems: 'center',
                   gap: 0.5,
+                  flexShrink: 0,
+                  whiteSpace: 'nowrap',
                   '&:hover': {
                     color: isDark ? '#e0e0e0' : '#1a1a1a',
                   },

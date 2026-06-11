@@ -411,11 +411,6 @@ export function conditionToSqlPretty(cond: Condition): string {
 // Tree mutation helpers (immutable — return new tree)
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** Deep clone */
-export function cloneTree(cond: Condition): Condition {
-  if (cond.type === 'filter') return { ...cond };
-  return { ...cond, children: cond.children.map(cloneTree) };
-}
 
 /** Find and remove a condition by ID. Returns [newTree, removedItem]. */
 export function removeCondition(
@@ -539,6 +534,8 @@ export function hasValidFilters(root: GroupCondition): boolean {
   for (const child of root.children) {
     if (child.type === 'filter') {
       if (child.field === 'has' || child.field === '!has') {
+        if (child.value) return true;
+      } else if (child.aggregateFunc) {
         if (child.value) return true;
       } else if (child.field && child.value) {
         return true;

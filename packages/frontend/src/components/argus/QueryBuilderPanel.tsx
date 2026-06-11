@@ -14,7 +14,6 @@ import React, {
 import {
   Box,
   Typography,
-  Button,
   IconButton,
   Dialog,
   Select,
@@ -74,6 +73,7 @@ import {
   updateCondition,
   hasValidFilters,
   duplicateCondition,
+  insertCondition,
 } from './query-builder-tree';
 import {
   DialogBody,
@@ -357,13 +357,28 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
 
   const getFacetValues = useCallback(
     (field: string): FacetValue[] => {
-      if (facets[field]?.length > 0) return facets[field];
-      if (dynamicFacets[field])
-        return dynamicFacets[field].map((v) => ({ value: v, count: 0 }));
-      const fc = config.fields.find((f) => f.key === field);
-      if (fc?.staticValues)
-        return fc.staticValues.map((v) => ({ value: v, count: 0 }));
-      return [];
+      // 1. Collect static values if any
+      const fc = getFieldByKey(field, config);
+      const staticVals = fc?.staticValues || [];
+      const staticMap = new Map<string, FacetValue>(
+        staticVals.map((v) => [v, { value: v, count: 0 }])
+      );
+
+      // 2. Overlay dynamic facets from props
+      const propVals = facets[field] || [];
+      propVals.forEach((pv) => {
+        staticMap.set(pv.value, pv);
+      });
+
+      // 3. Overlay dynamic facets loaded on-demand
+      const dynVals = dynamicFacets[field] || [];
+      dynVals.forEach((v) => {
+        if (!staticMap.has(v)) {
+          staticMap.set(v, { value: v, count: 0 });
+        }
+      });
+
+      return Array.from(staticMap.values());
     },
     [facets, dynamicFacets, config]
   );
@@ -390,7 +405,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
   const getFieldOps = useCallback(
     (fieldKey: string) => {
       if (fieldKey === 'has' || fieldKey === '!has') return [];
-      const f = config.fields.find((x) => x.key === fieldKey);
+      const f = getFieldByKey(fieldKey, config);
       if (f) return getOperatorOptions(f.operators, f.type);
       return [
         { op: '=', label: 'is' },
@@ -464,8 +479,23 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
   );
 
   const addFilter = useCallback((groupId: string, field: string) => {
+    if (field.startsWith('__agg:')) {
+      const aggName = field.slice(6);
+      const aggDef = config.aggregates?.find((a) => a.name === aggName);
+      if (aggDef) {
+        setTree((t) => {
+          const filter = {
+            ...createFilter('', '>'),
+            aggregateFunc: aggName,
+            aggregateArgs: aggDef.args.length === 0 ? [] : undefined,
+          };
+          return insertCondition(t, groupId, filter, Infinity);
+        });
+        return;
+      }
+    }
     setTree((t) => addFilterToGroup(t, groupId, field));
-  }, []);
+  }, [config.aggregates]);
 
   const addGroup = useCallback((groupId: string) => {
     setTree((t) => addGroupToGroup(t, groupId));
@@ -763,10 +793,11 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 <CategoryBadge category="has" isDark={isDark} />
                 has not
               </MenuItem>
-              {config.aggregates && config.aggregates.length > 0 && (
-                <>
-                  <Divider sx={{ my: 0.3 }} />
+              {config.aggregates &&
+                config.aggregates.length > 0 && [
+                  <Divider key="agg-divider" sx={{ my: 0.3 }} />,
                   <ListSubheader
+                    key="agg-subheader"
                     sx={{
                       fontSize: '0.55rem',
                       fontWeight: 700,
@@ -776,8 +807,8 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                     }}
                   >
                     AGGREGATES
-                  </ListSubheader>
-                  {config.aggregates.map((agg) => (
+                  </ListSubheader>,
+                  ...config.aggregates.map((agg) => (
                     <MenuItem
                       key={`__agg:${agg.name}`}
                       value={`__agg:${agg.name}`}
@@ -788,9 +819,8 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                         ? `${agg.name}()`
                         : `${agg.name}(field)`}
                     </MenuItem>
-                  ))}
-                </>
-              )}
+                  )),
+                ]}
               <Divider sx={{ my: 0.3 }} />
               <ListSubheader
                 sx={{
@@ -804,7 +834,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 FIELDS
               </ListSubheader>
               {sortedFields.map((f) => {
-                const fc = config.fields.find((x) => x.key === f);
+                const fc = getFieldByKey(f, config);
                 return (
                   <MenuItem
                     key={f}
@@ -1228,6 +1258,9 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             const filteredFields = sortedFields.filter(
               (f) => !q || f.toLowerCase().includes(q)
             );
+            const filteredAggregates = (config.aggregates || []).filter(
+              (a) => !q || a.name.toLowerCase().includes(q)
+            );
             return (
               <>
                 {specialFields.length > 0 && (
@@ -1257,6 +1290,40 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                           <CategoryBadge category="has" isDark={isDark} />
                         </ListItemIcon>
                         {f === '!has' ? 'has not' : f}
+                      </MenuItem>
+                    ))}
+                    <Divider sx={{ my: 0.3 }} />
+                  </>
+                )}
+                {filteredAggregates.length > 0 && (
+                  <>
+                    <ListSubheader
+                      sx={{
+                        fontSize: '0.55rem',
+                        fontWeight: 700,
+                        lineHeight: '24px',
+                        color: 'text.disabled',
+                        letterSpacing: '0.06em',
+                      }}
+                    >
+                      {t('argus.builder.aggregates', 'AGGREGATES')}
+                    </ListSubheader>
+                    {filteredAggregates.map((agg) => (
+                      <MenuItem
+                        key={`__agg:${agg.name}`}
+                        sx={{ fontSize: '0.7rem', gap: 0.5 }}
+                        onClick={() => {
+                          addFilter(group.id, `__agg:${agg.name}`);
+                          setRuleMenuAnchor(null);
+                          setFieldSearch('');
+                        }}
+                      >
+                        <ListItemIcon sx={{ minWidth: 24 }}>
+                          <CategoryBadge category="aggregate" isDark={isDark} />
+                        </ListItemIcon>
+                        {agg.args.length === 0
+                          ? `${agg.name}()`
+                          : `${agg.name}(field)`}
                       </MenuItem>
                     ))}
                     <Divider sx={{ my: 0.3 }} />
@@ -1312,14 +1379,16 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                     })}
                   </>
                 )}
-                {specialFields.length === 0 && filteredFields.length === 0 && (
-                  <MenuItem
-                    disabled
-                    sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}
-                  >
-                    {t('argus.builder.noFieldMatch', 'No matching fields')}
-                  </MenuItem>
-                )}
+                {specialFields.length === 0 &&
+                  filteredFields.length === 0 &&
+                  filteredAggregates.length === 0 && (
+                    <MenuItem
+                      disabled
+                      sx={{ fontSize: '0.7rem', fontStyle: 'italic' }}
+                    >
+                      {t('argus.builder.noFieldMatch', 'No matching fields')}
+                    </MenuItem>
+                  )}
               </>
             );
           })()}
