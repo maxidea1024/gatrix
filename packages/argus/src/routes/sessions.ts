@@ -142,7 +142,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
           }),
         ]);
 
-        // Duration distribution & browser/OS breakdown require complex multiIf ??        // these are best expressed as rawQuery since multiIf isn't part of the DSL
+        // Duration distribution & browser/OS breakdown require complex multiIf ??        // these are best expressed as rawQuery since multiIf isn't part of the query language
         const bucket = getBucketingConfig(
           period,
           undefined,

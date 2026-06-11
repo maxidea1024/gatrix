@@ -473,7 +473,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
       };
 
       try {
-        // dsn_key_id filter is not a standard DSL field, use rawQuery
+        // dsn_key_id filter is not a standard AQL field, use rawQuery
         const [errorsResult, txnResult] = await Promise.all([
           optic.rawQuery({
             query: `SELECT ${bucket.selectExpr} AS ts, count() AS accepted

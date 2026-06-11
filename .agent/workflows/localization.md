@@ -113,15 +113,15 @@ PowerShell의 `Add-Content`는 기본적으로 **시스템 코드페이지(CP949
 
 ```powershell
 # 금지: PowerShell로 한글/중문 직접 쓰기
-Add-Content -Path "ko.ini" -Value "dsl.field.level=레벨"
-Add-Content -Path "zh.ini" -Value "dsl.field.level=级别"
+Add-Content -Path "ko.ini" -Value "aql.field.level=레벨"
+Add-Content -Path "zh.ini" -Value "aql.field.level=级别"
 
 # 금지: -Encoding UTF8 써도 BOM 문제 발생
 Add-Content -Path "ko.ini" -Value "key=값" -Encoding UTF8
 
 # 금지: heredoc으로 한글 쓰기
 Add-Content -Path "ko.ini" -Value @"
-dsl.field.level=레벨
+aql.field.level=레벨
 "@
 ```
 
@@ -132,7 +132,7 @@ dsl.field.level=레벨
 # 이 도구들은 항상 UTF-8 without BOM으로 저장함
 
 # 터미널은 검증에만 사용:
-Select-String -Path "ko.ini" -Pattern "dsl.field"
+Select-String -Path "ko.ini" -Pattern "aql.field"
 node archived/compare-locales.js
 ```
 

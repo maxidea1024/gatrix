@@ -88,7 +88,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       // Date filter
       const dateClause = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
-      // Search filter — parse DSL query via QueryParser
+      // Search filter — parse AQL query via QueryParser
       let searchClause = '';
       if (search && search.trim()) {
         const parser = new QueryParser(

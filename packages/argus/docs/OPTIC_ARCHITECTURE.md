@@ -381,7 +381,7 @@ interface ColumnDef {
 
 ---
 
-## 4. Query DSL (OpticQuery)
+## 4. Query Language (OpticQuery)
 
 Route 파일에서 쿼리를 선언적으로 구성하는 인터페이스입니다.
 

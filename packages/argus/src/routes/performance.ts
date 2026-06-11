@@ -90,7 +90,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
         };
 
         const [batch, histogram, relatedIssues] = await Promise.all([
-          // Main queries via DSL
+          // Main queries via AQL
           optic.queryBatch({
             trend: {
               dataset: 'transactions',
