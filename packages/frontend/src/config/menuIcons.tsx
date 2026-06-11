@@ -76,6 +76,7 @@ import {
   Feedback as FeedbackIcon,
   NewReleases as NewReleasesIcon,
   NotificationsActive as NotificationsActiveIcon,
+  Speed as SpeedIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 
@@ -152,6 +153,7 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Feedback: <FeedbackIcon />,
   NewReleases: <NewReleasesIcon />,
   NotificationsActive: <NotificationsActiveIcon />,
+  Speed: <SpeedIcon />,
   Ripple: <RippleIcon />,
 };
 

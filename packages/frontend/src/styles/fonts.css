@@ -1,16 +1,27 @@
-/* D2Coding Font */
-@font-face {
-  font-family: 'D2Coding';
-  src: url('/fonts/D2Coding.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* ==========================================================
+ *  Font Tokens
+ * ==========================================================
+ *  UI:   Pretendard (KR) + Inter (EN/Num) + system fallback
+ *  Mono: JetBrains Mono + Fira Code + Pretendard (KR fallback)
+ *
+ *  ⚠️  컴포넌트에서 인라인으로 fontFamily를 지정하지 마세요!
+ *      CSS custom properties(--font-sans, --font-mono)만 사용하세요.
+ * ========================================================== */
 
-@font-face {
-  font-family: 'D2Coding';
-  src: url('/fonts/D2CodingBold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
+:root {
+  /* ── UI sans-serif (Korean / default) ── */
+  --font-sans: 'Pretendard', 'Inter', 'Noto Sans KR',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+
+  /* ── UI sans-serif (Chinese) ── */
+  --font-sans-zh: 'Inter', 'Microsoft YaHei', '微软雅黑',
+    'Source Han Sans SC', '思源黑体', 'Noto Sans SC',
+    'PingFang SC', 'Hiragino Sans GB',
+    'Roboto', 'Helvetica', 'Arial', sans-serif;
+
+  /* ── Monospace (code / log / console) ── */
+  --font-mono: 'JetBrains Mono', 'Fira Code',
+    'Pretendard', 'Noto Sans KR',
+    'Source Code Pro', 'Consolas', 'Monaco', monospace;
 }

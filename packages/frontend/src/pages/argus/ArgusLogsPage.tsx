@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, useTheme, IconButton, Button } from '@mui/material';
 import {
   Terminal as LogIcon,
@@ -37,6 +38,8 @@ import LogsToolbar from './components/LogsToolbar';
 import LogsTablePanel from './components/LogsTablePanel';
 import LogsAggregatePanel from './components/LogsAggregatePanel';
 import LogsPatternsPanel from './components/LogsPatternsPanel';
+import PatternDetailPanel from './components/PatternDetailPanel';
+import type { PatternEntry } from './components/LogsPatternsPanel';
 import LogsLiveTailPanel from './components/LogsLiveTailPanel';
 import {
   EditTableDialog,
@@ -55,11 +58,13 @@ const ArgusLogsPage: React.FC = () => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
+  const navigate = useNavigate();
 
   const {
     projectId,
     activeTab,
     aggGroupBy,
+    aggGroupBys,
     filters,
     search,
     logs,
@@ -69,6 +74,7 @@ const ArgusLogsPage: React.FC = () => {
     columns,
     setColumns,
     columnNames,
+    setColumnNames,
     dynamicAvailableColumns,
     selectedLogIndex,
     selectedLog,
@@ -79,6 +85,7 @@ const ArgusLogsPage: React.FC = () => {
     customFacetData,
     discoveredFacets,
     aggData,
+    aggDataMap,
     aggLoading,
     savedQueries,
     currentQueryId,
@@ -132,6 +139,7 @@ const ArgusLogsPage: React.FC = () => {
   }, [columnNames]);
 
   const [editTableOpen, setEditTableOpen] = useState(false);
+  const [selectedPattern, setSelectedPattern] = useState<PatternEntry | null>(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
@@ -161,10 +169,6 @@ const ArgusLogsPage: React.FC = () => {
   const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
   const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useLocalStorage(
     'argus_facet_sidebar_collapsed',
-    false
-  );
-  const [tableCollapsed, setTableCollapsed] = useLocalStorage(
-    'argus_logs_table_collapsed',
     false
   );
 
@@ -426,14 +430,16 @@ const ArgusLogsPage: React.FC = () => {
             onFilter={(key, value) => {
               const ref = dslEditorRef.current;
               if (!ref) return;
-              const current = ref.getFieldValues(key);
+              // Strip internal prefixes (discovered facets use "discovered.key", custom facets use "attr.key")
+              const cleanKey = key.replace(/^(discovered\.|attr\.)/, '');
+              const current = ref.getFieldValues(cleanKey);
               if (current.includes(value)) {
                 ref.upsertFieldChip(
-                  key,
+                  cleanKey,
                   current.filter((v) => v !== value)
                 );
               } else {
-                ref.upsertFieldChip(key, [...current, value]);
+                ref.upsertFieldChip(cleanKey, [...current, value]);
               }
             }}
             collapsed={facetSidebarCollapsed}
@@ -726,27 +732,71 @@ const ArgusLogsPage: React.FC = () => {
                     />
                   )}
                 {activeTab === 1 &&
-                  (aggLoading || (aggData && aggData.topValues.length > 0)) && (
-                    <LogsAggregatePanel
-                      aggData={aggData}
-                      aggGroupBy={aggGroupBy}
-                      aggLoading={aggLoading}
-                      isDark={isDark}
-                      tableCollapsed={tableCollapsed}
-                      setTableCollapsed={setTableCollapsed}
-                      onGroupByChange={(val) => {
-                        setUrlState({ groupBy: val });
-                        fetchAggregates(val);
-                      }}
-                      onAddFilter={(key, val) => {
-                        const r = dslEditorRef.current;
-                        if (!r) return;
-                        const current = r.getFieldValues(key);
-                        if (!current.includes(val)) {
-                          r.upsertFieldChip(key, [...current, val]);
-                        }
-                      }}
-                    />
+                  (aggLoading || aggGroupBys.some((g) => aggDataMap[g]?.topValues?.length > 0)) && (
+                    <>
+                      {aggGroupBys.map((gKey, gIdx) => (
+                        <LogsAggregatePanel
+                          key={gKey}
+                          aggData={aggDataMap[gKey] || null}
+                          aggGroupBy={gKey}
+                          aggLoading={aggLoading}
+                          isDark={isDark}
+                          discoveredFacetKeys={discoveredFacets.map((f) => f.label)}
+                          onGroupByChange={(val) => {
+                            const newKeys = [...aggGroupBys];
+                            newKeys[gIdx] = val;
+                            const deduped = [...new Set(newKeys)];
+                            setUrlState({ groupBy: deduped.join(',') });
+                            fetchAggregates(deduped);
+                          }}
+                          onAddFilter={(key, val) => {
+                            const r = dslEditorRef.current;
+                            if (!r) return;
+                            const current = r.getFieldValues(key);
+                            if (current.includes(val)) {
+                              r.upsertFieldChip(
+                                key,
+                                current.filter((v) => v !== val)
+                              );
+                            } else {
+                              r.upsertFieldChip(key, [...current, val]);
+                            }
+                          }}
+                          showRemove={aggGroupBys.length > 1}
+                          onRemovePanel={() => {
+                            const newKeys = aggGroupBys.filter((_, i) => i !== gIdx);
+                            setUrlState({ groupBy: newKeys.join(',') });
+                            fetchAggregates(newKeys);
+                          }}
+                        />
+                      ))}
+                      {aggGroupBys.length < 3 && (
+                        <Box
+                          onClick={() => {
+                            // Add a new group-by panel with a default key not already used
+                            const defaults = ['level', 'service', 'environment', 'logger_name', 'release'];
+                            const next = defaults.find((d) => !aggGroupBys.includes(d)) || 'level';
+                            const newKeys = [...aggGroupBys, next];
+                            setUrlState({ groupBy: newKeys.join(',') });
+                            fetchAggregates(newKeys);
+                          }}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            py: 0.75,
+                            cursor: 'pointer',
+                            borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                            color: 'text.disabled',
+                            fontSize: '0.72rem',
+                            transition: 'all 0.15s',
+                            '&:hover': { color: 'primary.main', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                          }}
+                        >
+                          + {t('argus.logs.agg.addGroup', 'Add group')}
+                        </Box>
+                      )}
+                    </>
                   )}
 
                 {/* Patterns Tab */}
@@ -755,6 +805,55 @@ const ArgusLogsPage: React.FC = () => {
                     patterns={patterns}
                     loading={patternsLoading}
                     isDark={isDark}
+                    onPatternClick={(p) => setSelectedPattern(p)}
+                    onCreateAlert={(p) => {
+                      const params = new URLSearchParams();
+                      params.set('dataset', 'logs');
+                      const keyword = p.sample_message
+                        ?.replace(/<[A-Z]+>/g, '')
+                        ?.split(/[\s:]+/)
+                        ?.find((w) => w.length > 3 && !/^\d+$/.test(w));
+                      if (keyword) params.set('query', `message:"${keyword}"`);
+                      if (p.level) params.set('level', p.level);
+                      if (p.service) params.set('service', p.service);
+                      navigate(`/argus/alerts?action=create&${params.toString()}`);
+                    }}
+                  />
+                )}
+
+                {/* Pattern Detail Drilldown Panel (⭐7) */}
+                {activeTab === 2 && (
+                  <PatternDetailPanel
+                    pattern={selectedPattern}
+                    open={!!selectedPattern}
+                    onClose={() => setSelectedPattern(null)}
+                    isDark={isDark}
+                    onFilterPattern={(p) => {
+                      const keyword = p.sample_message
+                        ?.replace(/<[A-Z]+>/g, '')
+                        ?.split(/[\s:]+/)
+                        ?.find((w) => w.length > 3 && !/^\d+$/.test(w));
+                      if (keyword) {
+                        const ref = dslEditorRef.current;
+                        if (ref) ref.upsertFieldChip('message', [keyword]);
+                      }
+                      setSelectedPattern(null);
+                      setUrlState({ tab: '0' });
+                    }}
+                    onCreateAlert={(p) => {
+                      const params = new URLSearchParams();
+                      params.set('dataset', 'logs');
+                      const keyword = p.sample_message
+                        ?.replace(/<[A-Z]+>/g, '')
+                        ?.split(/[\s:]+/)
+                        ?.find((w) => w.length > 3 && !/^\d+$/.test(w));
+                      if (keyword) params.set('query', `message:"${keyword}"`);
+                      if (p.level) params.set('level', p.level);
+                      if (p.service) params.set('service', p.service);
+                      navigate(`/argus/alerts?action=create&${params.toString()}`);
+                    }}
+                    projectId={projectId}
+                    period={currentPeriod}
                   />
                 )}
 
@@ -865,7 +964,12 @@ const ArgusLogsPage: React.FC = () => {
         open={saveDialogOpen}
         initialName={saveName}
         onClose={() => setSaveDialogOpen(false)}
-        onSave={handleSaveQuery}
+        onSave={(name: string) =>
+          handleSaveQuery(name, {
+            displayDensity,
+            wrapLines,
+          })
+        }
       />
 
       <SavedQueriesDrawer
@@ -873,7 +977,12 @@ const ArgusLogsPage: React.FC = () => {
         queries={savedQueries}
         isDark={isDark}
         onClose={() => setSavedPanelOpen(false)}
-        onLoad={handleLoadSavedQuery}
+        onLoad={(sq) =>
+          handleLoadSavedQuery(sq, (cfg) => {
+            if (cfg.displayDensity) setDisplayDensity(cfg.displayDensity);
+            if (cfg.wrapLines !== undefined) setWrapLines(cfg.wrapLines);
+          })
+        }
         onDelete={handleDeleteSavedQuery}
       />
     </Box>

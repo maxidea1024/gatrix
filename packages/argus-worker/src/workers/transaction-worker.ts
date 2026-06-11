@@ -91,13 +91,18 @@ export class TransactionWorker {
       concurrency: txnConcurrency,
     });
 
-    await this.worker.run();
-
     logger.info('Transaction worker started (GroupMQ)', {
       namespace: QUEUES.TRANSACTION_PROCESSING,
       concurrency: txnConcurrency,
       chFlushIntervalMs: flushIntervalMs,
       chMaxBatchSize: maxBatchSize,
+    });
+
+    // Fire-and-forget — do NOT await, otherwise it blocks all subsequent workers
+    this.worker.run().catch((error) => {
+      logger.error('Transaction worker run() crashed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
     });
   }
 

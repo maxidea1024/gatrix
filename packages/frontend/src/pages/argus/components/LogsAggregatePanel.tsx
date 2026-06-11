@@ -2,9 +2,9 @@ import React from 'react';
 import {
   Box,
   Typography,
-  FormControl,
-  Select,
+  Menu,
   MenuItem,
+  Divider,
   Table,
   TableHead,
   TableBody,
@@ -14,6 +14,7 @@ import {
   ToggleButton,
   alpha,
   useTheme,
+  IconButton,
 } from '@mui/material';
 import {
   ViewColumn as ViewIcon,
@@ -25,6 +26,9 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   ScatterPlot as ScatterPlotIcon,
+  DonutLarge as DonutIcon,
+  AlignHorizontalLeft as HBarIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -36,7 +40,7 @@ import InteractiveTimeSeriesChart, {
 } from '@/components/argus/InteractiveTimeSeriesChart';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Chart as ChartJS, ArcElement } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
+import { Pie, Doughnut, Bar as BarChart } from 'react-chartjs-2';
 import LogsTreemapChart from './LogsTreemapChart';
 
 ChartJS.register(ArcElement);
@@ -52,10 +56,14 @@ export interface LogsAggregatePanelProps {
   aggGroupBy: string;
   aggLoading: boolean;
   isDark: boolean;
-  tableCollapsed: boolean;
-  setTableCollapsed: (val: boolean | ((prev: boolean) => boolean)) => void;
   onGroupByChange: (val: string) => void;
   onAddFilter: (key: string, val: string) => void;
+  /** Discovered attribute keys from facet sidebar — appear as extra group-by options */
+  discoveredFacetKeys?: string[];
+  /** Show remove button (when multiple panels exist) */
+  showRemove?: boolean;
+  /** Called when this panel is removed */
+  onRemovePanel?: () => void;
 }
 
 const CHART_COLORS = [
@@ -73,14 +81,16 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
   aggGroupBy,
   aggLoading,
   isDark,
-  tableCollapsed,
-  setTableCollapsed,
   onGroupByChange,
   onAddFilter,
+  discoveredFacetKeys = [],
+  showRemove = false,
+  onRemovePanel,
 }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
-  const [chartType, setChartType] = useLocalStorage<'bar' | 'line' | 'area' | 'treemap' | 'pie' | 'scatter'>(
+  const [tableCollapsed, setTableCollapsed] = React.useState(false);
+  const [chartType, setChartType] = useLocalStorage<'bar' | 'line' | 'area' | 'treemap' | 'pie' | 'scatter' | 'doughnut' | 'horizontalBar'>(
     'argus_agg_chart_type',
     'bar'
   );
@@ -102,9 +112,87 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
     };
   }, [aggData, isDark]);
 
+  const pieTotal = React.useMemo(() => {
+    if (!aggData?.topValues) return 0;
+    return aggData.topValues.reduce((s, v) => s + Number(v.count), 0);
+  }, [aggData]);
+
+  const pieClickHandler = React.useCallback((event: any, elements: any[]) => {
+    if (elements && elements.length > 0) {
+      const index = elements[0].index;
+      const label = aggData?.topValues[index]?.group_value;
+      if (label) {
+        onAddFilter(aggGroupBy, label);
+      }
+    }
+  }, [aggData, aggGroupBy, onAddFilter]);
+
+  const pieLegendConfig = React.useMemo(() => ({
+    display: true,
+    position: 'right' as const,
+    labels: {
+      boxWidth: 8,
+      font: { size: 10 },
+      color: isDark ? '#c9d1d9' : '#24292f',
+      usePointStyle: true,
+      pointStyle: 'circle',
+    },
+  }), [isDark]);
+
+  const pieTooltipConfig = React.useMemo(() => ({
+    callbacks: {
+      label: (context: any) => {
+        const label = context.label || '';
+        const value = context.parsed || 0;
+        const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+        const pct = total > 0 ? (value / total) * 100 : 0;
+        return ` ${label}: ${formatCompactNumber(value)} (${pct.toFixed(1)}%)`;
+      },
+    },
+  }), []);
+
   const pieOptions = React.useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
+    onClick: pieClickHandler,
+    plugins: {
+      legend: pieLegendConfig,
+      tooltip: pieTooltipConfig,
+    },
+  }), [pieClickHandler, pieLegendConfig, pieTooltipConfig]);
+
+  const doughnutOptions = React.useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '55%',
+    onClick: pieClickHandler,
+    plugins: {
+      legend: pieLegendConfig,
+      tooltip: pieTooltipConfig,
+    },
+  }), [pieClickHandler, pieLegendConfig, pieTooltipConfig]);
+
+  const hBarData = React.useMemo(() => {
+    if (!aggData?.topValues) return { labels: [], datasets: [] };
+    return {
+      labels: aggData.topValues.map((v) => v.group_value || '(empty)'),
+      datasets: [
+        {
+          data: aggData.topValues.map((v) => Number(v.count)),
+          backgroundColor: aggData.topValues.map((_, i) => alpha(CHART_COLORS[i % CHART_COLORS.length], 0.7)),
+          borderColor: aggData.topValues.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
+          borderWidth: 1,
+          borderRadius: 3,
+          borderSkipped: false,
+        },
+      ],
+    };
+  }, [aggData, isDark]);
+
+  const hBarOptions = React.useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y' as const,
     onClick: (event: any, elements: any[]) => {
       if (elements && elements.length > 0) {
         const index = elements[0].index;
@@ -115,27 +203,26 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
       }
     },
     plugins: {
-      legend: {
-        display: true,
-        position: 'right' as const,
-        labels: {
-          boxWidth: 8,
-          font: { size: 10 },
-          color: isDark ? '#c9d1d9' : '#24292f',
-          usePointStyle: true,
-          pointStyle: 'circle',
-        },
-      },
+      legend: { display: false },
       tooltip: {
         callbacks: {
           label: (context: any) => {
-            const label = context.label || '';
-            const value = context.parsed || 0;
-            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
-            const pct = total > 0 ? (value / total) * 100 : 0;
-            return ` ${label}: ${formatCompactNumber(value)} (${pct.toFixed(1)}%)`;
+            return ` ${formatCompactNumber(context.parsed.x)}`;
           },
         },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        grid: { color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' },
+        border: { display: false },
+        ticks: { font: { size: 10 }, color: isDark ? '#555' : '#aaa' },
+      },
+      y: {
+        grid: { display: false },
+        border: { display: false },
+        ticks: { font: { size: 10 }, color: isDark ? '#ccc' : '#555' },
       },
     },
   }), [aggData, aggGroupBy, onAddFilter, isDark]);
@@ -162,6 +249,9 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        borderRadius: '8px',
+        mb: 1.5,
       }}
     >
       {/* Toolbar */}
@@ -178,44 +268,133 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
             : 'rgba(0,0,0,0.01)',
         }}
       >
-        <Typography
-          sx={{ fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}
-        >
-          {t('argus.logs.groupByLabel', 'Group by')}
-        </Typography>
-        <FormControl size="small" variant="outlined" sx={{ minWidth: 130 }}>
-          <Select
-            value={aggGroupBy}
-            onChange={(e) => onGroupByChange(e.target.value)}
-            sx={{
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              height: 28,
-              '& .MuiSelect-select': { py: 0.5 },
-            }}
-          >
-            <MenuItem value="level" sx={{ fontSize: '0.75rem' }}>
-              {t('argus.logs.agg.level', 'Severity')}
-            </MenuItem>
-            <MenuItem value="service" sx={{ fontSize: '0.75rem' }}>
-              {t('argus.logs.agg.service', 'Service')}
-            </MenuItem>
-            <MenuItem value="environment" sx={{ fontSize: '0.75rem' }}>
-              {t('argus.logs.agg.environment', 'Environment')}
-            </MenuItem>
-            <MenuItem value="logger_name" sx={{ fontSize: '0.75rem' }}>
-              {t('argus.logs.agg.logger', 'Logger')}
-            </MenuItem>
-            <MenuItem value="release" sx={{ fontSize: '0.75rem' }}>
-              {t('argus.logs.agg.release', 'Release')}
-            </MenuItem>
-          </Select>
-        </FormControl>
+        {(() => {
+          const groupByOptions: { value: string; label: string }[] = [
+            { value: 'level', label: t('argus.logs.agg.level', 'Severity') },
+            { value: 'service', label: t('argus.logs.agg.service', 'Service') },
+            { value: 'environment', label: t('argus.logs.agg.environment', 'Environment') },
+            { value: 'logger_name', label: t('argus.logs.agg.logger', 'Logger') },
+            { value: 'release', label: t('argus.logs.agg.release', 'Release') },
+          ];
+          const selectedLabel = groupByOptions.find((o) => o.value === aggGroupBy)?.label || aggGroupBy;
+          const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
+          return (
+            <>
+              <Box
+                onClick={(e) => setMenuAnchor(e.currentTarget)}
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  height: 28,
+                  borderRadius: '4px',
+                  border: '1px solid',
+                  borderColor: menuAnchor ? 'primary.main' : 'divider',
+                  bgcolor: menuAnchor ? 'action.hover' : 'background.paper',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  overflow: 'hidden',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: 'action.hover',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 1,
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                    borderRight: '1px solid',
+                    borderRightColor: 'divider',
+                  }}
+                >
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: '0.72rem', fontWeight: 500, color: 'text.secondary', whiteSpace: 'nowrap' }}
+                  >
+                    {t('argus.logs.groupByLabel', 'Group by')}
+                  </Typography>
+                </Box>
+                <Box sx={{ px: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <Typography
+                    component="span"
+                    sx={{ fontSize: '0.72rem', fontWeight: 600, color: 'text.primary', whiteSpace: 'nowrap' }}
+                  >
+                    {selectedLabel}
+                  </Typography>
+                  <ExpandMoreIcon
+                    sx={{
+                      fontSize: 14,
+                      color: 'text.disabled',
+                      transition: 'transform 0.2s',
+                      transform: menuAnchor ? 'rotate(180deg)' : 'rotate(0deg)',
+                      ml: -0.25,
+                    }}
+                  />
+                </Box>
+              </Box>
+              <Menu
+                anchorEl={menuAnchor}
+                open={Boolean(menuAnchor)}
+                onClose={() => setMenuAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                slotProps={{ paper: { sx: { mt: 0.5, borderRadius: '8px', minWidth: 140 } } }}
+              >
+                {groupByOptions.map((opt) => (
+                  <MenuItem
+                    key={opt.value}
+                    selected={opt.value === aggGroupBy}
+                    onClick={() => {
+                      onGroupByChange(opt.value);
+                      setMenuAnchor(null);
+                    }}
+                    sx={{ fontSize: '0.78rem' }}
+                  >
+                    {opt.label}
+                  </MenuItem>
+                ))}
+                {discoveredFacetKeys.length > 0 && (
+                  <Divider sx={{ my: 0.5 }} />
+                )}
+                {discoveredFacetKeys.length > 0 && (
+                  <MenuItem disabled sx={{ fontSize: '0.65rem', opacity: 0.5, minHeight: 24, py: 0.25 }}>
+                    Attributes
+                  </MenuItem>
+                )}
+                {discoveredFacetKeys.map((key) => (
+                  <MenuItem
+                    key={`attr.${key}`}
+                    selected={key === aggGroupBy}
+                    onClick={() => {
+                      onGroupByChange(key);
+                      setMenuAnchor(null);
+                    }}
+                    sx={{ fontSize: '0.75rem', pl: 2.5 }}
+                  >
+                    {key}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
+          );
+        })()}
         <Box sx={{ flex: 1 }} />
         {aggData && (
           <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
             {aggData.topValues.length} {t('argus.logs.agg.groups', 'groups')}
           </Typography>
+        )}
+        {showRemove && onRemovePanel && (
+          <IconButton
+            size="small"
+            onClick={onRemovePanel}
+            sx={{ p: 0.3, ml: 0.5, color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+          >
+            <CloseIcon sx={{ fontSize: 14 }} />
+          </IconButton>
         )}
       </Box>
 
@@ -275,9 +454,7 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
                       display: 'flex',
                       flexDirection: 'column',
                       minHeight: 0,
-                      ...(tableCollapsed
-                        ? { flex: 1 }
-                        : { flex: '0 0 auto' }),
+                      flex: '0 0 auto',
                     }}
                   >
                     <Box
@@ -337,9 +514,9 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
                             <AreaChartIcon sx={{ fontSize: 16 }} />
                           </SafeTooltip>
                         </ToggleButton>
-                        <ToggleButton value="treemap">
-                          <SafeTooltip title={t('argus.chart.treemap', 'Treemap')}>
-                            <TreemapIcon sx={{ fontSize: 16 }} />
+                        <ToggleButton value="scatter">
+                          <SafeTooltip title={t('argus.chart.scatter', 'Scatter')}>
+                            <ScatterPlotIcon sx={{ fontSize: 16 }} />
                           </SafeTooltip>
                         </ToggleButton>
                         <ToggleButton value="pie">
@@ -347,22 +524,30 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
                             <PieChartIcon sx={{ fontSize: 16 }} />
                           </SafeTooltip>
                         </ToggleButton>
-                        <ToggleButton value="scatter">
-                          <SafeTooltip title={t('argus.chart.scatter', 'Scatter')}>
-                            <ScatterPlotIcon sx={{ fontSize: 16 }} />
+                        <ToggleButton value="doughnut">
+                          <SafeTooltip title={t('argus.chart.doughnut', 'Doughnut')}>
+                            <DonutIcon sx={{ fontSize: 16 }} />
+                          </SafeTooltip>
+                        </ToggleButton>
+                        <ToggleButton value="treemap">
+                          <SafeTooltip title={t('argus.chart.treemap', 'Treemap')}>
+                            <TreemapIcon sx={{ fontSize: 16 }} />
+                          </SafeTooltip>
+                        </ToggleButton>
+                        <ToggleButton value="horizontalBar">
+                          <SafeTooltip title={t('argus.chart.horizontalBar', 'Horizontal Bar')}>
+                            <HBarIcon sx={{ fontSize: 16 }} />
                           </SafeTooltip>
                         </ToggleButton>
                       </ToggleButtonGroup>
                     </Box>
                     <Box
                       sx={{
-                        flex: 1,
+                        flex: 'none',
+                        height: (chartType === 'treemap' || chartType === 'pie' || chartType === 'doughnut' || chartType === 'horizontalBar') ? 180 : 150,
                         minHeight: 150,
                         position: 'relative',
                         overflow: 'hidden',
-                        ...(!tableCollapsed
-                          ? { height: chartType === 'treemap' || chartType === 'pie' ? 180 : 150 }
-                          : { height: '100%' }),
                       }}
                     >
                       {chartType === 'treemap' ? (
@@ -374,6 +559,35 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
                         <Pie
                           data={pieData}
                           options={pieOptions}
+                        />
+                      ) : chartType === 'doughnut' ? (
+                        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+                          <Doughnut
+                            data={pieData}
+                            options={doughnutOptions}
+                          />
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: `calc(50% - ${aggData.topValues.length > 0 ? 40 : 0}px)`,
+                              transform: 'translate(-50%, -50%)',
+                              textAlign: 'center',
+                              pointerEvents: 'none',
+                            }}
+                          >
+                            <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
+                              {formatCompactNumber(pieTotal)}
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled', lineHeight: 1 }}>
+                              {t('argus.logs.agg.count', 'Count')}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      ) : chartType === 'horizontalBar' ? (
+                        <BarChart
+                          data={hBarData}
+                          options={hBarOptions as any}
                         />
                       ) : (
                         <InteractiveTimeSeriesChart
@@ -417,7 +631,7 @@ const LogsAggregatePanel: React.FC<LogsAggregatePanelProps> = ({
                   color: 'text.secondary',
                 }}
               >
-                {t('argus.logs.agg.groupList', 'Group List')} ({aggData.topValues.length})
+                {t('argus.logs.agg.topValues', 'Top Values')} ({aggData.topValues.length})
               </Typography>
               {tableCollapsed ? (
                 <ExpandMoreIcon sx={{ fontSize: 16, color: 'text.secondary' }} />

@@ -79,13 +79,18 @@ export class ErrorWorker {
       concurrency: errorConcurrency,
     });
 
-    await this.worker.run();
-
     logger.info('Error worker started (GroupMQ)', {
       namespace: QUEUES.ERROR_PROCESSING,
       concurrency: errorConcurrency,
       chFlushIntervalMs: flushIntervalMs,
       chMaxBatchSize: maxBatchSize,
+    });
+
+    // Fire-and-forget — do NOT await, otherwise it blocks all subsequent workers
+    this.worker.run().catch((error) => {
+      logger.error('Error worker run() crashed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
     });
   }
 

@@ -29,8 +29,8 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
   const isChinese = language.startsWith('zh');
   const fontFamily = isChinese
-    ? '"D2Coding", "Inter", "Rubik", "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
-    : '"D2Coding", "Pretendard", "Inter", "Noto Sans KR", "Rubik", "Roboto", "Helvetica", "Arial", sans-serif';
+    ? '"Inter", "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "思源黑体", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Roboto", "Helvetica", "Arial", sans-serif'
+    : '"Pretendard", "Inter", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif';
 
   // -- Sentry-inspired color palette --
   const colors = {
@@ -142,18 +142,18 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
     },
     typography: {
       fontFamily,
-      fontWeightRegular: 500,
-      h1: { fontSize: '2.5rem', fontWeight: 600 },
-      h2: { fontSize: '2rem', fontWeight: 600 },
-      h3: { fontSize: '1.75rem', fontWeight: 600 },
-      h4: { fontSize: '1.5rem', fontWeight: 600 },
-      h5: { fontSize: '1.25rem', fontWeight: 600 },
-      h6: { fontSize: '1rem', fontWeight: 600 },
-      body1: { fontWeight: 500 },
-      body2: { fontWeight: 500 },
-      subtitle1: { fontWeight: 500 },
-      subtitle2: { fontWeight: 500 },
-      caption: { fontWeight: 500 },
+      fontWeightRegular: 400,
+      h1: { fontSize: '2rem', fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em' },
+      h2: { fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.3, letterSpacing: '-0.01em' },
+      h3: { fontSize: '1.25rem', fontWeight: 600, lineHeight: 1.4, letterSpacing: '-0.01em' },
+      h4: { fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.4 },
+      h5: { fontSize: '1rem', fontWeight: 600, lineHeight: 1.4 },
+      h6: { fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.5, letterSpacing: '0.01em' },
+      body1: { fontWeight: 400, lineHeight: 1.6 },
+      body2: { fontWeight: 400, fontSize: '0.8125rem', lineHeight: 1.5 },
+      subtitle1: { fontWeight: 500, lineHeight: 1.5 },
+      subtitle2: { fontWeight: 500, fontSize: '0.8125rem', lineHeight: 1.5 },
+      caption: { fontWeight: 400, fontSize: '0.75rem', lineHeight: 1.4, letterSpacing: '0.01em' },
     },
     shape: {
       borderRadius: 4,
@@ -380,17 +380,17 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: `${txt.primary} !important`,
-            fontWeight: 500,
+            fontWeight: 400,
           },
           input: {
             color: `${txt.primary} !important`,
             WebkitTextFillColor: `${txt.primary} !important`,
-            fontWeight: 500,
+            fontWeight: 400,
             '&::placeholder': {
               color: txt.secondary,
               WebkitTextFillColor: txt.secondary,
               opacity: 1,
-              fontWeight: 500,
+              fontWeight: 400,
             },
           },
         },
@@ -399,14 +399,14 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: `${txt.primary} !important`,
-            fontWeight: 500,
+            fontWeight: 400,
           },
           input: {
             color: `${txt.primary} !important`,
             WebkitTextFillColor: `${txt.primary} !important`,
-            fontWeight: 500,
+            fontWeight: 400,
             '&::placeholder': {
-              fontWeight: 500,
+              fontWeight: 400,
             },
           },
         },
@@ -415,7 +415,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             color: txt.secondary,
-            fontWeight: 500,
+            fontWeight: 400,
             '&.Mui-focused': {
               color: p.main,
             },
@@ -443,11 +443,17 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiTableCell: {
         styleOverrides: {
           root: {
+            fontSize: '0.8125rem',
+            letterSpacing: '-0.01em',
+            lineHeight: 1.5,
             borderBottom: `1px solid ${colors.border}`,
           },
           head: {
             backgroundColor: colors.theadBg,
             fontWeight: 600,
+            fontSize: '0.75rem',
+            letterSpacing: '0.04em',
+            textTransform: 'uppercase' as const,
             color: txt.secondary,
             borderBottom: `1px solid ${colors.border}`,
           },
@@ -535,6 +541,12 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             borderRadius: 4,
             fontWeight: 500,
+            fontSize: '0.75rem',
+            letterSpacing: '0.02em',
+          },
+          sizeSmall: {
+            fontSize: '0.6875rem',
+            letterSpacing: '0.02em',
           },
         },
       },

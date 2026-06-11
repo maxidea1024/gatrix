@@ -3,7 +3,9 @@ import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import {
   FilterList as FilterIcon,
   Block as ExcludeIcon,
+  Timeline as TraceIcon,
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +20,8 @@ export const AttrRow: React.FC<{
 }> = ({ label, value, isDark, color, bold, onFilter }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isTraceField = label === 'trace_id' || label === 'span_id';
 
   return (
     <Box
@@ -83,6 +87,27 @@ export const AttrRow: React.FC<{
             ml: 1,
           }}
         >
+          {isTraceField && value && (
+            <SafeTooltip
+              title={t(
+                'argus.logs.panel.viewInTraceExplorer',
+                'View in Trace Explorer'
+              )}
+            >
+              <IconButton
+                size="small"
+                onClick={() =>
+                  navigate(
+                    `/argus/explore/traces?search=${encodeURIComponent(`${label}:${value}`)}`,
+                    { state: { allowBack: true } }
+                  )
+                }
+                sx={{ p: 0.2, color: theme.palette.info.main }}
+              >
+                <TraceIcon sx={{ fontSize: 12 }} />
+              </IconButton>
+            </SafeTooltip>
+          )}
           <CopyButton text={value} size={12} sx={{ p: 0.2 }} />
           {onFilter && value && (
             <>

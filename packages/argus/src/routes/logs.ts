@@ -300,15 +300,31 @@ export default async function logsRoutes(app: FastifyInstance) {
       const bucket = getBucketingConfig(period, start, end);
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
-      // Only allow safe column names
-      const ALLOWED_GROUP = new Set([
+      // Support both top-level columns and custom attribute keys
+      const TOP_LEVEL_COLUMNS = new Set([
         'level',
         'service',
         'environment',
         'logger_name',
         'release',
       ]);
-      const safeGroup = ALLOWED_GROUP.has(groupBy) ? groupBy : 'level';
+
+      let groupExpr: string;
+      let resolvedGroupBy: string;
+
+      if (TOP_LEVEL_COLUMNS.has(groupBy)) {
+        // Direct column reference
+        groupExpr = groupBy;
+        resolvedGroupBy = groupBy;
+      } else if (/^[a-zA-Z_][a-zA-Z0-9_.]*$/.test(groupBy)) {
+        // Custom attribute key — reference from attributes Map
+        groupExpr = `attributes[{attrGroupKey:String}]`;
+        resolvedGroupBy = groupBy;
+      } else {
+        // Invalid key — fallback to level
+        groupExpr = 'level';
+        resolvedGroupBy = 'level';
+      }
 
       try {
         const conditions: string[] = [
@@ -320,6 +336,11 @@ export default async function logsRoutes(app: FastifyInstance) {
           fillStart: String(bucket.queryParams.fillStart),
           fillEnd: String(bucket.queryParams.fillEnd),
         };
+
+        // Set attribute key param if using custom attribute
+        if (!TOP_LEVEL_COLUMNS.has(resolvedGroupBy) && resolvedGroupBy !== 'level') {
+          params.attrGroupKey = resolvedGroupBy;
+        }
 
         if (service) {
           conditions.push('service = {service:String}');
@@ -345,7 +366,7 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         // 1) Top values by count
         const topSql = `
-          SELECT ${safeGroup} AS group_value, count() AS count
+          SELECT ${groupExpr} AS group_value, count() AS count
           FROM argus.logs
           WHERE ${conditions.join(' AND ')}
           GROUP BY group_value
@@ -368,9 +389,9 @@ export default async function logsRoutes(app: FastifyInstance) {
           });
 
           const tsSql = `
-            SELECT ${bucket.selectExpr} AS bucket, ${safeGroup} AS group_value, count() AS count
+            SELECT ${bucket.selectExpr} AS bucket, ${groupExpr} AS group_value, count() AS count
             FROM argus.logs
-            WHERE ${conditions.join(' AND ')} AND ${safeGroup} IN (${inList})
+            WHERE ${conditions.join(' AND ')} AND ${groupExpr} IN (${inList})
             GROUP BY bucket, group_value
             ORDER BY bucket ASC
           `;
@@ -380,7 +401,7 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         return reply.send({
           data: {
-            groupBy: safeGroup,
+            groupBy: resolvedGroupBy,
             topValues,
             timeSeries,
           },
@@ -594,6 +615,11 @@ export default async function logsRoutes(app: FastifyInstance) {
       const bucket = getBucketingConfig(period, start, end);
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
+      // Calculate previous period for delta comparison
+      const periodDelta = bucket.queryParams.fillEnd - bucket.queryParams.fillStart;
+      const prevStart = bucket.queryParams.fillStart - periodDelta;
+      const prevEnd = bucket.queryParams.fillStart;
+
       try {
         const conditions: string[] = [
           'project_id = {projectId:String}',
@@ -636,8 +662,6 @@ export default async function logsRoutes(app: FastifyInstance) {
           }
         }
 
-        // Use ClickHouse to extract patterns by normalizing messages:
-        // Replace numbers, UUIDs, hex strings, IPs, quoted strings with placeholders
         const patternExpr = `replaceRegexpAll(
           replaceRegexpAll(
             replaceRegexpAll(
@@ -649,6 +673,7 @@ export default async function logsRoutes(app: FastifyInstance) {
             '\\\\b\\\\d+\\\\b', '<N>'),
           '"[^"]*"', '<STR>')`;
 
+        // 1) Main query: current period patterns
         const sql = `
           SELECT
             ${patternExpr} AS pattern,
@@ -667,7 +692,82 @@ export default async function logsRoutes(app: FastifyInstance) {
         params.patternLimit = String(Math.min(parseInt(limit, 10), 200));
 
         const result = await optic.rawQuery({ query: sql, params });
-        return reply.send({ data: result.data });
+        const patterns = result.data as any[];
+
+        if (patterns.length === 0) {
+          return reply.send({ data: [] });
+        }
+
+        // Build IN list for top patterns (limit to 30 for performance)
+        const topN = Math.min(patterns.length, 30);
+        const patternInList = patterns
+          .slice(0, topN)
+          .map((_: any, i: number) => `{pat_${i}:String}`)
+          .join(', ');
+        patterns.slice(0, topN).forEach((p: any, i: number) => {
+          params[`pat_${i}`] = p.pattern;
+        });
+
+        // 2) Previous period counts for delta calculation
+        params.prevStart = String(prevStart);
+        params.prevEnd = String(prevEnd);
+        const prevTimeCond = `timestamp >= toDateTime({prevStart:UInt32}) AND timestamp <= toDateTime({prevEnd:UInt32})`;
+        const prevConditions = conditions.map((c) =>
+          c === `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`
+            ? prevTimeCond
+            : c
+        );
+
+        const prevSql = `
+          SELECT ${patternExpr} AS pattern, count() AS prev_count
+          FROM argus.logs
+          WHERE ${prevConditions.join(' AND ')} AND ${patternExpr} IN (${patternInList})
+          GROUP BY pattern
+        `;
+
+        // 3) Trend sparkline: 8 equal time buckets within the current period
+        const trendIntervalSecs = Math.max(1, Math.floor(periodDelta / 8));
+        params.trendInterval = String(trendIntervalSecs);
+        const trendSql = `
+          SELECT ${patternExpr} AS pattern,
+            intDiv(toUInt32(timestamp) - {fillStart:UInt32}, {trendInterval:UInt32}) AS bucket_idx,
+            count() AS count
+          FROM argus.logs
+          WHERE ${conditions.join(' AND ')} AND ${patternExpr} IN (${patternInList})
+          GROUP BY pattern, bucket_idx
+          ORDER BY pattern, bucket_idx
+        `;
+
+        const [prevResult, trendResult] = await Promise.all([
+          optic.rawQuery({ query: prevSql, params }).catch(() => ({ data: [] })),
+          optic.rawQuery({ query: trendSql, params }).catch(() => ({ data: [] })),
+        ]);
+
+        // Build prev_count lookup
+        const prevMap = new Map<string, number>();
+        for (const row of prevResult.data as any[]) {
+          prevMap.set(row.pattern, Number(row.prev_count));
+        }
+
+        // Build trend lookup: pattern → number[8]
+        const trendMap = new Map<string, number[]>();
+        for (const row of trendResult.data as any[]) {
+          const idx = Math.min(Number(row.bucket_idx), 7);
+          if (!trendMap.has(row.pattern)) {
+            trendMap.set(row.pattern, new Array(8).fill(0));
+          }
+          const arr = trendMap.get(row.pattern)!;
+          arr[idx] = (arr[idx] || 0) + Number(row.count);
+        }
+
+        // Enrich patterns with prev_count and trend
+        const enriched = patterns.map((p: any) => ({
+          ...p,
+          prev_count: prevMap.get(p.pattern) ?? null,
+          trend: trendMap.get(p.pattern) ?? null,
+        }));
+
+        return reply.send({ data: enriched });
       } catch (error) {
         logger.error('Failed to get log patterns', {
           projectId,

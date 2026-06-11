@@ -1753,6 +1753,31 @@ class ArgusService {
     return response.data?.data || [];
   }
 
+  /**
+   * Get attribute distribution for a specific log pattern.
+   * Returns top values per attribute (service, environment, host, etc.)
+   */
+  async getPatternAttributes(
+    projectId: number | string,
+    params: {
+      pattern: string;
+      period?: string;
+      start?: string;
+      end?: string;
+      attributes?: string;
+    }
+  ): Promise<Record<string, { value: string; count: number }[]>> {
+    try {
+      const response = await argusApi.get(
+        `${ARGUS_BASE}/${projectId}/logs/pattern-attributes`,
+        { params }
+      );
+      return response.data?.data || {};
+    } catch {
+      return {};
+    }
+  }
+
   async getAttributeFacet(
     projectId: number | string,
     key: string,

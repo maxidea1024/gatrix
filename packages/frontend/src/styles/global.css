@@ -2,12 +2,12 @@
  * ============================================================
  *  FONT POLICY
  * ============================================================
- *  기본 폰트: D2Coding (body) + CJK fallback 체인
- *  고정폭 폰트: D2Coding + CJK Mono fallback (pre, code, kbd, samp)
+ *  기본 폰트: Pretendard + Inter (body) + CJK fallback 체인
+ *  고정폭 폰트: JetBrains Mono + Fira Code + Pretendard (KR fallback)
  *
  *  ⚠️  컴포넌트에서 인라인으로 fontFamily를 지정하지 마세요!
  *      예: sx={{ fontFamily: 'monospace' }}           ← 금지
- *      예: fontFamily: '"D2Coding", monospace'        ← 금지
+ *      예: fontFamily: '"JetBrains Mono", monospace'  ← 금지
  *      예: style={{ fontFamily: 'Consolas, ...' }}    ← 금지
  *
  *  모든 폰트는 이 파일과 ThemeContext.tsx에서 전역으로 관리됩니다.
@@ -25,10 +25,12 @@
 }
 
 body {
-  font-family: "D2Coding", "Pretendard", "Inter", "Noto Sans KR",
-    "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", "PingFang SC",
-    "Rubik", "Roboto", "Helvetica", "Arial", sans-serif;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga' 1, 'calt' 1;
 }
 
 /* Elements that don't inherit font by default in browsers */
@@ -37,12 +39,16 @@ input, button, select, textarea, table, th, td {
   font-weight: inherit;
 }
 
-/* Monospace elements: D2Coding as default monospace font */
+/* Monospace elements: JetBrains Mono as default monospace font */
 pre, code, kbd, samp {
-  font-family: 'D2Coding', 'NanumGothicCoding',
-    'Source Han Mono', 'Noto Sans Mono CJK KR', 'Noto Sans Mono CJK SC',
-    monospace;
+  font-family: var(--font-mono);
   font-weight: inherit;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
+/* Utility class for forcing monospace font */
+.font-mono {
+  font-family: var(--font-mono) !important;
 }
 
 /* Placeholder text should also follow the theme font */

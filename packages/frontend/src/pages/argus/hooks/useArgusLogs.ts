@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -70,7 +70,12 @@ export function useArgusLogs() {
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
   const activeTab = parseInt(urlState.tab, 10) || 0;
-  const aggGroupBy = urlState.groupBy;
+  // Support multiple group-by keys (comma-separated in URL)
+  const aggGroupBys: string[] = useMemo(() => {
+    const parsed = (urlState.groupBy || 'level').split(',').filter(Boolean);
+    return parsed.length > 0 ? parsed : ['level'];
+  }, [urlState.groupBy]);
+  const aggGroupBy = aggGroupBys[0];
 
   // Derive filters from URL period
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
@@ -289,13 +294,16 @@ export function useArgusLogs() {
     setCustomFacetData((prev) => prev.filter((f) => f.key !== facetKey));
   }, []);
 
-  // Aggregates state
-  const [aggData, setAggData] = useState<{
+  // Aggregates state — keyed by groupBy value for multi-panel support
+  type AggDataEntry = {
     groupBy: string;
     topValues: { group_value: string; count: number }[];
     timeSeries: { bucket: string; group_value: string; count: number }[];
-  } | null>(null);
+  };
+  const [aggDataMap, setAggDataMap] = useState<Record<string, AggDataEntry>>({});
   const [aggLoading, setAggLoading] = useState(false);
+  // Convenience: single aggData for backward compat (first panel)
+  const aggData = aggDataMap[aggGroupBy] || null;
 
   // Saved Queries State
   const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
@@ -564,25 +572,42 @@ export function useArgusLogs() {
   }, [fetchLogs, fetchFacets, fetchVolume]);
 
   const fetchAggregates = useCallback(
-    async (groupByVal?: string) => {
+    async (groupByOverrides?: string[]) => {
+      const keys = groupByOverrides || aggGroupBys;
       setAggLoading(true);
       try {
         const apiParams = argusFilterStateToApiParams(filters);
-        const data = await argusService.getLogAggregate(projectId, {
-          period: apiParams.period || currentPeriod,
-          start: apiParams.start,
-          end: apiParams.end,
-          groupBy: groupByVal || aggGroupBy,
-          search: search.trim() || undefined,
+        // Use allSettled so one failed panel doesn't break the rest
+        const settled = await Promise.allSettled(
+          keys.map((gKey) =>
+            argusService.getLogAggregate(projectId, {
+              period: apiParams.period || currentPeriod,
+              start: apiParams.start,
+              end: apiParams.end,
+              groupBy: gKey,
+              search: search.trim() || undefined,
+            })
+          )
+        );
+        const newMap: Record<string, AggDataEntry> = {};
+        settled.forEach((result, idx) => {
+          if (result.status === 'fulfilled') {
+            const data = result.value;
+            // Use the requested key (not the returned groupBy) in case backend fallback changed it
+            newMap[keys[idx]] = data;
+          } else {
+            // Store empty result so the panel renders in empty state instead of disappearing
+            newMap[keys[idx]] = { groupBy: keys[idx], topValues: [], timeSeries: [] };
+          }
         });
-        setAggData(data);
+        setAggDataMap(newMap);
       } catch (err) {
         console.error('Failed to fetch aggregates', err);
       } finally {
         setAggLoading(false);
       }
     },
-    [projectId, filters, currentPeriod, aggGroupBy, search]
+    [projectId, filters, currentPeriod, aggGroupBys, search]
   );
 
   useEffect(() => {
@@ -687,7 +712,10 @@ export function useArgusLogs() {
   );
 
   // ─── Saved Query Handlers ───
-  const handleSaveQuery = async (finalName: string) => {
+  const handleSaveQuery = async (
+    finalName: string,
+    extras?: Record<string, any>
+  ) => {
     if (!finalName.trim()) return;
     try {
       const res = await argusService.createSavedQuery(projectId, {
@@ -695,8 +723,11 @@ export function useArgusLogs() {
         query_config: {
           search: search.trim(),
           columns,
+          columnNames,
           period: currentPeriod,
-          groupBy: aggGroupBy,
+          groupBy: aggGroupBys.length > 0 ? aggGroupBys.join(',') : 'level',
+          activeTab,
+          ...extras,
         },
         display_type: 'table',
         query_type: 'logs',
@@ -735,20 +766,36 @@ export function useArgusLogs() {
     }
   };
 
-  const handleLoadSavedQuery = (sq: ArgusSavedQuery) => {
-    const cfg =
-      typeof sq.query_config === 'string'
-        ? JSON.parse(sq.query_config)
-        : sq.query_config;
-    if (cfg.search !== undefined) {
-      setSearch(cfg.search);
-      setUrlState({ q: cfg.search });
+  const handleLoadSavedQuery = (
+    sq: ArgusSavedQuery,
+    onExtrasLoaded?: (extras: Record<string, any>) => void
+  ) => {
+    try {
+      const cfg =
+        typeof sq.query_config === 'string'
+          ? JSON.parse(sq.query_config)
+          : sq.query_config;
+      if (cfg.search !== undefined) {
+        setSearch(cfg.search);
+        setUrlState({ q: cfg.search });
+      }
+      if (cfg.columns) setColumns(cfg.columns);
+      if (cfg.columnNames) setColumnNames(cfg.columnNames);
+      if (cfg.period) setUrlState({ period: cfg.period });
+      if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
+      if (cfg.activeTab !== undefined) setUrlState({ tab: String(cfg.activeTab) });
+      setQueryName(sq.name);
+      setCurrentQueryId(sq.id);
+
+      // Pass extra fields (displayDensity, wrapLines) to the caller
+      if (onExtrasLoaded) {
+        onExtrasLoaded(cfg);
+      }
+    } catch (err) {
+      console.error('Failed to load saved query config:', err);
+      setQueryName(sq.name);
+      setCurrentQueryId(sq.id);
     }
-    if (cfg.columns) setColumns(cfg.columns);
-    if (cfg.period) setUrlState({ period: cfg.period });
-    if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
-    setQueryName(sq.name);
-    setCurrentQueryId(sq.id);
   };
 
   const totalLogCount =
@@ -758,6 +805,7 @@ export function useArgusLogs() {
     projectId,
     activeTab,
     aggGroupBy,
+    aggGroupBys,
     filters,
     search,
     logs,
@@ -768,6 +816,7 @@ export function useArgusLogs() {
     columns,
     setColumns,
     columnNames,
+    setColumnNames,
     dynamicAvailableColumns,
     selectedLogIndex,
     selectedLog,
@@ -778,6 +827,7 @@ export function useArgusLogs() {
     customFacetData,
     discoveredFacets,
     aggData,
+    aggDataMap,
     aggLoading,
     savedQueries,
     currentQueryId,
