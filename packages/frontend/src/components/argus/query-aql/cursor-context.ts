@@ -25,7 +25,8 @@ export function resolveCursorContext(
   cursorOffset: number,
   tokens: Token[]
 ): CursorContext {
-  const editorState = resolveEditorState(tokens, cursorOffset);
+  const fsmResult = resolveEditorState(tokens, cursorOffset);
+  const editorState = fsmResult.state;
 
   // Find the token at or just before cursor
   let currentToken: Token | null = null;
@@ -195,7 +196,12 @@ export function resolveCursorContext(
       type = 'FIELD';
       break;
     case EditorState.EXPECT_COLON:
-      type = 'FIELD';
+      // If inside aggregate paren, show field suggestions for the aggregate arg
+      if (fsmResult.inAggregateParen) {
+        type = 'AGGREGATE_ARG';
+      } else {
+        type = 'FIELD';
+      }
       break;
     case EditorState.EXPECT_OPERATOR_OR_VALUE:
       // Per Spec 9.3: country:| → OPERATOR, country:K| → VALUE
@@ -314,6 +320,8 @@ export function resolveCursorContext(
     inQuotedString: editorState === EditorState.IN_QUOTED_STRING,
     inParenthesis: editorState === EditorState.IN_PARENTHESIS,
     isNegated,
+    inAggregateParen: fsmResult.inAggregateParen,
+    aggregateFunc: fsmResult.aggregateFunc,
   };
 }
 

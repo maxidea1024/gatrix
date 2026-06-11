@@ -287,7 +287,8 @@ export type CursorContextType =
   | 'FIELD'
   | 'OPERATOR'
   | 'VALUE'
-  | 'LOGICAL_OPERATOR';
+  | 'LOGICAL_OPERATOR'
+  | 'AGGREGATE_ARG';
 
 export interface CursorContext {
   type: CursorContextType;
@@ -300,6 +301,10 @@ export interface CursorContext {
   inQuotedString: boolean;
   inParenthesis: boolean;
   isNegated?: boolean;
+  /** True when cursor is inside aggregate function parens, e.g. avg(|) */
+  inAggregateParen?: boolean;
+  /** Aggregate function name when inAggregateParen is true */
+  aggregateFunc?: string;
 }
 
 // ─── Suggestion ──────────────────────────────────────────────────────────────

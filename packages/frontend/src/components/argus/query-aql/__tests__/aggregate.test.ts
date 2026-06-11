@@ -644,6 +644,77 @@ describe('Aggregate Suggestions', () => {
   });
 });
 
+// ─── Aggregate Arg Suggestions ───────────────────────────────────────────────
+
+describe('Aggregate Arg Suggestions', () => {
+  function argSuggestions(input: string, config = DISCOVER_CONFIG) {
+    const tokens = tokenize(input);
+    const context = resolveCursorContext(input, input.length, tokens);
+    return getSuggestions(context, config);
+  }
+
+  it('should detect AGGREGATE_ARG context for single-arg function like avg(', () => {
+    const input = 'avg(';
+    const tokens = tokenize(input);
+    const context = resolveCursorContext(input, input.length, tokens);
+    expect(context.type).toBe('AGGREGATE_ARG');
+    expect(context.aggregateFunc).toBe('avg');
+    expect(context.inAggregateParen).toBe(true);
+  });
+
+  it('should detect AGGREGATE_ARG context for uniq(', () => {
+    const input = 'uniq(';
+    const tokens = tokenize(input);
+    const context = resolveCursorContext(input, input.length, tokens);
+    expect(context.type).toBe('AGGREGATE_ARG');
+    expect(context.aggregateFunc).toBe('uniq');
+  });
+
+  it('should suggest fields for avg( arg', () => {
+    const suggestions = argSuggestions('avg(');
+    expect(suggestions.length).toBeGreaterThan(0);
+    // Should suggest domain fields (not aggregate functions themselves)
+    const fieldSugs = suggestions.filter((s) => s.category === 'field');
+    expect(fieldSugs.length).toBeGreaterThan(0);
+    // Should include field names from DISCOVER_CONFIG
+    expect(fieldSugs.some((s) => s.label === 'duration')).toBe(true);
+  });
+
+  it('should have insertText with closing paren for aggregate arg fields', () => {
+    const suggestions = argSuggestions('avg(');
+    const durationSug = suggestions.find((s) => s.label === 'duration');
+    expect(durationSug).toBeDefined();
+    // Should insert "duration):" to close the function and add colon
+    expect(durationSug!.insertText).toBe('duration):');
+  });
+
+  it('should filter arg suggestions by prefix', () => {
+    const input = 'avg(dur';
+    const tokens = tokenize(input);
+    const context = resolveCursorContext(input, input.length, tokens);
+    // FSM should still be in aggregate paren mode
+    expect(context.inAggregateParen).toBe(true);
+    const suggestions = getSuggestions(context, DISCOVER_CONFIG);
+    // Should only show fields starting with "dur"
+    const fieldSugs = suggestions.filter((s) => s.category === 'field');
+    expect(fieldSugs.every((s) => s.label.startsWith('dur'))).toBe(true);
+  });
+
+  it('should suggest closing paren for zero-arg function like count(', () => {
+    const suggestions = argSuggestions('count(');
+    expect(suggestions.length).toBeGreaterThan(0);
+    const closeParen = suggestions.find((s) => s.label === ')');
+    expect(closeParen).toBeDefined();
+    expect(closeParen!.insertText).toBe('):');
+  });
+
+  it('should not show aggregate tab items inside aggregate paren', () => {
+    const suggestions = argSuggestions('avg(');
+    const aggSugs = suggestions.filter((s) => s.category === 'aggregate');
+    expect(aggSugs).toHaveLength(0);
+  });
+});
+
 // ─── Domain Config ───────────────────────────────────────────────────────────
 
 describe('Domain Config Aggregates', () => {

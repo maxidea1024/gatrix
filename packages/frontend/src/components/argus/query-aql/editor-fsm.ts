@@ -6,6 +6,12 @@
 import { TokenType, EditorState } from './types';
 import type { Token } from './types';
 
+export interface EditorFSMResult {
+  state: EditorState;
+  inAggregateParen: boolean;
+  aggregateFunc?: string;
+}
+
 /**
  * Determine the current editor state based on tokens and cursor position.
  * The FSM walks tokens to determine what the user should type next.
@@ -13,10 +19,11 @@ import type { Token } from './types';
 export function resolveEditorState(
   tokens: Token[],
   cursorOffset: number
-): EditorState {
+): EditorFSMResult {
   let state = EditorState.EXPECT_FIELD;
   let parenDepth = 0;
   let inAggregateParen = false;
+  let aggregateFunc: string | undefined;
 
   for (const token of tokens) {
     if (token.type === TokenType.EOF) break;
@@ -92,6 +99,13 @@ export function resolveEditorState(
           // FIELD followed by LPAREN → aggregate function args (e.g., count(, avg(duration)
           // Stay in a state that will transition to EXPECT_COLON after RPAREN
           inAggregateParen = true;
+          // Find the preceding FIELD token to get the aggregate function name
+          for (let j = tokens.indexOf(token) - 1; j >= 0; j--) {
+            if (tokens[j].type === TokenType.FIELD) {
+              aggregateFunc = tokens[j].value;
+              break;
+            }
+          }
         } else if (state === EditorState.EXPECT_FIELD) {
           state = EditorState.IN_PARENTHESIS;
           // Reset to expect field inside parens
@@ -144,7 +158,7 @@ export function resolveEditorState(
     state = EditorState.IN_PARENTHESIS;
   }
 
-  return state;
+  return { state, inAggregateParen, aggregateFunc };
 }
 
 /**

@@ -51,6 +51,8 @@ export function getSuggestions(
       return getValueSuggestions(context, config, facets, maxSuggestions);
     case 'LOGICAL_OPERATOR':
       return getLogicalSuggestions(maxSuggestions, chips);
+    case 'AGGREGATE_ARG':
+      return getAggregateArgSuggestions(context, config);
     default:
       return [];
   }
@@ -658,6 +660,68 @@ function fieldToSuggestion(field: QueryField): SuggestionItem {
     fieldType: field.type,
     fieldCategory: field.category,
   };
+}
+
+/**
+ * Aggregate arg suggestions: when cursor is inside aggregate function parens (e.g. avg(|)),
+ * show appropriate fields for the aggregate's args definition.
+ */
+function getAggregateArgSuggestions(
+  context: CursorContext,
+  config: DomainConfig
+): SuggestionItem[] {
+  const aggName = context.aggregateFunc?.toLowerCase();
+  if (!aggName) return [];
+
+  const aggDef = config.aggregates?.find(
+    (a) => a.name.toLowerCase() === aggName
+  );
+  if (!aggDef) return [];
+
+  // Zero-arg functions (e.g., count()) — suggest closing paren
+  if (aggDef.args.length === 0) {
+    return [
+      {
+        label: ')',
+        insertText: '):',
+        category: 'paren',
+        description: `Close ${aggDef.name}()`,
+      },
+    ];
+  }
+
+  const prefix = context.prefix.toLowerCase();
+  const results: SuggestionItem[] = [];
+
+  for (const argDef of aggDef.args) {
+    if (argDef.type === 'field') {
+      // Suggest all domain fields (filtered by type if needed)
+      for (const field of config.fields) {
+        if (prefix === '' || field.key.toLowerCase().startsWith(prefix)) {
+          results.push({
+            label: field.key,
+            // Insert the field name + closing paren + colon to transition to operator
+            insertText: `${field.key}):`,
+            category: 'field',
+            description: field.description,
+            fieldType: field.type,
+            fieldCategory: field.category,
+          });
+        }
+      }
+    } else if (argDef.type === 'number' || argDef.type === 'duration') {
+      // For numeric args (e.g., apdex(300)), show placeholder
+      if (prefix === '') {
+        results.push({
+          label: `<${argDef.name}>`,
+          category: 'value',
+          description: `Enter ${argDef.type} value`,
+        });
+      }
+    }
+  }
+
+  return results;
 }
 
 /**
