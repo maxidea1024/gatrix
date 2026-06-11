@@ -71,7 +71,7 @@ const HAS_CATEGORY_BADGES: Record<
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type EditingPart = 'field' | 'operator' | 'value';
+export type EditingPart = 'field' | 'operator' | 'value' | 'aggregateArg';
 
 export interface TokenEditDropdownProps {
   type: EditingPart;
@@ -203,6 +203,15 @@ export function TokenEditDropdown({
         <HasToggleMenu
           currentField={chip.field ?? 'has'}
           onSelect={handleFieldSelect}
+          isDark={isDark}
+        />
+      )}
+      {type === 'aggregateArg' && (
+        <AggregateArgMenu
+          config={config}
+          chip={chip}
+          onUpdate={onUpdate}
+          onClose={onClose}
           isDark={isDark}
         />
       )}
@@ -1065,6 +1074,158 @@ function AggregateFieldMenu({
               />
               {isCurrent && (
                 <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+              )}
+            </ListItemButton>
+          );
+        })}
+      </List>
+    </Box>
+  );
+}
+
+// ─── Aggregate Arg (Field) Selection Menu ─────────────────────────────────────
+
+function AggregateArgMenu({
+  config,
+  chip,
+  onUpdate,
+  onClose,
+  isDark,
+}: {
+  config: DomainConfig;
+  chip: FilterChip;
+  onUpdate: (updates: Partial<FilterChip>) => void;
+  onClose: () => void;
+  isDark: boolean;
+}) {
+  const { t } = useTranslation();
+  const [filter, setFilter] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const currentArg = chip.aggregateArgs?.[0] ?? '';
+
+  // Gather all numeric/applicable fields from the domain
+  const fields = useMemo(() => {
+    const allFields = config.fields ?? [];
+    // For aggregate arg, show all fields (aggregates can apply to various types)
+    return allFields.filter(
+      (f) => f.type === 'number' || f.type === 'string' || f.type === 'datetime'
+    );
+  }, [config.fields]);
+
+  const filtered = useMemo(() => {
+    if (!filter) return fields;
+    const lower = filter.toLowerCase();
+    return fields.filter(
+      (f) =>
+        f.key.toLowerCase().includes(lower) ||
+        f.label.toLowerCase().includes(lower)
+    );
+  }, [fields, filter]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => searchRef.current?.focus());
+  }, []);
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [filter]);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const items = list.querySelectorAll('li');
+    const item = items[selectedIndex] as HTMLElement;
+    if (item) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  const selectField = (fieldKey: string) => {
+    onUpdate({ aggregateArgs: [fieldKey] });
+    onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < filtered.length) {
+        selectField(filtered[selectedIndex].key);
+      } else if (filtered.length > 0) {
+        selectField(filtered[0].key);
+      }
+    }
+  };
+
+  return (
+    <Box sx={{ minWidth: 200 }}>
+      <Box
+        sx={{
+          px: 1,
+          py: 0.75,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        }}
+      >
+        <InputBase
+          inputRef={searchRef}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          onKeyDown={handleKeyDown}
+          autoFocus
+          fullWidth
+          placeholder={t('aql.chip.filterFields', 'Filter fields...')}
+          sx={{
+            fontSize: '0.8rem',
+            '& input': { py: 0.25 },
+          }}
+        />
+      </Box>
+      <List
+        ref={listRef}
+        dense
+        sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}
+      >
+        {filtered.map((f, idx) => {
+          const isCurrent = f.key === currentArg;
+          const isHighlighted = idx === selectedIndex;
+          return (
+            <ListItemButton
+              key={f.key}
+              onClick={() => selectField(f.key)}
+              selected={isHighlighted || isCurrent}
+              sx={{
+                py: 0.5,
+                px: 1.5,
+                fontSize: '0.8rem',
+                '&.Mui-selected': {
+                  backgroundColor: isHighlighted
+                    ? isDark
+                      ? 'rgba(124,138,255,0.15)'
+                      : 'rgba(92,107,192,0.12)'
+                    : isDark
+                      ? 'rgba(0,188,212,0.12)'
+                      : 'rgba(0,151,167,0.08)',
+                },
+              }}
+            >
+              <ListItemText
+                primary={f.key}
+                primaryTypographyProps={{
+                  fontSize: '0.8rem',
+                  fontWeight: isCurrent ? 600 : 400,
+                }}
+              />
+              {isCurrent && (
+                <CheckIcon
+                  sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                />
               )}
             </ListItemButton>
           );

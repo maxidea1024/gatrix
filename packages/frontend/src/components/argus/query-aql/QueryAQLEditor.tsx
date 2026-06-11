@@ -452,7 +452,7 @@ export const QueryAQLEditor = forwardRef<
 
   type VisualTokenRef = {
     chipId: string;
-    part: 'field' | 'operator' | 'value' | 'logical' | 'paren';
+    part: 'field' | 'operator' | 'value' | 'logical' | 'paren' | 'aggregateArg';
   };
 
   const visualTokens: VisualTokenRef[] = useMemo(() => {
@@ -464,6 +464,15 @@ export const QueryAQLEditor = forwardRef<
       if (isHas) {
         return [
           { chipId: chip.id, part: 'field' },
+          { chipId: chip.id, part: 'value' },
+        ];
+      }
+      // Aggregate chips: field (func name), aggregateArg (field arg), operator, value
+      if (chip.type === 'aggregate' && chip.aggregateArgs && chip.aggregateArgs.length > 0) {
+        return [
+          { chipId: chip.id, part: 'field' },
+          { chipId: chip.id, part: 'aggregateArg' },
+          { chipId: chip.id, part: 'operator' },
           { chipId: chip.id, part: 'value' },
         ];
       }
@@ -2360,7 +2369,8 @@ export const QueryAQLEditor = forwardRef<
                   vt.chipId === chip.id &&
                   (vt.part === 'field' ||
                     vt.part === 'operator' ||
-                    vt.part === 'value')
+                    vt.part === 'value' ||
+                    vt.part === 'aggregateArg')
                 ) {
                   return vt.part as TokenPart;
                 }

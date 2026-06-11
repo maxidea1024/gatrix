@@ -21,7 +21,7 @@ import { getOpLabel } from './operator-labels';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type TokenPart = 'field' | 'operator' | 'value';
+export type TokenPart = 'field' | 'operator' | 'value' | 'aggregateArg';
 
 export interface FilterTokenGroupProps {
   chip: FilterChip;
@@ -89,6 +89,7 @@ export const FilterTokenGroup = forwardRef<
 
   const chipContainerRef = useRef<HTMLDivElement>(null);
   const fieldRef = useRef<HTMLElement>(null);
+  const aggregateArgRef = useRef<HTMLElement>(null);
   const operatorRef = useRef<HTMLElement>(null);
   const valueRef = useRef<HTMLElement>(null);
   const valueInputRef = useRef<HTMLInputElement>(null);
@@ -107,6 +108,8 @@ export const FilterTokenGroup = forwardRef<
       switch (part) {
         case 'field':
           return fieldRef.current;
+        case 'aggregateArg':
+          return aggregateArgRef.current;
         case 'operator':
           return operatorRef.current;
         case 'value':
@@ -284,6 +287,7 @@ export const FilterTokenGroup = forwardRef<
     >
       {/* Field token — or aggregate function name */}
       {isAggregateChip ? (
+        <>
         <Box
           ref={fieldRef}
           component="span"
@@ -301,8 +305,34 @@ export const FilterTokenGroup = forwardRef<
         >
           <FunctionsIcon sx={{ fontSize: 13, opacity: 0.8 }} />
           {chip.aggregateFunc}
-          ({chip.aggregateArgs?.join(', ') ?? ''})
         </Box>
+        {chip.aggregateArgs && chip.aggregateArgs.length > 0 ? (
+          <>
+            <Box component="span" sx={{ ...tokenStyle('field'), cursor: 'default', px: 0, mx: 0, opacity: 0.5 }}>{'('}</Box>
+            <Box
+              ref={aggregateArgRef}
+              component="span"
+              sx={{
+                ...tokenStyle('aggregateArg'),
+                color: isDark ? '#80cbc4' : '#00695c',
+                fontWeight: 500,
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: isDark ? 'rgba(0,188,212,0.12)' : 'rgba(0,151,167,0.08)',
+                },
+              }}
+              onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+                onPartClick(chip.id, 'aggregateArg', e.currentTarget)
+              }
+            >
+              {chip.aggregateArgs.join(', ')}
+            </Box>
+            <Box component="span" sx={{ ...tokenStyle('field'), cursor: 'default', px: 0, mx: 0, opacity: 0.5 }}>{')'}</Box>
+          </>
+        ) : (
+          <Box component="span" sx={{ ...tokenStyle('field'), cursor: 'default', px: 0, mx: 0, opacity: 0.5 }}>{'()'}</Box>
+        )}
+        </>
       ) : (
         <Box
           ref={fieldRef}
