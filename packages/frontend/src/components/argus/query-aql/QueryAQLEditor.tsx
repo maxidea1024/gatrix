@@ -1404,7 +1404,28 @@ export const QueryAQLEditor = forwardRef<
           }
         }
       } else {
-        // Field or operator selected
+        // Field, operator, or aggregate selected
+
+        // Aggregate function selection → put text in input, keep dropdown open
+        if (item.category === 'aggregate') {
+          setInputValue(result.text);
+          setCursorOffset(result.cursorOffset);
+          setShowDropdown(true);
+          setSelectedIndex(-1);
+
+          suppressDropdownRef.current = true;
+          requestAnimationFrame(() => {
+            if (inputRef.current) {
+              inputRef.current.focus();
+              inputRef.current.setSelectionRange(
+                result.cursorOffset,
+                result.cursorOffset
+              );
+            }
+          });
+          return;
+        }
+
         // Step-by-step creation: if this is a field selection from empty input,
         // create a composing chip instead of putting text in input
         if (item.category === 'field' && !inputValue.includes(':')) {
@@ -1752,7 +1773,21 @@ export const QueryAQLEditor = forwardRef<
         return;
       }
       // ( and ) → immediately create paren chip (Sentry-style)
+      // But NOT when input is an aggregate function name (e.g., count, avg, p95)
       if ((e.key === '(' || e.key === ')') && !inputValue.includes(':')) {
+        // Check if current input is an aggregate function name — if so, let the ( through as text
+        if (e.key === '(' && inputValue.trim() && aggregateNames.has(inputValue.trim().toLowerCase())) {
+          // Don't intercept — let the ( character be typed into the input naturally
+          return;
+        }
+        // Check if ) is closing an aggregate function paren (e.g., count() or avg(duration))
+        if (e.key === ')' && inputValue.includes('(')) {
+          const funcName = inputValue.split('(')[0].trim().toLowerCase();
+          if (aggregateNames.has(funcName)) {
+            // Don't intercept — let the ) character complete the aggregate call
+            return;
+          }
+        }
         e.preventDefault();
         // Commit any existing input text first
         if (inputValue.trim()) {
