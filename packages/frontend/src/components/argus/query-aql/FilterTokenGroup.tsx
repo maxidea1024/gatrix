@@ -95,9 +95,10 @@ export const FilterTokenGroup = forwardRef<
   const valueInputRef = useRef<HTMLInputElement>(null);
 
   const field = getFieldByKey(chip.field ?? '', domain);
-  const fieldType = chip.type === 'aggregate'
-    ? getAggregateFieldType(chip.aggregateFunc ?? '', domain)
-    : (field?.type ?? 'string');
+  const fieldType =
+    chip.type === 'aggregate'
+      ? getAggregateFieldType(chip.aggregateFunc ?? '', domain)
+      : (field?.type ?? 'string');
   const opLabel = getOpLabel(chip.operator ?? '=', fieldType);
   const isHasChip = chip.field === 'has' || chip.field === '!has';
   const isAggregateChip = chip.type === 'aggregate';
@@ -290,52 +291,84 @@ export const FilterTokenGroup = forwardRef<
       {/* Field token — or aggregate function name */}
       {isAggregateChip ? (
         <>
-        <Box
-          ref={fieldRef}
-          component="span"
-          sx={{
-            ...tokenStyle('field'),
-            color: isDark ? '#4dd0e1' : '#00838f',
-            fontWeight: 600,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '2px',
-            pr: 0,
-          }}
-          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-            onPartClick(chip.id, 'field', e.currentTarget)
-          }
-        >
-          <FunctionsIcon sx={{ fontSize: 13, opacity: 0.8 }} />
-          {chip.aggregateFunc}
-        </Box>
-        {chip.aggregateArgs && chip.aggregateArgs.length > 0 ? (
-          <>
-            <Box component="span" sx={{ fontSize: '0.8rem', opacity: 0.5, lineHeight: 1, userSelect: 'none' }}>{'('}</Box>
+          <Box
+            ref={fieldRef}
+            component="span"
+            sx={{
+              ...tokenStyle('field'),
+              color: isDark ? '#4dd0e1' : '#00838f',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '2px',
+              pr: 0,
+            }}
+            onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+              onPartClick(chip.id, 'field', e.currentTarget)
+            }
+          >
+            <FunctionsIcon sx={{ fontSize: 13, opacity: 0.8 }} />
+            {chip.aggregateFunc}
+          </Box>
+          {chip.aggregateArgs && chip.aggregateArgs.length > 0 ? (
+            <>
+              <Box
+                component="span"
+                sx={{
+                  fontSize: '0.8rem',
+                  opacity: 0.5,
+                  lineHeight: 1,
+                  userSelect: 'none',
+                }}
+              >
+                {'('}
+              </Box>
+              <Box
+                ref={aggregateArgRef}
+                component="span"
+                sx={{
+                  ...tokenStyle('aggregateArg'),
+                  color: isDark ? '#80cbc4' : '#00695c',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  px: '2px',
+                  '&:hover': {
+                    backgroundColor: isDark
+                      ? 'rgba(0,188,212,0.12)'
+                      : 'rgba(0,151,167,0.08)',
+                  },
+                }}
+                onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+                  onPartClick(chip.id, 'aggregateArg', e.currentTarget)
+                }
+              >
+                {chip.aggregateArgs.join(', ')}
+              </Box>
+              <Box
+                component="span"
+                sx={{
+                  fontSize: '0.8rem',
+                  opacity: 0.5,
+                  lineHeight: 1,
+                  userSelect: 'none',
+                }}
+              >
+                {')'}
+              </Box>
+            </>
+          ) : (
             <Box
-              ref={aggregateArgRef}
               component="span"
               sx={{
-                ...tokenStyle('aggregateArg'),
-                color: isDark ? '#80cbc4' : '#00695c',
-                fontWeight: 500,
-                cursor: 'pointer',
-                px: '2px',
-                '&:hover': {
-                  backgroundColor: isDark ? 'rgba(0,188,212,0.12)' : 'rgba(0,151,167,0.08)',
-                },
+                fontSize: '0.8rem',
+                opacity: 0.5,
+                lineHeight: 1,
+                userSelect: 'none',
               }}
-              onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-                onPartClick(chip.id, 'aggregateArg', e.currentTarget)
-              }
             >
-              {chip.aggregateArgs.join(', ')}
+              {'()'}
             </Box>
-            <Box component="span" sx={{ fontSize: '0.8rem', opacity: 0.5, lineHeight: 1, userSelect: 'none' }}>{')'}</Box>
-          </>
-        ) : (
-          <Box component="span" sx={{ fontSize: '0.8rem', opacity: 0.5, lineHeight: 1, userSelect: 'none' }}>{'()'}</Box>
-        )}
+          )}
         </>
       ) : (
         <Box

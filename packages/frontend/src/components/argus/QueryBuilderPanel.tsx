@@ -672,7 +672,9 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             title={
               isAggregate
                 ? `${filter.aggregateFunc}(${filter.aggregateArgs?.join(', ') ?? ''})`
-                : filter.field === '!has' ? 'has not' : filter.field || ''
+                : filter.field === '!has'
+                  ? 'has not'
+                  : filter.field || ''
             }
             placement="top"
           >
@@ -696,8 +698,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                     update(filter.id, {
                       field: '',
                       aggregateFunc: aggName,
-                      aggregateArgs:
-                        aggDef.args.length === 0 ? [] : undefined,
+                      aggregateArgs: aggDef.args.length === 0 ? [] : undefined,
                       operator: '>',
                       value: '',
                       values: undefined,
@@ -835,42 +836,43 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
           </SafeTooltip>
 
           {/* Aggregate arg field selector */}
-          {isAggregate && (() => {
-            const aggDef = config.aggregates?.find(
-              (a) => a.name === filter.aggregateFunc
-            );
-            if (!aggDef || aggDef.args.length === 0) return null;
-            return (
-              <Select
-                size="small"
-                displayEmpty
-                value={filter.aggregateArgs?.[0] || ''}
-                onChange={(e) =>
-                  update(filter.id, {
-                    aggregateArgs: [e.target.value],
-                  })
-                }
-                sx={{
-                  width: 110,
-                  height: 26,
-                  fontSize: '0.7rem',
-                  '& .MuiSelect-select': { py: 0.3 },
-                }}
-                MenuProps={{
-                  PaperProps: { sx: { maxHeight: 200, fontSize: '0.7rem' } },
-                }}
-              >
-                <MenuItem value="" disabled sx={{ display: 'none' }}>
-                  {t('argus.builder.argPlaceholder', 'field…')}
-                </MenuItem>
-                {sortedFields.map((f) => (
-                  <MenuItem key={f} value={f} sx={{ fontSize: '0.7rem' }}>
-                    {f}
+          {isAggregate &&
+            (() => {
+              const aggDef = config.aggregates?.find(
+                (a) => a.name === filter.aggregateFunc
+              );
+              if (!aggDef || aggDef.args.length === 0) return null;
+              return (
+                <Select
+                  size="small"
+                  displayEmpty
+                  value={filter.aggregateArgs?.[0] || ''}
+                  onChange={(e) =>
+                    update(filter.id, {
+                      aggregateArgs: [e.target.value],
+                    })
+                  }
+                  sx={{
+                    width: 110,
+                    height: 26,
+                    fontSize: '0.7rem',
+                    '& .MuiSelect-select': { py: 0.3 },
+                  }}
+                  MenuProps={{
+                    PaperProps: { sx: { maxHeight: 200, fontSize: '0.7rem' } },
+                  }}
+                >
+                  <MenuItem value="" disabled sx={{ display: 'none' }}>
+                    {t('argus.builder.argPlaceholder', 'field…')}
                   </MenuItem>
-                ))}
-              </Select>
-            );
-          })()}
+                  {sortedFields.map((f) => (
+                    <MenuItem key={f} value={f} sx={{ fontSize: '0.7rem' }}>
+                      {f}
+                    </MenuItem>
+                  ))}
+                </Select>
+              );
+            })()}
 
           {/* Operator select — hidden for has/!has */}
           {!isHas && ops.length > 0 && (

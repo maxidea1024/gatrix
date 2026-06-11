@@ -395,7 +395,11 @@ const ArgusReleasesPage: React.FC = () => {
               sx={{ height: 32 }}
             />
             {searchTerm && (
-              <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ flexShrink: 0 }}
+              >
                 {filteredTotal} / {total}{' '}
                 {t('argus.releases.releasesLabel', 'releases')}
               </Typography>
@@ -510,8 +514,6 @@ const ArgusReleasesPage: React.FC = () => {
           />
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-
-
             {filteredReleases.length === 0 ? (
               <Box sx={{ mt: 1 }}>
                 <EmptyPlaceholder

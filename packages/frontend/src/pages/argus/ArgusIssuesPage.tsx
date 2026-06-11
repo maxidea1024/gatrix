@@ -921,7 +921,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                 <EmptyPlaceholder
                   icon={<BugReportIcon sx={{ fontSize: 48 }} />}
                   message={t('argus.issues.noIssues')}
-                  description={t('argus.issues.noIssuesDescription', '검색 조건을 변경하거나 필터를 해제해 보세요.')}
+                  description={t(
+                    'argus.issues.noIssuesDescription',
+                    '검색 조건을 변경하거나 필터를 해제해 보세요.'
+                  )}
                   variant="text"
                   sx={{ flex: 1 }}
                 />

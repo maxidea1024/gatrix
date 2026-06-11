@@ -35,7 +35,10 @@ import type {
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-export function parse(input: string, aggregateNames?: Set<string>): ParseResult {
+export function parse(
+  input: string,
+  aggregateNames?: Set<string>
+): ParseResult {
   const tokens = tokenize(input);
   const parser = new Parser(tokens, input, aggregateNames);
   return parser.parse();
@@ -359,9 +362,7 @@ class Parser {
     } else if (valTok.type === TokenType.BOOLEAN) {
       value = valTok.value === 'true';
       this.advance();
-    } else if (
-      valTok.type === TokenType.FIELD
-    ) {
+    } else if (valTok.type === TokenType.FIELD) {
       // Unquoted string value
       value = valTok.value;
       this.advance();
@@ -372,9 +373,7 @@ class Parser {
       });
     }
 
-    const finalEnd = this.pos > 0
-      ? this.tokens[this.pos - 1].end
-      : end;
+    const finalEnd = this.pos > 0 ? this.tokens[this.pos - 1].end : end;
 
     return {
       type: 'AggregateFilter',

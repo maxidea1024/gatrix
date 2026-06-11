@@ -300,7 +300,9 @@ export function useArgusLogs() {
     topValues: { group_value: string; count: number }[];
     timeSeries: { bucket: string; group_value: string; count: number }[];
   };
-  const [aggDataMap, setAggDataMap] = useState<Record<string, AggDataEntry>>({});
+  const [aggDataMap, setAggDataMap] = useState<Record<string, AggDataEntry>>(
+    {}
+  );
   const [aggLoading, setAggLoading] = useState(false);
   // Convenience: single aggData for backward compat (first panel)
   const aggData = aggDataMap[aggGroupBy] || null;
@@ -597,7 +599,11 @@ export function useArgusLogs() {
             newMap[keys[idx]] = data;
           } else {
             // Store empty result so the panel renders in empty state instead of disappearing
-            newMap[keys[idx]] = { groupBy: keys[idx], topValues: [], timeSeries: [] };
+            newMap[keys[idx]] = {
+              groupBy: keys[idx],
+              topValues: [],
+              timeSeries: [],
+            };
           }
         });
         setAggDataMap(newMap);
@@ -783,7 +789,8 @@ export function useArgusLogs() {
       if (cfg.columnNames) setColumnNames(cfg.columnNames);
       if (cfg.period) setUrlState({ period: cfg.period });
       if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
-      if (cfg.activeTab !== undefined) setUrlState({ tab: String(cfg.activeTab) });
+      if (cfg.activeTab !== undefined)
+        setUrlState({ tab: String(cfg.activeTab) });
       setQueryName(sq.name);
       setCurrentQueryId(sq.id);
 

@@ -190,8 +190,6 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         value={value.dateRange}
         onChange={handleDateRangeChange}
       />
-
-
     </Box>
   );
 };

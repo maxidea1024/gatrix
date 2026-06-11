@@ -338,7 +338,10 @@ export default async function logsRoutes(app: FastifyInstance) {
         };
 
         // Set attribute key param if using custom attribute
-        if (!TOP_LEVEL_COLUMNS.has(resolvedGroupBy) && resolvedGroupBy !== 'level') {
+        if (
+          !TOP_LEVEL_COLUMNS.has(resolvedGroupBy) &&
+          resolvedGroupBy !== 'level'
+        ) {
           params.attrGroupKey = resolvedGroupBy;
         }
 
@@ -616,7 +619,8 @@ export default async function logsRoutes(app: FastifyInstance) {
       const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
       // Calculate previous period for delta comparison
-      const periodDelta = bucket.queryParams.fillEnd - bucket.queryParams.fillStart;
+      const periodDelta =
+        bucket.queryParams.fillEnd - bucket.queryParams.fillStart;
       const prevStart = bucket.queryParams.fillStart - periodDelta;
       const prevEnd = bucket.queryParams.fillStart;
 
@@ -713,7 +717,8 @@ export default async function logsRoutes(app: FastifyInstance) {
         params.prevEnd = String(prevEnd);
         const prevTimeCond = `timestamp >= toDateTime({prevStart:UInt32}) AND timestamp <= toDateTime({prevEnd:UInt32})`;
         const prevConditions = conditions.map((c) =>
-          c === `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`
+          c ===
+          `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`
             ? prevTimeCond
             : c
         );
@@ -739,8 +744,12 @@ export default async function logsRoutes(app: FastifyInstance) {
         `;
 
         const [prevResult, trendResult] = await Promise.all([
-          optic.rawQuery({ query: prevSql, params }).catch(() => ({ data: [] })),
-          optic.rawQuery({ query: trendSql, params }).catch(() => ({ data: [] })),
+          optic
+            .rawQuery({ query: prevSql, params })
+            .catch(() => ({ data: [] })),
+          optic
+            .rawQuery({ query: trendSql, params })
+            .catch(() => ({ data: [] })),
         ]);
 
         // Build prev_count lookup

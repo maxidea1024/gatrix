@@ -190,8 +190,8 @@ export const QueryAQLEditor = forwardRef<
 
   // ─── State ───────────────────────────────────────────────────────────
 
-  const { chips, setChips, undo, redo, resetTo } = useChipHistory(
-    () => queryToChips(initialQuery, aggregateNames)
+  const { chips, setChips, undo, redo, resetTo } = useChipHistory(() =>
+    queryToChips(initialQuery, aggregateNames)
   );
   const [inputValue, setInputValue] = useState('');
   const [cursorOffset, setCursorOffset] = useState(0);
@@ -275,9 +275,13 @@ export const QueryAQLEditor = forwardRef<
   const prevInitialQuery = useRef(initialQuery);
   useEffect(() => {
     if (initialQuery !== prevInitialQuery.current) {
-      const standardInitial = chipsToQuery(queryToChips(initialQuery, aggregateNames));
+      const standardInitial = chipsToQuery(
+        queryToChips(initialQuery, aggregateNames)
+      );
       const standardLastInternal = lastInternalQueryRef.current
-        ? chipsToQuery(queryToChips(lastInternalQueryRef.current, aggregateNames))
+        ? chipsToQuery(
+            queryToChips(lastInternalQueryRef.current, aggregateNames)
+          )
         : null;
       const isInternalCatchUp = standardInitial === standardLastInternal;
 
@@ -468,7 +472,11 @@ export const QueryAQLEditor = forwardRef<
         ];
       }
       // Aggregate chips: field (func name), aggregateArg (field arg), operator, value
-      if (chip.type === 'aggregate' && chip.aggregateArgs && chip.aggregateArgs.length > 0) {
+      if (
+        chip.type === 'aggregate' &&
+        chip.aggregateArgs &&
+        chip.aggregateArgs.length > 0
+      ) {
         return [
           { chipId: chip.id, part: 'field' },
           { chipId: chip.id, part: 'aggregateArg' },
@@ -492,7 +500,14 @@ export const QueryAQLEditor = forwardRef<
       updates: Partial<
         Pick<
           FilterChip,
-          'field' | 'operator' | 'value' | 'values' | 'composingPart' | 'label' | 'aggregateFunc' | 'aggregateArgs'
+          | 'field'
+          | 'operator'
+          | 'value'
+          | 'values'
+          | 'composingPart'
+          | 'label'
+          | 'aggregateFunc'
+          | 'aggregateArgs'
         >
       >
     ) => {
@@ -637,10 +652,12 @@ export const QueryAQLEditor = forwardRef<
   /** Set of currently selected values from the chip being edited.
    *  Uses chip.values directly — NOT comma-split from inlineValueText,
    *  because values themselves can contain commas (e.g., log messages). */
-  const [inlineSelectedValuesOverride, setInlineSelectedValues] = useState<Set<string> | null>(null);
+  const [inlineSelectedValuesOverride, setInlineSelectedValues] =
+    useState<Set<string> | null>(null);
   const inlineSelectedValues = useMemo(() => {
     // Aggregate chips use single-value mode — no pills
-    if (inlineSelectedValuesOverride !== null) return inlineSelectedValuesOverride;
+    if (inlineSelectedValuesOverride !== null)
+      return inlineSelectedValuesOverride;
     if (!editingToken) return new Set<string>();
     const chip = chips.find((c) => c.id === editingToken.chipId);
     if (chip?.type === 'aggregate') return new Set<string>();
@@ -1466,10 +1483,17 @@ export const QueryAQLEditor = forwardRef<
         // Step-by-step creation: if this is a field selection from empty input,
         // create a composing chip instead of putting text in input
         // BUT NOT when inside aggregate function parens (e.g., uniq(|) → selecting a field arg)
-        if (item.category === 'field' && !inputValue.includes(':') && !cursorContext?.inAggregateParen) {
+        if (
+          item.category === 'field' &&
+          !inputValue.includes(':') &&
+          !cursorContext?.inAggregateParen
+        ) {
           // HAS suggestions (has:"fieldName") → immediately create complete chip
           if (item.fieldCategory === 'has' && item.insertText) {
-            const completedChips = queryToChips(item.insertText, aggregateNames);
+            const completedChips = queryToChips(
+              item.insertText,
+              aggregateNames
+            );
             if (completedChips.length > 0) {
               insertChipsAtCursor(completedChips);
               setInputValue('');
@@ -1487,9 +1511,15 @@ export const QueryAQLEditor = forwardRef<
           const newChipId = `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
           // Map has/has not labels to internal field keys
           let chipField = item.label;
-          if (item.label === 'has not' || item.insertText?.startsWith('!has:')) {
+          if (
+            item.label === 'has not' ||
+            item.insertText?.startsWith('!has:')
+          ) {
             chipField = '!has';
-          } else if (item.label === 'has' || item.insertText?.startsWith('has:')) {
+          } else if (
+            item.label === 'has' ||
+            item.insertText?.startsWith('has:')
+          ) {
             chipField = 'has';
           }
           // Datetime fields default to 'after' operator
@@ -1822,7 +1852,11 @@ export const QueryAQLEditor = forwardRef<
       // But NOT when input is an aggregate function name (e.g., count, avg, p95)
       if ((e.key === '(' || e.key === ')') && !inputValue.includes(':')) {
         // Check if current input is an aggregate function name — if so, let the ( through as text
-        if (e.key === '(' && inputValue.trim() && aggregateNames.has(inputValue.trim().toLowerCase())) {
+        if (
+          e.key === '(' &&
+          inputValue.trim() &&
+          aggregateNames.has(inputValue.trim().toLowerCase())
+        ) {
           // Don't intercept — let the ( character be typed into the input naturally
           return;
         }
