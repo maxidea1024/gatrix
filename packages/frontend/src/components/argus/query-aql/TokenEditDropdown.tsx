@@ -853,10 +853,35 @@ function HasToggleMenu({
     { key: '!has', label: 'has not' },
   ];
 
+  const [selectedIndex, setSelectedIndex] = useState(() => {
+    const idx = options.findIndex((o) => o.key === currentField);
+    return idx >= 0 ? idx : 0;
+  });
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    listRef.current?.focus();
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, options.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < options.length) {
+        onSelect(options[selectedIndex].key);
+      }
+    }
+  };
+
   return (
-    <List dense sx={{ py: 0.5 }}>
-      {options.map(({ key, label }) => {
-        const isCurrent = key === currentField;
+    <List ref={listRef} tabIndex={0} onKeyDown={handleKeyDown} dense sx={{ py: 0.5, outline: 'none' }}>
+      {options.map(({ key, label }, idx) => {
+        const isCurrent = idx === selectedIndex || key === currentField;
         return (
           <ListItemButton
             key={key}
@@ -879,7 +904,7 @@ function HasToggleMenu({
                 fontWeight: isCurrent ? 600 : 400,
               }}
             />
-            {isCurrent && (
+            {key === currentField && (
               <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
             )}
           </ListItemButton>
@@ -905,7 +930,9 @@ function AggregateFieldMenu({
   isDark: boolean;
 }) {
   const [search, setSearch] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const aggregates = config.aggregates ?? [];
   const currentFunc = chip.aggregateFunc ?? '';
 
@@ -918,6 +945,49 @@ function AggregateFieldMenu({
       !search || agg.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [search]);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const items = list.querySelectorAll('div[role="button"]');
+    const item = items[selectedIndex] as HTMLElement;
+    if (item) {
+      item.scrollIntoView({ block: 'nearest' });
+    }
+  }, [selectedIndex]);
+
+  const selectAgg = (agg: typeof aggregates[0]) => {
+    const needsArgs = agg.args.length > 0;
+    const hasCurrentArgs = chip.aggregateArgs && chip.aggregateArgs.length > 0;
+    onUpdate({
+      aggregateFunc: agg.name,
+      aggregateArgs: needsArgs
+        ? (hasCurrentArgs ? chip.aggregateArgs : undefined)
+        : [],
+    });
+    onClose();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < filtered.length) {
+        selectAgg(filtered[selectedIndex]);
+      } else if (filtered.length > 0) {
+        selectAgg(filtered[0]);
+      }
+    }
+  };
+
   return (
     <Box sx={{ maxHeight: 280, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
@@ -925,6 +995,7 @@ function AggregateFieldMenu({
           inputRef={searchRef}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Search aggregates…"
           fullWidth
           sx={{
@@ -936,35 +1007,30 @@ function AggregateFieldMenu({
           }}
         />
       </Box>
-      <List dense sx={{ overflow: 'auto', py: 0.5 }}>
-        {filtered.map((agg) => {
+      <List ref={listRef} dense sx={{ overflow: 'auto', py: 0.5 }}>
+        {filtered.map((agg, idx) => {
           const isCurrent = agg.name === currentFunc;
+          const isHighlighted = idx === selectedIndex;
           const label = agg.args.length === 0
             ? `${agg.name}()`
             : `${agg.name}(field)`;
           return (
             <ListItemButton
               key={agg.name}
-              onClick={() => {
-                const needsArgs = agg.args.length > 0;
-                const hasCurrentArgs = chip.aggregateArgs && chip.aggregateArgs.length > 0;
-                onUpdate({
-                  aggregateFunc: agg.name,
-                  // Keep args if new function also takes args, clear if zero-arg
-                  aggregateArgs: needsArgs
-                    ? (hasCurrentArgs ? chip.aggregateArgs : undefined)
-                    : [],
-                });
-                onClose();
-              }}
+              onClick={() => selectAgg(agg)}
+              selected={isHighlighted || isCurrent}
               sx={{
                 py: 0.5,
                 px: 1.5,
-                backgroundColor: isCurrent
-                  ? isDark
-                    ? 'rgba(0,188,212,0.12)'
-                    : 'rgba(0,151,167,0.08)'
-                  : 'transparent',
+                '&.Mui-selected': {
+                  backgroundColor: isHighlighted
+                    ? isDark
+                      ? 'rgba(124,138,255,0.15)'
+                      : 'rgba(92,107,192,0.12)'
+                    : isDark
+                      ? 'rgba(0,188,212,0.12)'
+                      : 'rgba(0,151,167,0.08)',
+                },
               }}
             >
               <Box
