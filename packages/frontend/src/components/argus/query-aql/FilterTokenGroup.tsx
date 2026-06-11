@@ -298,6 +298,7 @@ export const FilterTokenGroup = forwardRef<
             display: 'inline-flex',
             alignItems: 'center',
             gap: '2px',
+            pr: 0,
           }}
           onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
             onPartClick(chip.id, 'field', e.currentTarget)
@@ -308,7 +309,7 @@ export const FilterTokenGroup = forwardRef<
         </Box>
         {chip.aggregateArgs && chip.aggregateArgs.length > 0 ? (
           <>
-            <Box component="span" sx={{ ...tokenStyle('field'), cursor: 'default', px: 0, mx: 0, opacity: 0.5 }}>{'('}</Box>
+            <Box component="span" sx={{ fontSize: '0.8rem', opacity: 0.5, lineHeight: 1, userSelect: 'none' }}>{'('}</Box>
             <Box
               ref={aggregateArgRef}
               component="span"
@@ -317,6 +318,7 @@ export const FilterTokenGroup = forwardRef<
                 color: isDark ? '#80cbc4' : '#00695c',
                 fontWeight: 500,
                 cursor: 'pointer',
+                px: '2px',
                 '&:hover': {
                   backgroundColor: isDark ? 'rgba(0,188,212,0.12)' : 'rgba(0,151,167,0.08)',
                 },
@@ -327,10 +329,10 @@ export const FilterTokenGroup = forwardRef<
             >
               {chip.aggregateArgs.join(', ')}
             </Box>
-            <Box component="span" sx={{ ...tokenStyle('field'), cursor: 'default', px: 0, mx: 0, opacity: 0.5 }}>{')'}</Box>
+            <Box component="span" sx={{ fontSize: '0.8rem', opacity: 0.5, lineHeight: 1, userSelect: 'none' }}>{')'}</Box>
           </>
         ) : (
-          <Box component="span" sx={{ ...tokenStyle('field'), cursor: 'default', px: 0, mx: 0, opacity: 0.5 }}>{'()'}</Box>
+          <Box component="span" sx={{ fontSize: '0.8rem', opacity: 0.5, lineHeight: 1, userSelect: 'none' }}>{'()'}</Box>
         )}
         </>
       ) : (
