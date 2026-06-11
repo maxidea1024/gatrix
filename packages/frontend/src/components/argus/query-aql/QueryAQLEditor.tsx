@@ -519,11 +519,17 @@ export const QueryAQLEditor = forwardRef<
             values: [...(chip?.values ?? [])],
           };
           const isComposingChip = !!chip?.composingPart;
-          // Existing values are shown as pill tags; input starts empty for new values
-          const textVal = '';
+          const isAggregate = chip?.type === 'aggregate';
+          // Aggregate: pre-fill with current value (single-value mode, no pills)
+          // Regular: existing values shown as pill tags; input starts empty for new values
+          const textVal = isAggregate ? (chip?.value ?? '') : '';
           setInlineValueText(textVal);
           setPopoverHighlightIdx(-1);
           inlineValueDirtyRef.current = false;
+          // For aggregate chips, clear selectedValues so no pills are shown
+          if (isAggregate) {
+            setInlineSelectedValues(new Set());
+          }
           // Use chip container as anchor for stability
           const chipEl =
             (anchorEl.closest('[data-chip]') as HTMLElement) || anchorEl;
@@ -622,14 +628,18 @@ export const QueryAQLEditor = forwardRef<
   /** Set of currently selected values from the chip being edited.
    *  Uses chip.values directly — NOT comma-split from inlineValueText,
    *  because values themselves can contain commas (e.g., log messages). */
+  const [inlineSelectedValuesOverride, setInlineSelectedValues] = useState<Set<string> | null>(null);
   const inlineSelectedValues = useMemo(() => {
+    // Aggregate chips use single-value mode — no pills
+    if (inlineSelectedValuesOverride !== null) return inlineSelectedValuesOverride;
     if (!editingToken) return new Set<string>();
     const chip = chips.find((c) => c.id === editingToken.chipId);
+    if (chip?.type === 'aggregate') return new Set<string>();
     const vals = chip?.values?.filter((v) => v !== '') ?? [];
     // Fallback: single-value chips may only have chip.value without chip.values
     if (vals.length === 0 && chip?.value) return new Set([chip.value]);
     return new Set(vals);
-  }, [editingToken, chips]);
+  }, [editingToken, chips, inlineSelectedValuesOverride]);
 
   /** Close inline editing and return focus to main input */
   const closeInlineEdit = useCallback(() => {
@@ -640,6 +650,7 @@ export const QueryAQLEditor = forwardRef<
     setEditingToken(null);
     chipEditingRef.current = false;
     setInlineValueText('');
+    setInlineSelectedValues(null);
     setPopoverHighlightIdx(-1);
     setHighlightedPillIdx(-1);
     skipDeleteOnCloseRef.current = true;
@@ -652,11 +663,29 @@ export const QueryAQLEditor = forwardRef<
    *  otherwise use chip.values directly to avoid comma-in-value issues. */
   const commitInlineEdit = useCallback(
     (chipId: string) => {
+      const chip = chips.find((c) => c.id === chipId);
+
+      // Aggregate chips: single value only (no multi-value accumulation)
+      if (chip?.type === 'aggregate') {
+        const trimmed = inlineValueText.trim();
+        if (!trimmed) {
+          deleteChip(chipId);
+          closeInlineEdit();
+          return;
+        }
+        updateChip(chipId, {
+          value: trimmed,
+          values: [trimmed],
+          composingPart: undefined,
+        });
+        closeInlineEdit();
+        return;
+      }
+
       let vals: string[];
       if (inlineValueDirtyRef.current) {
         // User manually typed → treat entire text as single value (no comma splitting)
         const trimmed = inlineValueText.trim();
-        const chip = chips.find((c) => c.id === chipId);
         const existing = chip?.values?.filter((v) => v !== '') ?? [];
         if (trimmed) {
           if (!existing.includes(trimmed)) {
@@ -669,7 +698,6 @@ export const QueryAQLEditor = forwardRef<
         }
       } else {
         // Checkbox-only edits → use chip.values directly
-        const chip = chips.find((c) => c.id === chipId);
         vals = chip?.values?.filter((v) => v !== '') ?? [];
       }
 
