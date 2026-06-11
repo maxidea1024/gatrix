@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Suggestion Engine
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Suggestion Engine
 // Spec: Section 10, 11
 // ============================================================================
 
@@ -183,7 +183,7 @@ function getFieldSuggestions(
         insertText: 'has:',
         category: 'field',
         fieldCategory: 'logic',
-        description: 'dsl.has.fieldNotExists',
+        description: 'aql.has.fieldNotExists',
       });
     }
   } else {
@@ -193,7 +193,7 @@ function getFieldSuggestions(
         insertText: 'has:',
         category: 'field',
         fieldCategory: 'logic',
-        description: 'dsl.has.fieldExists',
+        description: 'aql.has.fieldExists',
       });
     }
     if (
@@ -207,7 +207,7 @@ function getFieldSuggestions(
         insertText: '!has:',
         category: 'field',
         fieldCategory: 'logic',
-        description: 'dsl.has.fieldNotExists',
+        description: 'aql.has.fieldNotExists',
       });
     }
   }
@@ -288,7 +288,7 @@ function getFieldSuggestions(
           insertText: `has:"${matchedField.key}"`,
           category: 'field',
           fieldCategory: 'has',
-          description: 'dsl.has.fieldExists',
+          description: 'aql.has.fieldExists',
         });
       }
     }
@@ -309,45 +309,45 @@ function getFieldSuggestions(
       {
         label: `message contains ${originalPrefix}`,
         insertText: `message:contains("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageContains',
+        desc: 'aql.smart.messageContains',
       },
       {
         label: `message is ${originalPrefix}`,
         insertText: `message:"${escapedPrefix}"`,
-        desc: 'dsl.smart.messageIs',
+        desc: 'aql.smart.messageIs',
       },
       // Negation
       {
         label: `message not contains ${originalPrefix}`,
         insertText: `message:!contains("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageNotContains',
+        desc: 'aql.smart.messageNotContains',
       },
       {
         label: `message is not ${originalPrefix}`,
         insertText: `message:!="${escapedPrefix}"`,
-        desc: 'dsl.smart.messageIsNot',
+        desc: 'aql.smart.messageIsNot',
       },
       // Prefix/suffix
       {
         label: `message starts with ${originalPrefix}`,
         insertText: `message:startsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageStartsWith',
+        desc: 'aql.smart.messageStartsWith',
       },
       {
         label: `message ends with ${originalPrefix}`,
         insertText: `message:endsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageEndsWith',
+        desc: 'aql.smart.messageEndsWith',
       },
       // Negated prefix/suffix
       {
         label: `message not starts with ${originalPrefix}`,
         insertText: `message:!startsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageNotStartsWith',
+        desc: 'aql.smart.messageNotStartsWith',
       },
       {
         label: `message not ends with ${originalPrefix}`,
         insertText: `message:!endsWith("${escapedPrefix}")`,
-        desc: 'dsl.smart.messageNotEndsWith',
+        desc: 'aql.smart.messageNotEndsWith',
       },
     ];
 
@@ -652,21 +652,21 @@ function formatOperatorInsert(op: string): string {
 /** i18n key for operator description (translated in UI) */
 function getOperatorDescriptionKey(op: string): string {
   const keys: Record<string, string> = {
-    '=': 'dsl.op.equals',
-    '!=': 'dsl.op.notEquals',
-    '>': 'dsl.op.greaterThan',
-    '>=': 'dsl.op.greaterOrEqual',
-    '<': 'dsl.op.lessThan',
-    '<=': 'dsl.op.lessOrEqual',
-    contains: 'dsl.op.contains',
-    '!contains': 'dsl.op.notContains',
-    startsWith: 'dsl.op.startsWith',
-    '!startsWith': 'dsl.op.notStartsWith',
-    endsWith: 'dsl.op.endsWith',
-    '!endsWith': 'dsl.op.notEndsWith',
-    before: 'dsl.op.before',
-    after: 'dsl.op.after',
-    in: 'dsl.op.in',
+    '=': 'aql.op.equals',
+    '!=': 'aql.op.notEquals',
+    '>': 'aql.op.greaterThan',
+    '>=': 'aql.op.greaterOrEqual',
+    '<': 'aql.op.lessThan',
+    '<=': 'aql.op.lessOrEqual',
+    contains: 'aql.op.contains',
+    '!contains': 'aql.op.notContains',
+    startsWith: 'aql.op.startsWith',
+    '!startsWith': 'aql.op.notStartsWith',
+    endsWith: 'aql.op.endsWith',
+    '!endsWith': 'aql.op.notEndsWith',
+    before: 'aql.op.before',
+    after: 'aql.op.after',
+    in: 'aql.op.in',
   };
   return keys[op] ?? op;
 }

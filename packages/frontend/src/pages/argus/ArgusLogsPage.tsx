@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+﻿import React, { useState, useRef, useCallback } from 'react';
 import { Box, useTheme, IconButton, Button } from '@mui/material';
 import {
   Terminal as LogIcon,
@@ -21,10 +21,10 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import ArgusFilterBar from '@/components/argus/ArgusFilterBar';
 import {
-  QueryDSLEditor,
+  QueryAQLEditor,
   LOGS_CONFIG,
-  type QueryDSLEditorHandle,
-} from '@/components/argus/query-dsl';
+  type QueryAQLEditorHandle,
+} from '@/components/argus/query-aql';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -158,7 +158,7 @@ const ArgusLogsPage: React.FC = () => {
     activeTab === 3 ? liveTailSelectedLog !== null : isRightPanelOpen;
 
   const logContainerRef = useRef<HTMLDivElement>(null);
-  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
+  const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
   const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useLocalStorage(
     'argus_facet_sidebar_collapsed',
     false
@@ -360,7 +360,7 @@ const ArgusLogsPage: React.FC = () => {
         projectId={projectId}
         value={filters}
         onChange={(newFilters) => {
-          // Environment change → DSL chip
+          // Environment change → AQL chip
           const prevEnvs = filters.environments;
           const newEnvs = newFilters.environments;
           if (
@@ -384,7 +384,7 @@ const ArgusLogsPage: React.FC = () => {
               minWidth: 0,
             }}
           >
-            <QueryDSLEditor
+            <QueryAQLEditor
               ref={dslEditorRef}
               config={LOGS_CONFIG}
               initialQuery={search}

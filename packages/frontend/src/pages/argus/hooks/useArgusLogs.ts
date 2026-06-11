@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+﻿import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -325,7 +325,7 @@ export function useArgusLogs() {
     return '14d';
   }, [filters.dateRange]);
 
-  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field
+  // Lazy-loading callback for QueryAQLEditor: fetch values for a specific field
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {

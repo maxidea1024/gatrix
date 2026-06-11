@@ -1,4 +1,4 @@
-/**
+﻿/**
  * QuerySuggestionDropdown — Sentry-style autocomplete dropdown with category tabs.
  *
  * Features:
@@ -232,7 +232,7 @@ export const QuerySuggestionDropdown = forwardRef<
     let valueCount = 0;
     let isStringField = false;
     for (const s of suggestions) {
-      if (s.category === 'value' && !s.description?.startsWith('dsl.smart.')) {
+      if (s.category === 'value' && !s.description?.startsWith('aql.smart.')) {
         if (s.fieldType === 'string') isStringField = true;
         valueCount++;
       }
@@ -247,13 +247,13 @@ export const QuerySuggestionDropdown = forwardRef<
   // Domain-aware tab labels
   const FIELD_CAT_TABS: Record<string, { i18nKey: string; fallback: string }> =
     {
-      log: { i18nKey: 'dsl.tab.logs', fallback: 'Logs' },
-      resource: { i18nKey: 'dsl.tab.resource', fallback: 'Resource' },
-      trace: { i18nKey: 'dsl.tab.trace', fallback: 'Trace' },
-      event: { i18nKey: 'dsl.tab.event', fallback: 'Event' },
-      user: { i18nKey: 'dsl.tab.user', fallback: 'User' },
-      attribute: { i18nKey: 'dsl.tab.attributes', fallback: 'Attributes' },
-      logic: { i18nKey: 'dsl.tab.logic', fallback: 'Logic' },
+      log: { i18nKey: 'aql.tab.logs', fallback: 'Logs' },
+      resource: { i18nKey: 'aql.tab.resource', fallback: 'Resource' },
+      trace: { i18nKey: 'aql.tab.trace', fallback: 'Trace' },
+      event: { i18nKey: 'aql.tab.event', fallback: 'Event' },
+      user: { i18nKey: 'aql.tab.user', fallback: 'User' },
+      attribute: { i18nKey: 'aql.tab.attributes', fallback: 'Attributes' },
+      logic: { i18nKey: 'aql.tab.logic', fallback: 'Logic' },
     };
 
   const availableTabs = useMemo(() => {
@@ -262,11 +262,11 @@ export const QuerySuggestionDropdown = forwardRef<
     if (hasRecent) {
       tabs.push({
         key: 'recent',
-        i18nKey: 'dsl.tab.recent',
+        i18nKey: 'aql.tab.recent',
         fallback: 'Recent',
       });
     }
-    tabs.push({ key: 'all', i18nKey: 'dsl.tab.all', fallback: 'All' });
+    tabs.push({ key: 'all', i18nKey: 'aql.tab.all', fallback: 'All' });
 
     // Add tabs for each field category present in suggestions
     const catOrder = [
@@ -281,7 +281,7 @@ export const QuerySuggestionDropdown = forwardRef<
     for (const cat of catOrder) {
       if (fieldCategories.has(cat)) {
         const meta = FIELD_CAT_TABS[cat] ?? {
-          i18nKey: `dsl.tab.${cat}`,
+          i18nKey: `AQL.tab.${cat}`,
           fallback: cat,
         };
         tabs.push({ key: cat, ...meta });
@@ -530,7 +530,7 @@ export const QuerySuggestionDropdown = forwardRef<
                 textAlign: 'center',
               }}
             >
-              {t('dsl.noRecent', 'No recent searches')}
+              {t('aql.noRecent', 'No recent searches')}
             </Typography>
           ) : (
             recentSearches.map((recent, idx) => {
@@ -654,7 +654,7 @@ export const QuerySuggestionDropdown = forwardRef<
                   color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
                 }}
               >
-                {t('dsl.loadingValues', 'Loading values...')}
+                {t('aql.loadingValues', 'Loading values...')}
               </Typography>
             </Box>
           ) : (
@@ -667,7 +667,7 @@ export const QuerySuggestionDropdown = forwardRef<
                 textAlign: 'center',
               }}
             >
-              {t('dsl.noSuggestions', 'No suggestions')}
+              {t('aql.noSuggestions', 'No suggestions')}
             </Typography>
           )
         ) : (
@@ -688,7 +688,7 @@ export const QuerySuggestionDropdown = forwardRef<
                     userSelect: 'none',
                   }}
                 >
-                  {t(`dsl.category.${category}`, category)}
+                  {t(`AQL.category.${category}`, category)}
                 </Typography>
               )}
 
@@ -697,9 +697,9 @@ export const QuerySuggestionDropdown = forwardRef<
                 const isSelected = idx === selectedIndex;
                 const isValue =
                   item.category === 'value' &&
-                  !item.description?.startsWith('dsl.smart.') &&
+                  !item.description?.startsWith('aql.smart.') &&
                   !item.fieldCategory;
-                const isSmart = item.description?.startsWith('dsl.smart.');
+                const isSmart = item.description?.startsWith('aql.smart.');
                 const isLogical = item.category === 'logical';
                 const isParen = item.category === 'paren';
 
@@ -867,7 +867,7 @@ export const QuerySuggestionDropdown = forwardRef<
 
                     {/* Description or field type — hide for smart suggestions */}
                     {(item.description || item.fieldType) &&
-                      !item.description?.startsWith('dsl.smart.') && (
+                      !item.description?.startsWith('aql.smart.') && (
                         <Typography
                           sx={{
                             fontSize: '10px',
@@ -913,17 +913,17 @@ export const QuerySuggestionDropdown = forwardRef<
               whiteSpace: 'nowrap',
             }}
           >
-            {t('dsl.hint.multiSelect', 'Hold {{key}} to select multiple', {
+            {t('aql.hint.multiSelect', 'Hold {{key}} to select multiple', {
               key: navigator.platform?.includes('Mac') ? '⌘' : 'Ctrl',
             })}
           </Typography>
         )}
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           {[
-            { keys: '↑↓', label: t('dsl.hint.navigate', 'navigate') },
-            { keys: '←→', label: t('dsl.hint.switchTab', 'tab') },
-            { keys: 'Tab', label: t('dsl.hint.select', 'select') },
-            { keys: 'Esc', label: t('dsl.hint.close', 'close') },
+            { keys: '↑↓', label: t('aql.hint.navigate', 'navigate') },
+            { keys: '←→', label: t('aql.hint.switchTab', 'tab') },
+            { keys: 'Tab', label: t('aql.hint.select', 'select') },
+            { keys: 'Esc', label: t('aql.hint.close', 'close') },
           ].map(({ keys, label }) => (
             <Box
               key={keys}

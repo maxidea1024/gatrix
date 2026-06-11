@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useEffect,
   useCallback,
@@ -33,10 +33,10 @@ import PageHeader from '@/components/common/PageHeader';
 import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 
 import {
-  QueryDSLEditor,
+  QueryAQLEditor,
   ISSUES_CONFIG,
-  type QueryDSLEditorHandle,
-} from '@/components/argus/query-dsl';
+  type QueryAQLEditorHandle,
+} from '@/components/argus/query-aql';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 
 import { useResizableSplit } from '@/hooks/useResizableSplit';
@@ -212,7 +212,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     [setFacetCollapsed]
   );
 
-  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
+  const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
 
   // ─── Real-time SSE ──────────────────────────────────────────────
   const { newIssueCount, resetNewIssueCount } = useArgusRealtime(
@@ -550,7 +550,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const levelOptions = getLevelOptions(t);
   const sortOptions = getSortOptions(t);
 
-  // Lazy-loading callback for QueryDSLEditor: fetch values for a specific field on demand
+  // Lazy-loading callback for QueryAQLEditor: fetch values for a specific field on demand
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
@@ -746,7 +746,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
               }}
             />
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <QueryDSLEditor
+              <QueryAQLEditor
                 ref={dslEditorRef}
                 config={ISSUES_CONFIG}
                 initialQuery={storeSearch}

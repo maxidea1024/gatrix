@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import { parse } from '../parser';
 import { validate } from '../validator';
 import { LOGS_CONFIG, PERFORMANCE_CONFIG } from '../fields';
@@ -82,8 +82,8 @@ describe('Validator', () => {
     it('should include correct i18n keys', () => {
       const { ast } = parse('foobar:test');
       const errors = validate(ast, LOGS_CONFIG);
-      expect(errors[0].messageKey).toBe('dsl.error.unknownField');
-      expect(errors[0].hintKey).toBe('dsl.hint.unknownField');
+      expect(errors[0].messageKey).toBe('aql.error.unknownField');
+      expect(errors[0].hintKey).toBe('aql.hint.unknownField');
     });
   });
 });

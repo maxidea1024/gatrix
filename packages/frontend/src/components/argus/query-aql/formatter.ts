@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Formatter (Pretty Print + Syntax Highlighting)
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Formatter (Pretty Print + Syntax Highlighting)
 // Spec: Section 16
 // ============================================================================
 

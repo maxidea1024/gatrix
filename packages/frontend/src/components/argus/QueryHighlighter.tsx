@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+﻿import React, { useMemo } from 'react';
 import { ContentCopy as CopyIcon } from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,7 @@ interface QueryHighlighterProps {
   /** The query string to render with syntax highlighting */
   query: string;
   /** Which syntax to use for coloring */
-  mode: 'dsl' | 'clickhouse';
+  mode: 'AQL' | 'clickhouse';
   /** Dark mode flag */
   isDark: boolean;
   /** Show copy button */
@@ -33,7 +33,7 @@ interface ColoredSpan {
   italic?: boolean;
 }
 
-// ─── DSL Syntax Colors ──────────────────────────────────────────────────────
+// ─── AQL Syntax Colors ──────────────────────────────────────────────────────
 
 function getDslColors(isDark: boolean) {
   return {
@@ -56,7 +56,7 @@ function tokenizeDsl(query: string, isDark: boolean): ColoredSpan[] {
   const colors = getDslColors(isDark);
   const spans: ColoredSpan[] = [];
 
-  // Regex to match DSL tokens (order matters — more specific patterns first):
+  // Regex to match AQL tokens (order matters — more specific patterns first):
   // 1. Quoted strings: "..." or '...'
   // 2. Function operators after dot: .contains: .starts_with: etc.
   // 3. Logical operators: AND OR NOT
@@ -227,7 +227,7 @@ export const QueryHighlighter: React.FC<QueryHighlighterProps> = ({
   };
 
   const dslSpans = useMemo(
-    () => (mode === 'dsl' ? tokenizeDsl(query, isDark) : []),
+    () => (mode === 'AQL' ? tokenizeDsl(query, isDark) : []),
     [query, mode, isDark]
   );
 
@@ -253,7 +253,7 @@ export const QueryHighlighter: React.FC<QueryHighlighterProps> = ({
 
   return (
     <PreviewContainer isDark={isDark}>
-      {mode === 'dsl' ? (
+      {mode === 'AQL' ? (
         <SpanRenderer spans={dslSpans} />
       ) : (
         sqlLines.map((lineSpans, i) => (

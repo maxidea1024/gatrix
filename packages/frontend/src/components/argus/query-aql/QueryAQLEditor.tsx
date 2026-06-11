@@ -1,5 +1,5 @@
-/**
- * QueryDSLEditor — Sentry-style tokenized grid editor.
+﻿/**
+ * QueryAQLEditor — Sentry-style tokenized grid editor.
  *
  * Each filter is rendered as a clickable chip: [field] [op] [value] [×]
  * New filters are added via an inline input at the end.
@@ -71,7 +71,7 @@ import QueryBuilderPanel from '../QueryBuilderPanel';
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
-export interface QueryDSLEditorProps {
+export interface QueryAQLEditorProps {
   config: DomainConfig;
   initialQuery?: string;
   onSearch: (query: string) => void;
@@ -88,7 +88,7 @@ export interface QueryDSLEditorProps {
 }
 
 /** Imperative handle for external filter integration */
-export interface QueryDSLEditorHandle {
+export interface QueryAQLEditorHandle {
   /** Set values for a field chip (add if missing, update if exists, remove if values empty) */
   upsertFieldChip: (field: string, values: string[], operator?: string) => void;
   /** Remove all chips matching a field key */
@@ -155,10 +155,10 @@ function useChipHistory(initial: FilterChip[] | (() => FilterChip[])) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export const QueryDSLEditor = forwardRef<
-  QueryDSLEditorHandle,
-  QueryDSLEditorProps
->(function QueryDSLEditor(
+export const QueryAQLEditor = forwardRef<
+  QueryAQLEditorHandle,
+  QueryAQLEditorProps
+>(function QueryAQLEditor(
   {
     config,
     initialQuery = '',
@@ -1327,7 +1327,7 @@ export const QueryDSLEditor = forwardRef<
           // Rebuild the filter to ensure any partial parenthesis or multi-value state is discarded
           if (
             currentFilterInfo.field &&
-            !item.description?.startsWith('dsl.smart.')
+            !item.description?.startsWith('aql.smart.')
           ) {
             const field = currentFilterInfo.field;
             let op = currentFilterInfo.operator || '=';
@@ -2027,7 +2027,7 @@ export const QueryDSLEditor = forwardRef<
       autoComplete="off"
       placeholder={
         chips.length === 0 && !isAtFront
-          ? (placeholder ?? t('dsl.placeholder', 'Search with DSL...'))
+          ? (placeholder ?? t('aql.placeholder', 'Search with AQL...'))
           : ''
       }
       style={{

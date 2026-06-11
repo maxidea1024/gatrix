@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Barrel Exports
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Barrel Exports
 // ============================================================================
 
 // Core engine
@@ -32,11 +32,11 @@ export {
 } from './fields';
 
 // UI Components
-export { QueryDSLEditor } from './QueryDSLEditor';
+export { QueryAQLEditor } from './QueryAQLEditor';
 export type {
-  QueryDSLEditorProps,
-  QueryDSLEditorHandle,
-} from './QueryDSLEditor';
+  QueryAQLEditorProps,
+  QueryAQLEditorHandle,
+} from './QueryAQLEditor';
 export { QuerySuggestionDropdown } from './QuerySuggestionDropdown';
 export type { QuerySuggestionDropdownProps } from './QuerySuggestionDropdown';
 

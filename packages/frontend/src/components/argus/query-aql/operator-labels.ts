@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Operator Display Labels
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Operator Display Labels
 // Sentry-style human-readable operator names
 // ============================================================================
 

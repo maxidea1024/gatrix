@@ -1,12 +1,12 @@
 /**
- * QueryDSL Recent Search History — localStorage-based.
+ * AQL Recent Search History — localStorage-based.
  *
  * Stores recent search queries per domain, limited to MAX_RECENT items.
  * Newest entries first, duplicates are deduplicated (moved to top).
  */
 
 const MAX_RECENT = 10;
-const STORAGE_KEY_PREFIX = 'dsl_recent_';
+const STORAGE_KEY_PREFIX = 'AQL_recent_';
 
 export interface RecentSearch {
   query: string;

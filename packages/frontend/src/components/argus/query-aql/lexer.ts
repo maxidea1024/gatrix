@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Lexer (Character-by-character tokenizer)
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Lexer (Character-by-character tokenizer)
 // Spec: Section 6
 // ============================================================================
 //
@@ -19,7 +19,7 @@ import type { Token } from './types';
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
- * Tokenize a DSL query string into a list of tokens.
+ * Tokenize a AQL query string into a list of tokens.
  * Every token has start/end character offsets (0-indexed, end exclusive).
  */
 export function tokenize(input: string): Token[] {

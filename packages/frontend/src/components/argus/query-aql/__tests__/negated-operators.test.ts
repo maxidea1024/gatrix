@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Negated Operators — Unit Tests
  *
  * Verifies the full pipeline for:
@@ -101,7 +101,7 @@ describe('queryToChips: negated operators', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// 3. chipsToQuery: negated operators serialized to correct DSL format
+// 3. chipsToQuery: negated operators serialized to correct AQL format
 // ═══════════════════════════════════════════════════════════════════════════════
 
 describe('chipsToQuery: negated operators', () => {

@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Semantic Validator
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Semantic Validator
 // Spec: Section 12
 // ============================================================================
 
@@ -67,8 +67,8 @@ function validateFilter(
   if (!field) {
     errors.push({
       type: 'UNKNOWN_FIELD',
-      messageKey: 'dsl.error.unknownField',
-      hintKey: 'dsl.hint.unknownField',
+      messageKey: 'aql.error.unknownField',
+      hintKey: 'aql.hint.unknownField',
       params: { field: node.field },
       field: node.field,
       start: node.start,
@@ -83,8 +83,8 @@ function validateFilter(
   if (op !== '=' && !field.operators.includes(op)) {
     errors.push({
       type: 'INVALID_OPERATOR',
-      messageKey: 'dsl.error.invalidOperator',
-      hintKey: 'dsl.hint.invalidOperator',
+      messageKey: 'aql.error.invalidOperator',
+      hintKey: 'aql.hint.invalidOperator',
       params: { field: node.field, op },
       field: node.field,
       operator: op,
@@ -118,8 +118,8 @@ function validateValueType(
       if (typeof value === 'string' && isNaN(Number(value)) && value !== '') {
         errors.push({
           type: 'INVALID_VALUE_TYPE',
-          messageKey: 'dsl.error.invalidValueType',
-          hintKey: 'dsl.hint.invalidValueType',
+          messageKey: 'aql.error.invalidValueType',
+          hintKey: 'aql.hint.invalidValueType',
           params: { field: fieldName, expected: 'number' },
           field: fieldName,
           start,
@@ -137,8 +137,8 @@ function validateValueType(
       ) {
         errors.push({
           type: 'INVALID_VALUE_TYPE',
-          messageKey: 'dsl.error.invalidValueType',
-          hintKey: 'dsl.hint.invalidValueType',
+          messageKey: 'aql.error.invalidValueType',
+          hintKey: 'aql.hint.invalidValueType',
           params: { field: fieldName, expected: 'boolean' },
           field: fieldName,
           start,

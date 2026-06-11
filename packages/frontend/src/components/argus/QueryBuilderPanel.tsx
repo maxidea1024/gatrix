@@ -38,7 +38,7 @@ import {
   Undo as UndoIcon,
   Redo as RedoIcon,
   Storage as SqlIcon,
-  Code as DslIcon,
+  Code as AqlIcon,
   ContentCopy as CopyIcon,
   Fullscreen as FullscreenIcon,
   FullscreenExit as FullscreenExitIcon,
@@ -50,20 +50,20 @@ import SafeTooltip from '@/components/common/SafeTooltip';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { QueryHighlighter } from './QueryHighlighter';
-import { queryToChips } from './query-dsl/useFilterChips';
-import type { DomainConfig } from './query-dsl/types';
-import { getOperatorOptions } from './query-dsl/operator-labels';
-import { getFieldByKey } from './query-dsl/fields';
-import DatetimeValueEditor from './query-dsl/DatetimeValueEditor';
+import { queryToChips } from './query-aql/useFilterChips';
+import type { DomainConfig } from './query-aql/types';
+import { getOperatorOptions } from './query-aql/operator-labels';
+import { getFieldByKey } from './query-aql/fields';
+import DatetimeValueEditor from './query-aql/DatetimeValueEditor';
 
 import {
   type Condition,
   type FilterCondition,
   type GroupCondition,
   chipsToTree,
-  conditionToDsl,
+  conditionToAql,
   conditionToSql,
-  conditionToDslPretty,
+  conditionToAqlPretty,
   conditionToSqlPretty,
   createFilter,
   createEmptyRoot,
@@ -113,7 +113,7 @@ interface FacetValue {
   count: number;
 }
 
-// ── Category badges (matching DSL editor's visual system) ────────────────────
+// ── Category badges (matching AQL editor's visual system) ────────────────────
 const CATEGORY_BADGES: Record<
   string,
   { label: string; color: string; bg: string; bgLight: string }
@@ -302,9 +302,9 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
   const [dynamicFacets, setDynamicFacets] = useState<Record<string, string[]>>(
     {}
   );
-  const [previewMode, setPreviewMode] = useLocalStorage<'dsl' | 'clickhouse'>(
+  const [previewMode, setPreviewMode] = useLocalStorage<'AQL' | 'clickhouse'>(
     'qb-preview-mode',
-    'dsl'
+    'AQL'
   );
   const [drag, setDrag] = useState<DragState>({
     draggingId: null,
@@ -520,17 +520,17 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
   }, []);
 
   // ── Previews (tree-walk pretty-print) ──
-  const dslForApply = useMemo(() => conditionToDsl(tree), [tree]);
+  const aqlForApply = useMemo(() => conditionToAql(tree), [tree]);
 
-  const dslPreview = useMemo(() => conditionToDslPretty(tree), [tree]);
+  const aqlPreview = useMemo(() => conditionToAqlPretty(tree), [tree]);
 
   const sqlPreview = useMemo(() => conditionToSqlPretty(tree), [tree]);
 
   const isValid = useMemo(() => hasValidFilters(tree), [tree]);
   const handleApply = useCallback(() => {
-    onApply(dslForApply);
+    onApply(aqlForApply);
     onClose();
-  }, [onApply, onClose, dslForApply]);
+  }, [onApply, onClose, aqlForApply]);
 
   // ═════════════════════════════════════════════════════════════════════════
   // renderFilter — a single filter row
@@ -1527,19 +1527,19 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 sx={{ display: 'flex', gap: 0.5 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                {(['dsl', 'clickhouse'] as const).map((m) => (
+                {(['AQL', 'clickhouse'] as const).map((m) => (
                   <PreviewModeToggle
                     key={m}
                     isActive={previewMode === m}
                     primaryColor={primary}
                     onClick={() => setPreviewMode(m)}
                   >
-                    {m === 'dsl' ? (
-                      <DslIcon sx={{ fontSize: 11 }} />
+                    {m === 'AQL' ? (
+                      <AqlIcon sx={{ fontSize: 11 }} />
                     ) : (
                       <SqlIcon sx={{ fontSize: 11 }} />
                     )}
-                    {m === 'dsl' ? 'DSL' : 'ClickHouse'}
+                    {m === 'AQL' ? 'AQL' : 'ClickHouse'}
                   </PreviewModeToggle>
                 ))}
               </Box>
@@ -1549,14 +1549,14 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             (isValid ? (
               <PreviewContainer>
                 <QueryHighlighter
-                  query={previewMode === 'dsl' ? dslPreview : sqlPreview}
+                  query={previewMode === 'AQL' ? aqlPreview : sqlPreview}
                   mode={previewMode}
                   isDark={isDark}
                 />
               </PreviewContainer>
             ) : (
               <QueryHighlighter
-                query={previewMode === 'dsl' ? dslPreview : sqlPreview}
+                query={previewMode === 'AQL' ? aqlPreview : sqlPreview}
                 mode={previewMode}
                 isDark={isDark}
               />

@@ -1,6 +1,6 @@
-// ============================================================================
-// Query DSL Engine — Type Definitions
-// Spec: packages/argus/docs/QUERY_DSL_ENGINE_SPEC.md
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Type Definitions
+// Spec: packages/argus/docs/AQL_ENGINE_SPEC.md
 // ============================================================================
 
 // ─── Token Types ─────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ export interface FilterExpression {
  * Free text without a field.
  * Created as FreeTextExpression in Parser (not converted to FilterExpression).
  * Serializer converts this to message:contains("...") for the backend.
- * Reason: Parser only structures DSL grammar. Semantic interpretation
+ * Reason: Parser only structures AQL grammar. Semantic interpretation
  * (which field to map to) is the Serializer's responsibility.
  */
 export interface FreeTextExpression {
@@ -156,9 +156,9 @@ export type ValidationErrorType =
 
 export interface ValidationError {
   type: ValidationErrorType;
-  /** i18n message key: `dsl.error.${type}` */
+  /** i18n message key: `AQL.error.${type}` */
   messageKey: string;
-  /** i18n hint key: `dsl.hint.${type}` */
+  /** i18n hint key: `AQL.hint.${type}` */
   hintKey: string;
   /** Interpolation params for i18n */
   params: Record<string, string>;
@@ -292,7 +292,7 @@ export interface SuggestionResult {
 
 // ─── Component Props ─────────────────────────────────────────────────────────
 
-export interface QueryDSLEditorProps {
+export interface QueryAQLEditorProps {
   /** Domain config — determines fields, aliases, facet endpoints */
   config: DomainConfig;
   /** Initial query string */

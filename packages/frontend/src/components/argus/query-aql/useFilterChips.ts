@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — FilterChip Data Model & Serialization
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — FilterChip Data Model & Serialization
 // AST ↔ FilterChip[] conversion for tokenized grid editor
 // ============================================================================
 
@@ -149,10 +149,10 @@ function negateOperator(op: QueryOperator): QueryOperator {
   return negMap[op] ?? op;
 }
 
-// ─── FilterChip[] → DSL string ───────────────────────────────────────────────
+// ─── FilterChip[] → AQL string ───────────────────────────────────────────────
 
 /**
- * Serialize an array of FilterChips back to a DSL query string.
+ * Serialize an array of FilterChips back to a AQL query string.
  */
 export function chipsToQuery(chips: FilterChip[]): string {
   if (chips.length === 0) return '';
@@ -299,7 +299,7 @@ const VALUE_TYPES = new Set([
 ]);
 
 /**
- * Parse a DSL query string directly into FilterChips.
+ * Parse a AQL query string directly into FilterChips.
  * Uses token-based reconstruction for perfect roundtrip fidelity.
  * Each token maps directly to a chip — parens/AND/OR are never auto-paired.
  */

@@ -1,10 +1,10 @@
 // ═════════════════════════════════════════════════════════════════════════════
-// Query Builder Tree — Condition data model + DSL/SQL conversion
+// Query Builder Tree — Condition data model + AQL/SQL conversion
 // Works with existing queryToChips → chipsToQuery pipeline
 // ═════════════════════════════════════════════════════════════════════════════
 
-import type { FilterChip } from './query-dsl/useFilterChips';
-import { chipToQueryPart } from './query-dsl/useFilterChips';
+import type { FilterChip } from './query-aql/useFilterChips';
+import { chipToQueryPart } from './query-aql/useFilterChips';
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Types
@@ -198,10 +198,10 @@ function resolveValues(cond: FilterCondition): string[] | null {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Condition Tree → DSL string
+// Condition Tree → AQL string
 // ═════════════════════════════════════════════════════════════════════════════
 
-export function conditionToDsl(cond: Condition): string {
+export function conditionToAql(cond: Condition): string {
   if (cond.type === 'filter') {
     if (!cond.field) return '';
     const multi = resolveValues(cond);
@@ -219,7 +219,7 @@ export function conditionToDsl(cond: Condition): string {
   }
 
   // Group
-  const parts = cond.children.map(conditionToDsl).filter(Boolean);
+  const parts = cond.children.map(conditionToAql).filter(Boolean);
   if (parts.length === 0) return '';
   const inner =
     parts.length === 1 ? parts[0] : `(${parts.join(` ${cond.connector} `)})`;
@@ -292,13 +292,13 @@ function prefixBlock(text: string, first: string, rest: string): string {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// Pretty-printed DSL (multi-line, aligned)
+// Pretty-printed AQL (multi-line, aligned)
 // ═════════════════════════════════════════════════════════════════════════════
 
-export function conditionToDslPretty(cond: Condition): string {
+export function conditionToAqlPretty(cond: Condition): string {
   const fmt = (c: Condition, depth: number): string[] => {
     if (c.type === 'filter') {
-      return [conditionToDsl(c)];
+      return [conditionToAql(c)];
     }
     const childLineGroups = c.children
       .map((ch) => fmt(ch, depth + 1))

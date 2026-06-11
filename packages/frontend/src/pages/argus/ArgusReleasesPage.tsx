@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useEffect,
   useCallback,
@@ -50,11 +50,11 @@ import ArgusFilterBar, {
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import {
-  QueryDSLEditor,
+  QueryAQLEditor,
   parse,
   RELEASES_CONFIG,
-  type QueryDSLEditorHandle,
-} from '@/components/argus/query-dsl';
+  type QueryAQLEditorHandle,
+} from '@/components/argus/query-aql';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
@@ -137,7 +137,7 @@ const ArgusReleasesPage: React.FC = () => {
     defaultArgusFilterState(urlState.period)
   );
   const [sortAnchor, setSortAnchor] = useState<null | HTMLElement>(null);
-  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
+  const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
 
   const sortOptions = useMemo(
     () => [
@@ -258,7 +258,7 @@ const ArgusReleasesPage: React.FC = () => {
   const filteredReleases = useMemo(() => {
     let result = [...releases];
 
-    // Search using DSL Query Parser
+    // Search using AQL Query Parser
     if (searchTerm.trim()) {
       try {
         const { ast } = parse(searchTerm);
@@ -475,7 +475,7 @@ const ArgusReleasesPage: React.FC = () => {
               sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}
             >
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <QueryDSLEditor
+                <QueryAQLEditor
                   ref={dslEditorRef}
                   config={RELEASES_CONFIG}
                   initialQuery={searchTerm}

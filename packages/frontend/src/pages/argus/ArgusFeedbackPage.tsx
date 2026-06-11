@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useEffect,
   useCallback,
@@ -71,10 +71,10 @@ import {
 } from './components/FeedbackDialogs';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
 import {
-  QueryDSLEditor,
+  QueryAQLEditor,
   FEEDBACK_CONFIG,
-  type QueryDSLEditorHandle,
-} from '@/components/argus/query-dsl';
+  type QueryAQLEditorHandle,
+} from '@/components/argus/query-aql';
 import {
   PageContainer,
   TotalCountChip,
@@ -216,7 +216,7 @@ const ArgusFeedbackPage: React.FC = () => {
     }));
   }, [urlState.period]);
 
-  // Lazy-loading callback for QueryDSLEditor
+  // Lazy-loading callback for QueryAQLEditor
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
@@ -242,7 +242,7 @@ const ArgusFeedbackPage: React.FC = () => {
   );
 
   const [search, setSearch] = useState('');
-  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
+  const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
   const statusTab = urlState.status as FeedbackStatusTab;
   const sortOrder = urlState.sort;
 
@@ -916,7 +916,7 @@ const ArgusFeedbackPage: React.FC = () => {
                 }}
               />
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <QueryDSLEditor
+                <QueryAQLEditor
                   ref={dslEditorRef}
                   config={FEEDBACK_CONFIG}
                   initialQuery={search}

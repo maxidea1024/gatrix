@@ -1,4 +1,4 @@
-import { Expression } from '@/components/argus/query-dsl';
+﻿import { Expression } from '@/components/argus/query-aql';
 import { ArgusRelease } from '@/services/argusService';
 
 /**

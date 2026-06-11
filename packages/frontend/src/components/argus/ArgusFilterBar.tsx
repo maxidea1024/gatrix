@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   IconButton,
@@ -182,7 +182,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         />
       )}
 
-      {/* Extra controls (e.g., query DSL editor) — flex:1 fills remaining space */}
+      {/* Extra controls (e.g., query AQL editor) — flex:1 fills remaining space */}
       {extraControls}
 
       {/* Date Range Picker — always rightmost */}

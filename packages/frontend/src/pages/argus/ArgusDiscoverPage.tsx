@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useCallback,
   useEffect,
@@ -57,10 +57,10 @@ import ArgusFilterBar, {
 } from '@/components/argus/ArgusFilterBar';
 import DiscoverFacetMap from '@/components/argus/DiscoverFacetMap';
 import {
-  QueryDSLEditor,
+  QueryAQLEditor,
   DISCOVER_CONFIG,
-  type QueryDSLEditorHandle,
-} from '@/components/argus/query-dsl';
+  type QueryAQLEditorHandle,
+} from '@/components/argus/query-aql';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
@@ -145,7 +145,7 @@ const ArgusDiscoverPage: React.FC = () => {
 
   const [conditions, setConditions] = useState<string>(urlState.q || '');
   const lastSubmittedConditionsRef = useRef<string>(urlState.q || '');
-  const dslEditorRef = useRef<QueryDSLEditorHandle>(null);
+  const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
 
   useEffect(() => {
     const urlVal = urlState.q || '';
@@ -587,7 +587,7 @@ const ArgusDiscoverPage: React.FC = () => {
       />
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <QueryDSLEditor
+        <QueryAQLEditor
           ref={dslEditorRef}
           config={DISCOVER_CONFIG}
           initialQuery={conditions}

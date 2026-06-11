@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // TokenEditDropdown — Unified editing dropdown for filter token parts
 // Handles field, operator, and value editing via Popover
 // Extracted from FilterTokenChip's FieldMenu, OperatorMenu, ValueEditor
@@ -355,7 +355,7 @@ function FieldMenu({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
-          placeholder={t('dsl.chip.filterFields', 'Filter fields...')}
+          placeholder={t('aql.chip.filterFields', 'Filter fields...')}
           sx={{
             fontSize: '0.8rem',
             '& input': { py: 0.25 },
@@ -740,7 +740,7 @@ function HasFieldSelector({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
-          placeholder={t('dsl.chip.filterFields', 'Filter fields...')}
+          placeholder={t('aql.chip.filterFields', 'Filter fields...')}
           sx={{
             fontSize: '0.8rem',
             '& input': { py: 0.25 },

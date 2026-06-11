@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // DatetimeValueEditor — Datetime field value editor with presets + DateTimePicker
 // Used in TokenEditDropdown for datetime-type fields (e.g., timestamp)
 // ============================================================================
@@ -35,10 +35,10 @@ interface TimePreset {
 }
 
 export const RELATIVE_PRESETS: TimePreset[] = [
-  { labelKey: 'dsl.datetime.preset.1h', value: 'now-1h' },
-  { labelKey: 'dsl.datetime.preset.24h', value: 'now-24h' },
-  { labelKey: 'dsl.datetime.preset.7d', value: 'now-7d' },
-  { labelKey: 'dsl.datetime.preset.30d', value: 'now-30d' },
+  { labelKey: 'aql.datetime.preset.1h', value: 'now-1h' },
+  { labelKey: 'aql.datetime.preset.24h', value: 'now-24h' },
+  { labelKey: 'aql.datetime.preset.7d', value: 'now-7d' },
+  { labelKey: 'aql.datetime.preset.30d', value: 'now-30d' },
 ];
 
 /** Number of quick presets (for keyboard navigation) */
@@ -185,7 +185,7 @@ export default function DatetimeValueEditor({
       {/* Quick Presets */}
       <Box sx={sectionHeaderSx}>
         <AccessTimeIcon sx={{ fontSize: 14 }} />
-        {t('dsl.datetime.quickSelect', 'Quick Select')}
+        {t('aql.datetime.quickSelect', 'Quick Select')}
       </Box>
       <List dense disablePadding sx={{ px: 0.5 }}>
         {RELATIVE_PRESETS.map((preset, idx) => (
@@ -234,8 +234,8 @@ export default function DatetimeValueEditor({
       <Box sx={sectionHeaderSx}>
         <CalendarMonthIcon sx={{ fontSize: 14 }} />
         {isBetween
-          ? t('dsl.datetime.dateRange', 'Date Range')
-          : t('dsl.datetime.pickDateTime', 'Pick Date & Time')}
+          ? t('aql.datetime.dateRange', 'Date Range')
+          : t('aql.datetime.pickDateTime', 'Pick Date & Time')}
       </Box>
       <Box ref={pickerContainerRef} sx={{ px: 1.5, pb: 1.5 }}>
         <LocalizationProvider
@@ -245,8 +245,8 @@ export default function DatetimeValueEditor({
           <DateTimePicker
             label={
               isBetween
-                ? t('dsl.datetime.from', 'From')
-                : t('dsl.datetime.pickDateTime', 'Date & Time')
+                ? t('aql.datetime.from', 'From')
+                : t('aql.datetime.pickDateTime', 'Date & Time')
             }
             value={fromValue}
             onChange={(d) => handleDateChange(d, 'from')}
@@ -281,7 +281,7 @@ export default function DatetimeValueEditor({
           />
           {isBetween && (
             <DateTimePicker
-              label={t('dsl.datetime.to', 'To')}
+              label={t('aql.datetime.to', 'To')}
               value={toValue}
               onChange={(d) => handleDateChange(d, 'to')}
               timezone={storedTz}

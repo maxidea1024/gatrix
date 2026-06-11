@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // FilterTokenGroup — Renders a single filter as 3 independent inline tokens
 // Sentry-style: [field] [operator] [value]  each independently editable
 // ============================================================================
@@ -458,7 +458,7 @@ export const FilterTokenGroup = forwardRef<
                       fontSize: '0.6rem',
                     }}
                   >
-                    {t('dsl.chip.valueCount', '{{count}} values', {
+                    {t('aql.chip.valueCount', '{{count}} values', {
                       count: chip.values.length,
                     })}
                   </Box>

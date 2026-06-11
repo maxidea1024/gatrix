@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useCallback,
   useEffect,
@@ -38,7 +38,7 @@ import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
 import ExploreActions from '@/components/argus/ExploreActions';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
-import { TRACES_CONFIG } from '@/components/argus/query-dsl/fields';
+import { TRACES_CONFIG } from '@/components/argus/query-aql/fields';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useNavigate, useLocation } from 'react-router-dom';

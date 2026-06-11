@@ -1,5 +1,5 @@
-// ============================================================================
-// Query DSL Engine — Recursive Descent Parser
+﻿// ============================================================================
+// AQL (Argus Query Language) Engine — Recursive Descent Parser
 // Spec: Section 7
 // ============================================================================
 //
@@ -516,8 +516,8 @@ class Parser {
     const typeKey = type.replace(/([A-Z])/g, (m) => m.toLowerCase());
     this.errors.push({
       type,
-      messageKey: `dsl.error.${camelToSnake(type)}`,
-      hintKey: `dsl.hint.${camelToSnake(type)}`,
+      messageKey: `AQL.error.${camelToSnake(type)}`,
+      hintKey: `AQL.hint.${camelToSnake(type)}`,
       params,
       start,
       end,
