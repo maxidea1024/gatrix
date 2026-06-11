@@ -1,4 +1,4 @@
-﻿/**
+/**
  * QuerySuggestionDropdown — Sentry-style autocomplete dropdown with category tabs.
  *
  * Features:
@@ -145,6 +145,12 @@ const CATEGORY_BADGES: Record<string, CategoryBadge> = {
     color: '#4db6ac',
     bg: 'rgba(77,182,172,0.12)',
     bgLight: 'rgba(0,121,107,0.10)',
+  },
+  aggregate: {
+    label: 'Σ',
+    color: '#4dd0e1',
+    bg: 'rgba(0,188,212,0.12)',
+    bgLight: 'rgba(0,151,167,0.10)',
   },
 };
 

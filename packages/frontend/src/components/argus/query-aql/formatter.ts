@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Formatter (Pretty Print + Syntax Highlighting)
 // Spec: Section 16
 // ============================================================================
@@ -116,6 +116,15 @@ function formatNode(node: Expression): string {
         : `not ${formatNode(node.expression)}`;
     case 'Group':
       return `(${formatNode(node.expression)})`;
+    case 'AggregateFilter': {
+      const argsStr = node.args.length > 0 ? node.args.join(', ') : '';
+      const funcCall = `${node.funcName}(${argsStr})`;
+      if (!node.value && node.value !== 0) return funcCall;
+      if (node.operator === '=') {
+        return `${funcCall}:${formatValue(node.value)}`;
+      }
+      return `${funcCall}:${node.operator}${formatValue(node.value)}`;
+    }
     case 'Partial':
       return node.raw;
     default:

@@ -173,7 +173,9 @@ export type ValidationErrorType =
   | 'INCOMPLETE_FUNCTION'
   | 'UNKNOWN_FIELD'
   | 'INVALID_OPERATOR'
-  | 'INVALID_VALUE_TYPE';
+  | 'INVALID_VALUE_TYPE'
+  | 'UNKNOWN_AGGREGATE'
+  | 'INVALID_AGGREGATE_ARGS';
 
 export interface ValidationError {
   type: ValidationErrorType;

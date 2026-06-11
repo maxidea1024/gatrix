@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Semantic Validator
 // Spec: Section 12
 // ============================================================================
@@ -38,6 +38,9 @@ function validateNode(
   switch (node.type) {
     case 'Filter':
       validateFilter(node, config, errors);
+      break;
+    case 'AggregateFilter':
+      validateAggregateFilter(node, config, errors);
       break;
     case 'FreeText':
       break;
@@ -148,5 +151,49 @@ function validateValueType(
       }
       break;
     // string and datetime accept any value
+  }
+}
+
+function validateAggregateFilter(
+  node: Expression & { type: 'AggregateFilter' },
+  config: DomainConfig,
+  errors: ValidationError[]
+): void {
+  const aggregates = config.aggregates ?? [];
+  const funcNameLower = node.funcName.toLowerCase();
+  const aggDef = aggregates.find((a) => a.name.toLowerCase() === funcNameLower);
+
+  if (!aggDef) {
+    errors.push({
+      type: 'UNKNOWN_AGGREGATE',
+      messageKey: 'aql.error.unknownAggregate',
+      hintKey: 'aql.hint.unknownAggregate',
+      params: { func: node.funcName },
+      field: node.funcName,
+      start: node.start,
+      end: node.end,
+      severity: 'error',
+    });
+    return;
+  }
+
+  // Check argument count
+  const expectedArgCount = aggDef.args.length;
+  const actualArgCount = node.args.length;
+  if (expectedArgCount !== actualArgCount) {
+    errors.push({
+      type: 'INVALID_AGGREGATE_ARGS',
+      messageKey: 'aql.error.invalidAggregateArgs',
+      hintKey: 'aql.hint.invalidAggregateArgs',
+      params: {
+        func: node.funcName,
+        expected: String(expectedArgCount),
+        actual: String(actualArgCount),
+      },
+      field: node.funcName,
+      start: node.start,
+      end: node.end,
+      severity: 'error',
+    });
   }
 }
