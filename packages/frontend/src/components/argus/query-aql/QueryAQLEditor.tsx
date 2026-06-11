@@ -1476,14 +1476,21 @@ export const QueryAQLEditor = forwardRef<
             }
           }
           const newChipId = `chip_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          // Map has/has not labels to internal field keys
+          let chipField = item.label;
+          if (item.label === 'has not' || item.insertText?.startsWith('!has:')) {
+            chipField = '!has';
+          } else if (item.label === 'has' || item.insertText?.startsWith('has:')) {
+            chipField = 'has';
+          }
           // Datetime fields default to 'after' operator
-          const selectedField = getFieldByKey(item.label, config);
+          const selectedField = getFieldByKey(chipField, config);
           const defaultOp = selectedField?.type === 'datetime' ? 'after' : '=';
           insertChipsAtCursor([
             {
               id: newChipId,
               type: 'filter' as const,
-              field: item.label,
+              field: chipField,
               operator: defaultOp,
               composingPart: 'value' as const,
             },
