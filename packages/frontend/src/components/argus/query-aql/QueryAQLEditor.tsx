@@ -1691,7 +1691,8 @@ export const QueryAQLEditor = forwardRef<
           token &&
           (token.part === 'field' ||
             token.part === 'operator' ||
-            token.part === 'value')
+            token.part === 'value' ||
+            token.part === 'aggregateArg')
         ) {
           const groupHandle = tokenGroupRefs.current.get(token.chipId);
           const el = groupHandle?.getPartEl(token.part);
