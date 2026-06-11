@@ -206,66 +206,66 @@ const PerformanceTransactionTable: React.FC<
       )}
 
       {/* Transaction Table */}
-      <Paper
-        elevation={0}
-        sx={{
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: 2,
-          overflow: 'hidden',
-        }}
-      >
-        {/* Table Header */}
-        <Box
+      {transactions.length === 0 ? (
+        <EmptyPlaceholder
+          icon={<SpeedIcon sx={{ fontSize: 48 }} />}
+          message={t('argus.performance.noTransactions')}
+          minHeight={250}
+        />
+      ) : (
+        <Paper
+          elevation={0}
           sx={{
-            display: 'grid',
-            gridTemplateColumns: '2fr repeat(5, 1fr)',
-            gap: 0,
-            px: 0,
-            py: 0,
-            backgroundColor: isDark
-              ? 'rgba(255,255,255,0.02)'
-              : 'rgba(0,0,0,0.02)',
-            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            borderRadius: 2,
+            overflow: 'hidden',
           }}
         >
-          <Typography
-            variant="caption"
-            fontWeight={600}
-            sx={{ px: 2, py: 1.2 }}
+          {/* Table Header */}
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '2fr repeat(5, 1fr)',
+              gap: 0,
+              px: 0,
+              py: 0,
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.02)'
+                : 'rgba(0,0,0,0.02)',
+              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            }}
           >
-            {t('argus.performance.transactionName')}
-          </Typography>
-          {[
-            t('argus.performance.count'),
-            t('argus.performance.avgDuration'),
-            'P50',
-            'P95',
-            t('argus.performance.errorRate'),
-          ].map((header) => (
             <Typography
-              key={header}
               variant="caption"
               fontWeight={600}
-              sx={{
-                textAlign: 'right',
-                px: 2,
-                py: 1.2,
-                borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              }}
+              sx={{ px: 2, py: 1.2 }}
             >
-              {header}
+              {t('argus.performance.transactionName')}
             </Typography>
-          ))}
-        </Box>
+            {[
+              t('argus.performance.count'),
+              t('argus.performance.avgDuration'),
+              'P50',
+              'P95',
+              t('argus.performance.errorRate'),
+            ].map((header) => (
+              <Typography
+                key={header}
+                variant="caption"
+                fontWeight={600}
+                sx={{
+                  textAlign: 'right',
+                  px: 2,
+                  py: 1.2,
+                  borderLeft: `1px dashed ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                }}
+              >
+                {header}
+              </Typography>
+            ))}
+          </Box>
 
-        {transactions.length === 0 ? (
-          <EmptyPlaceholder
-            icon={<SpeedIcon sx={{ fontSize: 48 }} />}
-            message={t('argus.performance.noTransactions')}
-            minHeight={250}
-          />
-        ) : (
-          transactions
+          {transactions
             .slice(
               perfPage * perfRowsPerPage,
               perfPage * perfRowsPerPage + perfRowsPerPage
@@ -522,9 +522,9 @@ const PerformanceTransactionTable: React.FC<
                   </Box>
                 </Box>
               );
-            })
-        )}
-      </Paper>
+            })}
+        </Paper>
+      )}
 
       {/* Pagination */}
       {transactions.length > 0 && (

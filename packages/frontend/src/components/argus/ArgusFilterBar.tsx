@@ -185,6 +185,8 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
       {/* Extra controls (e.g., query AQL editor) — flex:1 fills remaining space */}
       {extraControls}
 
+      <Box sx={{ flexGrow: 1 }} />
+
       {/* Date Range Picker — always rightmost */}
       <DateRangeSelector
         value={value.dateRange}
