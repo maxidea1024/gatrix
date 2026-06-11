@@ -1,4 +1,4 @@
-﻿/**
+/**
  * QueryAQLEditor — Sentry-style tokenized grid editor.
  *
  * Each filter is rendered as a clickable chip: [field] [op] [value] [×]
@@ -182,10 +182,16 @@ export const QueryAQLEditor = forwardRef<
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
+  // ─── Aggregate function names set (for parser/chip disambiguation) ──
+  const aggregateNames = useMemo(
+    () => new Set(config.aggregates?.map((a) => a.name.toLowerCase()) ?? []),
+    [config.aggregates]
+  );
+
   // ─── State ───────────────────────────────────────────────────────────
 
   const { chips, setChips, undo, redo, resetTo } = useChipHistory(
-    queryToChips(initialQuery)
+    () => queryToChips(initialQuery, aggregateNames)
   );
   const [inputValue, setInputValue] = useState('');
   const [cursorOffset, setCursorOffset] = useState(0);
@@ -243,7 +249,7 @@ export const QueryAQLEditor = forwardRef<
       // Suppress onChange to prevent it from sending empty query to URL
       // before resetTo commits the new chips
       suppressOnChangeRef.current = true;
-      resetTo(queryToChips(query));
+      resetTo(queryToChips(query, aggregateNames));
       setInputValue('');
       setShowDropdown(false);
       // Track that this update was initiated internally so the sync effect won't re-reset
@@ -254,7 +260,7 @@ export const QueryAQLEditor = forwardRef<
         onSearch(query);
       });
     },
-    [resetTo, onSearch]
+    [resetTo, onSearch, aggregateNames]
   );
 
   const handleRemoveRecent = useCallback(
@@ -269,9 +275,9 @@ export const QueryAQLEditor = forwardRef<
   const prevInitialQuery = useRef(initialQuery);
   useEffect(() => {
     if (initialQuery !== prevInitialQuery.current) {
-      const standardInitial = chipsToQuery(queryToChips(initialQuery));
+      const standardInitial = chipsToQuery(queryToChips(initialQuery, aggregateNames));
       const standardLastInternal = lastInternalQueryRef.current
-        ? chipsToQuery(queryToChips(lastInternalQueryRef.current))
+        ? chipsToQuery(queryToChips(lastInternalQueryRef.current, aggregateNames))
         : null;
       const isInternalCatchUp = standardInitial === standardLastInternal;
 
@@ -279,11 +285,11 @@ export const QueryAQLEditor = forwardRef<
       if (isInternalCatchUp) {
         lastInternalQueryRef.current = null;
       } else {
-        resetTo(queryToChips(initialQuery));
+        resetTo(queryToChips(initialQuery, aggregateNames));
         setInputValue('');
       }
     }
-  }, [initialQuery, resetTo]);
+  }, [initialQuery, resetTo, aggregateNames]);
 
   const {
     getFieldValues,
@@ -1170,7 +1176,7 @@ export const QueryAQLEditor = forwardRef<
         setInputValue('');
       } else {
         // Try to parse as filter, or fall through as free text
-        const parsed = queryToChips(text);
+        const parsed = queryToChips(text, aggregateNames);
         if (parsed.length > 0) {
           insertChipsAtCursor(parsed);
           setInputValue('');
@@ -1362,7 +1368,7 @@ export const QueryAQLEditor = forwardRef<
           }
 
           // Value → try to create filter chips
-          const completedChips = queryToChips(finalInput);
+          const completedChips = queryToChips(finalInput, aggregateNames);
           if (completedChips.length > 0) {
             insertChipsAtCursor(completedChips);
             setInputValue('');
@@ -1404,7 +1410,7 @@ export const QueryAQLEditor = forwardRef<
         if (item.category === 'field' && !inputValue.includes(':')) {
           // HAS suggestions (has:"fieldName") → immediately create complete chip
           if (item.fieldCategory === 'has' && item.insertText) {
-            const completedChips = queryToChips(item.insertText);
+            const completedChips = queryToChips(item.insertText, aggregateNames);
             if (completedChips.length > 0) {
               insertChipsAtCursor(completedChips);
               setInputValue('');
@@ -2405,7 +2411,7 @@ export const QueryAQLEditor = forwardRef<
           fetchFieldValues={fetchFieldValues}
           onApply={(q) => {
             // Apply the built query: reset chips from query, trigger search
-            resetTo(queryToChips(q));
+            resetTo(queryToChips(q, aggregateNames));
             setInputValue('');
             setShowDropdown(false);
             setBuilderOpen(false);

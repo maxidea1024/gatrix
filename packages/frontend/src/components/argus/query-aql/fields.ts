@@ -1,9 +1,9 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Field Registry & Domain Configs
 // Spec: Section 5
 // ============================================================================
 
-import type { QueryField, DomainConfig } from './types';
+import type { QueryField, DomainConfig, AggregateFunctionDef } from './types';
 
 // ─── Master Field Registry ───────────────────────────────────────────────────
 // All available fields. Each domain uses a subset via DomainConfig.
@@ -402,6 +402,120 @@ const SHARED_ALIASES: Record<string, string> = {
   issueid: 'issue_id',
 };
 
+// ─── Aggregate Function Definitions ─────────────────────────────────────────────
+
+const AGG_COUNT: AggregateFunctionDef = {
+  name: 'count',
+  label: 'aql.aggregate.count',
+  description: 'aql.aggregate.count.desc',
+  args: [],
+  returnType: 'number',
+};
+
+const AGG_AVG: AggregateFunctionDef = {
+  name: 'avg',
+  label: 'aql.aggregate.avg',
+  description: 'aql.aggregate.avg.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'number',
+};
+
+const AGG_SUM: AggregateFunctionDef = {
+  name: 'sum',
+  label: 'aql.aggregate.sum',
+  description: 'aql.aggregate.sum.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'number',
+};
+
+const AGG_MIN: AggregateFunctionDef = {
+  name: 'min',
+  label: 'aql.aggregate.min',
+  description: 'aql.aggregate.min.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'number',
+};
+
+const AGG_MAX: AggregateFunctionDef = {
+  name: 'max',
+  label: 'aql.aggregate.max',
+  description: 'aql.aggregate.max.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'number',
+};
+
+const AGG_UNIQ: AggregateFunctionDef = {
+  name: 'uniq',
+  label: 'aql.aggregate.uniq',
+  description: 'aql.aggregate.uniq.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'number',
+};
+
+const AGG_P50: AggregateFunctionDef = {
+  name: 'p50',
+  label: 'aql.aggregate.p50',
+  description: 'aql.aggregate.p50.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'duration',
+};
+
+const AGG_P75: AggregateFunctionDef = {
+  name: 'p75',
+  label: 'aql.aggregate.p75',
+  description: 'aql.aggregate.p75.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'duration',
+};
+
+const AGG_P95: AggregateFunctionDef = {
+  name: 'p95',
+  label: 'aql.aggregate.p95',
+  description: 'aql.aggregate.p95.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'duration',
+};
+
+const AGG_P99: AggregateFunctionDef = {
+  name: 'p99',
+  label: 'aql.aggregate.p99',
+  description: 'aql.aggregate.p99.desc',
+  args: [{ name: 'field', type: 'field', required: true }],
+  returnType: 'duration',
+};
+
+const AGG_FAILURE_RATE: AggregateFunctionDef = {
+  name: 'failure_rate',
+  label: 'aql.aggregate.failureRate',
+  description: 'aql.aggregate.failureRate.desc',
+  args: [],
+  returnType: 'percentage',
+};
+
+const AGG_APDEX: AggregateFunctionDef = {
+  name: 'apdex',
+  label: 'aql.aggregate.apdex',
+  description: 'aql.aggregate.apdex.desc',
+  args: [{ name: 'threshold', type: 'number', required: true }],
+  returnType: 'number',
+};
+
+const AGG_TPM: AggregateFunctionDef = {
+  name: 'tpm',
+  label: 'aql.aggregate.tpm',
+  description: 'aql.aggregate.tpm.desc',
+  args: [],
+  returnType: 'number',
+};
+
+const AGG_CRASH_FREE_RATE: AggregateFunctionDef = {
+  name: 'crash_free_rate',
+  label: 'aql.aggregate.crashFreeRate',
+  description: 'aql.aggregate.crashFreeRate.desc',
+  args: [],
+  returnType: 'percentage',
+};
+
 // ─── Domain Configs ──────────────────────────────────────────────────────────
 
 export const LOGS_CONFIG: DomainConfig = {
@@ -421,6 +535,7 @@ export const LOGS_CONFIG: DomainConfig = {
     'issue_id',
   ]),
   aliases: SHARED_ALIASES,
+  aggregates: [AGG_COUNT, AGG_AVG, AGG_SUM, AGG_MIN, AGG_MAX, AGG_UNIQ, AGG_P50, AGG_P75, AGG_P95, AGG_P99],
 };
 
 export const ISSUES_CONFIG: DomainConfig = {
@@ -459,6 +574,7 @@ export const ISSUES_CONFIG: DomainConfig = {
     }
   ),
   aliases: { severity: 'level' },
+  aggregates: [AGG_COUNT, AGG_UNIQ, AGG_AVG, AGG_MIN, AGG_MAX],
 };
 
 export const DISCOVER_CONFIG: DomainConfig = {
@@ -479,6 +595,11 @@ export const DISCOVER_CONFIG: DomainConfig = {
     }
   ),
   aliases: SHARED_ALIASES,
+  aggregates: [
+    AGG_COUNT, AGG_AVG, AGG_SUM, AGG_MIN, AGG_MAX, AGG_UNIQ,
+    AGG_P50, AGG_P75, AGG_P95, AGG_P99,
+    AGG_FAILURE_RATE, AGG_APDEX, AGG_TPM,
+  ],
 };
 
 export const FEEDBACK_CONFIG: DomainConfig = {
@@ -502,6 +623,7 @@ export const FEEDBACK_CONFIG: DomainConfig = {
     }
   ),
   freeTextField: 'feedback',
+  aggregates: [AGG_COUNT, AGG_UNIQ, AGG_AVG],
 };
 
 export const PERFORMANCE_CONFIG: DomainConfig = {
@@ -526,6 +648,10 @@ export const PERFORMANCE_CONFIG: DomainConfig = {
       },
     }
   ),
+  aggregates: [
+    AGG_COUNT, AGG_AVG, AGG_P50, AGG_P75, AGG_P95, AGG_P99,
+    AGG_FAILURE_RATE, AGG_APDEX, AGG_TPM,
+  ],
 };
 
 export const SESSIONS_CONFIG: DomainConfig = {
@@ -541,6 +667,7 @@ export const SESSIONS_CONFIG: DomainConfig = {
     'timestamp',
   ]),
   aliases: SHARED_ALIASES,
+  aggregates: [AGG_COUNT, AGG_UNIQ, AGG_AVG, AGG_CRASH_FREE_RATE],
 };
 
 export const RELEASES_CONFIG: DomainConfig = {
@@ -554,6 +681,7 @@ export const RELEASES_CONFIG: DomainConfig = {
     }
   ),
   aliases: SHARED_ALIASES,
+  aggregates: [AGG_COUNT, AGG_UNIQ],
 };
 
 export const TRACES_CONFIG: DomainConfig = {
@@ -586,6 +714,7 @@ export const TRACES_CONFIG: DomainConfig = {
     }
   ),
   aliases: SHARED_ALIASES,
+  aggregates: [AGG_COUNT, AGG_AVG, AGG_P50, AGG_P75, AGG_P95, AGG_P99, AGG_UNIQ],
 };
 
 // ─── Public API (DomainConfig-based) ─────────────────────────────────────────

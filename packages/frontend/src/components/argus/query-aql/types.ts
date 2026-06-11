@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Type Definitions
 // Spec: packages/argus/docs/AQL_ENGINE_SPEC.md
 // ============================================================================
@@ -60,6 +60,7 @@ export interface Token {
 
 export type Expression =
   | FilterExpression
+  | AggregateFilterExpression
   | FreeTextExpression
   | BinaryExpression
   | NotExpression
@@ -77,6 +78,26 @@ export interface FilterExpression {
   quoted: boolean;
   /** For function operators: the function name (contains, startsWith, etc.) */
   funcOp?: string;
+  start: number;
+  end: number;
+}
+
+/**
+ * Aggregate function filter: count():>100, avg(duration):>500, p95(response_time):>=1000
+ * Created when Parser detects FIELD+LPAREN where FIELD matches DomainConfig.aggregates.
+ */
+export interface AggregateFilterExpression {
+  type: 'AggregateFilter';
+  /** Function name: count, avg, p95, uniq, etc. */
+  funcName: string;
+  /** Function arguments: ['duration'], ['user_id'], [] (for count) */
+  args: string[];
+  /** Comparison operator after colon */
+  operator: QueryOperator;
+  /** Comparison value */
+  value: string | number | boolean;
+  /** Whether the value was a quoted string */
+  quoted: boolean;
   start: number;
   end: number;
 }
@@ -215,6 +236,24 @@ export interface QueryField {
 
 // ─── Domain Config ───────────────────────────────────────────────────────────
 
+/** Definition of an aggregate function available in a domain */
+export interface AggregateFunctionDef {
+  /** Function name (lowercase): count, avg, p95, uniq, etc. */
+  name: string;
+  /** i18n key for display label */
+  label: string;
+  /** i18n key for description */
+  description: string;
+  /** Function arguments definition */
+  args: {
+    name: string;
+    type: 'field' | 'number' | 'duration';
+    required: boolean;
+  }[];
+  /** Return type (determines valid comparison operators) */
+  returnType: 'number' | 'percentage' | 'duration';
+}
+
 export interface DomainConfig {
   /** Domain name (for logging/debugging and localStorage keys) */
   name: string;
@@ -224,6 +263,8 @@ export interface DomainConfig {
   aliases?: Record<string, string>;
   /** Free text default mapping field (default: 'message') */
   freeTextField?: string;
+  /** Aggregate functions available in this domain */
+  aggregates?: AggregateFunctionDef[];
 }
 
 // ─── Editor FSM ──────────────────────────────────────────────────────────────
@@ -266,7 +307,8 @@ export type SuggestionCategory =
   | 'operator'
   | 'value'
   | 'logical'
-  | 'paren';
+  | 'paren'
+  | 'aggregate';
 
 /** @deprecated Use SuggestionCategory instead */
 export type SuggestionType = SuggestionCategory;

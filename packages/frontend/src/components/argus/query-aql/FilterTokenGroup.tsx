@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // FilterTokenGroup — Renders a single filter as 3 independent inline tokens
 // Sentry-style: [field] [operator] [value]  each independently editable
 // ============================================================================
@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import { Box, Typography, IconButton, Tooltip, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import FunctionsIcon from '@mui/icons-material/Functions';
 import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
@@ -96,6 +97,7 @@ export const FilterTokenGroup = forwardRef<
   const fieldType = field?.type ?? 'string';
   const opLabel = getOpLabel(chip.operator ?? '=', fieldType);
   const isHasChip = chip.field === 'has' || chip.field === '!has';
+  const isAggregateChip = chip.type === 'aggregate';
 
   // IME composition tracking (Korean, Japanese, etc.)
   const [isIME, setIsIME] = useState(false);
@@ -258,11 +260,21 @@ export const FilterTokenGroup = forwardRef<
         mr: 1,
         my: '1px',
         maxWidth: '100%',
-        backgroundColor: isDark
-          ? 'rgba(255, 255, 255, 0.04)'
-          : 'rgba(0, 0, 0, 0.02)',
+        backgroundColor: isAggregateChip
+          ? isDark
+            ? 'rgba(0, 188, 212, 0.06)'
+            : 'rgba(0, 151, 167, 0.04)'
+          : isDark
+            ? 'rgba(255, 255, 255, 0.04)'
+            : 'rgba(0, 0, 0, 0.02)',
         border: `1px solid ${
-          isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'
+          isAggregateChip
+            ? isDark
+              ? 'rgba(0, 188, 212, 0.25)'
+              : 'rgba(0, 151, 167, 0.20)'
+            : isDark
+              ? 'rgba(255, 255, 255, 0.08)'
+              : 'rgba(0, 0, 0, 0.08)'
         }`,
         borderRadius: '6px',
         pl: 0.5,
@@ -270,17 +282,39 @@ export const FilterTokenGroup = forwardRef<
         py: 0,
       }}
     >
-      {/* Field token */}
-      <Box
-        ref={fieldRef}
-        component="span"
-        sx={tokenStyle('field')}
-        onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
-          onPartClick(chip.id, 'field', e.currentTarget)
-        }
-      >
-        {chip.field === '!has' ? 'has not' : chip.field}
-      </Box>
+      {/* Field token — or aggregate function name */}
+      {isAggregateChip ? (
+        <Box
+          ref={fieldRef}
+          component="span"
+          sx={{
+            ...tokenStyle('field'),
+            color: isDark ? '#4dd0e1' : '#00838f',
+            fontWeight: 600,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '2px',
+          }}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            onPartClick(chip.id, 'field', e.currentTarget)
+          }
+        >
+          <FunctionsIcon sx={{ fontSize: 13, opacity: 0.8 }} />
+          {chip.aggregateFunc}
+          ({chip.aggregateArgs?.join(', ') ?? ''})
+        </Box>
+      ) : (
+        <Box
+          ref={fieldRef}
+          component="span"
+          sx={tokenStyle('field')}
+          onClick={(e: React.MouseEvent<HTMLSpanElement>) =>
+            onPartClick(chip.id, 'field', e.currentTarget)
+          }
+        >
+          {chip.field === '!has' ? 'has not' : chip.field}
+        </Box>
+      )}
 
       {/* Operator token — hidden for has/!has */}
       {!isHasChip && (

@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Serializer (AST → Backend Query String)
 // Spec: Section 13
 // ============================================================================
@@ -31,6 +31,8 @@ function serializeNode(node: Expression): string {
   switch (node.type) {
     case 'Filter':
       return serializeFilter(node);
+    case 'AggregateFilter':
+      return serializeAggregateFilter(node);
     case 'FreeText':
       return serializeFreeText(node);
     case 'Binary':
@@ -44,6 +46,18 @@ function serializeNode(node: Expression): string {
     default:
       throw new Error(`Unknown node type: ${(node as Expression).type}`);
   }
+}
+
+function serializeAggregateFilter(
+  node: Expression & { type: 'AggregateFilter' }
+): string {
+  const argsStr = node.args.length > 0 ? node.args.join(',') : '';
+  const funcCall = `${node.funcName}(${argsStr})`;
+
+  if (node.operator === '=') {
+    return `${funcCall}:${formatValue(node.value)}`;
+  }
+  return `${funcCall}:${node.operator}${formatValue(node.value)}`;
 }
 
 function serializeFilter(node: Expression & { type: 'Filter' }): string {

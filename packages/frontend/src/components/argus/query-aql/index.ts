@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Barrel Exports
 // ============================================================================
 
@@ -45,6 +45,7 @@ export type {
   Token,
   Expression,
   FilterExpression,
+  AggregateFilterExpression,
   FreeTextExpression,
   BinaryExpression,
   NotExpression,
@@ -55,6 +56,7 @@ export type {
   QueryField,
   QueryOperator,
   DomainConfig,
+  AggregateFunctionDef,
   CursorContext,
   CursorContextType,
   SuggestionItem,

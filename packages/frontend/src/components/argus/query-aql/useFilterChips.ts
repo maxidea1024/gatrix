@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — FilterChip Data Model & Serialization
 // AST ↔ FilterChip[] conversion for tokenized grid editor
 // ============================================================================
@@ -14,7 +14,7 @@ import type {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-export type ChipType = 'filter' | 'logical' | 'paren';
+export type ChipType = 'filter' | 'logical' | 'paren' | 'aggregate';
 
 export interface FilterChip {
   /** Unique identifier for React key and editing reference */
@@ -38,6 +38,10 @@ export interface FilterChip {
   quoted?: boolean;
   /** Which part is currently being composed during step-by-step creation */
   composingPart?: 'operator' | 'value';
+  /** Aggregate function name (aggregate chip only) */
+  aggregateFunc?: string;
+  /** Aggregate function arguments (aggregate chip only) */
+  aggregateArgs?: string[];
 }
 
 let _chipIdCounter = 0;
@@ -65,6 +69,17 @@ function collectChips(node: Expression, chips: FilterChip[]): void {
   switch (node.type) {
     case 'Filter':
       chips.push(filterToChip(node));
+      break;
+    case 'AggregateFilter':
+      chips.push({
+        id: nextChipId(),
+        type: 'aggregate',
+        aggregateFunc: node.funcName,
+        aggregateArgs: node.args,
+        operator: node.operator,
+        value: String(node.value),
+        quoted: node.quoted,
+      });
       break;
     case 'FreeText':
       chips.push({
@@ -200,7 +215,24 @@ export function chipsToQuery(chips: FilterChip[]): string {
   return parts.join('').replace(/\s+/g, ' ').trim();
 }
 
+function aggregateChipToQueryPart(chip: FilterChip): string {
+  const func = chip.aggregateFunc ?? '';
+  const argsStr = chip.aggregateArgs?.join(', ') ?? '';
+  const funcCall = `${func}(${argsStr})`;
+  const operator = chip.operator ?? '=';
+  const value = chip.value ?? '';
+
+  if (!value) return funcCall;
+  if (operator !== '=') return `${funcCall}:${operator}${value}`;
+  return `${funcCall}:${value}`;
+}
+
 export function chipToQueryPart(chip: FilterChip): string {
+  // Aggregate chip: count():>100, avg(duration):>500
+  if (chip.type === 'aggregate') {
+    return aggregateChipToQueryPart(chip);
+  }
+
   // Graceful fallback if type is filter but fields are missing
   const field = chip.field ?? '';
   const operator = chip.operator ?? '=';
@@ -303,7 +335,7 @@ const VALUE_TYPES = new Set([
  * Uses token-based reconstruction for perfect roundtrip fidelity.
  * Each token maps directly to a chip — parens/AND/OR are never auto-paired.
  */
-export function queryToChips(query: string): FilterChip[] {
+export function queryToChips(query: string, aggregateNames?: Set<string>): FilterChip[] {
   if (!query.trim()) return [];
   const tokens = tokenize(query);
   const chips: FilterChip[] = [];
@@ -340,6 +372,64 @@ export function queryToChips(query: string): FilterChip[] {
 
   while (tok().type !== TokenType.EOF) {
     const t = tok();
+
+    // ── Aggregate function: count():>100, avg(duration):>500 ──
+    if (
+      t.type === TokenType.FIELD &&
+      tok(1)?.type === TokenType.LPAREN &&
+      aggregateNames?.has(t.value.toLowerCase())
+    ) {
+      const funcName = t.value;
+      advance(); // skip func name
+      advance(); // skip LPAREN
+
+      // Parse args until RPAREN
+      const args: string[] = [];
+      while (
+        tok().type !== TokenType.RPAREN &&
+        tok().type !== TokenType.EOF
+      ) {
+        if (tok().type === TokenType.COMMA) {
+          advance();
+          continue;
+        }
+        args.push(tok().value);
+        advance();
+      }
+      if (tok().type === TokenType.RPAREN) advance(); // skip RPAREN
+
+      // Parse :operator value
+      let operator: QueryOperator | string = '=';
+      let value = '';
+      let quoted = false;
+
+      if (tok().type === TokenType.COLON) {
+        advance(); // skip COLON
+
+        if (COMPARE_OPS.has(tok().type)) {
+          operator = tok().value;
+          advance();
+        }
+
+        const valTok = tok();
+        if (VALUE_TYPES.has(valTok.type)) {
+          value = valTok.value;
+          quoted = query[valTok.start] === '"';
+          advance();
+        }
+      }
+
+      chips.push({
+        id: nextChipId(),
+        type: 'aggregate',
+        aggregateFunc: funcName,
+        aggregateArgs: args,
+        operator,
+        value,
+        quoted,
+      });
+      continue;
+    }
 
     // ── !has:field pattern → !has filter chip ──
     if (

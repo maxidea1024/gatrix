@@ -1,18 +1,19 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Recursive Descent Parser
 // Spec: Section 7
 // ============================================================================
 //
 // Grammar (from EBNF):
-//   Query         = Expression | ε
-//   Expression    = OrExpr
-//   OrExpr        = AndExpr ( OR AndExpr )*
-//   AndExpr       = UnaryExpr ( AND UnaryExpr )*
-//   UnaryExpr     = (NOT | BANG) UnaryExpr | Primary
-//   Primary       = LPAREN Expression RPAREN | Filter | FreeText
-//   Filter        = FIELD COLON ValueExpr
-//   FreeText      = QuotedString | UnquotedString
-//   ValueExpr     = CompareOp Value | FuncOp LPAREN ArgList RPAREN | Value
+//   Query           = Expression | ε
+//   Expression      = OrExpr
+//   OrExpr          = AndExpr ( OR AndExpr )*
+//   AndExpr         = UnaryExpr ( AND UnaryExpr )*
+//   UnaryExpr       = (NOT | BANG) UnaryExpr | Primary
+//   Primary         = AggregateFilter | LPAREN Expression RPAREN | Filter | FreeText
+//   AggregateFilter = FIELD LPAREN ArgList? RPAREN COLON ValueExpr
+//   Filter          = FIELD COLON ValueExpr
+//   FreeText        = QuotedString | UnquotedString
+//   ValueExpr       = CompareOp Value | FuncOp LPAREN ArgList RPAREN | Value
 // ============================================================================
 
 import { tokenize } from './lexer';
@@ -21,6 +22,7 @@ import type {
   Token,
   Expression,
   FilterExpression,
+  AggregateFilterExpression,
   FreeTextExpression,
   BinaryExpression,
   NotExpression,
@@ -33,9 +35,9 @@ import type {
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
-export function parse(input: string): ParseResult {
+export function parse(input: string, aggregateNames?: Set<string>): ParseResult {
   const tokens = tokenize(input);
-  const parser = new Parser(tokens, input);
+  const parser = new Parser(tokens, input, aggregateNames);
   return parser.parse();
 }
 
@@ -64,12 +66,14 @@ const FUNC_TOKEN_TO_OP: Partial<Record<TokenType, QueryOperator>> = {
 class Parser {
   private readonly tokens: Token[];
   private readonly input: string;
+  private readonly aggregateNames: Set<string>;
   private pos: number = 0;
   private errors: ValidationError[] = [];
 
-  constructor(tokens: Token[], input: string) {
+  constructor(tokens: Token[], input: string, aggregateNames?: Set<string>) {
     this.tokens = tokens;
     this.input = input;
+    this.aggregateNames = aggregateNames ?? new Set();
   }
 
   parse(): ParseResult {
@@ -213,6 +217,16 @@ class Parser {
   private parsePrimary(): Expression {
     const tok = this.current();
 
+    // Aggregate function: count():>100, avg(duration):>500
+    // Must check BEFORE group expression since both start with FIELD+LPAREN
+    if (
+      tok.type === TokenType.FIELD &&
+      this.peek()?.type === TokenType.LPAREN &&
+      this.aggregateNames.has(tok.value.toLowerCase())
+    ) {
+      return this.parseAggregateFilter();
+    }
+
     // Grouped expression: ( ... )
     if (tok.type === TokenType.LPAREN) {
       this.advance(); // consume (
@@ -272,6 +286,106 @@ class Parser {
     });
     this.advance();
     return this.makePartial(tok.start, tok.end);
+  }
+
+  private parseAggregateFilter(): AggregateFilterExpression {
+    const funcToken = this.current();
+    const funcName = funcToken.value;
+    this.advance(); // consume function name (FIELD)
+    this.advance(); // consume LPAREN
+
+    // Parse args until RPAREN
+    const args: string[] = [];
+    while (
+      this.current().type !== TokenType.RPAREN &&
+      this.current().type !== TokenType.EOF
+    ) {
+      const argTok = this.current();
+      if (argTok.type === TokenType.COMMA) {
+        this.advance(); // skip comma
+        continue;
+      }
+      args.push(argTok.value);
+      this.advance();
+    }
+
+    let end = funcToken.end;
+    if (this.current().type === TokenType.RPAREN) {
+      end = this.current().end;
+      this.advance(); // consume RPAREN
+    } else {
+      this.addError('UNCLOSED_PAREN', funcToken.start, end, {});
+    }
+
+    // Expect COLON for comparison: count():>100
+    if (this.current().type !== TokenType.COLON) {
+      // Aggregate without comparison: count() — partial (no colon/value)
+      return {
+        type: 'AggregateFilter',
+        funcName,
+        args,
+        operator: '=',
+        value: '',
+        quoted: false,
+        start: funcToken.start,
+        end,
+      };
+    }
+    this.advance(); // consume COLON
+
+    // Parse comparison operator (optional) and value
+    const opTok = this.current();
+    const compareOp = COMPARE_TOKEN_TO_OP[opTok.type];
+    let operator: QueryOperator = '=';
+
+    if (compareOp) {
+      operator = compareOp;
+      this.advance(); // consume comparison operator
+    }
+
+    // Parse value
+    const valTok = this.current();
+    let value: string | number | boolean = '';
+    let quoted = false;
+
+    if (valTok.type === TokenType.NUMBER) {
+      value = parseFloat(valTok.value);
+      this.advance();
+    } else if (valTok.type === TokenType.STRING) {
+      const rawChar = this.input[valTok.start];
+      quoted = rawChar === '"';
+      value = valTok.value;
+      this.advance();
+    } else if (valTok.type === TokenType.BOOLEAN) {
+      value = valTok.value === 'true';
+      this.advance();
+    } else if (
+      valTok.type === TokenType.FIELD
+    ) {
+      // Unquoted string value
+      value = valTok.value;
+      this.advance();
+    } else {
+      // No value: count():> (incomplete)
+      this.addError('INCOMPLETE_FILTER', funcToken.start, opTok.end, {
+        field: `${funcName}()`,
+      });
+    }
+
+    const finalEnd = this.pos > 0
+      ? this.tokens[this.pos - 1].end
+      : end;
+
+    return {
+      type: 'AggregateFilter',
+      funcName,
+      args,
+      operator,
+      value,
+      quoted,
+      start: funcToken.start,
+      end: finalEnd,
+    };
   }
 
   private parseFilter(): FilterExpression {
