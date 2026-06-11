@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Suggestion Engine
 // Spec: Section 10, 11
 // ============================================================================
@@ -105,7 +105,7 @@ export function applyCompletion(
  * value/logical → close.
  */
 export function shouldKeepDropdownOpen(item: SuggestionItem): boolean {
-  return item.category === 'field' || item.category === 'operator';
+  return item.category === 'field' || item.category === 'operator' || item.category === 'aggregate';
 }
 
 // ─── Suggestion generators ───────────────────────────────────────────────────
@@ -173,6 +173,22 @@ function getFieldSuggestions(
   const hasFilterChip = chips?.some(
     (c) => c.type === 'filter' || (c.type === 'paren' && c.label === ')')
   );
+
+  // ── Aggregate function suggestions ──
+  if (config.aggregates && config.aggregates.length > 0) {
+    for (const agg of config.aggregates) {
+      if (prefix === '' || agg.name.toLowerCase().startsWith(prefix)) {
+        const hasArgs = agg.args.length > 0;
+        results.push({
+          label: hasArgs ? `${agg.name}(field)` : `${agg.name}()`,
+          insertText: hasArgs ? `${agg.name}(` : `${agg.name}():`,
+          category: 'aggregate',
+          description: agg.description,
+          fieldCategory: 'aggregate',
+        });
+      }
+    }
+  }
 
   // ── has / !has existence operators ──
   // Show in All + Logic tabs — push to appear at the bottom (after field list)
