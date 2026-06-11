@@ -253,6 +253,16 @@ export function conditionToSql(cond: Condition): string {
   const esc = (s: string) => `'${s.replace(/'/g, "''")}'`;
 
   if (cond.type === 'filter') {
+    // Aggregate condition → count() > 100, avg(duration) > 500
+    if (cond.aggregateFunc) {
+      const argsStr = cond.aggregateArgs?.join(', ') ?? '';
+      const funcCall = `${cond.aggregateFunc}(${argsStr})`;
+      if (!cond.value) return '';
+      const op = cond.operator || '>';
+      const expr = `${funcCall} ${op} ${cond.value}`;
+      return cond.negated ? `NOT (${expr})` : expr;
+    }
+
     if (
       !cond.field ||
       (!cond.value && cond.field !== 'has' && cond.field !== '!has')

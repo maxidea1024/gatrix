@@ -160,6 +160,12 @@ const CATEGORY_BADGES: Record<
     bg: 'rgba(77,182,172,0.12)',
     bgLight: 'rgba(0,121,107,0.10)',
   },
+  aggregate: {
+    label: 'Σ',
+    color: '#4dd0e1',
+    bg: 'rgba(0,188,212,0.12)',
+    bgLight: 'rgba(0,151,167,0.10)',
+  },
 };
 
 function CategoryBadge({
@@ -543,8 +549,18 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
     depth: number
   ) => {
     const isHas = filter.field === 'has' || filter.field === '!has';
-    const ops = getFieldOps(filter.field);
-    const facetVals = getFacetValues(filter.field);
+    const isAggregate = !!filter.aggregateFunc;
+    const ops = isAggregate
+      ? [
+          { op: '>', label: '>' },
+          { op: '>=', label: '>=' },
+          { op: '<', label: '<' },
+          { op: '<=', label: '<=' },
+          { op: '!=', label: '!=' },
+          { op: '=', label: '=' },
+        ]
+      : getFieldOps(filter.field);
+    const facetVals = isAggregate ? [] : getFacetValues(filter.field);
     const valueOpts = [...facetVals]
       .sort((a, b) => b.count - a.count)
       .map((v) => String(v.value ?? ''));
@@ -555,7 +571,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
     const fieldConfig = filter.field
       ? getFieldByKey(filter.field, config)
       : undefined;
-    const fieldType = fieldConfig?.type;
+    const fieldType = isAggregate ? 'number' : fieldConfig?.type;
 
     return (
       <Box key={filter.id}>
@@ -653,20 +669,49 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
 
           {/* Field select */}
           <SafeTooltip
-            title={filter.field === '!has' ? 'has not' : filter.field || ''}
+            title={
+              isAggregate
+                ? `${filter.aggregateFunc}(${filter.aggregateArgs?.join(', ') ?? ''})`
+                : filter.field === '!has' ? 'has not' : filter.field || ''
+            }
             placement="top"
           >
             <Select
               size="small"
               displayEmpty
-              value={filter.field || ''}
+              value={
+                isAggregate
+                  ? `__agg:${filter.aggregateFunc}`
+                  : filter.field || ''
+              }
               onChange={(e) => {
                 const newField = e.target.value;
-                // Clear value/values when field changes to avoid stale data
+                // Check if selecting an aggregate
+                if (newField.startsWith('__agg:')) {
+                  const aggName = newField.slice(6);
+                  const aggDef = config.aggregates?.find(
+                    (a) => a.name === aggName
+                  );
+                  if (aggDef) {
+                    update(filter.id, {
+                      field: '',
+                      aggregateFunc: aggName,
+                      aggregateArgs:
+                        aggDef.args.length === 0 ? [] : undefined,
+                      operator: '>',
+                      value: '',
+                      values: undefined,
+                    });
+                    return;
+                  }
+                }
+                // Regular field selection
                 update(filter.id, {
                   field: newField,
                   value: '',
                   values: undefined,
+                  aggregateFunc: undefined,
+                  aggregateArgs: undefined,
                 });
                 if (newField !== 'has' && newField !== '!has')
                   loadField(newField);
@@ -686,7 +731,7 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 },
               }}
               MenuProps={{
-                PaperProps: { sx: { maxHeight: 250, fontSize: '0.7rem' } },
+                PaperProps: { sx: { maxHeight: 300, fontSize: '0.7rem' } },
               }}
             >
               <MenuItem value="" disabled sx={{ display: 'none' }}>
@@ -717,6 +762,34 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
                 <CategoryBadge category="has" isDark={isDark} />
                 has not
               </MenuItem>
+              {config.aggregates && config.aggregates.length > 0 && (
+                <>
+                  <Divider sx={{ my: 0.3 }} />
+                  <ListSubheader
+                    sx={{
+                      fontSize: '0.55rem',
+                      fontWeight: 700,
+                      lineHeight: '24px',
+                      color: 'text.disabled',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
+                    AGGREGATES
+                  </ListSubheader>
+                  {config.aggregates.map((agg) => (
+                    <MenuItem
+                      key={`__agg:${agg.name}`}
+                      value={`__agg:${agg.name}`}
+                      sx={{ fontSize: '0.7rem', gap: 0.5 }}
+                    >
+                      <CategoryBadge category="aggregate" isDark={isDark} />
+                      {agg.args.length === 0
+                        ? `${agg.name}()`
+                        : `${agg.name}(field)`}
+                    </MenuItem>
+                  ))}
+                </>
+              )}
               <Divider sx={{ my: 0.3 }} />
               <ListSubheader
                 sx={{
@@ -761,6 +834,44 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             </Select>
           </SafeTooltip>
 
+          {/* Aggregate arg field selector */}
+          {isAggregate && (() => {
+            const aggDef = config.aggregates?.find(
+              (a) => a.name === filter.aggregateFunc
+            );
+            if (!aggDef || aggDef.args.length === 0) return null;
+            return (
+              <Select
+                size="small"
+                displayEmpty
+                value={filter.aggregateArgs?.[0] || ''}
+                onChange={(e) =>
+                  update(filter.id, {
+                    aggregateArgs: [e.target.value],
+                  })
+                }
+                sx={{
+                  width: 110,
+                  height: 26,
+                  fontSize: '0.7rem',
+                  '& .MuiSelect-select': { py: 0.3 },
+                }}
+                MenuProps={{
+                  PaperProps: { sx: { maxHeight: 200, fontSize: '0.7rem' } },
+                }}
+              >
+                <MenuItem value="" disabled sx={{ display: 'none' }}>
+                  {t('argus.builder.argPlaceholder', 'field…')}
+                </MenuItem>
+                {sortedFields.map((f) => (
+                  <MenuItem key={f} value={f} sx={{ fontSize: '0.7rem' }}>
+                    {f}
+                  </MenuItem>
+                ))}
+              </Select>
+            );
+          })()}
+
           {/* Operator select — hidden for has/!has */}
           {!isHas && ops.length > 0 && (
             <SafeTooltip
@@ -773,12 +884,12 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
             >
               <Select
                 size="small"
-                value={filter.operator || '='}
+                value={filter.operator || (isAggregate ? '>' : '=')}
                 onChange={(e) =>
                   update(filter.id, { operator: e.target.value })
                 }
                 sx={{
-                  width: 120,
+                  width: isAggregate ? 70 : 120,
                   height: 26,
                   fontSize: '0.7rem',
                   '& .MuiSelect-select': { py: 0.3 },
