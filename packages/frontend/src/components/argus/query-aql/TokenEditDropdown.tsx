@@ -110,6 +110,7 @@ export function TokenEditDropdown({
   isLoading = false,
 }: TokenEditDropdownProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const isHasChip = chip.field === 'has' || chip.field === '!has';
 
@@ -281,7 +282,7 @@ export function TokenEditDropdown({
                 color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
               }}
             >
-              Loading...
+              {t('aql.chip.loading', 'Loading...')}
             </Typography>
           </Box>
         ) : (
@@ -929,6 +930,7 @@ function AggregateFieldMenu({
   onClose: () => void;
   isDark: boolean;
 }) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -996,7 +998,7 @@ function AggregateFieldMenu({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search aggregates…"
+          placeholder={t('aql.chip.filterAggregates', 'Search aggregates…')}
           fullWidth
           sx={{
             fontSize: '0.8rem',
