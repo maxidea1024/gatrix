@@ -392,6 +392,26 @@ function getOperatorAndValueSuggestions(
 ): SuggestionItem[] {
   if (!context.field) return [];
 
+  // ── Aggregate functions: show only comparison operators ──
+  const aggNames = config.aggregates?.map((a) => a.name.toLowerCase()) ?? [];
+  if (aggNames.includes(context.field.toLowerCase())) {
+    const prefix = context.prefix.toLowerCase();
+    const comparisonOps = ['>', '>=', '<', '<=', '!='];
+    const suggestions: SuggestionItem[] = [];
+    for (const op of comparisonOps) {
+      if (prefix === '' || op.startsWith(prefix)) {
+        suggestions.push({
+          label: op,
+          insertText: op,
+          category: 'operator',
+          description: getOperatorDescriptionKey(op),
+          fieldType: 'number',
+        });
+      }
+    }
+    return suggestions.slice(0, max);
+  }
+
   // ── has / !has: show field list as values ──
   const fieldLower = context.field.toLowerCase();
   if (fieldLower === 'has' || fieldLower === '!has') {

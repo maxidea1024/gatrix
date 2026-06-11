@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Cursor Context Resolver
 // Spec: Section 9
 // ============================================================================
@@ -65,14 +65,16 @@ export function resolveCursorContext(
       break;
     }
 
-    // Stop at grouping parens, but NOT at value-list parens/brackets like field:(...) or field:[...]
+    // Stop at grouping parens, but NOT at value-list parens/brackets or aggregate function parens
     if (t.type === TokenType.LPAREN || t.type === TokenType.LBRACKET) {
       // Check if previous token is COLON or a comparison/function operator
       // If so, this is a value-list paren/bracket — don't break, continue to find the field
+      // Also check if previous token is FIELD — this is an aggregate function paren (e.g., count()
       const prevTok = i > 0 ? tokens[i - 1] : null;
-      const isValueListParen =
+      const isValueListOrAggregateParen =
         prevTok &&
         (prevTok.type === TokenType.COLON ||
+          prevTok.type === TokenType.FIELD ||
           prevTok.type === TokenType.NE ||
           prevTok.type === TokenType.GT ||
           prevTok.type === TokenType.GTE ||
@@ -86,7 +88,7 @@ export function resolveCursorContext(
           prevTok.type === TokenType.NOT_ENDS_WITH ||
           prevTok.type === TokenType.BEFORE ||
           prevTok.type === TokenType.AFTER);
-      if (!isValueListParen) {
+      if (!isValueListOrAggregateParen) {
         break;
       }
     }

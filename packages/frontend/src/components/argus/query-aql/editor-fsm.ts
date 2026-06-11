@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // AQL (Argus Query Language) Engine — Editor FSM (Finite State Machine)
 // Spec: Section 8
 // ============================================================================
@@ -16,6 +16,7 @@ export function resolveEditorState(
 ): EditorState {
   let state = EditorState.EXPECT_FIELD;
   let parenDepth = 0;
+  let inAggregateParen = false;
 
   for (const token of tokens) {
     if (token.type === TokenType.EOF) break;
@@ -87,7 +88,11 @@ export function resolveEditorState(
 
       case TokenType.LPAREN:
         parenDepth++;
-        if (state === EditorState.EXPECT_FIELD) {
+        if (state === EditorState.EXPECT_COLON) {
+          // FIELD followed by LPAREN → aggregate function args (e.g., count(, avg(duration)
+          // Stay in a state that will transition to EXPECT_COLON after RPAREN
+          inAggregateParen = true;
+        } else if (state === EditorState.EXPECT_FIELD) {
           state = EditorState.IN_PARENTHESIS;
           // Reset to expect field inside parens
           state = EditorState.EXPECT_FIELD;
@@ -101,7 +106,13 @@ export function resolveEditorState(
 
       case TokenType.RPAREN:
         parenDepth = Math.max(0, parenDepth - 1);
-        state = EditorState.EXPECT_LOGICAL_OPERATOR;
+        if (inAggregateParen) {
+          // Closing aggregate function paren → expect colon next (e.g., count():|)
+          state = EditorState.EXPECT_COLON;
+          inAggregateParen = false;
+        } else {
+          state = EditorState.EXPECT_LOGICAL_OPERATOR;
+        }
         break;
 
       case TokenType.RBRACKET:
@@ -173,7 +184,6 @@ function isInsideValueListParens(
       if (
         prev &&
         (prev.type === TokenType.COLON ||
-          prev.type === TokenType.FIELD ||
           prev.type === TokenType.NE ||
           prev.type === TokenType.GT ||
           prev.type === TokenType.GTE ||

@@ -24,6 +24,10 @@ export interface FilterCondition {
   values?: string[];
   negated: boolean;
   quoted?: boolean;
+  /** Aggregate function name (e.g., 'count', 'avg', 'p95') */
+  aggregateFunc?: string;
+  /** Aggregate function arguments (e.g., ['duration']) */
+  aggregateArgs?: string[];
 }
 
 export interface GroupCondition {
@@ -135,10 +139,10 @@ function parseLevel(
         i = j;
         continue;
       }
-      // NOT filter
+      // NOT filter or aggregate
       if (
         i + 1 < end &&
-        (chips[i + 1].type === 'filter' || !chips[i + 1].type)
+        (chips[i + 1].type === 'filter' || chips[i + 1].type === 'aggregate' || !chips[i + 1].type)
       ) {
         const f = chipToFilter(chips[i + 1]);
         f.negated = true;
@@ -157,8 +161,8 @@ function parseLevel(
       continue;
     }
 
-    // Filter
-    if (c.type === 'filter' || !c.type) {
+    // Filter or Aggregate
+    if (c.type === 'filter' || c.type === 'aggregate' || !c.type) {
       items.push(chipToFilter(c));
       i++;
       continue;
@@ -184,6 +188,8 @@ function chipToFilter(chip: FilterChip): FilterCondition {
     values,
     negated: false,
     quoted: chip.quoted,
+    aggregateFunc: chip.aggregateFunc,
+    aggregateArgs: chip.aggregateArgs ? [...chip.aggregateArgs] : undefined,
   };
 }
 
@@ -203,6 +209,19 @@ function resolveValues(cond: FilterCondition): string[] | null {
 
 export function conditionToAql(cond: Condition): string {
   if (cond.type === 'filter') {
+    // Aggregate condition → serialize directly
+    if (cond.aggregateFunc) {
+      const argsStr = cond.aggregateArgs?.join(', ') ?? '';
+      const funcCall = `${cond.aggregateFunc}(${argsStr})`;
+      if (!cond.value) return funcCall;
+      if (cond.operator === '=') {
+        const part = `${funcCall}:${cond.value}`;
+        return cond.negated ? `NOT ${part}` : part;
+      }
+      const part = `${funcCall}:${cond.operator}${cond.value}`;
+      return cond.negated ? `NOT ${part}` : part;
+    }
+
     if (!cond.field) return '';
     const multi = resolveValues(cond);
     const chip: FilterChip = {
