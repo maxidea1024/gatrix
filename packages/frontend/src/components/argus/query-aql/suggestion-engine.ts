@@ -846,6 +846,30 @@ export function isIncompleteQuery(text: string): boolean {
       if (prev.type === TokenType.COLON || functionOperators.has(prev.type)) {
         return true;
       }
+      // Aggregate function with open paren: count(, avg(
+      if (prev.type === TokenType.FIELD) {
+        return true;
+      }
+    }
+  }
+
+  // Aggregate patterns: "count()" or "avg(duration)" without colon/operator/value
+  // Look for FIELD LPAREN ... RPAREN at end without COLON after
+  if (lastToken.type === TokenType.RPAREN) {
+    // Find matching LPAREN
+    let depth = 0;
+    let lparenIdx = -1;
+    for (let i = activeTokens.length - 1; i >= 0; i--) {
+      if (activeTokens[i].type === TokenType.RPAREN) depth++;
+      if (activeTokens[i].type === TokenType.LPAREN) depth--;
+      if (depth === 0) {
+        lparenIdx = i;
+        break;
+      }
+    }
+    // If FIELD precedes LPAREN, this is aggregate without value → incomplete
+    if (lparenIdx > 0 && activeTokens[lparenIdx - 1].type === TokenType.FIELD) {
+      return true;
     }
   }
 

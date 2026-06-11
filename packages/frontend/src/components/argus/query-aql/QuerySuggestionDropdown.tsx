@@ -259,6 +259,7 @@ export const QuerySuggestionDropdown = forwardRef<
       event: { i18nKey: 'aql.tab.event', fallback: 'Event' },
       user: { i18nKey: 'aql.tab.user', fallback: 'User' },
       attribute: { i18nKey: 'aql.tab.attributes', fallback: 'Attributes' },
+      aggregate: { i18nKey: 'aql.tab.aggregates', fallback: 'Aggregates' },
       logic: { i18nKey: 'aql.tab.logic', fallback: 'Logic' },
     };
 
@@ -282,6 +283,7 @@ export const QuerySuggestionDropdown = forwardRef<
       'event',
       'user',
       'attribute',
+      'aggregate',
       'logic',
     ];
     for (const cat of catOrder) {

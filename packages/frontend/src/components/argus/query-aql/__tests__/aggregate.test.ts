@@ -7,11 +7,13 @@ import { describe, it, expect } from 'vitest';
 import { parse } from '../parser';
 import { serializeForBackend } from '../serializer';
 import { queryToChips, chipsToQuery } from '../useFilterChips';
-import { getSuggestions } from '../suggestion-engine';
+import { getSuggestions, isIncompleteQuery } from '../suggestion-engine';
 import { tokenize } from '../lexer';
 import { resolveCursorContext } from '../cursor-context';
 import { DISCOVER_CONFIG, PERFORMANCE_CONFIG, LOGS_CONFIG, RELEASES_CONFIG } from '../fields';
 import type { AggregateFilterExpression } from '../types';
+import { validate } from '../validator';
+import { formatQuery } from '../formatter';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -685,5 +687,102 @@ describe('Domain Config Aggregates', () => {
       expect(Array.isArray(agg.args)).toBe(true);
       expect(agg.returnType).toBeTruthy();
     }
+  });
+});
+
+// ─── isIncompleteQuery ───────────────────────────────────────────────────────
+
+describe('Aggregate isIncompleteQuery', () => {
+  it('identifies incomplete aggregate patterns', () => {
+    expect(isIncompleteQuery('count(')).toBe(true);
+    expect(isIncompleteQuery('avg(')).toBe(true);
+    expect(isIncompleteQuery('count()')).toBe(true);
+    expect(isIncompleteQuery('avg(duration)')).toBe(true);
+    expect(isIncompleteQuery('count():')).toBe(true);
+    expect(isIncompleteQuery('count():>')).toBe(true);
+  });
+
+  it('identifies complete aggregate queries', () => {
+    expect(isIncompleteQuery('count():>100')).toBe(false);
+    expect(isIncompleteQuery('avg(duration):>500')).toBe(false);
+    expect(isIncompleteQuery('p95(duration):>1000')).toBe(false);
+    expect(isIncompleteQuery('count():100')).toBe(false);
+  });
+});
+
+// ─── Validator ───────────────────────────────────────────────────────────────
+
+describe('Aggregate Validator', () => {
+  it('should accept known aggregate function', () => {
+    const { ast } = parseAgg('count():>100');
+    const errors = validate(ast, DISCOVER_CONFIG);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should accept aggregate with correct arg count', () => {
+    const { ast } = parseAgg('avg(duration):>500');
+    const errors = validate(ast, DISCOVER_CONFIG);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('should reject unknown aggregate function', () => {
+    // Force an AggregateFilter AST with unknown function name
+    const unknownAgg: AggregateFilterExpression = {
+      type: 'AggregateFilter',
+      funcName: 'unknown_func',
+      args: [],
+      operator: '>',
+      value: 100,
+      quoted: false,
+      start: 0,
+      end: 20,
+    };
+    const errors = validate(unknownAgg, DISCOVER_CONFIG);
+    expect(errors.some((e) => e.type === 'UNKNOWN_AGGREGATE')).toBe(true);
+  });
+
+  it('should reject wrong arg count', () => {
+    // avg expects 1 arg but provide 0
+    const wrongArgs: AggregateFilterExpression = {
+      type: 'AggregateFilter',
+      funcName: 'avg',
+      args: [],
+      operator: '>',
+      value: 100,
+      quoted: false,
+      start: 0,
+      end: 10,
+    };
+    const errors = validate(wrongArgs, DISCOVER_CONFIG);
+    expect(errors.some((e) => e.type === 'INVALID_AGGREGATE_ARGS')).toBe(true);
+  });
+});
+
+// ─── Formatter ───────────────────────────────────────────────────────────────
+
+describe('Aggregate Formatter', () => {
+  it('should format count():>100', () => {
+    const { ast } = parseAgg('count():>100');
+    expect(formatQuery(ast)).toBe('count():>100');
+  });
+
+  it('should format avg(duration):>500', () => {
+    const { ast } = parseAgg('avg(duration):>500');
+    expect(formatQuery(ast)).toBe('avg(duration):>500');
+  });
+
+  it('should format count():100 (implicit =)', () => {
+    const { ast } = parseAgg('count():100');
+    expect(formatQuery(ast)).toBe('count():100');
+  });
+
+  it('should format compound with aggregate', () => {
+    const { ast } = parseAgg('service:web and count():>100');
+    expect(formatQuery(ast)).toContain('count():>100');
+  });
+
+  it('should format NOT aggregate', () => {
+    const { ast } = parseAgg('not count():>100');
+    expect(formatQuery(ast)).toBe('not count():>100');
   });
 });
