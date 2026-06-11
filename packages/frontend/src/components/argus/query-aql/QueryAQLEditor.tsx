@@ -2088,7 +2088,7 @@ export const QueryAQLEditor = forwardRef<
         fontWeight: 500,
         fontFamily: 'inherit',
         lineHeight: '24px',
-        padding: isAtFront && !inputValue ? '2px 0' : '2px 4px',
+        padding: isAtFront && !inputValue ? '2px 0' : '2px 2px',
         caretColor: selectedTokenIdx >= 0 ? 'transparent' : undefined,
       }}
     />
@@ -2139,6 +2139,14 @@ export const QueryAQLEditor = forwardRef<
               minHeight: 0,
             }}
           >
+            {/* Front insert spacer — always present to prevent layout shift */}
+            <Box
+              sx={{
+                width: selectedTokenIdx === -2 ? 0 : 2,
+                flexShrink: 0,
+                transition: 'none',
+              }}
+            />
             {/* Input rendered before chips when in before-all position */}
             {selectedTokenIdx === -2 && renderInput()}
 
@@ -2234,7 +2242,7 @@ export const QueryAQLEditor = forwardRef<
                       position: 'relative',
                       px: '4px',
                       py: '2px',
-                      mx: '2px',
+                      mx: '1px',
                       fontSize: '11px',
                       fontWeight: 600,
                       color:

@@ -257,7 +257,7 @@ export const FilterTokenGroup = forwardRef<
         display: 'inline-flex',
         alignItems: 'center',
         gap: '1px',
-        mr: 1,
+        mr: 0.5,
         my: '1px',
         maxWidth: '100%',
         backgroundColor: isAggregateChip
