@@ -2109,11 +2109,11 @@ export const QueryAQLEditor = forwardRef<
       }
       style={{
         flex: isAtFront ? '0 0 auto' : 1,
-        minWidth: isAtFront ? 8 : 80,
+        minWidth: isAtFront ? 6 : 80,
         width: isAtFront
           ? inputValue
             ? `${Math.max(inputValue.length + 3, 1)}ch`
-            : 8
+            : 6
           : undefined,
         border: 'none',
         outline: 'none',
@@ -2177,7 +2177,7 @@ export const QueryAQLEditor = forwardRef<
             {/* Front insert spacer — always present to prevent layout shift */}
             <Box
               sx={{
-                width: selectedTokenIdx === -2 ? 0 : 8,
+                width: selectedTokenIdx === -2 ? 0 : 6,
                 flexShrink: 0,
                 transition: 'none',
               }}
