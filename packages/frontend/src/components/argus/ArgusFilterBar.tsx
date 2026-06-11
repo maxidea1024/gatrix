@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   IconButton,
@@ -117,7 +117,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         display: 'flex',
         alignItems: 'center',
         gap: 0.75,
-        mb: 2.5,
+        mb: 1.25,
         px: 1.5,
         py: 0.8,
         borderRadius: '10px',
@@ -191,45 +191,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         onChange={handleDateRangeChange}
       />
 
-      {/* Divider + Refresh */}
-      {onRefresh && (
-        <>
-          <Divider
-            orientation="vertical"
-            flexItem
-            sx={{
-              mx: 0.3,
-              borderColor: isDark
-                ? 'rgba(255,255,255,0.06)'
-                : 'rgba(0,0,0,0.08)',
-            }}
-          />
-          <Tooltip title={t('common.refresh', { defaultValue: 'Refresh' })}>
-            <span>
-              <IconButton
-                onClick={onRefresh}
-                disabled={loading}
-                size="small"
-                sx={{ p: 0.5 }}
-              >
-                <RefreshIcon
-                  sx={{
-                    fontSize: 18,
-                    transition: 'transform 0.3s',
-                    ...(loading && {
-                      animation: 'argus-spin 1s linear infinite',
-                      '@keyframes argus-spin': {
-                        from: { transform: 'rotate(0deg)' },
-                        to: { transform: 'rotate(360deg)' },
-                      },
-                    }),
-                  }}
-                />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </>
-      )}
+
     </Box>
   );
 };

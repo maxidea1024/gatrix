@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useEffect,
   useCallback,
@@ -888,7 +888,7 @@ const ArgusFeedbackPage: React.FC = () => {
       />
 
       {/* Filter Bar + Search + Sort */}
-      <Box sx={{ flexShrink: 0, '& > div': { mb: 1.5 } }}>
+      <Box sx={{ flexShrink: 0 }}>
         <ArgusFilterBar
           projectId={projectId}
           value={filters}
@@ -907,14 +907,6 @@ const ArgusFeedbackPage: React.FC = () => {
           loading={loading}
           extraControls={
             <>
-              <Box
-                sx={{
-                  height: 20,
-                  borderLeft: '1px solid',
-                  borderColor: 'divider',
-                  mx: 0.25,
-                }}
-              />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <QueryAQLEditor
                   ref={dslEditorRef}

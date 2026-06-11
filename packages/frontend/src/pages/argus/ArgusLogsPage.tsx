@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Box, useTheme, IconButton, Button } from '@mui/material';
 import {
   Terminal as LogIcon,
@@ -135,13 +135,13 @@ const ArgusLogsPage: React.FC = () => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
-  const [wrapLines, setWrapLines] = useState(false);
+  const [wrapLines, setWrapLines] = useLocalStorage<boolean>('argus_logs_wrap_lines', false);
   const [logsFullscreen, setLogsFullscreen] = useState(false);
   const [showGotoTime, setShowGotoTime] = useState(false);
   const [gotoTime, setGotoTime] = useState('');
-  const [displayDensity, setDisplayDensity] = useState<
+  const [displayDensity, setDisplayDensity] = useLocalStorage<
     'compact' | 'default' | 'expanded'
-  >('default');
+  >('argus_logs_display_density', 'default');
 
   // Live tail selected log (separate from normal log selection)
   const [liveTailSelectedLog, setLiveTailSelectedLog] =
@@ -161,6 +161,10 @@ const ArgusLogsPage: React.FC = () => {
   const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
   const [facetSidebarCollapsed, setFacetSidebarCollapsed] = useLocalStorage(
     'argus_facet_sidebar_collapsed',
+    false
+  );
+  const [tableCollapsed, setTableCollapsed] = useLocalStorage(
+    'argus_logs_table_collapsed',
     false
   );
 
@@ -728,6 +732,8 @@ const ArgusLogsPage: React.FC = () => {
                       aggGroupBy={aggGroupBy}
                       aggLoading={aggLoading}
                       isDark={isDark}
+                      tableCollapsed={tableCollapsed}
+                      setTableCollapsed={setTableCollapsed}
                       onGroupByChange={(val) => {
                         setUrlState({ groupBy: val });
                         fetchAggregates(val);

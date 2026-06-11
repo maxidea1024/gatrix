@@ -12,6 +12,7 @@ import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import { formatCompactNumber } from '@/utils/numberFormat';
 import { ArgusSessionHealth } from '@/services/argusService';
 import { RELEASE_COLORS } from './sessionHealthHelpers';
 import {
@@ -100,7 +101,7 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                 {adoptionData.map((item, idx) => (
                   <Tooltip
                     key={idx}
-                    title={`${item.release}: ${item.sessions.toLocaleString()} ${t('argus.sessions.sessions')} (${item.pct.toFixed(1)}%)`}
+                    title={`${item.release}: ${formatCompactNumber(item.sessions)} ${t('argus.sessions.sessions')} (${item.pct.toFixed(1)}%)`}
                     arrow
                   >
                     <Box
@@ -270,19 +271,19 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                   {
                     label: t('argus.sessions.sessions'),
                     key: 'total',
-                    format: (v: number) => Number(v).toLocaleString(),
+                    format: (v: number) => formatCompactNumber(Number(v)),
                     colorFn: () => 'text.primary',
                   },
                   {
                     label: t('argus.sessions.users'),
                     key: 'users',
-                    format: (v: number) => Number(v).toLocaleString(),
+                    format: (v: number) => formatCompactNumber(Number(v)),
                     colorFn: () => 'text.primary',
                   },
                   {
                     label: t('argus.sessions.crashed'),
                     key: 'crashed',
-                    format: (v: number) => Number(v).toLocaleString(),
+                    format: (v: number) => formatCompactNumber(Number(v)),
                     colorFn: (v: number) =>
                       Number(v) > 0 ? '#f44336' : '#4caf50',
                   },
@@ -427,9 +428,9 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                         fontSize: '0.68rem',
                       }}
                     >
-                      {Number(r.total).toLocaleString()}{' '}
+                      {formatCompactNumber(Number(r.total))}{' '}
                       {t('argus.sessions.sessions')} ·{' '}
-                      {Number(r.users).toLocaleString()}{' '}
+                      {formatCompactNumber(Number(r.users))}{' '}
                       {t('argus.sessions.users')}
                     </Typography>
                     <Typography

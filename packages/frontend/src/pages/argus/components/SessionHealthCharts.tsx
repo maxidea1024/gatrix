@@ -15,6 +15,7 @@ import {
   VisibilityOff as HideIcon,
   Visibility as ShowIcon,
 } from '@mui/icons-material';
+import { formatCompactNumber } from '@/utils/numberFormat';
 import { Line, Bar } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -514,7 +515,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
                           (sum: number, i: any) => sum + (i.raw as number),
                           0
                         );
-                        return `${t('common.total')}: ${total.toLocaleString()}`;
+                        return `${t('common.total')}: ${formatCompactNumber(total)}`;
                       },
                     },
                   },

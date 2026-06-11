@@ -2111,7 +2111,7 @@ export const QueryAQLEditor = forwardRef<
       onCompositionStart={() => setIsComposing(true)}
       onCompositionEnd={() => setIsComposing(false)}
       spellCheck={false}
-      autoComplete="off"
+      autoComplete="new-password"
       placeholder={
         chips.length === 0 && !isAtFront
           ? (placeholder ?? t('aql.placeholder', 'Search with AQL...'))

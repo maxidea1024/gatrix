@@ -10,6 +10,7 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import { formatCompactNumber } from '@/utils/numberFormat';
 
 export interface PatternEntry {
   pattern: string;
@@ -137,7 +138,7 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                       color: theme.palette.primary.main,
                     }}
                   >
-                    {Number(p.count).toLocaleString()}
+                    {formatCompactNumber(Number(p.count))}
                   </td>
                   <td
                     style={{

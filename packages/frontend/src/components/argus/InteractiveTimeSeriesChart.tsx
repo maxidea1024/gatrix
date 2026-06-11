@@ -37,20 +37,20 @@ export interface ChartDataset {
   label: string;
   data: number[];
   color?: string;
-  type?: 'bar' | 'line' | 'area';
+  type?: 'bar' | 'line' | 'area' | 'scatter';
 }
 
 interface InteractiveTimeSeriesChartProps {
   // Legacy single-series support
   data?: { label: string; count: number }[];
-  type?: 'bar' | 'line' | 'area';
+  type?: 'bar' | 'line' | 'area' | 'scatter';
 
   // Multi-series support
   labels?: string[];
   datasets?: ChartDataset[];
 
   // Configuration
-  height?: number;
+  height?: number | string;
   onZoom?: (startIndex: number, endIndex: number) => void;
   yAxisType?: 'linear' | 'logarithmic';
   showLegend?: boolean;
@@ -104,7 +104,7 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
         const dsColor = ds.color || theme.palette.primary.main;
         const dsType = ds.type || 'bar';
         return {
-          type: dsType === 'area' ? 'line' : dsType,
+          type: dsType === 'area' || dsType === 'scatter' ? 'line' : dsType,
           label: ds.label,
           data: ds.data,
           backgroundColor: (ctx: any) => {
@@ -130,8 +130,9 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
           borderSkipped: false,
           tension: 0.4,
           fill: dsType === 'area',
-          pointRadius: 0,
-          pointHoverRadius: 4,
+          pointRadius: dsType === 'scatter' ? 5 : 0,
+          pointHoverRadius: dsType === 'scatter' ? 7 : 4,
+          showLine: dsType !== 'scatter',
           yAxisID: 'y', // associate with main y axis
         };
       }),

@@ -12,6 +12,7 @@ import {
   TrendingDown as TrendingDownIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { formatCompactNumber } from '@/utils/numberFormat';
 
 // ─── formatHourLabel ───
 
@@ -132,7 +133,7 @@ export const DistributionCard: React.FC<{
                       fontWeight={700}
                       sx={{ fontSize: '0.7rem' }}
                     >
-                      {item.value.toLocaleString()}
+                      {formatCompactNumber(item.value)}
                     </Typography>
                     <Typography
                       variant="caption"

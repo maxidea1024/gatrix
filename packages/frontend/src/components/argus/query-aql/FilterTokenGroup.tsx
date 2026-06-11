@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
 import type { DomainConfig } from './types';
-import { getFieldByKey } from './fields';
+import { getFieldByKey, getAggregateFieldType } from './fields';
 import { getOpLabel } from './operator-labels';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -95,7 +95,9 @@ export const FilterTokenGroup = forwardRef<
   const valueInputRef = useRef<HTMLInputElement>(null);
 
   const field = getFieldByKey(chip.field ?? '', domain);
-  const fieldType = chip.type === 'aggregate' ? 'number' : (field?.type ?? 'string');
+  const fieldType = chip.type === 'aggregate'
+    ? getAggregateFieldType(chip.aggregateFunc ?? '', domain)
+    : (field?.type ?? 'string');
   const opLabel = getOpLabel(chip.operator ?? '=', fieldType);
   const isHasChip = chip.field === 'has' || chip.field === '!has';
   const isAggregateChip = chip.type === 'aggregate';
@@ -454,6 +456,7 @@ export const FilterTokenGroup = forwardRef<
           <input
             ref={valueInputRef}
             autoFocus
+            autoComplete="new-password"
             value={editingValueText ?? ''}
             placeholder={selectedValues && selectedValues.size > 0 ? '' : '...'}
             onChange={(e) => onValueInputChange?.(chip.id, e.target.value)}

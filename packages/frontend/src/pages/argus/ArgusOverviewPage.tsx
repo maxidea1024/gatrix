@@ -381,6 +381,7 @@ const ArgusOverviewPage: React.FC = () => {
         onChange={handleFilterChange}
         onRefresh={fetchData}
         loading={loading}
+        extraControls={<Box sx={{ flex: 1 }} />}
       />
 
       {/* Stat Cards — with change indicators */}
@@ -990,13 +991,13 @@ const ArgusOverviewPage: React.FC = () => {
                           fontWeight={700}
                           sx={{ color: '#f44336' }}
                         >
-                          {Number(r.count).toLocaleString()}
+                          {formatCompactNumber(Number(r.count))}
                         </Typography>
                         <Typography
                           variant="caption"
                           sx={{ color: isDark ? '#555' : '#bbb' }}
                         >
-                          {Number(r.users).toLocaleString()}{' '}
+                          {formatCompactNumber(Number(r.users))}{' '}
                           {t('argus.overview.users')}
                         </Typography>
                       </Box>
@@ -1159,7 +1160,7 @@ const ArgusOverviewPage: React.FC = () => {
                         fontWeight={700}
                         sx={{ color: levelColor, fontSize: '0.72rem' }}
                       >
-                        {issue.event_count?.toLocaleString()}
+                        {formatCompactNumber(issue.event_count || 0)}
                       </Typography>
                     </Box>
                   </Box>

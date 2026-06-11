@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
 import type { DomainConfig, QueryField } from './types';
-import { getFieldByKey } from './fields';
+import { getFieldByKey, getAggregateOperators, getAggregateFieldType } from './fields';
 import { getOperatorOptions } from './operator-labels';
 import DatetimeValueEditor from './DatetimeValueEditor';
 
@@ -222,9 +222,9 @@ export function TokenEditDropdown({
               ? ({
                   key: chip.aggregateFunc,
                   label: chip.aggregateFunc,
-                  type: 'number',
+                  type: getAggregateFieldType(chip.aggregateFunc, config),
                   category: 'log',
-                  operators: ['>', '>=', '<', '<=', '!='],
+                  operators: getAggregateOperators(chip.aggregateFunc, config),
                   searchable: false,
                   description: '',
                 } as QueryField)
@@ -386,6 +386,7 @@ function FieldMenu({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
+          autoComplete="new-password"
           placeholder={t('aql.chip.filterFields', 'Filter fields...')}
           sx={{
             fontSize: '0.8rem',
@@ -771,6 +772,7 @@ function HasFieldSelector({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
+          autoComplete="new-password"
           placeholder={t('aql.chip.filterFields', 'Filter fields...')}
           sx={{
             fontSize: '0.8rem',
@@ -1007,6 +1009,7 @@ function AggregateFieldMenu({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={handleKeyDown}
+          autoComplete="new-password"
           placeholder={t('aql.chip.filterAggregates', 'Search aggregates…')}
           fullWidth
           sx={{
@@ -1180,6 +1183,7 @@ function AggregateArgMenu({
           onKeyDown={handleKeyDown}
           autoFocus
           fullWidth
+          autoComplete="new-password"
           placeholder={t('aql.chip.filterFields', 'Filter fields...')}
           sx={{
             fontSize: '0.8rem',

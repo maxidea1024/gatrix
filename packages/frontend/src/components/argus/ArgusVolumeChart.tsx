@@ -130,6 +130,8 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
             justifyContent: 'space-between',
             mb: 1,
             minHeight: 24,
+            position: 'relative',
+            zIndex: 3,
           }}
         >
           <Typography
@@ -213,7 +215,7 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
               position: 'absolute',
               top: 4,
               right: 4,
-              zIndex: 2,
+              zIndex: 3,
               display: 'flex',
               alignItems: 'center',
               gap: 0.5,

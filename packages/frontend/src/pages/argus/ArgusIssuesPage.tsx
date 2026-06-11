@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useEffect,
   useCallback,
@@ -733,18 +733,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           }
           handleFilterChange(newFilters);
         }}
-        onRefresh={fetchIssues}
         loading={loading}
         extraControls={
           <>
-            <Box
-              sx={{
-                height: 20,
-                borderLeft: '1px solid',
-                borderColor: 'divider',
-                mx: 0.25,
-              }}
-            />
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <QueryAQLEditor
                 ref={dslEditorRef}
@@ -806,7 +797,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           display: 'flex',
           flex: 1,
           overflow: 'hidden',
-          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+          borderRadius: 2,
         }}
       >
         {/* Left: Facet Sidebar */}
@@ -876,8 +868,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
             flex: 1,
             minWidth: 0,
             overflow: 'hidden',
-            pl: facetCollapsed ? 0.25 : 0.75,
-            pt: 1,
+            p: 2,
             display: 'flex',
             flexDirection: 'column',
           }}
@@ -924,13 +915,14 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
             <PageContentLoader
               loading={loading}
-              skeleton={<ListSkeleton rows={8} />}
               sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
             >
               {issues.length === 0 ? (
                 <EmptyPlaceholder
                   icon={<BugReportIcon sx={{ fontSize: 48 }} />}
                   message={t('argus.issues.noIssues')}
+                  description={t('argus.issues.noIssuesDescription', '검색 조건을 변경하거나 필터를 해제해 보세요.')}
+                  variant="text"
                   sx={{ flex: 1 }}
                 />
               ) : (

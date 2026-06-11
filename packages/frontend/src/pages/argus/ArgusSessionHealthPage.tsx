@@ -53,6 +53,7 @@ import {
   ChangeIndicator,
   calcChange,
 } from './components/sessionHealthHelpers';
+import { formatCompactNumber } from '@/utils/numberFormat';
 
 ChartJS.register(
   CategoryScale,
@@ -336,15 +337,7 @@ const ArgusSessionHealthPage: React.FC = () => {
         onRefresh={fetchData}
         loading={loading}
         extraControls={
-          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-            <Box
-              sx={{
-                height: 20,
-                borderLeft: '1px solid',
-                borderColor: 'divider',
-                mx: 0.25,
-              }}
-            />
+          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', flex: 1 }}>
             {(['sessions', 'users'] as DisplayMode[]).map((mode) => (
               <Chip
                 key={mode}
@@ -377,6 +370,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                 }}
               />
             ))}
+            <Box sx={{ flex: 1 }} />
           </Box>
         }
       />
@@ -493,7 +487,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                         lineHeight: 1.2,
                       }}
                     >
-                      {Number(item.value || 0).toLocaleString()}
+                      {formatCompactNumber(Number(item.value || 0))}
                     </Typography>
                   </Box>
                 </Tooltip>
@@ -559,7 +553,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                         sx={{ lineHeight: 1.2, fontSize: '1.1rem' }}
                       >
                         {typeof card.value === 'number'
-                          ? card.value.toLocaleString()
+                          ? formatCompactNumber(card.value)
                           : (card.value ?? '-')}
                       </Typography>
                       {change != null && (

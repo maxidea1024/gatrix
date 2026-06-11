@@ -401,6 +401,56 @@ const SHARED_ALIASES: Record<string, string> = {
   logid: 'log_id',
   issueid: 'issue_id',
 };
+// ─── Aggregate Operator Mapping ──────────────────────────────────────────────
+
+/**
+ * Valid comparison operators per aggregate returnType.
+ * Numeric types (number, percentage, duration) support ordering operators.
+ * String type only supports equality/containment.
+ */
+const AGGREGATE_OPERATORS_BY_RETURN_TYPE: Record<
+  AggregateFunctionDef['returnType'],
+  string[]
+> = {
+  number:     ['=', '!=', '>', '>=', '<', '<='],
+  percentage: ['=', '!=', '>', '>=', '<', '<='],
+  duration:   ['=', '!=', '>', '>=', '<', '<='],
+  string:     ['=', '!=', 'contains', '!contains'],
+};
+
+/**
+ * Get the aggregate function definition by name from a DomainConfig.
+ */
+export function getAggregateDef(
+  funcName: string,
+  config: DomainConfig
+): AggregateFunctionDef | undefined {
+  return config.aggregates?.find((a) => a.name === funcName);
+}
+
+/**
+ * Get valid operators for an aggregate function based on its returnType.
+ * Falls back to numeric operators if the function is not found.
+ */
+export function getAggregateOperators(
+  funcName: string,
+  config: DomainConfig
+): string[] {
+  const def = getAggregateDef(funcName, config);
+  const returnType = def?.returnType ?? 'number';
+  return AGGREGATE_OPERATORS_BY_RETURN_TYPE[returnType];
+}
+
+/**
+ * Map aggregate returnType → QueryField type for operator display.
+ */
+export function getAggregateFieldType(
+  funcName: string,
+  config: DomainConfig
+): 'number' | 'string' {
+  const def = getAggregateDef(funcName, config);
+  return def?.returnType === 'string' ? 'string' : 'number';
+}
 
 // ─── Aggregate Function Definitions ─────────────────────────────────────────────
 

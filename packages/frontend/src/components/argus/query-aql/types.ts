@@ -253,7 +253,7 @@ export interface AggregateFunctionDef {
     required: boolean;
   }[];
   /** Return type (determines valid comparison operators) */
-  returnType: 'number' | 'percentage' | 'duration';
+  returnType: 'number' | 'percentage' | 'duration' | 'string';
 }
 
 export interface DomainConfig {

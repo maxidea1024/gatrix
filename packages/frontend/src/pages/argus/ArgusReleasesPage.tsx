@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useEffect,
   useCallback,
@@ -362,6 +362,46 @@ const ArgusReleasesPage: React.FC = () => {
           handleFilterChange(newFilters);
         }}
         loading={loading}
+        extraControls={
+          <>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <QueryAQLEditor
+                ref={dslEditorRef}
+                config={RELEASES_CONFIG}
+                initialQuery={searchTerm}
+                placeholder={t(
+                  'argus.releases.searchPlaceholder',
+                  'Search releases... e.g. errors > 10 status:adopted'
+                )}
+                onSearch={(val) => {
+                  setSearchTerm(val);
+                  setCurrentPage(1);
+                }}
+                onChange={(val) => {
+                  setSearchTerm(val);
+                  setCurrentPage(1);
+                }}
+                fetchFieldValues={fetchFieldValues}
+              />
+            </Box>
+            <FilterChipSelect
+              label={t('argus.releases.sortLabel', '정렬')}
+              value={sortBy}
+              options={sortOptions}
+              anchorEl={sortAnchor}
+              onOpen={handleSortOpen}
+              onClose={handleSortClose}
+              onSelect={handleSortSelect}
+              sx={{ height: 32 }}
+            />
+            {searchTerm && (
+              <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+                {filteredTotal} / {total}{' '}
+                {t('argus.releases.releasesLabel', 'releases')}
+              </Typography>
+            )}
+          </>
+        }
       />
 
       {/* Summary Stats */}
@@ -470,47 +510,7 @@ const ArgusReleasesPage: React.FC = () => {
           />
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            {/* Search & Sort Bar */}
-            <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}
-            >
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <QueryAQLEditor
-                  ref={dslEditorRef}
-                  config={RELEASES_CONFIG}
-                  initialQuery={searchTerm}
-                  placeholder={t(
-                    'argus.releases.searchPlaceholder',
-                    'Search releases... e.g. errors > 10 status:adopted'
-                  )}
-                  onSearch={(val) => {
-                    setSearchTerm(val);
-                    setCurrentPage(1);
-                  }}
-                  onChange={(val) => {
-                    setSearchTerm(val);
-                    setCurrentPage(1);
-                  }}
-                  fetchFieldValues={fetchFieldValues}
-                />
-              </Box>
-              <FilterChipSelect
-                label={t('argus.releases.sortLabel', '정렬')}
-                value={sortBy}
-                options={sortOptions}
-                anchorEl={sortAnchor}
-                onOpen={handleSortOpen}
-                onClose={handleSortClose}
-                onSelect={handleSortSelect}
-                sx={{ height: 32 }}
-              />
-              {searchTerm && (
-                <Typography variant="caption" color="text.secondary">
-                  {filteredTotal} / {total}{' '}
-                  {t('argus.releases.releasesLabel', 'releases')}
-                </Typography>
-              )}
-            </Box>
+
 
             {filteredReleases.length === 0 ? (
               <Box sx={{ mt: 1 }}>
