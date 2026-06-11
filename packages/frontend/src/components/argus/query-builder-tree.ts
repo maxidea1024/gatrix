@@ -142,7 +142,9 @@ function parseLevel(
       // NOT filter or aggregate
       if (
         i + 1 < end &&
-        (chips[i + 1].type === 'filter' || chips[i + 1].type === 'aggregate' || !chips[i + 1].type)
+        (chips[i + 1].type === 'filter' ||
+          chips[i + 1].type === 'aggregate' ||
+          !chips[i + 1].type)
       ) {
         const f = chipToFilter(chips[i + 1]);
         f.negated = true;

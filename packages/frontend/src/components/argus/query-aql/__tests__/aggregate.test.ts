@@ -10,7 +10,12 @@ import { queryToChips, chipsToQuery } from '../useFilterChips';
 import { getSuggestions, isIncompleteQuery } from '../suggestion-engine';
 import { tokenize } from '../lexer';
 import { resolveCursorContext } from '../cursor-context';
-import { DISCOVER_CONFIG, PERFORMANCE_CONFIG, LOGS_CONFIG, RELEASES_CONFIG } from '../fields';
+import {
+  DISCOVER_CONFIG,
+  PERFORMANCE_CONFIG,
+  LOGS_CONFIG,
+  RELEASES_CONFIG,
+} from '../fields';
 import type { AggregateFilterExpression } from '../types';
 import { validate } from '../validator';
 import { formatQuery } from '../formatter';
@@ -259,9 +264,7 @@ describe('Aggregate Parser', () => {
 
   describe('combined with regular filters', () => {
     it('should parse filter AND aggregate', () => {
-      const { ast, errors } = parseAgg(
-        'service:web and count():>100'
-      );
+      const { ast, errors } = parseAgg('service:web and count():>100');
       expect(errors).toHaveLength(0);
       expect(ast).toMatchObject({
         type: 'Binary',
@@ -372,9 +375,7 @@ describe('Aggregate Parser', () => {
       const { ast, errors } = parseAgg('count(');
       // count is aggregate → parseAggregateFilter tries to consume args
       // but hits EOF before RPAREN
-      expect(
-        errors.some((e) => e.type === 'UNCLOSED_PAREN')
-      ).toBe(true);
+      expect(errors.some((e) => e.type === 'UNCLOSED_PAREN')).toBe(true);
     });
 
     it('should handle incomplete aggregate: count():', () => {
@@ -388,9 +389,7 @@ describe('Aggregate Parser', () => {
     it('should handle aggregate with colon and operator but no value: count():>', () => {
       const { ast, errors } = parseAgg('count():>');
       // Should produce an INCOMPLETE_FILTER error
-      expect(
-        errors.some((e) => e.type === 'INCOMPLETE_FILTER')
-      ).toBe(true);
+      expect(errors.some((e) => e.type === 'INCOMPLETE_FILTER')).toBe(true);
     });
 
     it('should handle count() without colon (partial)', () => {
@@ -525,8 +524,7 @@ describe('Aggregate Chip Pipeline', () => {
     });
 
     it('should roundtrip complex expression', () => {
-      const input =
-        'service:web AND count():>100 AND p95(duration):>500';
+      const input = 'service:web AND count():>100 AND p95(duration):>500';
       const chips = toChips(input);
       const query = chipsToQuery(chips);
       expect(query).toBe(input);

@@ -20,9 +20,12 @@ describe('Aggregate arg → operator flow', () => {
     const tokens = tokenize(input);
     const ctx = resolveCursorContext(input, input.length, tokens);
     const suggestions = getSuggestions(ctx, DISCOVER_CONFIG);
-    console.log('Suggestions:', suggestions.map(s => `${s.label} (${s.category})`));
-    const opSugs = suggestions.filter(s => s.category === 'operator');
-    expect(opSugs.some(s => s.label === '>')).toBe(true);
-    expect(opSugs.some(s => s.label === '>=')).toBe(true);
+    console.log(
+      'Suggestions:',
+      suggestions.map((s) => `${s.label} (${s.category})`)
+    );
+    const opSugs = suggestions.filter((s) => s.category === 'operator');
+    expect(opSugs.some((s) => s.label === '>')).toBe(true);
+    expect(opSugs.some((s) => s.label === '>=')).toBe(true);
   });
 });

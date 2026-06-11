@@ -1,5 +1,20 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Box, Typography, IconButton, Chip, Button, Paper, useTheme, GlobalStyles } from '@mui/material';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
+import {
+  Box,
+  Typography,
+  IconButton,
+  Chip,
+  Button,
+  Paper,
+  useTheme,
+  GlobalStyles,
+} from '@mui/material';
 import {
   PlayArrow as PlayArrowIcon,
   Stop as StopIcon,
@@ -53,12 +68,14 @@ const HIGHLIGHT_DURATION = 1500;
 const FLUSH_INTERVAL = 200;
 
 /** Generate CSS @keyframes for each severity level */
-const HIGHLIGHT_ALPHA = 0.10;
+const HIGHLIGHT_ALPHA = 0.1;
 const HIGHLIGHT_KEYFRAMES = Object.entries(SEVERITY_COLORS)
   .map(
     ([level, color]) => `
 @keyframes liveTailHighlight-${level} {
-  0% { background-color: ${color}${Math.round(HIGHLIGHT_ALPHA * 255).toString(16).padStart(2, '0')}; }
+  0% { background-color: ${color}${Math.round(HIGHLIGHT_ALPHA * 255)
+    .toString(16)
+    .padStart(2, '0')}; }
   100% { background-color: transparent; }
 }`
   )
@@ -117,7 +134,16 @@ interface LogRowProps {
 }
 
 const LogRow = React.memo<LogRowProps>(
-  ({ log, isSelected, isNew, isDark, borderColor, primaryColor, onSelect, formatTimestamp }) => {
+  ({
+    log,
+    isSelected,
+    isNew,
+    isDark,
+    borderColor,
+    primaryColor,
+    onSelect,
+    formatTimestamp,
+  }) => {
     const levelColor = SEVERITY_COLORS[log.level?.toLowerCase()] || '#9e9e9e';
 
     const rowStyle: React.CSSProperties = {
@@ -135,17 +161,18 @@ const LogRow = React.memo<LogRowProps>(
     };
 
     return (
-      <div
-        style={rowStyle}
-        onClick={() => onSelect?.(log)}
-        className="lt-row"
-      >
+      <div style={rowStyle} onClick={() => onSelect?.(log)} className="lt-row">
         <div style={DOT_CONTAINER_STYLE}>
           <DotIcon style={{ fontSize: 8, color: levelColor }} />
         </div>
 
         <div style={{ flex: 1.3, minWidth: 165, overflow: 'hidden' }}>
-          <span style={{ ...TS_STYLE, color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }}>
+          <span
+            style={{
+              ...TS_STYLE,
+              color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
+            }}
+          >
             {formatTimestamp(log.timestamp)}
           </span>
         </div>
@@ -157,15 +184,18 @@ const LogRow = React.memo<LogRowProps>(
         </div>
 
         <div style={{ flex: 0.8, minWidth: 90, overflow: 'hidden' }}>
-          <span style={{ ...SERVICE_STYLE, color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)' }}>
+          <span
+            style={{
+              ...SERVICE_STYLE,
+              color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)',
+            }}
+          >
             {log.service || '—'}
           </span>
         </div>
 
         <div style={{ flex: 3, minWidth: 200, overflow: 'hidden' }}>
-          <span style={MSG_STYLE}>
-            {log.message || log.body}
-          </span>
+          <span style={MSG_STYLE}>{log.message || log.body}</span>
         </div>
       </div>
     );
@@ -195,7 +225,10 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
   const [liveTailCount, setLiveTailCount] = useState(0);
   const liveTailRef = useRef<EventSource | null>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
-  const [highlightEnabled, setHighlightEnabled] = useLocalStorage('argus_liveTail_highlight', true);
+  const [highlightEnabled, setHighlightEnabled] = useLocalStorage(
+    'argus_liveTail_highlight',
+    true
+  );
 
   // ── State for tracking scroll and missed logs (Datadog style) ──
   const [isAtBottom, setIsAtBottom] = useState(true);
@@ -329,7 +362,12 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
       setLiveTailPaused(true);
       liveTailPausedRef.current = true;
       autoPausedRef.current = true;
-    } else if (!selectedLogId && liveTailActive && liveTailPausedRef.current && autoPausedRef.current) {
+    } else if (
+      !selectedLogId &&
+      liveTailActive &&
+      liveTailPausedRef.current &&
+      autoPausedRef.current
+    ) {
       setLiveTailPaused(false);
       liveTailPausedRef.current = false;
       autoPausedRef.current = false;
@@ -402,7 +440,15 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
         />
       );
     },
-    [selectedLogId, highlightEnabled, isDark, borderColor, primaryColor, onSelectLog, formatTimestamp]
+    [
+      selectedLogId,
+      highlightEnabled,
+      isDark,
+      borderColor,
+      primaryColor,
+      onSelectLog,
+      formatTimestamp,
+    ]
   );
 
   return (
@@ -554,7 +600,9 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
                 {t('argus.logs.liveTail.clear', 'Clear Logs')}
               </Button>
             )}
-            <SafeTooltip title={t('argus.logs.liveTail.highlightNew', 'Highlight New')}>
+            <SafeTooltip
+              title={t('argus.logs.liveTail.highlightNew', 'Highlight New')}
+            >
               <IconButton
                 size="small"
                 onClick={() => setHighlightEnabled((v) => !v)}
@@ -679,7 +727,11 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
                     style={{ height: '100%' }}
                     overscan={50}
                     defaultItemHeight={33}
-                    initialTopMostItemIndex={liveTailLogs.length > 0 ? liveTailLogs.length - 1 : undefined}
+                    initialTopMostItemIndex={
+                      liveTailLogs.length > 0
+                        ? liveTailLogs.length - 1
+                        : undefined
+                    }
                     atBottomStateChange={handleAtBottomStateChange}
                     followOutput={isAtBottom ? 'auto' : false}
                   />
@@ -707,7 +759,9 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
                         },
                       }}
                     >
-                      {t('argus.logs.liveTail.newLogs', '{{count}} new logs', { count: newLogsCount })}
+                      {t('argus.logs.liveTail.newLogs', '{{count}} new logs', {
+                        count: newLogsCount,
+                      })}
                     </Button>
                   )}
                 </>

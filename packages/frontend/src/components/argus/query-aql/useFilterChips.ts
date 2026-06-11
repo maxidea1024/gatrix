@@ -335,7 +335,10 @@ const VALUE_TYPES = new Set([
  * Uses token-based reconstruction for perfect roundtrip fidelity.
  * Each token maps directly to a chip — parens/AND/OR are never auto-paired.
  */
-export function queryToChips(query: string, aggregateNames?: Set<string>): FilterChip[] {
+export function queryToChips(
+  query: string,
+  aggregateNames?: Set<string>
+): FilterChip[] {
   if (!query.trim()) return [];
   const tokens = tokenize(query);
   const chips: FilterChip[] = [];
@@ -385,10 +388,7 @@ export function queryToChips(query: string, aggregateNames?: Set<string>): Filte
 
       // Parse args until RPAREN
       const args: string[] = [];
-      while (
-        tok().type !== TokenType.RPAREN &&
-        tok().type !== TokenType.EOF
-      ) {
+      while (tok().type !== TokenType.RPAREN && tok().type !== TokenType.EOF) {
         if (tok().type === TokenType.COMMA) {
           advance();
           continue;

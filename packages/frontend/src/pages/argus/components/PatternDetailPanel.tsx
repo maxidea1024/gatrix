@@ -64,9 +64,20 @@ const DetailSparkline: React.FC<{
     .join(' ');
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block', width: '100%', height: 'auto' }}>
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      style={{ display: 'block', width: '100%', height: 'auto' }}
+    >
       <defs>
-        <linearGradient id={`grad-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient
+          id={`grad-${color.replace('#', '')}`}
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
           <stop offset="0%" stopColor={color} stopOpacity={0.3} />
           <stop offset="100%" stopColor={color} stopOpacity={0.02} />
         </linearGradient>
@@ -112,17 +123,28 @@ const StatRow: React.FC<{
       },
     }}
   >
-    <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+    <Typography
+      sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}
+    >
       {label}
     </Typography>
-    <Typography component="div" sx={{ fontSize: '0.78rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+    <Typography
+      component="div"
+      sx={{
+        fontSize: '0.78rem',
+        fontWeight: 600,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
       {value}
     </Typography>
   </Box>
 );
 
 /* ── Section Label ── */
-const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+const SectionLabel: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
   <Typography
     sx={{
       fontSize: '0.65rem',
@@ -224,7 +246,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
     };
 
     fetchIssues();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [open, pattern, projectId, getKeyword]);
 
   // Fetch attribute distribution when pattern changes
@@ -255,7 +279,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
       }
     };
     fetchAttrs();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [open, pattern, projectId, period, attrFetchedFor]);
 
   const handleLoadMore = useCallback(async () => {
@@ -284,20 +310,30 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
   if (pattern) lastPatternRef.current = pattern;
   const displayPattern = pattern ?? lastPatternRef.current;
 
-  const levelColor = displayPattern ? getLevelColor(displayPattern.level) : '#9e9e9e';
-  const prevCount = displayPattern?.prev_count != null ? Number(displayPattern.prev_count) : null;
+  const levelColor = displayPattern
+    ? getLevelColor(displayPattern.level)
+    : '#9e9e9e';
+  const prevCount =
+    displayPattern?.prev_count != null
+      ? Number(displayPattern.prev_count)
+      : null;
   const delta =
     prevCount !== null && prevCount > 0 && displayPattern
       ? ((Number(displayPattern.count) - prevCount) / prevCount) * 100
       : null;
-  const isNew = prevCount === 0 && displayPattern && Number(displayPattern.count) > 0;
+  const isNew =
+    prevCount === 0 && displayPattern && Number(displayPattern.count) > 0;
 
   return (
     <ResizableDrawer
       open={open}
       onClose={onClose}
       title={t('argus.logs.patterns.detail', 'Pattern Detail')}
-      subtitle={displayPattern?.level ? `${displayPattern.level.toUpperCase()} · ${displayPattern.service || '-'}` : undefined}
+      subtitle={
+        displayPattern?.level
+          ? `${displayPattern.level.toUpperCase()} · ${displayPattern.service || '-'}`
+          : undefined
+      }
       storageKey="argus-pattern-detail-width"
       defaultWidth={480}
       minWidth={360}
@@ -306,7 +342,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         {/* Pattern text */}
         <Box sx={{ px: 2, py: 2 }}>
-          <SectionLabel>{t('argus.logs.patterns.pattern', 'Pattern')}</SectionLabel>
+          <SectionLabel>
+            {t('argus.logs.patterns.pattern', 'Pattern')}
+          </SectionLabel>
           <Box
             component="code"
             sx={{
@@ -330,7 +368,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
         {/* Trend sparkline */}
         {displayPattern?.trend && (
           <Box sx={{ px: 2, py: 2 }}>
-            <SectionLabel>{t('argus.logs.patterns.trendOverTime', 'Trend Over Time')}</SectionLabel>
+            <SectionLabel>
+              {t('argus.logs.patterns.trendOverTime', 'Trend Over Time')}
+            </SectionLabel>
             <DetailSparkline data={displayPattern.trend} color={levelColor} />
           </Box>
         )}
@@ -360,10 +400,16 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                   sx={{
                     fontSize: '0.78rem',
                     fontWeight: 700,
-                    color: delta > 5 ? '#f44336' : delta < -5 ? '#4caf50' : 'text.secondary',
+                    color:
+                      delta > 5
+                        ? '#f44336'
+                        : delta < -5
+                          ? '#4caf50'
+                          : 'text.secondary',
                   }}
                 >
-                  {delta > 0 ? '+' : ''}{delta.toFixed(1)}%
+                  {delta > 0 ? '+' : ''}
+                  {delta.toFixed(1)}%
                 </Typography>
               }
               isDark={isDark}
@@ -402,12 +448,20 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
           />
           <StatRow
             label={t('argus.logs.patterns.firstSeen', 'First Seen')}
-            value={displayPattern?.first_seen ? formatRelativeTime(displayPattern.first_seen) : '-'}
+            value={
+              displayPattern?.first_seen
+                ? formatRelativeTime(displayPattern.first_seen)
+                : '-'
+            }
             isDark={isDark}
           />
           <StatRow
             label={t('argus.logs.patterns.lastSeen', 'Last Seen')}
-            value={displayPattern?.last_seen ? formatRelativeTime(displayPattern.last_seen) : '-'}
+            value={
+              displayPattern?.last_seen
+                ? formatRelativeTime(displayPattern.last_seen)
+                : '-'
+            }
             isDark={isDark}
           />
         </Box>
@@ -416,7 +470,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
 
         {/* Sample message */}
         <Box sx={{ px: 2, py: 2 }}>
-          <SectionLabel>{t('argus.logs.patterns.sampleMessage', 'Sample Message')}</SectionLabel>
+          <SectionLabel>
+            {t('argus.logs.patterns.sampleMessage', 'Sample Message')}
+          </SectionLabel>
           <Box
             component="code"
             sx={{
@@ -441,14 +497,24 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
 
         {/* Attribute Distribution */}
         <Box sx={{ px: 2, py: 2 }}>
-          <SectionLabel>{t('argus.logs.patterns.attrDistribution', 'Attribute Distribution')}</SectionLabel>
+          <SectionLabel>
+            {t(
+              'argus.logs.patterns.attrDistribution',
+              'Attribute Distribution'
+            )}
+          </SectionLabel>
           {attrLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
               <CircularProgress size={18} />
             </Box>
           ) : Object.keys(attrDistribution).length === 0 ? (
-            <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', py: 1 }}>
-              {t('argus.logs.patterns.noAttrData', 'No attribute distribution data available')}
+            <Typography
+              sx={{ fontSize: '0.72rem', color: 'text.disabled', py: 1 }}
+            >
+              {t(
+                'argus.logs.patterns.noAttrData',
+                'No attribute distribution data available'
+              )}
             </Typography>
           ) : (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -540,14 +606,19 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
 
         {/* Related Issues (⭐8) — inline list with show-more */}
         <Box sx={{ px: 2, py: 2 }}>
-          <SectionLabel>{t('argus.logs.patterns.relatedIssues', 'Related Issues')}</SectionLabel>
+          <SectionLabel>
+            {t('argus.logs.patterns.relatedIssues', 'Related Issues')}
+          </SectionLabel>
           {issuesLoading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
               <CircularProgress size={20} />
             </Box>
           ) : issues.length === 0 ? (
             <EmptyPlaceholder
-              message={t('argus.logs.patterns.noRelatedIssues', 'No related issues found')}
+              message={t(
+                'argus.logs.patterns.noRelatedIssues',
+                'No related issues found'
+              )}
               minHeight={80}
             />
           ) : (
@@ -561,7 +632,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                   showLastSeen={false}
                   isFirst={idx === 0}
                   isLast={idx === issues.length - 1}
-                  onClick={(iss) => navigate(`/argus/issues/${projectId}/${iss.id}`)}
+                  onClick={(iss) =>
+                    navigate(`/argus/issues/${projectId}/${iss.id}`)
+                  }
                 />
               ))}
               {hasMore && (
@@ -584,8 +657,12 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                       '&:hover': { textDecoration: 'underline' },
                     }}
                   >
-                    {loadingMore && <CircularProgress size={10} color="inherit" />}
-                    {t('common.showMore', '+{{count}} more', { count: PAGE_SIZE })}
+                    {loadingMore && (
+                      <CircularProgress size={10} color="inherit" />
+                    )}
+                    {t('common.showMore', '+{{count}} more', {
+                      count: PAGE_SIZE,
+                    })}
                   </Link>
                 </Box>
               )}
@@ -596,7 +673,15 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
         <Divider />
 
         {/* Action buttons */}
-        <Box sx={{ px: 2, py: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box
+          sx={{
+            px: 2,
+            py: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+          }}
+        >
           {onFilterPattern && (
             <Button
               variant="outlined"
@@ -628,7 +713,10 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                 justifyContent: 'flex-start',
                 color: '#ff9800',
                 borderColor: alpha('#ff9800', 0.3),
-                '&:hover': { borderColor: '#ff9800', bgcolor: alpha('#ff9800', 0.04) },
+                '&:hover': {
+                  borderColor: '#ff9800',
+                  bgcolor: alpha('#ff9800', 0.04),
+                },
               }}
             >
               {t('argus.logs.patterns.createAlert', 'Create Alert for Pattern')}

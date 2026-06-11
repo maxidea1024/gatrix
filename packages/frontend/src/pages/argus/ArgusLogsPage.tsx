@@ -139,11 +139,16 @@ const ArgusLogsPage: React.FC = () => {
   }, [columnNames]);
 
   const [editTableOpen, setEditTableOpen] = useState(false);
-  const [selectedPattern, setSelectedPattern] = useState<PatternEntry | null>(null);
+  const [selectedPattern, setSelectedPattern] = useState<PatternEntry | null>(
+    null
+  );
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
-  const [wrapLines, setWrapLines] = useLocalStorage<boolean>('argus_logs_wrap_lines', false);
+  const [wrapLines, setWrapLines] = useLocalStorage<boolean>(
+    'argus_logs_wrap_lines',
+    false
+  );
   const [logsFullscreen, setLogsFullscreen] = useState(false);
   const [showGotoTime, setShowGotoTime] = useState(false);
   const [gotoTime, setGotoTime] = useState('');
@@ -732,7 +737,10 @@ const ArgusLogsPage: React.FC = () => {
                     />
                   )}
                 {activeTab === 1 &&
-                  (aggLoading || aggGroupBys.some((g) => aggDataMap[g]?.topValues?.length > 0)) && (
+                  (aggLoading ||
+                    aggGroupBys.some(
+                      (g) => aggDataMap[g]?.topValues?.length > 0
+                    )) && (
                     <>
                       {aggGroupBys.map((gKey, gIdx) => (
                         <LogsAggregatePanel
@@ -741,7 +749,9 @@ const ArgusLogsPage: React.FC = () => {
                           aggGroupBy={gKey}
                           aggLoading={aggLoading}
                           isDark={isDark}
-                          discoveredFacetKeys={discoveredFacets.map((f) => f.label)}
+                          discoveredFacetKeys={discoveredFacets.map(
+                            (f) => f.label
+                          )}
                           onGroupByChange={(val) => {
                             const newKeys = [...aggGroupBys];
                             newKeys[gIdx] = val;
@@ -764,7 +774,9 @@ const ArgusLogsPage: React.FC = () => {
                           }}
                           showRemove={aggGroupBys.length > 1}
                           onRemovePanel={() => {
-                            const newKeys = aggGroupBys.filter((_, i) => i !== gIdx);
+                            const newKeys = aggGroupBys.filter(
+                              (_, i) => i !== gIdx
+                            );
                             setUrlState({ groupBy: newKeys.join(',') });
                             fetchAggregates(newKeys);
                           }}
@@ -774,8 +786,16 @@ const ArgusLogsPage: React.FC = () => {
                         <Box
                           onClick={() => {
                             // Add a new group-by panel with a default key not already used
-                            const defaults = ['level', 'service', 'environment', 'logger_name', 'release'];
-                            const next = defaults.find((d) => !aggGroupBys.includes(d)) || 'level';
+                            const defaults = [
+                              'level',
+                              'service',
+                              'environment',
+                              'logger_name',
+                              'release',
+                            ];
+                            const next =
+                              defaults.find((d) => !aggGroupBys.includes(d)) ||
+                              'level';
                             const newKeys = [...aggGroupBys, next];
                             setUrlState({ groupBy: newKeys.join(',') });
                             fetchAggregates(newKeys);
@@ -790,7 +810,12 @@ const ArgusLogsPage: React.FC = () => {
                             color: 'text.disabled',
                             fontSize: '0.72rem',
                             transition: 'all 0.15s',
-                            '&:hover': { color: 'primary.main', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' },
+                            '&:hover': {
+                              color: 'primary.main',
+                              bgcolor: isDark
+                                ? 'rgba(255,255,255,0.02)'
+                                : 'rgba(0,0,0,0.01)',
+                            },
                           }}
                         >
                           + {t('argus.logs.agg.addGroup', 'Add group')}
@@ -816,7 +841,9 @@ const ArgusLogsPage: React.FC = () => {
                       if (keyword) params.set('query', `message:"${keyword}"`);
                       if (p.level) params.set('level', p.level);
                       if (p.service) params.set('service', p.service);
-                      navigate(`/argus/alerts?action=create&${params.toString()}`);
+                      navigate(
+                        `/argus/alerts?action=create&${params.toString()}`
+                      );
                     }}
                   />
                 )}
@@ -850,7 +877,9 @@ const ArgusLogsPage: React.FC = () => {
                       if (keyword) params.set('query', `message:"${keyword}"`);
                       if (p.level) params.set('level', p.level);
                       if (p.service) params.set('service', p.service);
-                      navigate(`/argus/alerts?action=create&${params.toString()}`);
+                      navigate(
+                        `/argus/alerts?action=create&${params.toString()}`
+                      );
                     }}
                     projectId={projectId}
                     period={currentPeriod}

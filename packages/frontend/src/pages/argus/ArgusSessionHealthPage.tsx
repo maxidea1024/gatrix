@@ -337,7 +337,9 @@ const ArgusSessionHealthPage: React.FC = () => {
         onRefresh={fetchData}
         loading={loading}
         extraControls={
-          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', flex: 1 }}>
+          <Box
+            sx={{ display: 'flex', gap: 0.5, alignItems: 'center', flex: 1 }}
+          >
             {(['sessions', 'users'] as DisplayMode[]).map((mode) => (
               <Chip
                 key={mode}

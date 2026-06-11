@@ -412,10 +412,10 @@ const AGGREGATE_OPERATORS_BY_RETURN_TYPE: Record<
   AggregateFunctionDef['returnType'],
   string[]
 > = {
-  number:     ['=', '!=', '>', '>=', '<', '<='],
+  number: ['=', '!=', '>', '>=', '<', '<='],
   percentage: ['=', '!=', '>', '>=', '<', '<='],
-  duration:   ['=', '!=', '>', '>=', '<', '<='],
-  string:     ['=', '!=', 'contains', '!contains'],
+  duration: ['=', '!=', '>', '>=', '<', '<='],
+  string: ['=', '!=', 'contains', '!contains'],
 };
 
 /**
@@ -585,7 +585,18 @@ export const LOGS_CONFIG: DomainConfig = {
     'issue_id',
   ]),
   aliases: SHARED_ALIASES,
-  aggregates: [AGG_COUNT, AGG_AVG, AGG_SUM, AGG_MIN, AGG_MAX, AGG_UNIQ, AGG_P50, AGG_P75, AGG_P95, AGG_P99],
+  aggregates: [
+    AGG_COUNT,
+    AGG_AVG,
+    AGG_SUM,
+    AGG_MIN,
+    AGG_MAX,
+    AGG_UNIQ,
+    AGG_P50,
+    AGG_P75,
+    AGG_P95,
+    AGG_P99,
+  ],
 };
 
 export const ISSUES_CONFIG: DomainConfig = {
@@ -646,9 +657,19 @@ export const DISCOVER_CONFIG: DomainConfig = {
   ),
   aliases: SHARED_ALIASES,
   aggregates: [
-    AGG_COUNT, AGG_AVG, AGG_SUM, AGG_MIN, AGG_MAX, AGG_UNIQ,
-    AGG_P50, AGG_P75, AGG_P95, AGG_P99,
-    AGG_FAILURE_RATE, AGG_APDEX, AGG_TPM,
+    AGG_COUNT,
+    AGG_AVG,
+    AGG_SUM,
+    AGG_MIN,
+    AGG_MAX,
+    AGG_UNIQ,
+    AGG_P50,
+    AGG_P75,
+    AGG_P95,
+    AGG_P99,
+    AGG_FAILURE_RATE,
+    AGG_APDEX,
+    AGG_TPM,
   ],
 };
 
@@ -699,8 +720,15 @@ export const PERFORMANCE_CONFIG: DomainConfig = {
     }
   ),
   aggregates: [
-    AGG_COUNT, AGG_AVG, AGG_P50, AGG_P75, AGG_P95, AGG_P99,
-    AGG_FAILURE_RATE, AGG_APDEX, AGG_TPM,
+    AGG_COUNT,
+    AGG_AVG,
+    AGG_P50,
+    AGG_P75,
+    AGG_P95,
+    AGG_P99,
+    AGG_FAILURE_RATE,
+    AGG_APDEX,
+    AGG_TPM,
   ],
 };
 
@@ -764,7 +792,15 @@ export const TRACES_CONFIG: DomainConfig = {
     }
   ),
   aliases: SHARED_ALIASES,
-  aggregates: [AGG_COUNT, AGG_AVG, AGG_P50, AGG_P75, AGG_P95, AGG_P99, AGG_UNIQ],
+  aggregates: [
+    AGG_COUNT,
+    AGG_AVG,
+    AGG_P50,
+    AGG_P75,
+    AGG_P95,
+    AGG_P99,
+    AGG_UNIQ,
+  ],
 };
 
 // ─── Public API (DomainConfig-based) ─────────────────────────────────────────

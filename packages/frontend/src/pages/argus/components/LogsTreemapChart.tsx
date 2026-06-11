@@ -133,7 +133,10 @@ function layoutTreemap(
   return rects;
 }
 
-const LogsTreemapChart: React.FC<LogsTreemapChartProps> = ({ data, onClick }) => {
+const LogsTreemapChart: React.FC<LogsTreemapChartProps> = ({
+  data,
+  onClick,
+}) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const containerRef = useRef<HTMLDivElement>(null);

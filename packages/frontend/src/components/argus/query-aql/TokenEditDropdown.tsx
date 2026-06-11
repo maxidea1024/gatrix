@@ -21,7 +21,11 @@ import { useTranslation } from 'react-i18next';
 
 import type { FilterChip } from './useFilterChips';
 import type { DomainConfig, QueryField } from './types';
-import { getFieldByKey, getAggregateOperators, getAggregateFieldType } from './fields';
+import {
+  getFieldByKey,
+  getAggregateOperators,
+  getAggregateFieldType,
+} from './fields';
 import { getOperatorOptions } from './operator-labels';
 import DatetimeValueEditor from './DatetimeValueEditor';
 
@@ -891,7 +895,13 @@ function HasToggleMenu({
   };
 
   return (
-    <List ref={listRef} tabIndex={0} onKeyDown={handleKeyDown} dense sx={{ py: 0.5, outline: 'none' }}>
+    <List
+      ref={listRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      dense
+      sx={{ py: 0.5, outline: 'none' }}
+    >
       {options.map(({ key, label }, idx) => {
         const isCurrent = idx === selectedIndex || key === currentField;
         return (
@@ -954,8 +964,7 @@ function AggregateFieldMenu({
   }, []);
 
   const filtered = aggregates.filter(
-    (agg) =>
-      !search || agg.name.toLowerCase().includes(search.toLowerCase())
+    (agg) => !search || agg.name.toLowerCase().includes(search.toLowerCase())
   );
 
   useEffect(() => {
@@ -972,13 +981,15 @@ function AggregateFieldMenu({
     }
   }, [selectedIndex]);
 
-  const selectAgg = (agg: typeof aggregates[0]) => {
+  const selectAgg = (agg: (typeof aggregates)[0]) => {
     const needsArgs = agg.args.length > 0;
     const hasCurrentArgs = chip.aggregateArgs && chip.aggregateArgs.length > 0;
     onUpdate({
       aggregateFunc: agg.name,
       aggregateArgs: needsArgs
-        ? (hasCurrentArgs ? chip.aggregateArgs : undefined)
+        ? hasCurrentArgs
+          ? chip.aggregateArgs
+          : undefined
         : [],
     });
     onClose();
@@ -1002,7 +1013,14 @@ function AggregateFieldMenu({
   };
 
   return (
-    <Box sx={{ maxHeight: 280, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        maxHeight: 280,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
         <InputBase
           inputRef={searchRef}
@@ -1017,7 +1035,9 @@ function AggregateFieldMenu({
             px: 1,
             py: 0.3,
             borderRadius: '6px',
-            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.04)',
           }}
         />
       </Box>
@@ -1025,9 +1045,8 @@ function AggregateFieldMenu({
         {filtered.map((agg, idx) => {
           const isCurrent = agg.name === currentFunc;
           const isHighlighted = idx === selectedIndex;
-          const label = agg.args.length === 0
-            ? `${agg.name}()`
-            : `${agg.name}(field)`;
+          const label =
+            agg.args.length === 0 ? `${agg.name}()` : `${agg.name}(field)`;
           return (
             <ListItemButton
               key={agg.name}
@@ -1076,7 +1095,9 @@ function AggregateFieldMenu({
                 }}
               />
               {isCurrent && (
-                <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
+                <CheckIcon
+                  sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
+                />
               )}
             </ListItemButton>
           );

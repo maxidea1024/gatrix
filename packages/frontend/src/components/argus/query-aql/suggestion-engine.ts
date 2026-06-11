@@ -107,7 +107,11 @@ export function applyCompletion(
  * value/logical → close.
  */
 export function shouldKeepDropdownOpen(item: SuggestionItem): boolean {
-  return item.category === 'field' || item.category === 'operator' || item.category === 'aggregate';
+  return (
+    item.category === 'field' ||
+    item.category === 'operator' ||
+    item.category === 'aggregate'
+  );
 }
 
 // ─── Suggestion generators ───────────────────────────────────────────────────

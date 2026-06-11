@@ -157,8 +157,8 @@ const DeltaBadge: React.FC<{
   const multiplier = curr / prev;
   const displayText =
     Math.abs(delta) > 200
-      ? `${multiplier.toFixed(1)}×`       // "3.2×" — much clearer than "220%"
-      : `${Math.abs(delta).toFixed(0)}%`;  // "45%"
+      ? `${multiplier.toFixed(1)}×` // "3.2×" — much clearer than "220%"
+      : `${Math.abs(delta).toFixed(0)}%`; // "45%"
 
   return (
     <SafeTooltip
@@ -186,11 +186,23 @@ const DeltaBadge: React.FC<{
 });
 
 /* ── Sort types ── */
-type SortKey = 'count' | 'level' | 'service' | 'first_seen' | 'last_seen' | 'delta';
+type SortKey =
+  | 'count'
+  | 'level'
+  | 'service'
+  | 'first_seen'
+  | 'last_seen'
+  | 'delta';
 type SortDir = 'asc' | 'desc';
 
 const LEVEL_ORDER: Record<string, number> = {
-  fatal: 0, error: 1, warn: 2, warning: 2, info: 3, debug: 4, trace: 5,
+  fatal: 0,
+  error: 1,
+  warn: 2,
+  warning: 2,
+  info: 3,
+  debug: 4,
+  trace: 5,
 };
 
 /* ── Summary Cards ── */
@@ -208,7 +220,7 @@ const SummaryCards: React.FC<{
     patterns.forEach((p) => {
       const prev = p.prev_count;
       if (prev === 0 || prev === null || prev === undefined) {
-        if (Number(p.count) > 0 && (prev === 0)) newCount++;
+        if (Number(p.count) > 0 && prev === 0) newCount++;
       } else {
         const delta = ((Number(p.count) - Number(prev)) / Number(prev)) * 100;
         if (delta > 100) surgeCount++;
@@ -254,7 +266,11 @@ const SummaryCards: React.FC<{
             {c.value}
           </Typography>
           <Typography
-            sx={{ fontSize: '0.62rem', color: 'text.disabled', fontWeight: 600 }}
+            sx={{
+              fontSize: '0.62rem',
+              color: 'text.disabled',
+              fontWeight: 600,
+            }}
           >
             {c.label}
           </Typography>
@@ -296,20 +312,38 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
         case 'count':
           return (Number(a.count) - Number(b.count)) * dir;
         case 'level':
-          return ((LEVEL_ORDER[a.level?.toLowerCase()] ?? 9) - (LEVEL_ORDER[b.level?.toLowerCase()] ?? 9)) * dir;
+          return (
+            ((LEVEL_ORDER[a.level?.toLowerCase()] ?? 9) -
+              (LEVEL_ORDER[b.level?.toLowerCase()] ?? 9)) *
+            dir
+          );
         case 'service':
           return (a.service || '').localeCompare(b.service || '') * dir;
         case 'first_seen':
-          return (new Date(a.first_seen).getTime() - new Date(b.first_seen).getTime()) * dir;
+          return (
+            (new Date(a.first_seen).getTime() -
+              new Date(b.first_seen).getTime()) *
+            dir
+          );
         case 'last_seen':
-          return (new Date(a.last_seen).getTime() - new Date(b.last_seen).getTime()) * dir;
+          return (
+            (new Date(a.last_seen).getTime() -
+              new Date(b.last_seen).getTime()) *
+            dir
+          );
         case 'delta': {
-          const deltaA = a.prev_count != null && Number(a.prev_count) > 0
-            ? (Number(a.count) - Number(a.prev_count)) / Number(a.prev_count)
-            : a.prev_count === 0 ? 999 : -1;
-          const deltaB = b.prev_count != null && Number(b.prev_count) > 0
-            ? (Number(b.count) - Number(b.prev_count)) / Number(b.prev_count)
-            : b.prev_count === 0 ? 999 : -1;
+          const deltaA =
+            a.prev_count != null && Number(a.prev_count) > 0
+              ? (Number(a.count) - Number(a.prev_count)) / Number(a.prev_count)
+              : a.prev_count === 0
+                ? 999
+                : -1;
+          const deltaB =
+            b.prev_count != null && Number(b.prev_count) > 0
+              ? (Number(b.count) - Number(b.prev_count)) / Number(b.prev_count)
+              : b.prev_count === 0
+                ? 999
+                : -1;
           return (deltaA - deltaB) * dir;
         }
         default:
@@ -325,11 +359,11 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
     [patterns]
   );
 
-  const SortHeader: React.FC<{ label: string; field: SortKey; style?: React.CSSProperties }> = ({
-    label,
-    field,
-    style,
-  }) => (
+  const SortHeader: React.FC<{
+    label: string;
+    field: SortKey;
+    style?: React.CSSProperties;
+  }> = ({ label, field, style }) => (
     <th
       onClick={() => handleSort(field)}
       style={{
@@ -398,25 +432,67 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
                   }}
                 >
-                  <SortHeader label={t('argus.logs.patterns.level', 'Level')} field="level" style={{ textAlign: 'center', width: 50 }} />
-                  <SortHeader label={t('argus.logs.patterns.count', 'Count')} field="count" style={{ textAlign: 'right', width: 70 }} />
-                  <th style={{ padding: '6px 4px', fontWeight: 700, width: 50 }}>%</th>
-                  <SortHeader label="Δ" field="delta" style={{ textAlign: 'center', width: 55 }} />
-                  <th style={{ padding: '6px 4px', fontWeight: 700, width: 70, textAlign: 'center' }}>
+                  <SortHeader
+                    label={t('argus.logs.patterns.level', 'Level')}
+                    field="level"
+                    style={{ textAlign: 'center', width: 50 }}
+                  />
+                  <SortHeader
+                    label={t('argus.logs.patterns.count', 'Count')}
+                    field="count"
+                    style={{ textAlign: 'right', width: 70 }}
+                  />
+                  <th
+                    style={{ padding: '6px 4px', fontWeight: 700, width: 50 }}
+                  >
+                    %
+                  </th>
+                  <SortHeader
+                    label="Δ"
+                    field="delta"
+                    style={{ textAlign: 'center', width: 55 }}
+                  />
+                  <th
+                    style={{
+                      padding: '6px 4px',
+                      fontWeight: 700,
+                      width: 70,
+                      textAlign: 'center',
+                    }}
+                  >
                     {t('argus.logs.patterns.trend', 'Trend')}
                   </th>
-                  <th style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 700 }}>
+                  <th
+                    style={{
+                      textAlign: 'left',
+                      padding: '6px 10px',
+                      fontWeight: 700,
+                    }}
+                  >
                     {t('argus.logs.patterns.pattern', 'Pattern')}
                   </th>
-                  <SortHeader label={t('argus.logs.patterns.service', 'Service')} field="service" style={{ textAlign: 'left', width: 80 }} />
-                  <SortHeader label={t('argus.logs.patterns.firstSeen', 'First Seen')} field="first_seen" style={{ textAlign: 'left', width: 100 }} />
-                  <SortHeader label={t('argus.logs.patterns.lastSeen', 'Last Seen')} field="last_seen" style={{ textAlign: 'left', width: 100 }} />
+                  <SortHeader
+                    label={t('argus.logs.patterns.service', 'Service')}
+                    field="service"
+                    style={{ textAlign: 'left', width: 80 }}
+                  />
+                  <SortHeader
+                    label={t('argus.logs.patterns.firstSeen', 'First Seen')}
+                    field="first_seen"
+                    style={{ textAlign: 'left', width: 100 }}
+                  />
+                  <SortHeader
+                    label={t('argus.logs.patterns.lastSeen', 'Last Seen')}
+                    field="last_seen"
+                    style={{ textAlign: 'left', width: 100 }}
+                  />
                   <th style={{ width: 30 }} />
                 </tr>
               </thead>
               <tbody>
                 {sortedPatterns.map((p, idx) => {
-                  const pct = totalCount > 0 ? (Number(p.count) / totalCount) * 100 : 0;
+                  const pct =
+                    totalCount > 0 ? (Number(p.count) / totalCount) * 100 : 0;
                   const levelColor = getLevelColor(p.level);
                   return (
                     <tr
@@ -428,11 +504,16 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                         transition: 'background-color 0.15s',
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.backgroundColor =
-                          isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+                        (
+                          e.currentTarget as HTMLTableRowElement
+                        ).style.backgroundColor = isDark
+                          ? 'rgba(255,255,255,0.03)'
+                          : 'rgba(0,0,0,0.02)';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.backgroundColor = '';
+                        (
+                          e.currentTarget as HTMLTableRowElement
+                        ).style.backgroundColor = '';
                       }}
                     >
                       {/* Level badge */}
@@ -473,13 +554,21 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                       </td>
                       {/* Percentage bar */}
                       <td style={{ padding: '6px 4px', width: 50 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                          }}
+                        >
                           <Box
                             sx={{
                               width: 30,
                               height: 4,
                               borderRadius: 2,
-                              bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                              bgcolor: isDark
+                                ? 'rgba(255,255,255,0.06)'
+                                : 'rgba(0,0,0,0.06)',
                               overflow: 'hidden',
                               flexShrink: 0,
                             }}
@@ -507,14 +596,22 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                       </td>
                       {/* Delta badge */}
                       <td style={{ textAlign: 'center', padding: '4px 4px' }}>
-                        <DeltaBadge count={Number(p.count)} prevCount={p.prev_count} isDark={isDark} />
+                        <DeltaBadge
+                          count={Number(p.count)}
+                          prevCount={p.prev_count}
+                          isDark={isDark}
+                        />
                       </td>
                       {/* Sparkline */}
                       <td style={{ padding: '4px 4px', textAlign: 'center' }}>
                         {p.trend ? (
                           <Sparkline data={p.trend} color={levelColor} />
                         ) : (
-                          <Typography sx={{ fontSize: '0.55rem', color: 'text.disabled' }}>—</Typography>
+                          <Typography
+                            sx={{ fontSize: '0.55rem', color: 'text.disabled' }}
+                          >
+                            —
+                          </Typography>
                         )}
                       </td>
                       {/* Pattern + sample */}
@@ -551,7 +648,9 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                         style={{
                           padding: '6px 10px',
                           fontSize: '0.68rem',
-                          color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+                          color: isDark
+                            ? 'rgba(255,255,255,0.5)'
+                            : 'rgba(0,0,0,0.5)',
                         }}
                       >
                         {p.first_seen ? formatRelativeTime(p.first_seen) : '-'}
@@ -560,7 +659,9 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                         style={{
                           padding: '6px 10px',
                           fontSize: '0.68rem',
-                          color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+                          color: isDark
+                            ? 'rgba(255,255,255,0.5)'
+                            : 'rgba(0,0,0,0.5)',
                         }}
                       >
                         {p.last_seen ? formatRelativeTime(p.last_seen) : '-'}
@@ -568,7 +669,12 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                       {/* Alert button (⭐6) */}
                       <td style={{ padding: '2px' }}>
                         {onCreateAlert && (
-                          <SafeTooltip title={t('argus.logs.patterns.createAlert', 'Create alert for this pattern')}>
+                          <SafeTooltip
+                            title={t(
+                              'argus.logs.patterns.createAlert',
+                              'Create alert for this pattern'
+                            )}
+                          >
                             <IconButton
                               size="small"
                               onClick={(e) => {
