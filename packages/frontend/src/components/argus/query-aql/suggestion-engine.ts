@@ -377,7 +377,7 @@ function getFieldSuggestions(
     }
   }
 
-  return results.slice(0, max);
+  return results;
 }
 
 /**
