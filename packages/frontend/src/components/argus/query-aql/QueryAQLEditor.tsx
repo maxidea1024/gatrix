@@ -2177,7 +2177,7 @@ export const QueryAQLEditor = forwardRef<
             {/* Front insert spacer — always present to prevent layout shift */}
             <Box
               sx={{
-                width: selectedTokenIdx === -2 ? 0 : 2,
+                width: selectedTokenIdx === -2 ? 0 : 8,
                 flexShrink: 0,
                 transition: 'none',
               }}
