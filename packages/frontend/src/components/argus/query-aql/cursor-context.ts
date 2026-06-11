@@ -66,6 +66,27 @@ export function resolveCursorContext(
       break;
     }
 
+    // RPAREN → skip backward over aggregate function args to find the function name
+    // e.g., for `uniq(platform):` cursor after `:`, skip `platform` and `(` to find `uniq`
+    if (t.type === TokenType.RPAREN) {
+      // Check if this is an aggregate function paren by scanning backward for matching LPAREN
+      let depth = 1;
+      let j = i - 1;
+      while (j >= 0 && depth > 0) {
+        if (tokens[j].type === TokenType.RPAREN) depth++;
+        if (tokens[j].type === TokenType.LPAREN) depth--;
+        j--;
+      }
+      // j now points to the token before LPAREN; if it's a FIELD, that's the aggregate func name
+      if (j >= 0 && tokens[j].type === TokenType.FIELD) {
+        // Skip directly to this FIELD token — it will be picked up by the FIELD check below
+        i = j + 1; // will be decremented by the loop
+        continue;
+      }
+      // Not an aggregate paren — skip just this token
+      continue;
+    }
+
     // Stop at grouping parens, but NOT at value-list parens/brackets or aggregate function parens
     if (t.type === TokenType.LPAREN || t.type === TokenType.LBRACKET) {
       // Check if previous token is COLON or a comparison/function operator

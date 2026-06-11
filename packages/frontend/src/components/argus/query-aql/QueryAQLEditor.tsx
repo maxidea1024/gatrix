@@ -1428,7 +1428,8 @@ export const QueryAQLEditor = forwardRef<
 
         // Step-by-step creation: if this is a field selection from empty input,
         // create a composing chip instead of putting text in input
-        if (item.category === 'field' && !inputValue.includes(':')) {
+        // BUT NOT when inside aggregate function parens (e.g., uniq(|) → selecting a field arg)
+        if (item.category === 'field' && !inputValue.includes(':') && !cursorContext?.inAggregateParen) {
           // HAS suggestions (has:"fieldName") → immediately create complete chip
           if (item.fieldCategory === 'has' && item.insertText) {
             const completedChips = queryToChips(item.insertText, aggregateNames);
