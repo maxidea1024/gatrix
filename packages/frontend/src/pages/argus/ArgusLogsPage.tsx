@@ -855,18 +855,7 @@ const ArgusLogsPage: React.FC = () => {
                     open={!!selectedPattern}
                     onClose={() => setSelectedPattern(null)}
                     isDark={isDark}
-                    onFilterPattern={(p) => {
-                      const keyword = p.sample_message
-                        ?.replace(/<[A-Z]+>/g, '')
-                        ?.split(/[\s:]+/)
-                        ?.find((w) => w.length > 3 && !/^\d+$/.test(w));
-                      if (keyword) {
-                        const ref = dslEditorRef.current;
-                        if (ref) ref.upsertFieldChip('message', [keyword]);
-                      }
-                      setSelectedPattern(null);
-                      setUrlState({ tab: '0' });
-                    }}
+                    onFilterPattern={undefined}
                     onCreateAlert={(p) => {
                       const params = new URLSearchParams();
                       params.set('dataset', 'logs');

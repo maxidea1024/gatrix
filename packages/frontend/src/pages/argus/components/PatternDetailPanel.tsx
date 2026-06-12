@@ -269,7 +269,7 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
         const data = await argusService.getPatternAttributes(projectId, {
           pattern: pattern.pattern,
           period: period || '14d',
-          attributes: 'service,environment,host,level',
+          attributes: 'service,environment,level',
         });
         if (!cancelled) setAttrDistribution(data);
       } catch {
