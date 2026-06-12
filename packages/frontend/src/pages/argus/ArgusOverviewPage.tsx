@@ -320,7 +320,10 @@ const ArgusOverviewPage: React.FC = () => {
       borderColor: alpha('#7c4dff', 0.3),
       color: '#7c4dff',
       label: t('argus.overview.transactions'),
-      value: ts?.total_transactions != null ? Number(ts.total_transactions) : undefined,
+      value:
+        ts?.total_transactions != null
+          ? Number(ts.total_transactions)
+          : undefined,
       change: txnChange,
       sparkData: txnTrendData,
       invertChange: false,
