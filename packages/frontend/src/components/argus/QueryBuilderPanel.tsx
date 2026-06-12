@@ -478,24 +478,27 @@ const QueryBuilderPanel: React.FC<QueryBuilderPanelProps> = ({
     [prune]
   );
 
-  const addFilter = useCallback((groupId: string, field: string) => {
-    if (field.startsWith('__agg:')) {
-      const aggName = field.slice(6);
-      const aggDef = config.aggregates?.find((a) => a.name === aggName);
-      if (aggDef) {
-        setTree((t) => {
-          const filter = {
-            ...createFilter('', '>'),
-            aggregateFunc: aggName,
-            aggregateArgs: aggDef.args.length === 0 ? [] : undefined,
-          };
-          return insertCondition(t, groupId, filter, Infinity);
-        });
-        return;
+  const addFilter = useCallback(
+    (groupId: string, field: string) => {
+      if (field.startsWith('__agg:')) {
+        const aggName = field.slice(6);
+        const aggDef = config.aggregates?.find((a) => a.name === aggName);
+        if (aggDef) {
+          setTree((t) => {
+            const filter = {
+              ...createFilter('', '>'),
+              aggregateFunc: aggName,
+              aggregateArgs: aggDef.args.length === 0 ? [] : undefined,
+            };
+            return insertCondition(t, groupId, filter, Infinity);
+          });
+          return;
+        }
       }
-    }
-    setTree((t) => addFilterToGroup(t, groupId, field));
-  }, [config.aggregates]);
+      setTree((t) => addFilterToGroup(t, groupId, field));
+    },
+    [config.aggregates]
+  );
 
   const addGroup = useCallback((groupId: string) => {
     setTree((t) => addGroupToGroup(t, groupId));

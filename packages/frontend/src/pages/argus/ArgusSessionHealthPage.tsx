@@ -554,8 +554,7 @@ const ArgusSessionHealthPage: React.FC = () => {
                         fontWeight={800}
                         sx={{ lineHeight: 1.2, fontSize: '1.1rem' }}
                       >
-                        {card.value != null &&
-                        !isNaN(Number(card.value))
+                        {card.value != null && !isNaN(Number(card.value))
                           ? formatCompactNumber(Number(card.value))
                           : (card.value ?? '-')}
                       </Typography>

@@ -411,7 +411,6 @@ export function conditionToSqlPretty(cond: Condition): string {
 // Tree mutation helpers (immutable — return new tree)
 // ═════════════════════════════════════════════════════════════════════════════
 
-
 /** Find and remove a condition by ID. Returns [newTree, removedItem]. */
 export function removeCondition(
   root: GroupCondition,
