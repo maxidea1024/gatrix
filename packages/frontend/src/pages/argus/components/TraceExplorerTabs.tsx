@@ -200,21 +200,28 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
 
     return (
       <TablePaper elevation={0} isDark={isDark}>
-        <PageContentLoader loading={loading} skeleton={<TableSkeleton />}>
+        <PageContentLoader loading={loading} skeleton={<TableSkeleton />} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {spans.length > 0 ? (
             <>
-              <Table
-                size="small"
-                sx={{
-                  width: '100%',
-                  tableLayout: 'auto',
-                  '& td, & th': {
-                    borderColor: isDark
-                      ? 'rgba(255,255,255,0.04)'
-                      : 'rgba(0,0,0,0.04)',
-                  },
-                }}
-              >
+              <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+                <Table
+                  stickyHeader
+                  size="small"
+                  sx={{
+                    width: '100%',
+                    tableLayout: 'auto',
+                    '& td, & th': {
+                      borderColor: isDark
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.04)',
+                    },
+                    '& th': {
+                      backgroundColor: isDark
+                        ? '#1a1a2e'
+                        : '#fafafa',
+                    },
+                  }}
+                >
                 <TableHead>
                   <TableRow>
                     {SPAN_COLUMNS.map((col) => (
@@ -436,12 +443,13 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                   ))}
                 </TableBody>
               </Table>
-              <LoadMoreFooter
-                hasMore={hasMore}
-                loading={loadingMore}
-                onLoadMore={onLoadMore || (() => {})}
-                isDark={isDark}
-              />
+                <LoadMoreFooter
+                  hasMore={hasMore}
+                  loading={loadingMore}
+                  onLoadMore={onLoadMore || (() => {})}
+                  isDark={isDark}
+                />
+              </Box>
             </>
           ) : !loading ? (
             <Box sx={{ py: 8, textAlign: 'center' }}>
@@ -491,21 +499,28 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
 
     return (
       <TablePaper elevation={0} isDark={isDark}>
-        <PageContentLoader loading={loading} skeleton={<TableSkeleton />}>
+        <PageContentLoader loading={loading} skeleton={<TableSkeleton />} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
           {traceSamples.length > 0 ? (
             <>
-              <Table
-                size="small"
-                sx={{
-                  width: '100%',
-                  tableLayout: 'auto',
-                  '& td, & th': {
-                    borderColor: isDark
-                      ? 'rgba(255,255,255,0.04)'
-                      : 'rgba(0,0,0,0.04)',
-                  },
-                }}
-              >
+              <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+                <Table
+                  stickyHeader
+                  size="small"
+                  sx={{
+                    width: '100%',
+                    tableLayout: 'auto',
+                    '& td, & th': {
+                      borderColor: isDark
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.04)',
+                    },
+                    '& th': {
+                      backgroundColor: isDark
+                        ? '#1a1a2e'
+                        : '#fafafa',
+                    },
+                  }}
+                >
                 <TableHead>
                   <TableRow>
                     {[
@@ -644,12 +659,13 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
                   })}
                 </TableBody>
               </Table>
-              <LoadMoreFooter
-                hasMore={hasMore}
-                loading={loadingMore}
-                onLoadMore={onLoadMore || (() => {})}
-                isDark={isDark}
-              />
+                <LoadMoreFooter
+                  hasMore={hasMore}
+                  loading={loadingMore}
+                  onLoadMore={onLoadMore || (() => {})}
+                  isDark={isDark}
+                />
+              </Box>
             </>
           ) : !loading ? (
             <Box sx={{ py: 8, textAlign: 'center' }}>

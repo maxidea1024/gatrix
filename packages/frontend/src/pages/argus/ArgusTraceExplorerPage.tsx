@@ -716,7 +716,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   /* ═══ RENDER ═══ */
   return (
-    <Box>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <PageHeader
         icon={<TraceIcon />}
         title={
@@ -1050,7 +1050,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
       <Box
         sx={{
           display: 'flex',
-          minHeight: 500,
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           borderRadius: 2,
           backgroundColor: 'background.paper',
@@ -1099,7 +1101,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         )}
 
         {/* Center: Main content */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
           {/* Volume Chart */}
           <Box sx={{ px: 2, pt: 2 }}>
             <ArgusVolumeChart
@@ -1143,7 +1145,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
           </Box>
 
           {/* Tab Content */}
-          <Box sx={{ px: 2, pb: 2 }}>
+          <Box sx={{ px: 2, pb: 2, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {activeTab === 0 && (
               <SpansTab
                 spans={spans}
