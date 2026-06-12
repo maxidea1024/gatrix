@@ -96,6 +96,7 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const [tableCollapsed, setTableCollapsed] = React.useState(false);
+  const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
   const [chartType, setChartType] = useLocalStorage<
     | 'bar'
     | 'line'
@@ -316,8 +317,6 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
           const selectedLabel =
             groupByOptions.find((o) => o.value === aggGroupBy)?.label ||
             aggGroupBy;
-          const [menuAnchor, setMenuAnchor] =
-            React.useState<null | HTMLElement>(null);
           return (
             <>
               <Box
