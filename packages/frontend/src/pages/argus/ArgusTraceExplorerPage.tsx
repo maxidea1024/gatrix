@@ -43,7 +43,9 @@ import { TRACES_CONFIG } from '@/components/argus/query-aql/fields';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { SpanVolumeChart, getOpColor } from './components/traceExplorerHelpers';
+import { getOpColor } from './components/traceExplorerHelpers';
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import {
   SpansTab,
   TracesTab,
@@ -139,6 +141,50 @@ const ArgusTraceExplorerPage: React.FC = () => {
     { op: [], status: [], domain: [] }
   );
 
+  // ─── Transform volume for ArgusVolumeChart ───
+  const { volumeLabels, volumeDatasets } = useMemo(() => {
+    if (volume.length === 0)
+      return { volumeLabels: [] as string[], volumeDatasets: [] as ChartDataset[] };
+
+    const bucketSet = new Set<string>();
+    const opSet = new Set<string>();
+    volume.forEach((p) => {
+      bucketSet.add(p.bucket);
+      if (p.op) opSet.add(p.op);
+    });
+    const sorted = [...bucketSet].sort();
+
+    // Top 10 ops by total count
+    const opTotals = new Map<string, number>();
+    volume.forEach((p) => {
+      if (p.op)
+        opTotals.set(p.op, (opTotals.get(p.op) || 0) + (Number(p.count) || 0));
+    });
+    const topOps = [...opTotals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([op]) => op);
+
+    // Build lookup
+    const lookup = new Map<string, number>();
+    volume.forEach((p) => lookup.set(`${p.bucket}::${p.op}`, Number(p.count) || 0));
+
+    const labels = sorted.map((b) => {
+      try {
+        const d = new Date(b);
+        return `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:00`;
+      } catch { return b; }
+    });
+
+    const datasets: ChartDataset[] = topOps.map((op) => ({
+      label: op,
+      data: sorted.map((b) => lookup.get(`${b}::${op}`) || 0),
+      color: getOpColor(op),
+      type: 'bar' as const,
+    }));
+
+    return { volumeLabels: labels, volumeDatasets: datasets };
+  }, [volume]);
   // Aggregates
   const [aggData, setAggData] = useState<{
     groupBy: string;
@@ -157,6 +203,11 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [selectedSpanIndex, setSelectedSpanIndex] = useState<number | null>(null);
 
   // Facet sidebar
+  const MIN_FACET_WIDTH = 180;
+  const MAX_FACET_WIDTH = 400;
+  const DEFAULT_FACET_WIDTH = 220;
+  const FACET_WIDTH_KEY = 'argus-trace-facet-width';
+
   const [facetCollapsed, setFacetCollapsed] = useState(() => {
     try {
       return localStorage.getItem('argus-trace-facet-collapsed') === 'true';
@@ -164,6 +215,50 @@ const ArgusTraceExplorerPage: React.FC = () => {
       return false;
     }
   });
+  const [facetWidth, setFacetWidth] = useState(() => {
+    try {
+      const saved = parseInt(localStorage.getItem(FACET_WIDTH_KEY) || '', 10);
+      return !isNaN(saved) && saved >= MIN_FACET_WIDTH && saved <= MAX_FACET_WIDTH
+        ? saved
+        : DEFAULT_FACET_WIDTH;
+    } catch {
+      return DEFAULT_FACET_WIDTH;
+    }
+  });
+  const [isFacetDragging, setIsFacetDragging] = useState(false);
+
+  useEffect(() => {
+    try { localStorage.setItem(FACET_WIDTH_KEY, String(facetWidth)); } catch {}
+  }, [facetWidth]);
+
+  const handleFacetSplitterMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsFacetDragging(true);
+      const startX = e.clientX;
+      const startWidth = facetWidth;
+
+      const onMouseMove = (ev: MouseEvent) => {
+        const delta = ev.clientX - startX;
+        setFacetWidth(
+          Math.min(MAX_FACET_WIDTH, Math.max(MIN_FACET_WIDTH, startWidth + delta))
+        );
+      };
+      const onMouseUp = () => {
+        setIsFacetDragging(false);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      };
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    },
+    [facetWidth]
+  );
+
   const handleToggleFacetCollapse = useCallback(() => {
     setFacetCollapsed((v) => {
       const next = !v;
@@ -697,11 +792,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 alignItems: 'center',
                 gap: 0.5,
                 flex: 1,
+                minWidth: 0,
                 px: 1,
                 py: 0.2,
                 borderRadius: '6px',
-                minWidth: 400,
-                minHeight: 30,
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
                 transition: 'border-color 0.2s',
                 backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
@@ -953,13 +1047,70 @@ const ArgusTraceExplorerPage: React.FC = () => {
           collapsed={facetCollapsed}
           onToggleCollapse={handleToggleFacetCollapse}
           loading={loading}
+          width={facetWidth}
         />
+        {!facetCollapsed && (
+          <Box
+            onMouseDown={handleFacetSplitterMouseDown}
+            sx={{
+              width: '1px',
+              flexShrink: 0,
+              cursor: 'col-resize',
+              bgcolor: isFacetDragging ? 'primary.main' : 'divider',
+              position: 'relative',
+              zIndex: 10,
+              transition: 'background-color 0.15s, transform 0.15s',
+              transformOrigin: 'center',
+              ...(isFacetDragging && {
+                bgcolor: 'primary.main',
+                transform: 'scaleX(4)',
+              }),
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: '-5px',
+                right: '-5px',
+                cursor: 'col-resize',
+              },
+              '&:hover, &:active': {
+                bgcolor: 'primary.main',
+                transform: 'scaleX(4)',
+              },
+            }}
+          />
+        )}
 
         {/* Center: Main content */}
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {/* Volume Chart */}
           <Box sx={{ px: 2, pt: 2 }}>
-            <SpanVolumeChart data={volume} isDark={isDark} onZoom={handleZoom} />
+            <ArgusVolumeChart
+              datasets={volumeDatasets}
+              labels={volumeLabels}
+              loading={loading}
+              title="count(spans)"
+              onZoom={(startIdx, endIdx) => {
+                const buckets = [...new Set(volume.map((v) => v.bucket))].sort();
+                const si = Math.min(startIdx, endIdx);
+                const ei = Math.max(startIdx, endIdx);
+                if (buckets[si] && buckets[ei]) {
+                  const startDate = new Date(buckets[si]);
+                  let endDate = new Date(buckets[ei]);
+                  if (buckets.length > 1) {
+                    const gap = new Date(buckets[1]).getTime() - new Date(buckets[0]).getTime();
+                    endDate = new Date(endDate.getTime() + gap);
+                  } else {
+                    endDate = new Date(endDate.getTime() + 3600000);
+                  }
+                  handleZoom(startDate.toISOString(), endDate.toISOString());
+                }
+              }}
+              storagePrefix="argus_traces_volume"
+              showLegend={volumeDatasets.length > 1}
+              mb={1}
+            />
           </Box>
 
           {/* Tabs */}

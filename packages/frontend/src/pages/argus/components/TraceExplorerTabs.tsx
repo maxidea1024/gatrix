@@ -214,6 +214,8 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
               <Table
                 size="small"
                 sx={{
+                  width: '100%',
+                  tableLayout: 'auto',
                   '& td, & th': {
                     borderColor: isDark
                       ? 'rgba(255,255,255,0.04)'
@@ -503,6 +505,8 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
               <Table
                 size="small"
                 sx={{
+                  width: '100%',
+                  tableLayout: 'auto',
                   '& td, & th': {
                     borderColor: isDark
                       ? 'rgba(255,255,255,0.04)'
@@ -823,6 +827,8 @@ export const AggregatesTab: React.FC<AggregatesTabProps> = React.memo(
             <Table
               size="small"
               sx={{
+                width: '100%',
+                tableLayout: 'auto',
                 '& td, & th': {
                   borderColor: isDark
                     ? 'rgba(255,255,255,0.04)'
