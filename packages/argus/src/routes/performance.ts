@@ -80,7 +80,11 @@ export default async function performanceRoutes(app: FastifyInstance) {
         projectId: string;
         txnName: string;
       };
-      const { period = '24h', start, end } = request.query as { period?: string; start?: string; end?: string };
+      const {
+        period = '24h',
+        start,
+        end,
+      } = request.query as { period?: string; start?: string; end?: string };
 
       try {
         const txnFilter = {

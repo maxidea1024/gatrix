@@ -17,7 +17,6 @@ import {
   Archive as ArchiveIcon,
   NewReleases as NextReleaseIcon,
   Verified as CurrentReleaseIcon,
-
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusIssueDetail, ArgusErrorEvent } from '@/services/argusService';
@@ -415,8 +414,6 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
             </MenuItem>
           ))}
         </Menu>
-
-
 
         {/* Right side items */}
         <RightSideContainer>

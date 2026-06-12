@@ -266,7 +266,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
     '/:projectId/discover/tags',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '30d', start, end } = request.query as { period?: string; start?: string; end?: string };
+      const {
+        period = '30d',
+        start,
+        end,
+      } = request.query as { period?: string; start?: string; end?: string };
       const timeFilter = buildTimeFilter(period, start, end, '30d');
 
       try {

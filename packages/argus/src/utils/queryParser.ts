@@ -125,12 +125,12 @@ export class QueryParser {
   constructor(
     allowedColumns: Set<string>,
     allowedAggregates: Set<string>,
-    columnAliases?: Record<string, string>,
+    columnAliases?: Record<string, string>
   );
   constructor(
     arg1: Set<string> | TableSchema,
     arg2: Set<string> = new Set(),
-    arg3: Record<string, string> = {},
+    arg3: Record<string, string> = {}
   ) {
     if (arg1 instanceof Set) {
       // Legacy: Set<string>, Set<string>, aliases
@@ -593,7 +593,7 @@ export class QueryParser {
     mapKey: string,
     op: string,
     value: string | string[],
-    params: Record<string, string>,
+    params: Record<string, string>
   ): string {
     const mapCol = this.mapColumns[0]; // Default fallback: first Map column
     const keyParam = `mk_${Math.random().toString(36).substring(7)}`;

@@ -263,7 +263,8 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             borderRadius: 4,
             border: 'none',
             boxShadow: 'none',
-            transition: 'background-color 0.15s, border-color 0.15s, opacity 0.15s',
+            transition:
+              'background-color 0.15s, border-color 0.15s, opacity 0.15s',
             '&:active': {
               opacity: 0.8,
             },

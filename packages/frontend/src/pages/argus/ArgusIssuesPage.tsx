@@ -556,7 +556,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
-        const data = await argusService.getIssueAttributeFacet(projectId, fieldKey);
+        const data = await argusService.getIssueAttributeFacet(
+          projectId,
+          fieldKey
+        );
         return data.map((d) => d.attr_value);
       } catch {
         return [];

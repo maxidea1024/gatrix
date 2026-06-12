@@ -46,15 +46,31 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
           {/* Last Seen */}
-          <Box sx={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'baseline',
+              flexWrap: 'wrap',
+              gap: 0.5,
+            }}
+          >
             <Typography
-              sx={{ fontSize: '0.78rem', fontWeight: 700, color: 'text.primary', lineHeight: 1.3 }}
+              sx={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: 'text.primary',
+                lineHeight: 1.3,
+              }}
             >
               {t('argus.issues.lastSeen')}
             </Typography>
             <Typography
               component="span"
-              sx={{ fontSize: '0.78rem', fontWeight: 400, color: 'text.secondary' }}
+              sx={{
+                fontSize: '0.78rem',
+                fontWeight: 400,
+                color: 'text.secondary',
+              }}
             >
               {issue.last_seen
                 ? formatRelativeTime(issue.last_seen, undefined, i18n.language)
@@ -62,7 +78,12 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
             </Typography>
             {latestEvent?.release && releaseLink && (
               <>
-                <Typography component="span" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>·</Typography>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
+                >
+                  ·
+                </Typography>
                 <Typography
                   component="span"
                   onClick={() => navigate(releaseLink)}
@@ -80,15 +101,31 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
           </Box>
 
           {/* First Seen */}
-          <Box sx={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'baseline',
+              flexWrap: 'wrap',
+              gap: 0.5,
+            }}
+          >
             <Typography
-              sx={{ fontSize: '0.78rem', fontWeight: 700, color: 'text.primary', lineHeight: 1.3 }}
+              sx={{
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: 'text.primary',
+                lineHeight: 1.3,
+              }}
             >
               {t('argus.issues.firstSeen')}
             </Typography>
             <Typography
               component="span"
-              sx={{ fontSize: '0.78rem', fontWeight: 400, color: 'text.secondary' }}
+              sx={{
+                fontSize: '0.78rem',
+                fontWeight: 400,
+                color: 'text.secondary',
+              }}
             >
               {issue.first_seen
                 ? formatRelativeTime(issue.first_seen, undefined, i18n.language)
@@ -96,7 +133,12 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
             </Typography>
             {latestEvent?.release && releaseLink && (
               <>
-                <Typography component="span" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>·</Typography>
+                <Typography
+                  component="span"
+                  sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
+                >
+                  ·
+                </Typography>
                 <Typography
                   component="span"
                   onClick={() => navigate(releaseLink)}

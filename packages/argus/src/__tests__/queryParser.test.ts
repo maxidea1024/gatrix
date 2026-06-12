@@ -427,8 +427,6 @@ describe('List value (IN / NOT IN) SQL generation', () => {
 // 10. Map column fallback (schema-based)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-
-
 const MAP_SCHEMA: TableSchema = {
   columns: {
     level: 'string',
@@ -471,10 +469,7 @@ describe('Map column fallback — basic operations', () => {
 
   test('unknown key + no map config → 1=1 (backward compat)', () => {
     // Use legacy constructor without map columns
-    const parser = new QueryParser(
-      new Set(['level', 'message']),
-      new Set()
-    );
+    const parser = new QueryParser(new Set(['level', 'message']), new Set());
     const ast = parser.parse('build:10234');
     const params: Record<string, string> = {};
     const { where } = parser.generateSQL(ast, params);
@@ -653,11 +648,9 @@ describe('Map(String, Float64) support', () => {
 
 describe('Legacy constructor compatibility', () => {
   test('Set<string> constructor still works without map support', () => {
-    const parser = new QueryParser(
-      new Set(['level', 'message']),
-      new Set(),
-      { severity: 'level' }
-    );
+    const parser = new QueryParser(new Set(['level', 'message']), new Set(), {
+      severity: 'level',
+    });
     const ast = parser.parse('severity:error');
     const params: Record<string, string> = {};
     const { where } = parser.generateSQL(ast, params);

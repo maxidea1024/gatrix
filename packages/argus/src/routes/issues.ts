@@ -1172,10 +1172,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           { key: 'os_name', column: 'os_name' },
         ];
 
-        const results: Record<
-          string,
-          { value: string; count: number }[]
-        > = {};
+        const results: Record<string, { value: string; count: number }[]> = {};
 
         await Promise.all(
           facetQueries.map(async ({ key, column }) => {

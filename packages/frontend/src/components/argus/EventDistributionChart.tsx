@@ -155,9 +155,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({
         px: 2,
         py: 1.2,
         mb: 1.5,
-        backgroundColor: isDark
-          ? 'rgba(255,255,255,0.02)'
-          : 'rgba(0,0,0,0.01)',
+        backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
         minHeight: 72,
         overflow: 'hidden',
         opacity: loading ? 0.6 : 1,

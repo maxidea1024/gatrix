@@ -59,7 +59,10 @@ const ContextCard: React.FC<ContextCardProps> = ({
               width: 24,
               height: 24,
               borderRadius: '6px',
-              backgroundColor: alpha(theme.palette.primary.main, isDark ? 0.12 : 0.08),
+              backgroundColor: alpha(
+                theme.palette.primary.main,
+                isDark ? 0.12 : 0.08
+              ),
               color: theme.palette.primary.main,
               '& svg': { fontSize: '0.85rem' },
             }}
@@ -103,9 +106,7 @@ const ContextCard: React.FC<ContextCardProps> = ({
                 sx={{
                   fontSize: '0.75rem',
                   fontWeight: 600,
-                  color: item.isLink
-                    ? theme.palette.info.main
-                    : 'text.primary',
+                  color: item.isLink ? theme.palette.info.main : 'text.primary',
                   wordBreak: 'break-all',
                   py: 0.2,
                   textDecoration: item.isLink ? 'none' : undefined,

@@ -1510,9 +1510,7 @@ class ArgusService {
   async getIssueFacets(
     projectId: number | string,
     params?: { period?: string; start?: string; end?: string }
-  ): Promise<
-    Record<string, { value: string; count: number }[]>
-  > {
+  ): Promise<Record<string, { value: string; count: number }[]>> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/issues/facets`,
       { params }

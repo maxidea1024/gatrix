@@ -9,7 +9,6 @@ import { LOGS_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('logs-api');
 
-
 export default async function logsRoutes(app: FastifyInstance) {
   // ?�?�?� Browse Logs (independent explorer ??no trace_id required) ?�?�?�
   app.get(

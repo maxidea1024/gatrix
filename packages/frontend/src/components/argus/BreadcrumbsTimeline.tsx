@@ -627,7 +627,9 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           cursor: hasData ? 'pointer' : 'default',
         }}
         onClick={() =>
-          hasData && !fullyExpanded && setCollapsedSet((prev) => {
+          hasData &&
+          !fullyExpanded &&
+          setCollapsedSet((prev) => {
             const next = new Set(prev);
             if (next.has(idx)) next.delete(idx);
             else next.add(idx);
@@ -1162,9 +1164,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
             },
           }}
         >
-          <Box
-            sx={{ display: 'flex', height: '100%' }}
-          >
+          <Box sx={{ display: 'flex', height: '100%' }}>
             {/* Resize handle (left edge) */}
             <Box
               onMouseDown={handleDrawerResizeMouseDown}
@@ -1193,7 +1193,13 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
 
             {/* Drawer content */}
             <Box
-              sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100%' }}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                minWidth: 0,
+                height: '100%',
+              }}
             >
               {/* Drawer header */}
               <Box

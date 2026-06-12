@@ -83,7 +83,12 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { mode: stMode, setMode: setStMode, order: stOrder, setOrder: setStOrder } = useStacktraceState();
+  const {
+    mode: stMode,
+    setMode: setStMode,
+    order: stOrder,
+    setOrder: setStOrder,
+  } = useStacktraceState();
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     status: string;
@@ -414,7 +419,13 @@ const ArgusIssueDetailPage: React.FC = () => {
                       storageKey="stacktrace"
                       hideActionsOnCollapse
                       actions={
-                        <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            gap: 0.75,
+                            alignItems: 'center',
+                          }}
+                        >
                           <StacktraceControls
                             mode={stMode}
                             setMode={setStMode}
@@ -436,8 +447,6 @@ const ArgusIssueDetailPage: React.FC = () => {
                   }
                 />
               )}
-
-
 
               {/* Span Evidence */}
               <CollapsibleSection

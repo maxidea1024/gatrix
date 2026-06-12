@@ -58,7 +58,7 @@ interface ContextChip {
 }
 
 function extractContextChips(
-  event: IssueContextSectionProps['highlightEvent'],
+  event: IssueContextSectionProps['highlightEvent']
 ): ContextChip[] {
   if (!event) return [];
   const chips: ContextChip[] = [];
@@ -66,7 +66,9 @@ function extractContextChips(
   if (event.browser) {
     chips.push({
       icon: getBrowserIcon(event.browser, 16),
-      label: event.browser + (event.browser_version ? ` ${event.browser_version}` : ''),
+      label:
+        event.browser +
+        (event.browser_version ? ` ${event.browser_version}` : ''),
       value: 'browser',
     });
   }
@@ -91,8 +93,14 @@ function extractContextChips(
 // ── Highlight key-value extraction ────────────────────────────────
 /** Default highlight keys to show when user hasn't customized */
 const DEFAULT_HIGHLIGHT_KEYS = [
-  'handled', 'level', 'transaction', 'url',
-  'browser', 'os', 'environment', 'release',
+  'handled',
+  'level',
+  'transaction',
+  'url',
+  'browser',
+  'os',
+  'environment',
+  'release',
 ];
 
 interface HighlightKV {
@@ -103,7 +111,7 @@ interface HighlightKV {
 
 function extractHighlightKVs(
   event: IssueContextSectionProps['event'],
-  tags: Record<string, string>,
+  tags: Record<string, string>
 ): HighlightKV[] {
   const kvs: HighlightKV[] = [];
   const seen = new Set<string>();
@@ -123,8 +131,12 @@ function extractHighlightKVs(
       transaction: event.transaction,
       environment: event.environment,
       release: event.release,
-      browser: event.browser ? `${event.browser}${event.browser_version ? ` ${event.browser_version}` : ''}` : undefined,
-      os: event.os ? `${event.os}${event.os_version ? ` ${event.os_version}` : ''}` : undefined,
+      browser: event.browser
+        ? `${event.browser}${event.browser_version ? ` ${event.browser_version}` : ''}`
+        : undefined,
+      os: event.os
+        ? `${event.os}${event.os_version ? ` ${event.os_version}` : ''}`
+        : undefined,
     };
     if (fieldMap[hk]) {
       kvs.push({ key: hk, value: fieldMap[hk]!, isLink: false });
@@ -134,11 +146,16 @@ function extractHighlightKVs(
 
   // Also extract trace_id from contexts
   try {
-    const ctx = typeof event.contexts === 'string' ? JSON.parse(event.contexts) : event.contexts;
+    const ctx =
+      typeof event.contexts === 'string'
+        ? JSON.parse(event.contexts)
+        : event.contexts;
     if (ctx?.trace?.trace_id && !seen.has('trace_id')) {
       kvs.push({ key: 'Trace ID', value: ctx.trace.trace_id, isLink: false });
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   return kvs;
 }
@@ -146,21 +163,46 @@ function extractHighlightKVs(
 // ── Tag category classification ───────────────────────────────────
 
 const APPLICATION_TAG_KEYS = new Set([
-  'app', 'app.name', 'app.version', 'release', 'environment', 'level',
-  'handled', 'mechanism', 'sdk', 'sdk.name', 'sdk.version',
+  'app',
+  'app.name',
+  'app.version',
+  'release',
+  'environment',
+  'level',
+  'handled',
+  'mechanism',
+  'sdk',
+  'sdk.name',
+  'sdk.version',
 ]);
 
 const CLIENT_TAG_KEYS = new Set([
-  'browser', 'browser.name', 'browser.version',
-  'os', 'os.name', 'os.version', 'os.rooted',
-  'device', 'device.family', 'device.model', 'device.brand',
-  'url', 'runtime', 'runtime.name', 'runtime.version',
+  'browser',
+  'browser.name',
+  'browser.version',
+  'os',
+  'os.name',
+  'os.version',
+  'os.rooted',
+  'device',
+  'device.family',
+  'device.model',
+  'device.brand',
+  'url',
+  'runtime',
+  'runtime.name',
+  'runtime.version',
 ]);
 
 type TagCategory = 'all' | 'custom' | 'application' | 'client' | 'other';
 
 const OTHER_TAG_KEYS = new Set([
-  'team', 'transaction', 'user', 'server_name', 'logger', 'site',
+  'team',
+  'transaction',
+  'user',
+  'server_name',
+  'logger',
+  'site',
 ]);
 
 function classifyTag(key: string): Exclude<TagCategory, 'all'> {
@@ -170,7 +212,13 @@ function classifyTag(key: string): Exclude<TagCategory, 'all'> {
   if (OTHER_TAG_KEYS.has(k)) return 'other';
   // Check prefix-based matching
   if (k.startsWith('app.') || k.startsWith('sdk.')) return 'application';
-  if (k.startsWith('browser.') || k.startsWith('os.') || k.startsWith('device.') || k.startsWith('runtime.')) return 'client';
+  if (
+    k.startsWith('browser.') ||
+    k.startsWith('os.') ||
+    k.startsWith('device.') ||
+    k.startsWith('runtime.')
+  )
+    return 'client';
   return 'custom';
 }
 
@@ -180,7 +228,10 @@ function groupTags(tags: Record<string, any>): {
   value?: string;
   children?: { key: string; value: string }[];
 }[] {
-  const groups: Map<string, { value?: string; children: { key: string; value: string }[] }> = new Map();
+  const groups: Map<
+    string,
+    { value?: string; children: { key: string; value: string }[] }
+  > = new Map();
 
   for (const [k, v] of Object.entries(tags)) {
     const dotIdx = k.indexOf('.');
@@ -196,7 +247,11 @@ function groupTags(tags: Record<string, any>): {
     }
   }
 
-  const result: { key: string; value?: string; children?: { key: string; value: string }[] }[] = [];
+  const result: {
+    key: string;
+    value?: string;
+    children?: { key: string; value: string }[];
+  }[] = [];
   for (const [key, group] of groups) {
     if (group.children.length > 0) {
       result.push({ key, value: group.value, children: group.children });
@@ -218,7 +273,8 @@ function getContextIcon(ctxKey: string): React.ReactNode {
   if (k === 'trace' || k.includes('trace')) return <LinkIcon />;
   if (k === 'culture' || k === 'geo') return <GeoIcon />;
   if (k === 'runtime' || k === 'react' || k === 'sdk') return <SdkIcon />;
-  if (k.includes('settings') || k.includes('설정') || k.includes('config')) return <SettingsIcon />;
+  if (k.includes('settings') || k.includes('설정') || k.includes('config'))
+    return <SettingsIcon />;
   return <InfoIcon />;
 }
 
@@ -352,61 +408,107 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
 
   // Build context cards from ctxData and event top-level fields
   const contextCards = React.useMemo(() => {
-    const cards: { key: string; title: string; icon: React.ReactNode; items: { label: string; value: string; isLink?: boolean }[] }[] = [];
+    const cards: {
+      key: string;
+      title: string;
+      icon: React.ReactNode;
+      items: { label: string; value: string; isLink?: boolean }[];
+    }[] = [];
 
     // 1. User card from top-level event fields
     const userItems: { label: string; value: string }[] = [];
-    if (event.user_email) userItems.push({ label: 'Email', value: event.user_email });
+    if (event.user_email)
+      userItems.push({ label: 'Email', value: event.user_email });
     if (event.user_ip) userItems.push({ label: 'IP', value: event.user_ip });
     if (userItems.length > 0) {
-      cards.push({ key: 'user_toplevel', title: t('argus.issues.user', 'User'), icon: <PersonIcon />, items: userItems });
+      cards.push({
+        key: 'user_toplevel',
+        title: t('argus.issues.user', 'User'),
+        icon: <PersonIcon />,
+        items: userItems,
+      });
     }
 
     // 2. Cards from ctxData
     if (ctxData) {
-      for (const [ctxKey, ctxVal] of Object.entries(ctxData) as [string, any][]) {
+      for (const [ctxKey, ctxVal] of Object.entries(ctxData) as [
+        string,
+        any,
+      ][]) {
         if (typeof ctxVal === 'object' && ctxVal !== null) {
           // Merge with user_toplevel if key is 'user'
           if (ctxKey.toLowerCase() === 'user') {
-            const existing = cards.find(c => c.key === 'user_toplevel');
+            const existing = cards.find((c) => c.key === 'user_toplevel');
             const items = Object.entries(ctxVal).map(([k, v]) => ({
               label: k,
               value: String(v),
             }));
             if (existing) {
               // Add items that don't already exist
-              const existingLabels = new Set(existing.items.map(i => i.label.toLowerCase()));
+              const existingLabels = new Set(
+                existing.items.map((i) => i.label.toLowerCase())
+              );
               for (const item of items) {
                 if (!existingLabels.has(item.label.toLowerCase())) {
                   existing.items.push(item);
                 }
               }
             } else {
-              cards.push({ key: ctxKey, title: ctxKey, icon: getContextIcon(ctxKey), items });
+              cards.push({
+                key: ctxKey,
+                title: ctxKey,
+                icon: getContextIcon(ctxKey),
+                items,
+              });
             }
             continue;
           }
           const items = Object.entries(ctxVal).map(([k, v]) => {
             const sv = String(v);
-            const isLink = sv.startsWith('http://') || sv.startsWith('https://');
+            const isLink =
+              sv.startsWith('http://') || sv.startsWith('https://');
             return { label: k, value: sv, isLink };
           });
           if (items.length > 0) {
-            cards.push({ key: ctxKey, title: ctxKey, icon: getContextIcon(ctxKey), items });
+            cards.push({
+              key: ctxKey,
+              title: ctxKey,
+              icon: getContextIcon(ctxKey),
+              items,
+            });
           }
         }
       }
     }
 
     // 3. Environment card from top-level fields (if not already in ctxData)
-    const hasEnvCtx = cards.some(c => c.key === 'environment' || c.key === 'runtime');
+    const hasEnvCtx = cards.some(
+      (c) => c.key === 'environment' || c.key === 'runtime'
+    );
     if (!hasEnvCtx) {
       const envItems: { label: string; value: string }[] = [];
-      if (event.environment) envItems.push({ label: t('argus.issues.environment', 'Environment'), value: event.environment });
-      if (event.release) envItems.push({ label: t('argus.issues.release', 'Release'), value: event.release });
-      if (event.transaction) envItems.push({ label: t('argus.issues.transaction', 'Transaction'), value: event.transaction });
+      if (event.environment)
+        envItems.push({
+          label: t('argus.issues.environment', 'Environment'),
+          value: event.environment,
+        });
+      if (event.release)
+        envItems.push({
+          label: t('argus.issues.release', 'Release'),
+          value: event.release,
+        });
+      if (event.transaction)
+        envItems.push({
+          label: t('argus.issues.transaction', 'Transaction'),
+          value: event.transaction,
+        });
       if (envItems.length > 0) {
-        cards.push({ key: 'env_toplevel', title: t('argus.issues.environment', 'Environment'), icon: <SettingsIcon />, items: envItems });
+        cards.push({
+          key: 'env_toplevel',
+          title: t('argus.issues.environment', 'Environment'),
+          icon: <SettingsIcon />,
+          items: envItems,
+        });
       }
     }
 
@@ -414,11 +516,20 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
   }, [event, ctxData, t]);
 
   // ── Tag context menu state ──
-  const [tagMenuAnchor, setTagMenuAnchor] = React.useState<HTMLElement | null>(null);
-  const [tagMenuTarget, setTagMenuTarget] = React.useState({ key: '', value: '' });
+  const [tagMenuAnchor, setTagMenuAnchor] = React.useState<HTMLElement | null>(
+    null
+  );
+  const [tagMenuTarget, setTagMenuTarget] = React.useState({
+    key: '',
+    value: '',
+  });
   const [copySnackOpen, setCopySnackOpen] = React.useState(false);
 
-  const handleTagMenuOpen = (e: React.MouseEvent<HTMLElement>, key: string, value: string) => {
+  const handleTagMenuOpen = (
+    e: React.MouseEvent<HTMLElement>,
+    key: string,
+    value: string
+  ) => {
     setTagMenuAnchor(e.currentTarget);
     setTagMenuTarget({ key, value });
   };
@@ -449,7 +560,9 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                 height: 24,
                 fontSize: '0.72rem',
                 fontWeight: 600,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.05)',
                 color: 'text.primary',
                 '& .MuiChip-icon': { color: 'text.secondary' },
               }}
@@ -459,13 +572,25 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
             <Chip
               key={c.value}
               size="small"
-              icon={<Box sx={{ display: 'flex', alignItems: 'center', '& img, & svg': { width: 14, height: 14 } }}>{c.icon}</Box>}
+              icon={
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    '& img, & svg': { width: 14, height: 14 },
+                  }}
+                >
+                  {c.icon}
+                </Box>
+              }
               label={c.label}
               sx={{
                 height: 24,
                 fontSize: '0.72rem',
                 fontWeight: 600,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.05)',
                 color: 'text.primary',
                 '& .MuiChip-icon': { color: 'text.secondary' },
               }}
@@ -480,7 +605,9 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                 height: 24,
                 fontSize: '0.72rem',
                 fontWeight: 600,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.05)',
                 color: 'text.primary',
               }}
             />
@@ -494,7 +621,9 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                 height: 24,
                 fontSize: '0.72rem',
                 fontWeight: 600,
-                backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.05)',
                 color: 'text.primary',
               }}
             />
@@ -521,11 +650,18 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
               borderRadius: 1,
               px: 1,
               py: 0.3,
-              '&:hover': { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
+              '&:hover': {
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
+              },
             }}
           >
             <EditIcon sx={{ fontSize: 14, mr: 0.5 }} />
-            <Typography component="span" sx={{ fontSize: '0.7rem', fontWeight: 600 }}>
+            <Typography
+              component="span"
+              sx={{ fontSize: '0.7rem', fontWeight: 600 }}
+            >
               {t('argus.issues.editHighlights', 'Edit')}
             </Typography>
           </IconButton>
@@ -534,9 +670,15 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
         {(() => {
           const leftCol = highlightKVs.filter((_, i) => i % 2 === 0);
           const rightCol = highlightKVs.filter((_, i) => i % 2 === 1);
-          const borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-          const dividerColor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
-          const stripeBg = isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)';
+          const borderColor = isDark
+            ? 'rgba(255,255,255,0.06)'
+            : 'rgba(0,0,0,0.06)';
+          const dividerColor = isDark
+            ? 'rgba(255,255,255,0.04)'
+            : 'rgba(0,0,0,0.04)';
+          const stripeBg = isDark
+            ? 'rgba(255,255,255,0.02)'
+            : 'rgba(0,0,0,0.015)';
 
           const renderColumn = (items: typeof highlightKVs) => (
             <Box
@@ -558,8 +700,10 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                     px: 1.5,
                     py: 0.8,
                     backgroundColor: j % 2 === 0 ? stripeBg : 'transparent',
-                    borderBottom: j < items.length - 1
-                      ? `1px solid ${dividerColor}` : 'none',
+                    borderBottom:
+                      j < items.length - 1
+                        ? `1px solid ${dividerColor}`
+                        : 'none',
                   }}
                 >
                   <Typography
@@ -576,17 +720,27 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                   </Typography>
                   <Typography
                     component={kv.isLink ? 'a' : 'span'}
-                    {...(kv.isLink ? { href: kv.value, target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    {...(kv.isLink
+                      ? {
+                          href: kv.value,
+                          target: '_blank',
+                          rel: 'noopener noreferrer',
+                        }
+                      : {})}
                     sx={{
                       fontSize: '0.75rem',
                       fontWeight: 600,
-                      color: kv.isLink ? theme.palette.info.main : 'text.primary',
+                      color: kv.isLink
+                        ? theme.palette.info.main
+                        : 'text.primary',
                       fontFamily: '"JetBrains Mono", "Fira Code", monospace',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
                       textDecoration: 'none',
-                      '&:hover': kv.isLink ? { textDecoration: 'underline' } : {},
+                      '&:hover': kv.isLink
+                        ? { textDecoration: 'underline' }
+                        : {},
                     }}
                   >
                     {kv.value}
@@ -680,19 +834,33 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                 color: 'text.secondary',
                 '&.Mui-selected': {
                   color: theme.palette.primary.main,
-                  backgroundColor: alpha(theme.palette.primary.main, isDark ? 0.1 : 0.06),
+                  backgroundColor: alpha(
+                    theme.palette.primary.main,
+                    isDark ? 0.1 : 0.06
+                  ),
                 },
               },
               '& .MuiTabs-indicator': { display: 'none' },
             }}
           >
-            {(['all', 'custom', 'application', 'client', 'other'] as TagCategory[]).map(
+            {(
+              [
+                'all',
+                'custom',
+                'application',
+                'client',
+                'other',
+              ] as TagCategory[]
+            ).map(
               (cat) =>
                 categoryCounts[cat] > 0 && (
                   <Tab
                     key={cat}
                     value={cat}
-                    label={t(`argus.issues.tagCategory.${cat}`, cat.charAt(0).toUpperCase() + cat.slice(1))}
+                    label={t(
+                      `argus.issues.tagCategory.${cat}`,
+                      cat.charAt(0).toUpperCase() + cat.slice(1)
+                    )}
                   />
                 )
             )}
@@ -702,14 +870,31 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
         {/* 2-column key-value table */}
         {(() => {
           // Flatten groups into rows for consistent rendering
-          type TagRow = { key: string; value: string; isChild: boolean; parentKey?: string; fullKey: string };
+          type TagRow = {
+            key: string;
+            value: string;
+            isChild: boolean;
+            parentKey?: string;
+            fullKey: string;
+          };
           const groups: TagRow[][] = [];
           for (const group of filteredGroupedTags) {
             const block: TagRow[] = [];
-            block.push({ key: group.key, value: group.value || '', isChild: false, fullKey: group.key });
+            block.push({
+              key: group.key,
+              value: group.value || '',
+              isChild: false,
+              fullKey: group.key,
+            });
             if (group.children) {
               for (const child of group.children) {
-                block.push({ key: child.key, value: child.value, isChild: true, parentKey: group.key, fullKey: `${group.key}.${child.key}` });
+                block.push({
+                  key: child.key,
+                  value: child.value,
+                  isChild: true,
+                  parentKey: group.key,
+                  fullKey: `${group.key}.${child.key}`,
+                });
               }
             }
             groups.push(block);
@@ -728,8 +913,12 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
           }
           const leftRows = groups.slice(0, splitIdx).flat();
           const rightRows = groups.slice(splitIdx).flat();
-          const borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-          const dividerColor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+          const borderColor = isDark
+            ? 'rgba(255,255,255,0.06)'
+            : 'rgba(0,0,0,0.06)';
+          const dividerColor = isDark
+            ? 'rgba(255,255,255,0.04)'
+            : 'rgba(0,0,0,0.04)';
 
           const renderTagColumn = (col: typeof rows) => (
             <Box
@@ -747,13 +936,20 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                   sx={{
                     display: 'grid',
                     gridTemplateColumns: '140px 1fr auto',
-                    borderBottom: rowIdx < col.length - 1
-                      ? `1px solid ${dividerColor}` : 'none',
-                    backgroundColor: rowIdx % 2 === 0
-                      ? 'transparent'
-                      : isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.015)',
+                    borderBottom:
+                      rowIdx < col.length - 1
+                        ? `1px solid ${dividerColor}`
+                        : 'none',
+                    backgroundColor:
+                      rowIdx % 2 === 0
+                        ? 'transparent'
+                        : isDark
+                          ? 'rgba(255,255,255,0.015)'
+                          : 'rgba(0,0,0,0.015)',
                     '&:hover': {
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(0,0,0,0.03)',
                     },
                     '&:hover .tag-menu-btn': {
                       opacity: 1,
@@ -798,7 +994,9 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                     <IconButton
                       className="tag-menu-btn"
                       size="small"
-                      onClick={(e) => handleTagMenuOpen(e, row.fullKey, row.value)}
+                      onClick={(e) =>
+                        handleTagMenuOpen(e, row.fullKey, row.value)
+                      }
                       sx={{
                         opacity: 0,
                         transition: 'opacity 0.15s',
@@ -842,35 +1040,71 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
             },
           }}
         >
-          <MenuItem onClick={() => {
-            handleTagMenuClose();
-            document.getElementById('argus-tag-distribution')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}>
-            <ListItemIcon><BarChartIcon sx={{ fontSize: 16 }} /></ListItemIcon>
-            <ListItemText>{t('argus.issues.tagMenu.breakdown', 'Tag breakdown')}</ListItemText>
+          <MenuItem
+            onClick={() => {
+              handleTagMenuClose();
+              document
+                .getElementById('argus-tag-distribution')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            <ListItemIcon>
+              <BarChartIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
+            <ListItemText>
+              {t('argus.issues.tagMenu.breakdown', 'Tag breakdown')}
+            </ListItemText>
           </MenuItem>
-          <MenuItem onClick={() => {
-            handleTagMenuClose();
-            navigate(`/argus/explore/discover?q=${encodeURIComponent(`${tagMenuTarget.key}:"${tagMenuTarget.value}"`)}`);
-          }}>
-            <ListItemIcon><SearchIcon sx={{ fontSize: 16 }} /></ListItemIcon>
-            <ListItemText>{t('argus.issues.tagMenu.viewEvents', 'View events with this value')}</ListItemText>
+          <MenuItem
+            onClick={() => {
+              handleTagMenuClose();
+              navigate(
+                `/argus/explore/discover?q=${encodeURIComponent(`${tagMenuTarget.key}:"${tagMenuTarget.value}"`)}`
+              );
+            }}
+          >
+            <ListItemIcon>
+              <SearchIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
+            <ListItemText>
+              {t(
+                'argus.issues.tagMenu.viewEvents',
+                'View events with this value'
+              )}
+            </ListItemText>
           </MenuItem>
-          <MenuItem onClick={() => {
-            handleTagMenuClose();
-            navigate(`/argus/issues?search=${encodeURIComponent(`${tagMenuTarget.key}:${tagMenuTarget.value}`)}`);
-          }}>
-            <ListItemIcon><FindInPageIcon sx={{ fontSize: 16 }} /></ListItemIcon>
-            <ListItemText>{t('argus.issues.tagMenu.searchIssues', 'Search issues with this value')}</ListItemText>
+          <MenuItem
+            onClick={() => {
+              handleTagMenuClose();
+              navigate(
+                `/argus/issues?search=${encodeURIComponent(`${tagMenuTarget.key}:${tagMenuTarget.value}`)}`
+              );
+            }}
+          >
+            <ListItemIcon>
+              <FindInPageIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
+            <ListItemText>
+              {t(
+                'argus.issues.tagMenu.searchIssues',
+                'Search issues with this value'
+              )}
+            </ListItemText>
           </MenuItem>
           <MuiDivider />
-          <MenuItem onClick={() => {
-            navigator.clipboard.writeText(tagMenuTarget.value);
-            setCopySnackOpen(true);
-            handleTagMenuClose();
-          }}>
-            <ListItemIcon><CopyIcon sx={{ fontSize: 16 }} /></ListItemIcon>
-            <ListItemText>{t('argus.issues.tagMenu.copyValue', 'Copy tag value')}</ListItemText>
+          <MenuItem
+            onClick={() => {
+              navigator.clipboard.writeText(tagMenuTarget.value);
+              setCopySnackOpen(true);
+              handleTagMenuClose();
+            }}
+          >
+            <ListItemIcon>
+              <CopyIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
+            <ListItemText>
+              {t('argus.issues.tagMenu.copyValue', 'Copy tag value')}
+            </ListItemText>
           </MenuItem>
         </Menu>
 
@@ -964,9 +1198,7 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
               <ActionChip
                 label={t('argus.issues.viewFullTrace', 'View Full Trace')}
                 onClick={() =>
-                  navigate(
-                    `/argus/explore/traces?q=trace_id:"${traceId}"`
-                  )
+                  navigate(`/argus/explore/traces?q=trace_id:"${traceId}"`)
                 }
               />
             ) : undefined
@@ -981,9 +1213,10 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
               {/* Compact span preview (up to 5) */}
               {traceDetail.spans.slice(0, 5).map((span, idx) => {
                 const opColor = getOpColor(span.op);
-                const durStr = span.duration >= 1000
-                  ? `${(span.duration / 1000).toFixed(2)}s`
-                  : `${Math.round(span.duration)}ms`;
+                const durStr =
+                  span.duration >= 1000
+                    ? `${(span.duration / 1000).toFixed(2)}s`
+                    : `${Math.round(span.duration)}ms`;
                 return (
                   <Box
                     key={span.span_id || idx}
@@ -993,9 +1226,10 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                       gap: 1,
                       py: 0.6,
                       px: 0.5,
-                      borderBottom: idx < Math.min(traceDetail.spans.length, 5) - 1
-                        ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`
-                        : 'none',
+                      borderBottom:
+                        idx < Math.min(traceDetail.spans.length, 5) - 1
+                          ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`
+                          : 'none',
                     }}
                   >
                     <Chip
@@ -1024,21 +1258,23 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                     >
                       {span.description || span.op}
                     </Typography>
-                    {span.status && span.status !== 'ok' && span.status !== 'unknown' && (
-                      <Chip
-                        label={span.status}
-                        size="small"
-                        sx={{
-                          height: 16,
-                          fontSize: '0.58rem',
-                          fontWeight: 700,
-                          backgroundColor: alpha('#f44336', 0.1),
-                          color: '#f44336',
-                          border: 'none',
-                          flexShrink: 0,
-                        }}
-                      />
-                    )}
+                    {span.status &&
+                      span.status !== 'ok' &&
+                      span.status !== 'unknown' && (
+                        <Chip
+                          label={span.status}
+                          size="small"
+                          sx={{
+                            height: 16,
+                            fontSize: '0.58rem',
+                            fontWeight: 700,
+                            backgroundColor: alpha('#f44336', 0.1),
+                            color: '#f44336',
+                            border: 'none',
+                            flexShrink: 0,
+                          }}
+                        />
+                      )}
                     <Typography
                       sx={{
                         fontSize: '0.7rem',
@@ -1075,10 +1311,7 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
               color="text.disabled"
               sx={{ fontSize: '0.78rem' }}
             >
-              {t(
-                'argus.issues.noTraceData',
-                'No trace data available.'
-              )}
+              {t('argus.issues.noTraceData', 'No trace data available.')}
             </Typography>
           )}
         </CollapsibleSection>
@@ -1087,12 +1320,7 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
       {/* ═══ Extra Data ═══ */}
       <CollapsibleSection
         title={t('argus.issues.extraData', 'Additional Data')}
-        icon={
-          <DataObjectIcon
-            fontSize="small"
-            sx={{ color: '#ff9800' }}
-          />
-        }
+        icon={<DataObjectIcon fontSize="small" sx={{ color: '#ff9800' }} />}
         storageKey="extra"
         hidden={!extraData}
       >

@@ -56,7 +56,9 @@ export const StacktraceControls: React.FC<StacktraceControlsProps> = React.memo(
   ({ mode, setMode, order, setOrder, event, isDark }) => {
     const { t } = useTranslation();
     const theme = useTheme();
-    const [displayAnchor, setDisplayAnchor] = useState<null | HTMLElement>(null);
+    const [displayAnchor, setDisplayAnchor] = useState<null | HTMLElement>(
+      null
+    );
     const [copyAnchor, setCopyAnchor] = useState<null | HTMLElement>(null);
 
     const handleCopyRaw = () => {
@@ -142,19 +144,45 @@ export const StacktraceControls: React.FC<StacktraceControlsProps> = React.memo(
           >
             {t('argus.issues.displayView', 'View')}
           </Typography>
-          <MenuItem dense onClick={() => { setMode('relevant'); setDisplayAnchor(null); }}>
-            <Radio size="small" checked={mode === 'relevant'} sx={{ p: 0, mr: 1 }} />
+          <MenuItem
+            dense
+            onClick={() => {
+              setMode('relevant');
+              setDisplayAnchor(null);
+            }}
+          >
+            <Radio
+              size="small"
+              checked={mode === 'relevant'}
+              sx={{ p: 0, mr: 1 }}
+            />
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.issues.mostRelevant', 'Most Relevant')}
             </ListItemText>
           </MenuItem>
-          <MenuItem dense onClick={() => { setMode('full'); setDisplayAnchor(null); }}>
-            <Radio size="small" checked={mode === 'full'} sx={{ p: 0, mr: 1 }} />
+          <MenuItem
+            dense
+            onClick={() => {
+              setMode('full');
+              setDisplayAnchor(null);
+            }}
+          >
+            <Radio
+              size="small"
+              checked={mode === 'full'}
+              sx={{ p: 0, mr: 1 }}
+            />
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.issues.fullStackTrace', 'Full Stack Trace')}
             </ListItemText>
           </MenuItem>
-          <MenuItem dense onClick={() => { setMode('raw'); setDisplayAnchor(null); }}>
+          <MenuItem
+            dense
+            onClick={() => {
+              setMode('raw');
+              setDisplayAnchor(null);
+            }}
+          >
             <Radio size="small" checked={mode === 'raw'} sx={{ p: 0, mr: 1 }} />
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.issues.rawStackTrace', 'Raw Stack Trace')}
@@ -178,14 +206,34 @@ export const StacktraceControls: React.FC<StacktraceControlsProps> = React.memo(
           >
             {t('argus.issues.displaySort', 'Sort')}
           </Typography>
-          <MenuItem dense onClick={() => { setOrder('recent'); setDisplayAnchor(null); }}>
-            <Radio size="small" checked={order === 'recent'} sx={{ p: 0, mr: 1 }} />
+          <MenuItem
+            dense
+            onClick={() => {
+              setOrder('recent');
+              setDisplayAnchor(null);
+            }}
+          >
+            <Radio
+              size="small"
+              checked={order === 'recent'}
+              sx={{ p: 0, mr: 1 }}
+            />
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.issues.mostRecent', 'Newest')}
             </ListItemText>
           </MenuItem>
-          <MenuItem dense onClick={() => { setOrder('oldest'); setDisplayAnchor(null); }}>
-            <Radio size="small" checked={order === 'oldest'} sx={{ p: 0, mr: 1 }} />
+          <MenuItem
+            dense
+            onClick={() => {
+              setOrder('oldest');
+              setDisplayAnchor(null);
+            }}
+          >
+            <Radio
+              size="small"
+              checked={order === 'oldest'}
+              sx={{ p: 0, mr: 1 }}
+            />
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.issues.oldestFirst', 'Oldest')}
             </ListItemText>

@@ -843,7 +843,11 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     '/feedback/:projectId/filter-options',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '30d', start, end } = request.query as { period?: string; start?: string; end?: string };
+      const {
+        period = '30d',
+        start,
+        end,
+      } = request.query as { period?: string; start?: string; end?: string };
 
       const bucket = getBucketingConfig(period, start, end);
       const qp: Record<string, any> = {
