@@ -46,10 +46,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { getOpColor } from './components/traceExplorerHelpers';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
+import AggregatePanel from '@/components/argus/AggregatePanel';
 import {
   SpansTab,
   TracesTab,
-  AggregatesTab,
 } from './components/TraceExplorerTabs';
 import {
   SaveQueryDialog,
@@ -86,7 +86,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
   const activeTab = parseInt(urlState.tab, 10) || 0;
-  const aggGroupBy = urlState.groupBy;
+  const aggGroupBys = (urlState.groupBy || 'op').split(',').filter(Boolean);
   const orderBy = urlState.orderBy;
   const orderDir: 'asc' | 'desc' = orderBy.startsWith('-') ? 'desc' : 'asc';
   const orderCol = orderBy.replace(/^-/, '');
@@ -185,17 +185,17 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
     return { volumeLabels: labels, volumeDatasets: datasets };
   }, [volume]);
-  // Aggregates
-  const [aggData, setAggData] = useState<{
-    groupBy: string;
-    topValues: {
-      group_value: string;
-      count: number;
-      avg_duration?: number;
-      p95_duration?: number;
-    }[];
-    timeSeries: { bucket: string; group_value: string; count: number }[];
-  } | null>(null);
+  // Aggregates (multi-group)
+  const [aggDataMap, setAggDataMap] = useState<
+    Record<
+      string,
+      {
+        groupBy: string;
+        topValues: { group_value: string; count: number }[];
+        timeSeries: { bucket: string; group_value: string; count: number }[];
+      }
+    >
+  >({});
   const [aggLoading, setAggLoading] = useState(false);
 
   // Span detail drawer
@@ -482,24 +482,31 @@ const ArgusTraceExplorerPage: React.FC = () => {
   );
 
   const fetchAggregates = useCallback(
-    async (groupByVal?: string) => {
+    async (groupBys?: string[]) => {
+      const keys = groupBys || aggGroupBys;
       setAggLoading(true);
       try {
         const apiParams = argusFilterStateToApiParams(filters);
-        const data = await argusService.getSpanAggregates(projectId, {
-          period: apiParams.period || currentPeriod,
-          groupBy: groupByVal || aggGroupBy,
-          start: apiParams.start,
-          end: apiParams.end,
-        });
-        setAggData(data);
+        const results: Record<string, any> = {};
+        await Promise.all(
+          keys.map(async (gKey) => {
+            const data = await argusService.getSpanAggregates(projectId, {
+              period: apiParams.period || currentPeriod,
+              groupBy: gKey,
+              start: apiParams.start,
+              end: apiParams.end,
+            });
+            results[gKey] = data;
+          })
+        );
+        setAggDataMap(results);
       } catch (err) {
         console.error('Failed to fetch span aggregates', err);
       } finally {
         setAggLoading(false);
       }
     },
-    [projectId, filters, currentPeriod, aggGroupBy]
+    [projectId, filters, currentPeriod, aggGroupBys]
   );
 
   const fetchAll = useCallback(() => {
@@ -576,17 +583,23 @@ const ArgusTraceExplorerPage: React.FC = () => {
     [orderCol, orderDir, setUrlState]
   );
 
-  const handleGroupByChange = useCallback(
-    (val: string) => {
-      setUrlState({ groupBy: val });
-      fetchAggregates(val);
-    },
-    [setUrlState, fetchAggregates]
-  );
+  // handleGroupByChange is now inline per-panel (see render section)
 
   const handleRunAgg = useCallback(() => {
     fetchAggregates();
   }, [fetchAggregates]);
+
+  // groupByOptions for trace aggregates
+  const traceGroupByOptions = useMemo(
+    () => [
+      { value: 'op', label: 'Operation' },
+      { value: 'status', label: 'Status' },
+      { value: 'domain', label: 'Domain' },
+      { value: 'action', label: 'Action' },
+      { value: 'service', label: 'Service' },
+    ],
+    []
+  );
 
   const handleSaveQuery = useCallback(async () => {
     if (!saveName.trim()) return;
@@ -597,7 +610,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
           search,
           period: currentPeriod,
           tab: activeTab,
-          groupBy: aggGroupBy,
+          groupBy: aggGroupBys.join(','),
         },
         display_type: 'table',
         query_type: 'traces',
@@ -611,7 +624,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
     } catch (err) {
       console.error('Failed to save trace query:', err);
     }
-  }, [saveName, projectId, search, currentPeriod, activeTab, aggGroupBy]);
+  }, [saveName, projectId, search, currentPeriod, activeTab, aggGroupBys]);
 
   const handleRename = useCallback(
     async (newName: string) => {
@@ -784,7 +797,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         loading={loading}
         hideFilters={['browser', 'os']}
         extraControls={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>
             <Box
               ref={searchContainerRef}
               sx={{
@@ -1155,13 +1168,62 @@ const ArgusTraceExplorerPage: React.FC = () => {
             )}
 
             {activeTab === 2 && (
-              <AggregatesTab
-                aggData={aggData}
-                aggLoading={aggLoading}
-                aggGroupBy={aggGroupBy}
-                onGroupByChange={handleGroupByChange}
-                onRunAgg={handleRunAgg}
-              />
+              <Box sx={{ px: 2, pt: 1 }}>
+                {aggGroupBys.map((gKey, gIdx) => (
+                  <AggregatePanel
+                    key={gKey}
+                    aggData={aggDataMap[gKey] || null}
+                    aggGroupBy={gKey}
+                    aggLoading={aggLoading}
+                    isDark={isDark}
+                    groupByOptions={traceGroupByOptions}
+                    storagePrefix={`argus_traces_agg_${gIdx}`}
+                    discoveredFacetKeys={spanFacets.map((f) => f.label)}
+                    onGroupByChange={(val) => {
+                      const newKeys = [...aggGroupBys];
+                      newKeys[gIdx] = val;
+                      const deduped = [...new Set(newKeys)];
+                      setUrlState({ groupBy: deduped.join(',') });
+                      fetchAggregates(deduped);
+                    }}
+                    onAddFilter={(key, val) => {
+                      addSearchTag(key, val);
+                    }}
+                    showRemove={aggGroupBys.length > 1}
+                    onRemovePanel={() => {
+                      const newKeys = aggGroupBys.filter((_, i) => i !== gIdx);
+                      setUrlState({ groupBy: newKeys.join(',') });
+                      fetchAggregates(newKeys);
+                    }}
+                  />
+                ))}
+                {aggGroupBys.length < 3 && (
+                  <Box
+                    onClick={() => {
+                      const defaults = ['op', 'status', 'domain', 'action', 'service'];
+                      const next = defaults.find((d) => !aggGroupBys.includes(d)) || 'op';
+                      const newKeys = [...aggGroupBys, next];
+                      setUrlState({ groupBy: newKeys.join(',') });
+                      fetchAggregates(newKeys);
+                    }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      py: 0.75,
+                      cursor: 'pointer',
+                      borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                      color: 'text.disabled',
+                      fontSize: '0.72rem',
+                      fontWeight: 600,
+                      transition: 'color 0.15s',
+                      '&:hover': { color: 'primary.main' },
+                    }}
+                  >
+                    + Add group
+                  </Box>
+                )}
+              </Box>
             )}
           </Box>
         </Box>

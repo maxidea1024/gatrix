@@ -2,14 +2,10 @@ import React, { useMemo } from 'react';
 import {
   Box,
   Typography,
-  Paper,
   Chip,
   IconButton,
   Button,
   CircularProgress,
-  FormControl,
-  Select,
-  MenuItem,
   Table,
   TableHead,
   TableBody,
@@ -22,7 +18,6 @@ import {
   Timeline as TraceIcon,
   ArrowDownward as SortDescIcon,
   ArrowUpward as SortAscIcon,
-  ViewColumn as ViewIcon,
   Terminal as LogsIcon,
   ExpandMore as LoadMoreIcon,
 } from '@mui/icons-material';
@@ -32,14 +27,11 @@ import SafeTooltip from '@/components/common/SafeTooltip';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import { CopyButton } from '@/components/common/CopyButton';
-import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import { formatWith } from '@/utils/dateFormat';
 import { getOpColor, formatDuration } from './traceExplorerHelpers';
 import {
   TablePaper,
   SortableHeaderCell,
-  GroupByToolbar,
-  OpDot,
 } from './TraceExplorerTabs.styles';
 
 const SPAN_COLUMNS = [
@@ -687,239 +679,3 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
   }
 );
 TracesTab.displayName = 'TracesTab';
-
-// ─── Aggregates Tab ───
-
-interface AggregatesTabProps {
-  aggData: {
-    groupBy: string;
-    topValues: {
-      group_value: string;
-      count: number;
-      avg_duration?: number;
-      p95_duration?: number;
-    }[];
-    timeSeries: { bucket: string; group_value: string; count: number }[];
-  } | null;
-  aggLoading: boolean;
-  aggGroupBy: string;
-  onGroupByChange: (val: string) => void;
-  onRunAgg: () => void;
-}
-
-export const AggregatesTab: React.FC<AggregatesTabProps> = React.memo(
-  ({ aggData, aggLoading, aggGroupBy, onGroupByChange, onRunAgg }) => {
-    const theme = useTheme();
-    const { t } = useTranslation();
-    const isDark = theme.palette.mode === 'dark';
-
-    // Build time series chart data from aggData.timeSeries
-    const timeSeriesChart = useMemo(() => {
-      if (!aggData?.timeSeries || aggData.timeSeries.length === 0) return null;
-
-      const bucketSet = new Set<string>();
-      const groupSet = new Set<string>();
-      aggData.timeSeries.forEach((row) => {
-        bucketSet.add(row.bucket);
-        groupSet.add(row.group_value);
-      });
-      const sortedBuckets = [...bucketSet].sort();
-      // Only show top 8 groups
-      const topGroups = [...groupSet].slice(0, 8);
-
-      const lookup = new Map<string, number>();
-      aggData.timeSeries.forEach((row) => {
-        lookup.set(`${row.bucket}::${row.group_value}`, Number(row.count) || 0);
-      });
-
-      const labels = sortedBuckets.map((b) => {
-        const d = new Date(b);
-        return d.toLocaleString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        });
-      });
-
-      const datasets = topGroups.map((group) => ({
-        label: group || '(empty)',
-        data: sortedBuckets.map((b) => lookup.get(`${b}::${group}`) || 0),
-        type: 'bar' as const,
-        color: aggGroupBy === 'op' ? getOpColor(group) : undefined,
-      }));
-
-      return { labels, datasets };
-    }, [aggData?.timeSeries, aggGroupBy]);
-
-    return (
-      <TablePaper elevation={0} isDark={isDark}>
-        <GroupByToolbar isDark={isDark}>
-          <Typography
-            sx={{
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              color: 'text.secondary',
-            }}
-          >
-            {t('argus.traces.groupBy', 'Group by')}:
-          </Typography>
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <Select
-              value={aggGroupBy}
-              onChange={(e) => onGroupByChange(e.target.value as string)}
-              sx={{ height: 28, fontSize: '0.75rem', fontWeight: 700 }}
-            >
-              <MenuItem value="op" sx={{ fontSize: '0.75rem' }}>
-                Operation (op)
-              </MenuItem>
-              <MenuItem value="status" sx={{ fontSize: '0.75rem' }}>
-                Status
-              </MenuItem>
-              <MenuItem value="domain" sx={{ fontSize: '0.75rem' }}>
-                Domain
-              </MenuItem>
-              <MenuItem value="action" sx={{ fontSize: '0.75rem' }}>
-                Action
-              </MenuItem>
-            </Select>
-          </FormControl>
-          <Button
-            size="small"
-            variant="outlined"
-            onClick={onRunAgg}
-            disabled={aggLoading}
-            sx={{
-              textTransform: 'none',
-              fontSize: '0.72rem',
-              ml: 'auto',
-              borderRadius: '6px',
-            }}
-          >
-            {aggLoading ? (
-              <CircularProgress size={14} />
-            ) : (
-              t('argus.traces.runAgg', 'Run')
-            )}
-          </Button>
-        </GroupByToolbar>
-
-        {/* Time Series Chart */}
-        {timeSeriesChart && (
-          <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>
-            <ArgusVolumeChart
-              datasets={timeSeriesChart.datasets}
-              labels={timeSeriesChart.labels}
-              title={`count(spans) by ${aggGroupBy}`}
-              emptyMessage=""
-              storagePrefix="argus_span_agg_chart"
-              showLegend
-              showChartTypeToggle={false}
-              showCompactToggle={false}
-              mb={0}
-            />
-          </Box>
-        )}
-
-        <PageContentLoader loading={aggLoading} skeleton={<TableSkeleton />}>
-          {aggData && aggData.topValues.length > 0 ? (
-            <Table
-              size="small"
-              sx={{
-                width: '100%',
-                tableLayout: 'auto',
-                '& td, & th': {
-                  borderColor: isDark
-                    ? 'rgba(255,255,255,0.04)'
-                    : 'rgba(0,0,0,0.04)',
-                },
-              }}
-            >
-              <TableHead>
-                <TableRow>
-                  {[
-                    aggGroupBy.toUpperCase(),
-                    t('argus.traces.count', 'COUNT'),
-                    t('argus.traces.avgDuration', 'AVG DURATION'),
-                    'P95',
-                  ].map((header) => (
-                    <SortableHeaderCell key={header}>
-                      {header}
-                    </SortableHeaderCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {aggData.topValues.map((row, idx) => (
-                  <TableRow key={idx} hover>
-                    <TableCell sx={{ py: 0.8 }}>
-                      <Box
-                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-                      >
-                        {aggGroupBy === 'op' && (
-                          <OpDot dotColor={getOpColor(row.group_value)} />
-                        )}
-                        <Typography
-                          sx={{ fontSize: '0.78rem', fontWeight: 600 }}
-                        >
-                          {row.group_value || '(empty)'}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ py: 0.8 }}>
-                      <Typography sx={{ fontSize: '0.73rem' }}>
-                        {Number(row.count).toLocaleString()}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ py: 0.8 }}>
-                      <Typography sx={{ fontSize: '0.73rem' }}>
-                        {formatDuration(Number(row.avg_duration || 0))}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ py: 0.8 }}>
-                      <Typography
-                        sx={{
-                          fontSize: '0.73rem',
-                          fontWeight: 600,
-                          color:
-                            Number(row.p95_duration) > 1000
-                              ? theme.palette.error.main
-                              : 'text.primary',
-                        }}
-                      >
-                        {formatDuration(Number(row.p95_duration || 0))}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : !aggLoading ? (
-            <Box sx={{ py: 8, textAlign: 'center' }}>
-              <ViewIcon
-                sx={{
-                  fontSize: 48,
-                  color: alpha(theme.palette.primary.main, 0.15),
-                  mb: 1,
-                }}
-              />
-              <Typography
-                sx={{ fontSize: '0.95rem', fontWeight: 600, mb: 0.5 }}
-              >
-                {t('argus.traces.aggregatesTitle', 'Span Aggregates')}
-              </Typography>
-              <Typography color="text.disabled" sx={{ fontSize: '0.8rem' }}>
-                {t(
-                  'argus.traces.aggregatesDesc',
-                  'Group spans by operation, status, or domain to find patterns.'
-                )}
-              </Typography>
-            </Box>
-          ) : null}
-        </PageContentLoader>
-      </TablePaper>
-    );
-  }
-);
-AggregatesTab.displayName = 'AggregatesTab';
