@@ -605,7 +605,7 @@ const RewardTemplatesPage: React.FC = () => {
   const visibleColumns = columns.filter((col) => col.visible);
 
   return (
-    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+    <Box>
       {/* Header */}
       <PageHeader
         icon={<GiftIcon />}

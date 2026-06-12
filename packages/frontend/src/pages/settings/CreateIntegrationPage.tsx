@@ -37,6 +37,7 @@ import teamsIcon from '@/assets/icons/integrations/teams.svg';
 import webhookIcon from '@/assets/icons/integrations/webhook.svg';
 import larkIcon from '@/assets/icons/integrations/lark.svg';
 import newrelicIcon from '@/assets/icons/integrations/newrelic.svg';
+import PageHeader from '@/components/common/PageHeader';
 
 interface ProviderDefinition {
   name: string;
@@ -371,6 +372,7 @@ export const CreateIntegrationPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
+      <PageHeader title={t('integrations.createTitle')} />
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
         <Box sx={{ flex: 1 }}>

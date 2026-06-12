@@ -170,6 +170,7 @@ import SegmentedTabs from '../../components/common/SegmentedTabs';
 
 import changeRequestService from '../../services/changeRequestService';
 import { CopyButton } from '@/components/common/CopyButton';
+import PageHeader from '@/components/common/PageHeader';
 
 // Strategy context menu component for edit/delete actions
 const StrategyContextMenu: React.FC<{
@@ -2195,73 +2196,28 @@ const FeatureFlagDetailPage: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      {/* Title Bar */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
-          gap: 2,
-          px: 3,
-          py: 2,
-          bgcolor: 'background.paper',
-          borderBottom: 1,
-          borderColor: 'divider',
-          mb: 3,
-        }}
-      >
-        <Box>
+      <PageHeader
+        title={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              onClick={() => navigate('/feature-flags')}
-              sx={{ ml: -1 }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h5" fontWeight={600}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '1rem' }}>
               {flag.flagName}
             </Typography>
             {flag.isArchived && (
-              <Chip
-                label={t('featureFlags.archived')}
-                size="small"
-                color="warning"
-              />
+              <Chip label={t('featureFlags.archived')} size="small" color="warning" />
             )}
             <CopyButton text={flag.flagName} size={13} />
           </Box>
-          {flag.description && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mt: 0.5, ml: 5 }}
-            >
-              {flag.description}
-            </Typography>
-          )}
-        </Box>
-
-        {/* Tabs */}
-        <Box sx={{ flexShrink: 0 }}>
+        }
+        subtitle={flag.description || undefined}
+        onBack={() => navigate('/feature-flags')}
+        actions={
           <SegmentedTabs
             value={String(tabValue)}
             onChange={(key) => setTabValue(Number(key))}
             items={[
-              {
-                key: '0',
-                label: t('featureFlags.overview'),
-              },
-              {
-                key: '1',
-                label: t('featureFlags.flagValues'),
-                disabled: isCreating,
-              },
-              {
-                key: '2',
-                label: t('featureFlags.metrics'),
-                disabled: isCreating,
-              },
+              { key: '0', label: t('featureFlags.overview') },
+              { key: '1', label: t('featureFlags.flagValues'), disabled: isCreating },
+              { key: '2', label: t('featureFlags.metrics'), disabled: isCreating },
               {
                 key: '3',
                 label: (
@@ -2272,30 +2228,21 @@ const FeatureFlagDetailPage: React.FC = () => {
                         label={codeReferenceCount}
                         size="small"
                         variant="filled"
-                        sx={{
-                          height: 20,
-                          minWidth: 20,
-                          fontSize: '0.7rem',
-                          bgcolor: 'action.selected',
-                        }}
+                        sx={{ height: 20, minWidth: 20, fontSize: '0.7rem', bgcolor: 'action.selected' }}
                       />
                     )}
                   </>
                 ),
                 disabled: isCreating,
               },
-              {
-                key: '4',
-                label: t('featureFlags.tabs.history'),
-                disabled: isCreating,
-              },
+              { key: '4', label: t('featureFlags.tabs.history'), disabled: isCreating },
             ]}
           />
-        </Box>
-      </Box>
+        }
+      />
 
       {/* Main Content */}
-      <Box sx={{ px: 3, pb: 3, flex: 1 }}>
+      <Box sx={{ flex: 1 }}>
         {/* Overview Tab */}
         <TabPanel value={tabValue} index={0}>
           <Box

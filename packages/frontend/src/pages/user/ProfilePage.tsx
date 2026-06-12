@@ -56,6 +56,7 @@ import {
 import { formatRelativeTime, formatDateTimeDetailed } from '@/utils/dateFormat';
 import EffectivePermissionsViewer from '@/components/rbac/EffectivePermissionsViewer';
 import type { EffectivePermissions } from '@/services/rbacService';
+import PageHeader from '@/components/common/PageHeader';
 
 interface Environment {
   environmentId: string;
@@ -392,6 +393,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2, maxWidth: 1200 }}>
+      <PageHeader title={t('sidebar.profile')} />
       {/* Profile Header */}
       <Card sx={{ mb: 3, overflow: 'visible' }}>
         <Box

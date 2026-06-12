@@ -81,6 +81,7 @@ import serverLifecycleService, {
 } from '@/services/serverLifecycleService';
 import DashboardCcuChart from '@/components/admin/DashboardCcuChart';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 import {
   formatCompactNumber,
   formatWithCommas,
@@ -889,7 +890,8 @@ const DashboardPage: React.FC = () => {
 
   return (
     <PageContentLoader loading={permissionsLoading}>
-      <Box sx={{ p: 2 }}>
+      <PageHeader title={t('sidebar.dashboard')} />
+      <Box>
         {/* Hero Section */}
         <Box
           sx={{

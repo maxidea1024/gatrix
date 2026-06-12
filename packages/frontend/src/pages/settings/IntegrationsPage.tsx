@@ -54,6 +54,7 @@ import googleChatIcon from '@/assets/icons/integrations/google-chat.svg';
 import wecomIcon from '@/assets/icons/integrations/wecom.svg';
 import dingtalkIcon from '@/assets/icons/integrations/dingtalk.svg';
 import debugIcon from '@/assets/icons/integrations/debug.svg';
+import PageHeader from '@/components/common/PageHeader';
 
 interface Integration {
   id: string;
@@ -199,6 +200,7 @@ export const IntegrationsPage: React.FC = () => {
 
   return (
     <Box>
+      <PageHeader title={t('integrations.title')} />
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="body2" color="text.secondary">

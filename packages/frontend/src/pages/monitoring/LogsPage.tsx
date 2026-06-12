@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Box, Typography, Alert } from '@mui/material';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '@/components/common/PageHeader';
 
 /**
  * Resolve the Grafana base URL.
@@ -56,6 +57,7 @@ const LogsPage: React.FC<{ embedded?: boolean }> = () => {
         justifyContent: 'center',
       }}
     >
+      <PageHeader title={t('monitoring.logs.title')} />
       {iframeUrl ? (
         <iframe
           key={iframeUrl}

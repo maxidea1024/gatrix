@@ -829,3 +829,99 @@ setState(newValue)
 ```
 
 > **핵심:** `setTimeout`, `requestAnimationFrame`, `queueMicrotask` 등으로 fetch를 지연 호출하지 마세요. React의 state → deps → effect 체인을 신뢰하세요. 이 체인이 없는 경우에도 setTimeout 대신 `useEffect`로 state 변경에 반응하도록 설계하세요.
+
+## Number Formatting: 숫자 표시 규칙
+
+모든 UI에서 숫자를 표시할 때, **용도에 따라 정해진 포맷 함수를 반드시 사용**하세요. Raw 숫자를 그대로 출력하거나 `.toFixed()`만 사용하는 것은 금지입니다.
+
+### 규칙 1: 카운터/건수 → `formatCompactNumber`
+
+이벤트 수, 사용자 수, 트랜잭션 수, 스팬 수 등 **엔티티 개수**를 표시할 때는 반드시 `formatCompactNumber`를 사용합니다.
+
+**Location:** `@/utils/numberFormat`
+
+```tsx
+import { formatCompactNumber } from '@/utils/numberFormat';
+
+// ✅ 올바른 사용
+<Typography>{formatCompactNumber(600000)}</Typography>   // → "600K"
+<Typography>{formatCompactNumber(39999)}</Typography>    // → "40.0K"
+<Typography>{formatCompactNumber(1234567)}</Typography>  // → "1.23M"
+<Typography>{formatCompactNumber(500)}</Typography>      // → "500" (1000 미만은 그대로)
+```
+
+**⚠️ API 값이 문자열로 올 수 있음!** `typeof value === 'number'` 체크를 사용하는 경우, 반드시 `Number()`로 변환하세요:
+
+```tsx
+// ❌ API에서 "600000" (문자열)이 오면 typeof === 'number'가 false → raw 출력
+value: es?.total_errors,
+
+// ✅ Number()로 명시적 변환
+value: es?.total_errors != null ? Number(es.total_errors) : undefined,
+```
+
+**적용 대상:**
+- 대시보드 stat card의 값 (총에러, 영향받은 사용자, 트랜잭션 등)
+- 테이블 셀의 이벤트/사용자 카운트
+- 차트 tooltip의 건수
+- 칩/배지의 건수
+- **FacetSidebar**의 facet value 카운트 (`FacetSidebar.tsx`)
+- **LogsAggregatePanel**의 Top Values 테이블 카운트
+
+### 규칙 2: 지연시간(ms) → `Math.round().toLocaleString() + 'ms'`
+
+P50, P95, P99, 평균 응답시간, 스팬 duration 등 **밀리초 단위 지연시간**을 표시할 때는 반드시 `toLocaleString()`으로 3자리 콤마를 적용합니다.
+
+```tsx
+// ❌ 콤마 없이 표시
+<Typography>{value.toFixed(0)}ms</Typography>           // → "1000ms" ❌
+
+// ✅ 콤마 포맷 적용
+<Typography>{Math.round(value).toLocaleString()}ms</Typography>  // → "1,000ms" ✅
+
+// ✅ API 문자열 값인 경우
+<Typography>{Math.round(Number(detail.summary.p95)).toLocaleString()}ms</Typography>
+```
+
+**적용 대상:**
+- 성능 요약 카드 (Avg P95, Avg Duration 등)
+- 성능 테이블 행 (avg_duration, p50, p95 열)
+- 스팬 목록의 duration
+- Uptime 모니터의 avg response ms
+- Cron check-in duration
+
+**⚠️ 예외:** `formatDuration` 헬퍼 함수 내부에서 1000ms 미만일 때 `${Math.round(ms)}ms`로 표시하는 것은 OK (999 이하이므로 콤마 불필요).
+
+### 규칙 3: 퍼센트(%) → 큰 값에 `toLocaleString()` 적용
+
+변화율, delta 퍼센트 등 **100%를 초과할 수 있는 퍼센트 값**에는 `toLocaleString()`으로 콤마를 적용합니다.
+
+```tsx
+// ❌ 콤마 없이 표시
+<Typography>{Math.abs(value).toFixed(0)}%</Typography>   // → "3299%" ❌
+
+// ✅ 콤마 포맷 적용
+<Typography>{Math.round(Math.abs(value)).toLocaleString()}%</Typography>  // → "3,299%" ✅
+
+// ✅ 소수점이 필요한 경우
+<Typography>{Number(delta.toFixed(1)).toLocaleString()}%</Typography>     // → "3,299.5%" ✅
+```
+
+**적용 대상:**
+- `ChangeIndicator` 컴포넌트 (개요, 세션건강 페이지의 증감율)
+- `DeltaBadge` 컴포넌트 (로그 패턴의 변화율)
+- 패턴 상세의 Change 행
+
+**⚠️ 예외:** crash_free_rate, error_rate 등 0~100% 범위의 비율은 콤마 불필요 (`99.5%`, `0.12%`).
+
+### 요약 테이블
+
+| 용도 | 포맷 | 예시 |
+|------|------|------|
+| 엔티티 개수 (에러, 사용자, 트랜잭션) | `formatCompactNumber(value)` | `600K`, `1.23M` |
+| 지연시간 (ms) | `Math.round(v).toLocaleString() + 'ms'` | `1,000ms`, `12,345ms` |
+| 큰 퍼센트 (변화율, delta) | `Math.round(v).toLocaleString() + '%'` | `3,299%`, `1,500%` |
+| 작은 퍼센트 (비율) | `v.toFixed(1) + '%'` | `99.5%`, `0.12%` |
+
+> **핵심:** 숫자가 1,000 이상이 될 수 있는 모든 곳에 콤마를 적용하세요. Raw 숫자 출력은 금지입니다.
+

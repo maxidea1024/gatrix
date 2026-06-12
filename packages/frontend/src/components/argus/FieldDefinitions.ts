@@ -403,6 +403,64 @@ export function buildQueryToken(
   }
 }
 
+// ─── Field Navigation (Hyperlink Targets) ───────────────────────────────
+
+export interface FieldNavLink {
+  /** i18n key for the tooltip displayed on hover */
+  tooltip: string;
+  /** Build navigation path from field value and project ID */
+  buildPath: (value: string, projectId: string) => string;
+}
+
+/**
+ * Maps field names to their navigation target pages.
+ * Only fields that navigate to a **distinct page** should be listed here.
+ * Fields that merely apply a filter (service, environment, logger_name)
+ * are intentionally excluded — the existing filter buttons handle those.
+ */
+export const FIELD_NAVIGATIONS: Record<string, FieldNavLink> = {
+  trace_id: {
+    tooltip: 'argus.logs.nav.viewTrace',
+    buildPath: (v) => `/argus/performance?trace=${v}`,
+  },
+  span_id: {
+    tooltip: 'argus.logs.nav.viewSpan',
+    buildPath: (v) =>
+      `/argus/explore/traces?search=${encodeURIComponent(`span_id:${v}`)}`,
+  },
+  release: {
+    tooltip: 'argus.logs.nav.viewRelease',
+    buildPath: (v, pid) =>
+      `/argus/releases/${pid}/${encodeURIComponent(v)}`,
+  },
+  issue_id: {
+    tooltip: 'argus.logs.nav.viewIssue',
+    buildPath: (v, pid) => `/argus/issues/${pid}/${v}`,
+  },
+};
+
+/**
+ * Get the navigation link path for a field value.
+ * Returns null if the field has no navigation mapping or value is empty.
+ */
+export function getFieldLink(
+  fieldName: string,
+  value: string,
+  projectId: string
+): string | null {
+  const nav = FIELD_NAVIGATIONS[fieldName];
+  if (!nav || !value) return null;
+  return nav.buildPath(value, projectId);
+}
+
+/**
+ * Get the tooltip i18n key for a navigable field.
+ * Returns null if the field has no navigation mapping.
+ */
+export function getFieldNavTooltip(fieldName: string): string | null {
+  return FIELD_NAVIGATIONS[fieldName]?.tooltip ?? null;
+}
+
 /**
  * Relative time presets for date-type fields.
  */

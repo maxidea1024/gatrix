@@ -786,6 +786,134 @@ export default async function logsRoutes(app: FastifyInstance) {
       }
     }
   );
+  // ─── Pattern Attribute Distribution ───
+  // Returns top values per attribute for logs matching a given pattern.
+  // Uses LIKE-based matching with optional level/service pre-filter for speed.
+  app.get(
+    '/:projectId/logs/pattern-attributes',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const {
+        pattern,
+        period = '14d',
+        start,
+        end,
+        attributes = 'service,environment,level',
+        level: filterLevel,
+        service: filterService,
+      } = request.query as Record<string, string>;
+
+      if (!pattern) {
+        return reply.code(400).send({ error: 'pattern parameter is required' });
+      }
+
+      const bucket = getBucketingConfig(period, start, end);
+      const timeCond = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
+
+      // Extract the longest literal segment from the pattern for LIKE filtering.
+      // e.g. "attempt to index <N> at CharacterUI — data is nil" → longest segment
+      const segments = pattern
+        .split(/<UUID>|<HEX>|<IP>|<N>|<STR>/g)
+        .map((s) => s.trim())
+        .filter((s) => s.length >= 3)
+        .sort((a, b) => b.length - a.length); // longest first
+
+      if (segments.length === 0) {
+        return reply.send({ data: {} });
+      }
+
+      const TOP_LEVEL_COLUMNS = new Set([
+        'level',
+        'service',
+        'environment',
+        'logger_name',
+        'release',
+      ]);
+
+      const attrKeys = attributes
+        .split(',')
+        .map((k) => k.trim())
+        .filter(Boolean);
+
+      try {
+        const baseParams: Record<string, string> = {
+          projectId: String(projectId),
+          fillStart: String(bucket.queryParams.fillStart),
+          fillEnd: String(bucket.queryParams.fillEnd),
+        };
+
+        // Build WHERE conditions
+        const conditions: string[] = [
+          'project_id = {projectId:String}',
+          timeCond,
+        ];
+
+        // Add level/service pre-filters if provided (indexed, very fast)
+        if (filterLevel) {
+          conditions.push('level = {filterLevel:String}');
+          baseParams.filterLevel = filterLevel;
+        }
+        if (filterService) {
+          conditions.push('service = {filterService:String}');
+          baseParams.filterService = filterService;
+        }
+
+        // Use top 2 longest segments for LIKE (balance between precision and speed)
+        segments.slice(0, 2).forEach((seg, i) => {
+          const escaped = seg.replace(/%/g, '\\%').replace(/_/g, '\\_');
+          baseParams[`seg_${i}`] = `%${escaped}%`;
+          conditions.push(`message LIKE {seg_${i}:String}`);
+        });
+
+        const whereClause = conditions.join(' AND ');
+
+        // Run individual queries per attribute in parallel
+        const results: Record<string, { value: string; count: number }[]> = {};
+
+        const promises = attrKeys.map(async (attrKey) => {
+          const qp = { ...baseParams };
+          let valueExpr: string;
+
+          if (TOP_LEVEL_COLUMNS.has(attrKey)) {
+            valueExpr = attrKey;
+          } else {
+            qp[`ak_${attrKey}`] = attrKey;
+            valueExpr = `attributes[{ak_${attrKey}:String}]`;
+          }
+
+          const sql = `
+            SELECT ${valueExpr} AS value, count() AS count
+            FROM argus.logs
+            WHERE ${whereClause} AND ${valueExpr} != ''
+            GROUP BY value
+            ORDER BY count DESC
+            LIMIT 10
+          `;
+
+          try {
+            const result = await optic.rawQuery({ query: sql, params: qp });
+            results[attrKey] = (result.data as any[]).map((r) => ({
+              value: String(r.value),
+              count: Number(r.count),
+            }));
+          } catch {
+            results[attrKey] = [];
+          }
+        });
+
+        await Promise.all(promises);
+        return reply.send({ data: results });
+      } catch (error) {
+        logger.error('Failed to get pattern attributes', {
+          projectId,
+          error: String(error),
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get pattern attributes' });
+      }
+    }
+  );
 
   // ─── Custom Attribute Facet (distinct values for a given attribute key) ───
   app.get(

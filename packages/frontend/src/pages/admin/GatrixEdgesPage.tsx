@@ -55,6 +55,7 @@ import PageContentLoader from '../../components/common/PageContentLoader';
 import EmptyPlaceholder from '../../components/common/EmptyPlaceholder';
 import { useSnackbar } from 'notistack';
 import { copyToClipboardWithNotification } from '../../utils/clipboard';
+import PageHeader from '@/components/common/PageHeader';
 
 // Grouping options - Cloud-related only
 type GroupingField = 'cloudProvider' | 'cloudRegion';
@@ -983,6 +984,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
   return (
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
+      <PageHeader title={t('gatrixEdges.title', 'Edge Nodes')} />
       {/* Compact Grouping Controls */}
       <Box
         sx={{

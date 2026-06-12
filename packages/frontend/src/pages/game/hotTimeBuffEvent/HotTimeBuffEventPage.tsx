@@ -118,6 +118,7 @@ import {
 import { formatDayOfWeek, formatDateShort, isOverrideDirty } from './utils';
 import SortableColumnItem from './SortableColumnItem';
 import HotTimeBuffDrawer from './HotTimeBuffDrawer';
+import PageHeader from '@/components/common/PageHeader';
 
 const HotTimeBuffEventPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -1351,6 +1352,7 @@ const HotTimeBuffEventPage: React.FC = () => {
 
   return (
     <PageContentLoader loading={isInitialLoad}>
+      <PageHeader title={t('hotTimeBuff.title', 'Hot Time Buff Events')} />
       <Box>
         {/* Toolbar */}
         <Box

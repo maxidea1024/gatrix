@@ -20,6 +20,7 @@ import {
   Close as RemoveIcon,
 } from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
+import { formatCompactNumber } from '@/utils/numberFormat';
 import { useTranslation } from 'react-i18next';
 
 /* ─── Types ─── */
@@ -237,7 +238,7 @@ const FacetSection = React.memo<{
                       textAlign: 'right',
                     }}
                   >
-                    {v.count.toLocaleString()}
+                    {formatCompactNumber(v.count)}
                   </Typography>
                   <Box
                     className="facet-actions"

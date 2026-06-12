@@ -762,7 +762,7 @@ const ChangeRequestsPage: React.FC = () => {
   );
 
   return (
-    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+    <Box>
       <PageHeader
         icon={<CampaignIcon />}
         title={t('changeRequest.title')}

@@ -638,13 +638,18 @@ class ArgusService {
       orderBy?: string;
       start?: string;
       end?: string;
+      offset?: number;
     }
-  ): Promise<any[]> {
+  ): Promise<{ data: any[]; hasMore: boolean }> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/traces/${projectId}/spans`,
       { params }
     );
-    return response.data?.data || response.data || [];
+    const raw = response.data;
+    return {
+      data: raw?.data || [],
+      hasMore: raw?.hasMore ?? false,
+    };
   }
 
   async getTraceSamples(
@@ -655,13 +660,18 @@ class ArgusService {
       limit?: number;
       start?: string;
       end?: string;
+      offset?: number;
     }
-  ): Promise<any[]> {
+  ): Promise<{ data: any[]; hasMore: boolean }> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/traces/${projectId}/samples`,
       { params }
     );
-    return response.data?.data || response.data || [];
+    const raw = response.data;
+    return {
+      data: raw?.data || [],
+      hasMore: raw?.hasMore ?? false,
+    };
   }
 
   async getSpanAggregates(
@@ -1765,6 +1775,8 @@ class ArgusService {
       start?: string;
       end?: string;
       attributes?: string;
+      level?: string;
+      service?: string;
     }
   ): Promise<Record<string, { value: string; count: number }[]>> {
     try {

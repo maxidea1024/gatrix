@@ -20,6 +20,7 @@ import {
   ArrowBack as ArrowBackIcon,
   BugReport as BugReportIcon,
   Person as PersonIcon,
+  Timeline as TraceIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -42,6 +43,7 @@ import IssueStacktraceSection from './components/IssueStacktraceSection';
 import IssueContextSection from './components/IssueContextSection';
 import SpanEvidenceSection from '@/components/argus/SpanEvidenceSection';
 import IssueDetailSidebar from './components/IssueDetailSidebar';
+import PageHeader from '@/components/common/PageHeader';
 
 const MIN_SPLIT_WIDTH = 250;
 const MAX_SPLIT_WIDTH = 800;
@@ -255,6 +257,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   // ─── RENDER ───
   return (
     <PageContentLoader loading={loading}>
+      <PageHeader title={t('argus.issues.detail', 'Issue Detail')} />
       {!issue ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <BugReportIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
@@ -387,6 +390,30 @@ const ArgusIssueDetailPage: React.FC = () => {
               {spanEvidence.length > 0 && (
                 <Box sx={{ mb: 2 }}>
                   <SpanEvidenceSection spans={spanEvidence} />
+                </Box>
+              )}
+
+              {/* Trace Explorer Link */}
+              {traceId && (
+                <Box sx={{ mb: 2 }}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<TraceIcon sx={{ fontSize: 15 }} />}
+                    onClick={() =>
+                      navigate(
+                        `/argus/explore/traces?q=trace_id:"${traceId}"`
+                      )
+                    }
+                    sx={{
+                      textTransform: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      borderRadius: '6px',
+                    }}
+                  >
+                    {t('argus.issues.searchRelatedSpans', 'Search related spans')}
+                  </Button>
                 </Box>
               )}
 

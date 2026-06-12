@@ -58,6 +58,7 @@ import webhookIcon from '@/assets/icons/integrations/webhook.svg';
 import larkIcon from '@/assets/icons/integrations/lark.svg';
 import newrelicIcon from '@/assets/icons/integrations/newrelic.svg';
 import debugIcon from '@/assets/icons/integrations/debug.svg';
+import PageHeader from '@/components/common/PageHeader';
 
 interface Integration {
   id: string;
@@ -808,6 +809,7 @@ export const EditIntegrationPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2 }}>
+      <PageHeader title={t('integrations.editTitle', 'Edit Integration')} />
       {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
         <Box sx={{ flex: 1 }}>

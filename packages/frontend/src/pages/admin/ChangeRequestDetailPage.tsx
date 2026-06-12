@@ -45,6 +45,7 @@ import changeRequestService, {
   ChangeRequest,
   ChangeRequestStatus,
 } from '@/services/changeRequestService';
+import PageHeader from '@/components/common/PageHeader';
 
 // Status configuration
 const STATUS_CONFIG: Record<
@@ -438,6 +439,7 @@ const ChangeRequestDetailPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2, bgcolor: 'background.default', minHeight: '100vh' }}>
+      <PageHeader title={t('changeRequest.detail', 'Change Request')} />
       {/* GitHub-style Header */}
       <Box
         sx={{

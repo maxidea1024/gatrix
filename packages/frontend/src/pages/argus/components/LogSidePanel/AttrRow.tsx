@@ -3,12 +3,16 @@ import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import {
   FilterList as FilterIcon,
   Block as ExcludeIcon,
-  Timeline as TraceIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { CopyButton } from '@/components/common/CopyButton';
 import { useTranslation } from 'react-i18next';
+import {
+  getFieldLink,
+  getFieldNavTooltip,
+} from '@/components/argus/FieldDefinitions';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 export const AttrRow: React.FC<{
   label: string;
@@ -16,12 +20,38 @@ export const AttrRow: React.FC<{
   isDark: boolean;
   color?: string;
   bold?: boolean;
+  /** When true, suppress hyperlink rendering even if a navigation mapping exists. */
+  disableLink?: boolean;
   onFilter?: (key: string, value: string, exclude: boolean) => void;
-}> = ({ label, value, isDark, color, bold, onFilter }) => {
+}> = ({ label, value, isDark, color, bold, disableLink, onFilter }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const isTraceField = label === 'trace_id' || label === 'span_id';
+  const { currentProject } = useOrgProject();
+  const projectId = String(currentProject?.id || '1');
+  const fieldLink =
+    !disableLink && value ? getFieldLink(label, value, projectId) : null;
+  const tooltipKey = fieldLink ? getFieldNavTooltip(label) : null;
+  const isMonoField =
+    label === 'trace_id' || label === 'span_id' || label === 'log_id';
+
+  const linkContent = fieldLink ? (
+    <Typography
+      component={Link}
+      to={fieldLink}
+      sx={{
+        fontSize: '0.72rem',
+        wordBreak: 'break-all',
+        pt: 0.15,
+        color: color || theme.palette.info.main,
+        fontWeight: bold ? 700 : 400,
+        fontFamily: isMonoField ? 'monospace' : undefined,
+        textDecoration: 'none',
+        '&:hover': { textDecoration: 'underline' },
+      }}
+    >
+      {value}
+    </Typography>
+  ) : null;
 
   return (
     <Box
@@ -61,21 +91,28 @@ export const AttrRow: React.FC<{
           minWidth: 0,
         }}
       >
-        <Typography
-          sx={{
-            fontSize: '0.72rem',
-            wordBreak: 'break-all',
-            pt: 0.15,
-            color: color || 'text.primary',
-            fontWeight: bold ? 700 : 400,
-            fontFamily:
-              label === 'trace_id' || label === 'span_id' || label === 'log_id'
-                ? 'monospace'
-                : undefined,
-          }}
-        >
-          {value || '—'}
-        </Typography>
+        {linkContent ? (
+          tooltipKey ? (
+            <SafeTooltip title={t(tooltipKey)}>
+              {linkContent}
+            </SafeTooltip>
+          ) : (
+            linkContent
+          )
+        ) : (
+          <Typography
+            sx={{
+              fontSize: '0.72rem',
+              wordBreak: 'break-all',
+              pt: 0.15,
+              color: color || 'text.primary',
+              fontWeight: bold ? 700 : 400,
+              fontFamily: isMonoField ? 'monospace' : undefined,
+            }}
+          >
+            {value || '—'}
+          </Typography>
+        )}
         <Box
           className="attr-actions"
           sx={{
@@ -87,27 +124,6 @@ export const AttrRow: React.FC<{
             ml: 1,
           }}
         >
-          {isTraceField && value && (
-            <SafeTooltip
-              title={t(
-                'argus.logs.panel.viewInTraceExplorer',
-                'View in Trace Explorer'
-              )}
-            >
-              <IconButton
-                size="small"
-                onClick={() =>
-                  navigate(
-                    `/argus/explore/traces?search=${encodeURIComponent(`${label}:${value}`)}`,
-                    { state: { allowBack: true } }
-                  )
-                }
-                sx={{ p: 0.2, color: theme.palette.info.main }}
-              >
-                <TraceIcon sx={{ fontSize: 12 }} />
-              </IconButton>
-            </SafeTooltip>
-          )}
           <CopyButton text={value} size={12} sx={{ p: 0.2 }} />
           {onFilter && value && (
             <>

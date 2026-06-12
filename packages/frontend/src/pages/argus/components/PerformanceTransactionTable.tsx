@@ -1,11 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
+import { Box, Typography, Paper, Chip, IconButton, useTheme, alpha } from '@mui/material';
 import {
   Speed as SpeedIcon,
   Schedule as ScheduleIcon,
   Timeline as TimelineIcon,
+  ManageSearch as SpanSearchIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import SafeTooltip from '@/components/common/SafeTooltip';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import {
@@ -32,6 +35,7 @@ const PerformanceTransactionTable: React.FC<
 > = ({ transactions, loading, onTxnClick }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const isDark = theme.palette.mode === 'dark';
 
   const [perfPage, setPerfPage] = useState(0);
@@ -338,6 +342,29 @@ const PerformanceTransactionTable: React.FC<
                     >
                       {txnPath}
                     </Typography>
+                    <SafeTooltip
+                      title={t(
+                        'argus.performance.searchSpans',
+                        'Search spans in Trace Explorer'
+                      )}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(
+                            `/argus/explore/traces?q=description:"${txnPath}"`
+                          );
+                        }}
+                        sx={{
+                          p: 0.3,
+                          opacity: 0.4,
+                          '&:hover': { opacity: 1 },
+                        }}
+                      >
+                        <SpanSearchIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </SafeTooltip>
                   </Box>
 
                   {/* Count */}

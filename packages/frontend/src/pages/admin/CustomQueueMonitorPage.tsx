@@ -45,6 +45,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import apiClient from '@/services/api';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import PageHeader from '@/components/common/PageHeader';
 
 interface QueueStats {
   name: string;
@@ -234,6 +235,7 @@ const CustomQueueMonitorPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2 }}>
+      <PageHeader title={t('monitoring.customQueue.title', 'Custom Queue Monitor')} />
       <Box
         sx={{
           display: 'flex',

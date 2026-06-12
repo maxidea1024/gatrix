@@ -90,7 +90,7 @@ const SurveysTabPage: React.FC = () => {
   const ActiveComponent = visibleTabs[activeTabIndex]?.component;
 
   return (
-    <Box sx={{ px: 2, pb: 2, pt: 1.5 }}>
+    <Box>
       <PageHeader
         icon={<PollIcon />}
         title={t('surveys.title')}

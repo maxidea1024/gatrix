@@ -76,6 +76,7 @@ import PageContentLoader from '../../components/common/PageContentLoader';
 import EmptyPagePlaceholder from '../../components/common/EmptyPagePlaceholder';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import { CopyButton } from '@/components/common/CopyButton';
+import PageHeader from '@/components/common/PageHeader';
 
 interface EnvironmentsPageProps {
   /** When true, renders without outer padding and breadcrumbs */
@@ -599,6 +600,7 @@ const EnvironmentsPage: React.FC<EnvironmentsPageProps> = ({
 
   return (
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
+      <PageHeader title={t('environments.title')} />
       <Box
         sx={{
           display: 'flex',

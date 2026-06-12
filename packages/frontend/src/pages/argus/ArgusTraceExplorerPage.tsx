@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useCallback,
   useEffect,
@@ -9,7 +9,6 @@ import {
   Box,
   Typography,
   IconButton,
-  Tooltip,
   Popover,
   Button,
   useTheme,
@@ -19,13 +18,13 @@ import {
   Search as SearchIcon,
   Close as CloseIcon,
   Timeline as TraceIcon,
-  FilterList as FilterIcon,
   Tune as TuneIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
   Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import ArgusFilterBar, {
   ArgusFilterState,
@@ -33,6 +32,8 @@ import ArgusFilterBar, {
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
 import QueryBuilderPanel from '@/components/argus/QueryBuilderPanel';
+import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
+import SpanDetailPanel from '@/components/argus/SpanDetailDrawer';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import PageHeader from '@/components/common/PageHeader';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
@@ -151,6 +152,31 @@ const ArgusTraceExplorerPage: React.FC = () => {
   } | null>(null);
   const [aggLoading, setAggLoading] = useState(false);
 
+  // Span detail drawer
+  const [selectedSpan, setSelectedSpan] = useState<any | null>(null);
+  const [selectedSpanIndex, setSelectedSpanIndex] = useState<number | null>(null);
+
+  // Facet sidebar
+  const [facetCollapsed, setFacetCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('argus-trace-facet-collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const handleToggleFacetCollapse = useCallback(() => {
+    setFacetCollapsed((v) => {
+      const next = !v;
+      try { localStorage.setItem('argus-trace-facet-collapsed', String(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  // Pagination
+  const [spansHasMore, setSpansHasMore] = useState(false);
+  const [tracesHasMore, setTracesHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
   // Search state
   const [searchFocused, setSearchFocused] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -189,20 +215,53 @@ const ArgusTraceExplorerPage: React.FC = () => {
     return '24h';
   }, [filters.dateRange]);
 
+  // Facet groups derived from tags
+  const spanFacets = useMemo<FacetGroup[]>(() => {
+    const facets: FacetGroup[] = [];
+    if (tags.op?.length > 0) {
+      facets.push({
+        key: 'op',
+        label: 'Operation',
+        values: tags.op.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 })),
+      });
+    }
+    if (tags.status?.length > 0) {
+      facets.push({
+        key: 'status',
+        label: 'Status',
+        values: tags.status.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 })),
+      });
+    }
+    if (tags.domain?.length > 0) {
+      facets.push({
+        key: 'domain',
+        label: 'Domain',
+        values: tags.domain.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 })),
+      });
+    }
+    return facets;
+  }, [tags]);
+
   // ─── Fetch ───
+  const SPAN_PAGE_SIZE = 50;
+  const TRACE_PAGE_SIZE = 25;
+
   const fetchSpans = useCallback(async () => {
     setLoading(true);
+    setSelectedSpan(null);
+    setSelectedSpanIndex(null);
     try {
       const apiParams = argusFilterStateToApiParams(filters);
-      const data = await argusService.searchSpans(projectId, {
+      const result = await argusService.searchSpans(projectId, {
         period: apiParams.period || currentPeriod,
         search: search.trim() || undefined,
         orderBy,
-        limit: 50,
+        limit: SPAN_PAGE_SIZE,
         start: apiParams.start,
         end: apiParams.end,
       });
-      setSpans(data);
+      setSpans(result.data);
+      setSpansHasMore(result.hasMore);
     } catch (err) {
       console.error('Failed to search spans', err);
     } finally {
@@ -214,20 +273,64 @@ const ArgusTraceExplorerPage: React.FC = () => {
     setLoading(true);
     try {
       const apiParams = argusFilterStateToApiParams(filters);
-      const data = await argusService.getTraceSamples(projectId, {
+      const result = await argusService.getTraceSamples(projectId, {
         period: apiParams.period || currentPeriod,
         search: search.trim() || undefined,
-        limit: 25,
+        limit: TRACE_PAGE_SIZE,
         start: apiParams.start,
         end: apiParams.end,
       });
-      setTraceSamples(data);
+      setTraceSamples(result.data);
+      setTracesHasMore(result.hasMore);
     } catch (err) {
       console.error('Failed to get trace samples', err);
     } finally {
       setLoading(false);
     }
   }, [projectId, filters, currentPeriod, search]);
+
+  const handleLoadMoreSpans = useCallback(async () => {
+    setLoadingMore(true);
+    try {
+      const apiParams = argusFilterStateToApiParams(filters);
+      const result = await argusService.searchSpans(projectId, {
+        period: apiParams.period || currentPeriod,
+        search: search.trim() || undefined,
+        orderBy,
+        limit: SPAN_PAGE_SIZE,
+        offset: spans.length,
+        start: apiParams.start,
+        end: apiParams.end,
+      });
+      setSpans((prev) => [...prev, ...result.data]);
+      setSpansHasMore(result.hasMore);
+    } catch (err) {
+      console.error('Failed to load more spans', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [projectId, filters, currentPeriod, search, orderBy, spans.length]);
+
+  const handleLoadMoreTraces = useCallback(async () => {
+    setLoadingMore(true);
+    try {
+      const apiParams = argusFilterStateToApiParams(filters);
+      const result = await argusService.getTraceSamples(projectId, {
+        period: apiParams.period || currentPeriod,
+        search: search.trim() || undefined,
+        limit: TRACE_PAGE_SIZE,
+        offset: traceSamples.length,
+        start: apiParams.start,
+        end: apiParams.end,
+      });
+      setTraceSamples((prev) => [...prev, ...result.data]);
+      setTracesHasMore(result.hasMore);
+    } catch (err) {
+      console.error('Failed to load more traces', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [projectId, filters, currentPeriod, search, traceSamples.length]);
 
   const fetchVolume = useCallback(async () => {
     try {
@@ -238,7 +341,13 @@ const ArgusTraceExplorerPage: React.FC = () => {
         start: apiParams.start,
         end: apiParams.end,
       });
-      setVolume(data);
+      // Map 'hour' alias from backend to 'bucket' for chart
+      const mapped = (data || []).map((d: any) => ({
+        bucket: d.hour || d.bucket,
+        op: d.op || '',
+        count: Number(d.count) || 0,
+      }));
+      setVolume(mapped);
     } catch (err) {
       console.error('Failed to fetch span volume', err);
     }
@@ -482,6 +591,18 @@ const ArgusTraceExplorerPage: React.FC = () => {
     [search, setUrlState]
   );
 
+  const handleSelectSpan = useCallback((span: any, index: number) => {
+    setSelectedSpan(span);
+    setSelectedSpanIndex(index);
+  }, []);
+
+  const handleFacetFilter = useCallback(
+    (key: string, value: string) => {
+      addSearchTag(key, value);
+    },
+    [addSearchTag]
+  );
+
   /* ═══ RENDER ═══ */
   return (
     <Box>
@@ -513,7 +634,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         )}
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Tooltip title={t('argus.traces.savedQueries', 'Saved Queries')}>
+            <SafeTooltip title={t('argus.traces.savedQueries', 'Saved Queries')}>
               <IconButton
                 size="small"
                 onClick={() => setSavedPanelOpen(true)}
@@ -530,7 +651,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   <BookmarkBorderIcon sx={{ fontSize: 20 }} />
                 )}
               </IconButton>
-            </Tooltip>
+            </SafeTooltip>
             <Button
               size="small"
               variant="outlined"
@@ -637,7 +758,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 </IconButton>
               )}
 
-              {/* Builder toggle — inside the search bar */}
+              {/* Builder toggle */}
               <Box
                 sx={{
                   borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
@@ -648,7 +769,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   alignItems: 'center',
                 }}
               >
-                <Tooltip title={t('argus.builder.open', 'Open Query Builder')}>
+                <SafeTooltip title={t('argus.builder.open', 'Open Query Builder')}>
                   <IconButton
                     size="small"
                     onClick={() => setBuilderOpen((prev) => !prev)}
@@ -662,7 +783,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   >
                     <TuneIcon sx={{ fontSize: 15 }} />
                   </IconButton>
-                </Tooltip>
+                </SafeTooltip>
               </Box>
             </Box>
 
@@ -815,46 +936,108 @@ const ArgusTraceExplorerPage: React.FC = () => {
         }
       />
 
-      {/* Volume Chart */}
-      <SpanVolumeChart data={volume} isDark={isDark} onZoom={handleZoom} />
-
-      {/* Tabs */}
-      <Box sx={{ mb: 2 }}>
-        <SegmentedTabs
-          items={[
-            { key: '0', label: t('argus.traces.spansTab', 'Spans') },
-            { key: '1', label: t('argus.traces.tracesTab', 'Traces') },
-            { key: '2', label: t('argus.traces.aggregatesTab', 'Aggregates') },
-          ]}
-          value={String(activeTab)}
-          onChange={handleTabChange}
-        />
-      </Box>
-
-      {/* Tab Content */}
-      {activeTab === 0 && (
-        <SpansTab
-          spans={spans}
+      {/* ── Body: Sidebar + Content ── */}
+      <Box
+        sx={{
+          display: 'flex',
+          minHeight: 500,
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          borderRadius: 2,
+          backgroundColor: 'background.paper',
+        }}
+      >
+        {/* Left: Facets */}
+        <FacetSidebar
+          facets={spanFacets}
+          onFilter={handleFacetFilter}
+          collapsed={facetCollapsed}
+          onToggleCollapse={handleToggleFacetCollapse}
           loading={loading}
-          orderCol={orderCol}
-          orderDir={orderDir}
-          onColumnSort={handleColumnSort}
         />
-      )}
 
-      {activeTab === 1 && (
-        <TracesTab traceSamples={traceSamples} loading={loading} />
-      )}
+        {/* Center: Main content */}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {/* Volume Chart */}
+          <Box sx={{ px: 2, pt: 2 }}>
+            <SpanVolumeChart data={volume} isDark={isDark} onZoom={handleZoom} />
+          </Box>
 
-      {activeTab === 2 && (
-        <AggregatesTab
-          aggData={aggData}
-          aggLoading={aggLoading}
-          aggGroupBy={aggGroupBy}
-          onGroupByChange={handleGroupByChange}
-          onRunAgg={handleRunAgg}
-        />
-      )}
+          {/* Tabs */}
+          <Box sx={{ px: 2, mb: 1 }}>
+            <SegmentedTabs
+              items={[
+                { key: '0', label: t('argus.traces.spansTab', 'Spans') },
+                { key: '1', label: t('argus.traces.tracesTab', 'Traces') },
+                { key: '2', label: t('argus.traces.aggregatesTab', 'Aggregates') },
+              ]}
+              value={String(activeTab)}
+              onChange={handleTabChange}
+            />
+          </Box>
+
+          {/* Tab Content */}
+          <Box sx={{ px: 2, pb: 2 }}>
+            {activeTab === 0 && (
+              <SpansTab
+                spans={spans}
+                loading={loading}
+                orderCol={orderCol}
+                orderDir={orderDir}
+                onColumnSort={handleColumnSort}
+                onSelectSpan={handleSelectSpan}
+                selectedSpanIndex={selectedSpanIndex}
+                onFilterTag={addSearchTag}
+                hasMore={spansHasMore}
+                loadingMore={loadingMore}
+                onLoadMore={handleLoadMoreSpans}
+              />
+            )}
+
+            {activeTab === 1 && (
+              <TracesTab
+                traceSamples={traceSamples}
+                loading={loading}
+                hasMore={tracesHasMore}
+                loadingMore={loadingMore}
+                onLoadMore={handleLoadMoreTraces}
+              />
+            )}
+
+            {activeTab === 2 && (
+              <AggregatesTab
+                aggData={aggData}
+                aggLoading={aggLoading}
+                aggGroupBy={aggGroupBy}
+                onGroupByChange={handleGroupByChange}
+                onRunAgg={handleRunAgg}
+              />
+            )}
+          </Box>
+        </Box>
+
+        {/* Right: Span Detail Drawer */}
+        {selectedSpan && activeTab === 0 && (
+          <Box
+            sx={{
+              width: 400,
+              flexShrink: 0,
+              borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              overflow: 'auto',
+            }}
+          >
+            <SpanDetailPanel
+              span={selectedSpan}
+              onClose={() => {
+                setSelectedSpan(null);
+                setSelectedSpanIndex(null);
+              }}
+              isDark={isDark}
+              totalDuration={Number(selectedSpan.duration) || 0}
+              allSpans={spans}
+            />
+          </Box>
+        )}
+      </Box>
 
       {/* Save Query Dialog */}
       <SaveQueryDialog

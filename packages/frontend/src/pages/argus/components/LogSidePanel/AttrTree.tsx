@@ -66,6 +66,7 @@ export const AttrTreeRenderer: React.FC<{
               label={node.key}
               value={node.value || ''}
               isDark={isDark}
+              disableLink
               onFilter={(_, v, ex) => onFilter(node.fullKey, v, ex)}
             />
           </Box>

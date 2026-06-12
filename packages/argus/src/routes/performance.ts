@@ -197,13 +197,13 @@ export default async function performanceRoutes(app: FastifyInstance) {
             const bucket = getBucketingConfig(period);
             return optic.rawQuery({
               query: `
-                SELECT 'browser' AS tag_key, tags['browser'] AS tag_value, count() AS count, avg(duration) AS avg_duration, p95(duration) AS p95
+                SELECT 'browser' AS tag_key, tags['browser'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
                 FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32}) AND tags['browser'] != '' GROUP BY tags['browser'] HAVING count > 0
                 UNION ALL
-                SELECT 'os' AS tag_key, tags['os'] AS tag_value, count() AS count, avg(duration) AS avg_duration, p95(duration) AS p95
+                SELECT 'os' AS tag_key, tags['os'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
                 FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32}) AND tags['os'] != '' GROUP BY tags['os'] HAVING count > 0
                 UNION ALL
-                SELECT 'environment' AS tag_key, environment AS tag_value, count() AS count, avg(duration) AS avg_duration, p95(duration) AS p95
+                SELECT 'environment' AS tag_key, environment AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95
                 FROM argus.transactions WHERE project_id = {projectId:String} AND transaction = {txnName:String} AND timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32}) AND environment != '' GROUP BY environment HAVING count > 0
               `,
               params: { projectId, txnName, ...bucket.queryParams },

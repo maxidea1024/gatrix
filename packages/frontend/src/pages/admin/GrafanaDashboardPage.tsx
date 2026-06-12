@@ -3,6 +3,7 @@ import { Box, Tabs, Tab, Typography, Alert } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
+import PageHeader from '@/components/common/PageHeader';
 
 type DashboardKey = 'overview' | 'sdkMetrics';
 
@@ -108,6 +109,7 @@ export const GrafanaDashboardPage: React.FC<{ embedded?: boolean }> = ({
         flexDirection: 'column',
       }}
     >
+      <PageHeader title={t('monitoring.grafana.title', 'Grafana Dashboard')} />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={selectedDashboard}

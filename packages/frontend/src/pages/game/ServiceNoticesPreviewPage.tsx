@@ -30,6 +30,7 @@ import {
 } from '../../utils/dateFormat';
 import { Tooltip } from '@mui/material';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import PageHeader from '@/components/common/PageHeader';
 
 const PREVIEW_WIDTH = 1536;
 const PREVIEW_HEIGHT = 928;
@@ -463,6 +464,7 @@ const ServiceNoticesPreviewPage: React.FC = () => {
         textRendering: 'optimizeLegibility',
       }}
     >
+      <PageHeader title={t('serviceNotices.preview', 'Preview')} />
       {/* Left Sidebar - Notice List */}
       <Box
         sx={{

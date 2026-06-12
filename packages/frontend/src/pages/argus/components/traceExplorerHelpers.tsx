@@ -50,16 +50,37 @@ export const SpanVolumeChart: React.FC<{
         chartDatasets: [],
       };
 
-    const bucketMap = new Map<string, number>();
+    // Collect all buckets and ops
+    const bucketSet = new Set<string>();
+    const opSet = new Set<string>();
     data.forEach((p) => {
-      const count = Number(p.count) || 0;
-      bucketMap.set(p.bucket, (bucketMap.get(p.bucket) || 0) + count);
+      bucketSet.add(p.bucket);
+      if (p.op) opSet.add(p.op);
     });
-    const sorted = [...bucketMap.entries()].sort((a, b) =>
-      a[0].localeCompare(b[0])
-    );
+    const sorted = [...bucketSet].sort();
+    // Only show top 10 ops by total count
+    const opTotals = new Map<string, number>();
+    data.forEach((p) => {
+      if (p.op) {
+        opTotals.set(p.op, (opTotals.get(p.op) || 0) + (Number(p.count) || 0));
+      }
+    });
+    const topOps = [...opTotals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([op]) => op);
 
-    const labels = sorted.map(([b]) => {
+    // Build lookup: bucket::op → count
+    const lookup = new Map<string, number>();
+    data.forEach((p) => {
+      if (p.op) {
+        const key = `${p.bucket}::${p.op}`;
+        lookup.set(key, (lookup.get(key) || 0) + (Number(p.count) || 0));
+      }
+    });
+
+    // Build labels from sorted buckets
+    const properLabels = sorted.map((b) => {
       const d = new Date(b);
       return d.toLocaleString('en-US', {
         month: 'short',
@@ -70,18 +91,31 @@ export const SpanVolumeChart: React.FC<{
       });
     });
 
-    const datasets = [
-      {
-        label: 'count(spans)',
-        data: sorted.map(([, c]) => c),
-        type: 'bar' as const,
-        color: '#7c4dff',
-      },
-    ];
+    const datasets = topOps.length > 0
+      ? topOps.map((op) => ({
+          label: op,
+          data: sorted.map((b) => lookup.get(`${b}::${op}`) || 0),
+          type: 'bar' as const,
+          color: getOpColor(op),
+        }))
+      : [
+          {
+            label: 'count(spans)',
+            data: sorted.map((b) => {
+              let total = 0;
+              data.forEach((p) => {
+                if (p.bucket === b) total += Number(p.count) || 0;
+              });
+              return total;
+            }),
+            type: 'bar' as const,
+            color: '#7c4dff',
+          },
+        ];
 
     return {
-      sortedBuckets: sorted.map(([b]) => b),
-      chartLabels: labels,
+      sortedBuckets: sorted,
+      chartLabels: properLabels,
       chartDatasets: datasets,
     };
   }, [data]);

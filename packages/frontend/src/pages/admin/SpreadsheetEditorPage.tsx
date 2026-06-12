@@ -37,6 +37,7 @@ import SpreadsheetEditorWrapper from '@/components/spreadsheet/SpreadsheetEditor
 import ShareDialog from '@/components/spreadsheet/ShareDialog';
 import LottieLoader from '@/components/common/LottieLoader';
 import { exportToXlsx, importFromXlsx } from '@/utils/spreadsheetExcelUtils';
+import PageHeader from '@/components/common/PageHeader';
 
 // ==================== Save Status Indicator ====================
 
@@ -292,6 +293,7 @@ const SpreadsheetEditorPage: React.FC = () => {
         overflow: 'hidden',
       }}
     >
+      <PageHeader title={t('spreadsheet.editor.title', 'Spreadsheet Editor')} />
       {/* Top bar */}
       <Box
         sx={{

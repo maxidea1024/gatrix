@@ -20,6 +20,7 @@ import {
 import { CloudDownload, CloudUpload, Warning } from '@mui/icons-material';
 import { apiService } from '../../services/api';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '@/components/common/PageHeader';
 
 const DataManagementPage: React.FC = () => {
   const { t } = useTranslation();
@@ -89,6 +90,7 @@ const DataManagementPage: React.FC = () => {
 
   return (
     <Box>
+      <PageHeader title={t('dataManagement.title', 'Data Management')} />
       {message && (
         <Alert
           severity={message.type}

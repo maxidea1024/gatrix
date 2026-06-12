@@ -12,6 +12,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import PageHeader from '@/components/common/PageHeader';
 import {
   ChevronRight as ChevronRightIcon,
   Info as InfoIcon,
@@ -485,6 +486,7 @@ const IntegrationsSdksPage: React.FC = () => {
 
   return (
     <Box>
+      <PageHeader title={t('integrations.sdks.title')} />
       <Box sx={{ mb: 4 }}>
         <Typography variant="body2" color="text.secondary">
           {t('integrations.sdks.subtitle')}

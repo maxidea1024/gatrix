@@ -20,6 +20,7 @@ export default async function tracesRoutes(app: FastifyInstance) {
         orderBy = '-duration',
         start,
         end,
+        offset = '0',
       } = request.query as {
         period?: string;
         search?: string;
@@ -29,6 +30,7 @@ export default async function tracesRoutes(app: FastifyInstance) {
         orderBy?: string;
         start?: string;
         end?: string;
+        offset?: string;
       };
 
       const conditions: Condition[] = [];
@@ -52,6 +54,8 @@ export default async function tracesRoutes(app: FastifyInstance) {
         : 'duration';
 
       try {
+        const parsedLimit = parseInt(limit, 10);
+        const parsedOffset = parseInt(offset, 10) || 0;
         const result = await optic.query({
           dataset: 'spans',
           projectId,
@@ -70,13 +74,15 @@ export default async function tracesRoutes(app: FastifyInstance) {
             { field: 'start_timestamp' },
             { field: 'duration' },
             { field: 'tags' },
+            { field: 'data' },
           ],
           conditions,
           orderBy: [{ field: safeOrderCol, direction: orderDir }],
-          limit: parseInt(limit, 10),
+          limit: parsedLimit,
+          offset: parsedOffset,
         });
 
-        return reply.send({ data: result.data });
+        return reply.send({ data: result.data, hasMore: result.data.length >= parsedLimit });
       } catch (error) {
         logger.error('Failed to search spans', {
           projectId,
@@ -98,12 +104,14 @@ export default async function tracesRoutes(app: FastifyInstance) {
         limit = '25',
         start,
         end,
+        offset = '0',
       } = request.query as {
         period?: string;
         search?: string;
         limit?: string;
         start?: string;
         end?: string;
+        offset?: string;
       };
 
       const conditions: Condition[] = [];
@@ -115,6 +123,8 @@ export default async function tracesRoutes(app: FastifyInstance) {
         });
 
       try {
+        const parsedLimit = parseInt(limit, 10);
+        const parsedOffset = parseInt(offset, 10) || 0;
         const result = await optic.query({
           dataset: 'spans',
           projectId,
@@ -136,10 +146,11 @@ export default async function tracesRoutes(app: FastifyInstance) {
           conditions,
           groupBy: ['trace_id'],
           orderBy: [{ field: 'start_time', direction: 'DESC' }],
-          limit: parseInt(limit, 10),
+          limit: parsedLimit,
+          offset: parsedOffset,
         });
 
-        return reply.send({ data: result.data });
+        return reply.send({ data: result.data, hasMore: result.data.length >= parsedLimit });
       } catch (error) {
         logger.error('Failed to get trace samples', {
           projectId,

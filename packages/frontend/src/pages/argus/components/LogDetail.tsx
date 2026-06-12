@@ -3,12 +3,16 @@ import { Box, Typography, IconButton, Tooltip, useTheme } from '@mui/material';
 import {
   FilterList as FilterIcon,
   Block as ExcludeIcon,
-  Timeline as TimelineIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ArgusLogEntry } from '@/services/argusService';
 import { CopyButton } from '@/components/common/CopyButton';
+import {
+  getFieldLink,
+  getFieldNavTooltip,
+} from '@/components/argus/FieldDefinitions';
+import { useOrgProject } from '@/contexts/OrgProjectContext';
 
 const SEVERITY_COLORS: Record<string, string> = {
   fatal: '#d32f2f',
@@ -28,7 +32,9 @@ export interface LogDetailProps {
 
 const LogDetail: React.FC<LogDetailProps> = ({ log, isDark, onFilter }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const theme = useTheme();
+  const { currentProject } = useOrgProject();
+  const projectId = String(currentProject?.id || '1');
   const attrs: [string, any][] = [];
   if (log.level) attrs.push(['severity', log.level]);
   if (log.timestamp) attrs.push(['timestamp_precise', log.timestamp]);
@@ -49,119 +55,128 @@ const LogDetail: React.FC<LogDetailProps> = ({ log, isDark, onFilter }) => {
 
   const renderColumn = (items: [string, any][]) => (
     <Box sx={{ flex: 1 }}>
-      {items.map(([key, val]) => (
-        <Box
-          key={key}
-          sx={{
-            display: 'flex',
-            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-            py: 0.5,
-            gap: 2,
-            alignItems: 'flex-start',
-            '&:hover .detail-actions': { opacity: 1 },
-          }}
-        >
+      {items.map(([key, val]) => {
+        const strVal =
+          typeof val === 'object' ? JSON.stringify(val) : String(val);
+        const fieldLink = getFieldLink(key, strVal, projectId);
+        const tooltipKey = fieldLink ? getFieldNavTooltip(key) : null;
+        const isSeverity = key === 'severity';
+
+        const linkEl = fieldLink ? (
           <Typography
+            component={Link}
+            to={fieldLink}
             sx={{
               fontSize: '0.72rem',
-              color: 'text.disabled',
-              minWidth: 140,
-              flexShrink: 0,
+              wordBreak: 'break-all',
               pt: 0.2,
+              color: theme.palette.info.main,
+              fontWeight: isSeverity ? 700 : 400,
+              textDecoration: 'none',
+              '&:hover': { textDecoration: 'underline' },
             }}
           >
-            {key}
+            {strVal}
           </Typography>
+        ) : null;
+
+        return (
           <Box
+            key={key}
             sx={{
-              flex: 1,
               display: 'flex',
-              justifyContent: 'space-between',
+              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+              py: 0.5,
+              gap: 2,
               alignItems: 'flex-start',
-              minWidth: 0,
+              '&:hover .detail-actions': { opacity: 1 },
             }}
           >
             <Typography
               sx={{
                 fontSize: '0.72rem',
-                wordBreak: 'break-all',
+                color: 'text.disabled',
+                minWidth: 140,
+                flexShrink: 0,
                 pt: 0.2,
-                color:
-                  key === 'severity'
-                    ? SEVERITY_COLORS[String(val)?.toLowerCase()] ||
-                      'text.primary'
-                    : 'text.primary',
-                fontWeight: key === 'severity' ? 700 : 400,
               }}
             >
-              {typeof val === 'object' ? JSON.stringify(val) : String(val)}
+              {key}
             </Typography>
             <Box
-              className="detail-actions"
               sx={{
-                opacity: 0,
-                transition: 'opacity 0.2s',
+                flex: 1,
                 display: 'flex',
-                gap: 0.5,
-                flexShrink: 0,
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                minWidth: 0,
               }}
             >
-              <CopyButton
-                text={
-                  typeof val === 'object' ? JSON.stringify(val) : String(val)
-                }
-                size={13}
-                sx={{ p: 0.2 }}
-              />
-              <Tooltip
-                title={t('argus.logs.action.addFilter', 'Add to filter')}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() => onFilter(key, String(val), false)}
-                  sx={{ p: 0.2, color: 'primary.main' }}
+              {linkEl ? (
+                tooltipKey ? (
+                  <Tooltip title={t(tooltipKey)}>
+                    {linkEl}
+                  </Tooltip>
+                ) : (
+                  linkEl
+                )
+              ) : (
+                <Typography
+                  sx={{
+                    fontSize: '0.72rem',
+                    wordBreak: 'break-all',
+                    pt: 0.2,
+                    color: isSeverity
+                      ? SEVERITY_COLORS[String(val)?.toLowerCase()] ||
+                        'text.primary'
+                      : 'text.primary',
+                    fontWeight: isSeverity ? 700 : 400,
+                  }}
                 >
-                  <FilterIcon sx={{ fontSize: 13 }} />
-                </IconButton>
-              </Tooltip>
-              <Tooltip
-                title={t(
-                  'argus.logs.action.excludeFilter',
-                  'Exclude from filter'
-                )}
+                  {strVal}
+                </Typography>
+              )}
+              <Box
+                className="detail-actions"
+                sx={{
+                  opacity: 0,
+                  transition: 'opacity 0.2s',
+                  display: 'flex',
+                  gap: 0.5,
+                  flexShrink: 0,
+                }}
               >
-                <IconButton
-                  size="small"
-                  onClick={() => onFilter(key, String(val), true)}
-                  sx={{ p: 0.2, color: 'error.main' }}
+                <CopyButton text={strVal} size={13} sx={{ p: 0.2 }} />
+                <Tooltip
+                  title={t('argus.logs.action.addFilter', 'Add to filter')}
                 >
-                  <ExcludeIcon sx={{ fontSize: 13 }} />
-                </IconButton>
-              </Tooltip>
-              {key === 'trace_id' && val && (
+                  <IconButton
+                    size="small"
+                    onClick={() => onFilter(key, String(val), false)}
+                    sx={{ p: 0.2, color: 'primary.main' }}
+                  >
+                    <FilterIcon sx={{ fontSize: 13 }} />
+                  </IconButton>
+                </Tooltip>
                 <Tooltip
                   title={t(
-                    'argus.logs.viewInTraceExplorer',
-                    'View in Trace Explorer'
+                    'argus.logs.action.excludeFilter',
+                    'Exclude from filter'
                   )}
                 >
                   <IconButton
                     size="small"
-                    onClick={() =>
-                      navigate(`/argus/performance?trace=${val}`, {
-                        state: { allowBack: true },
-                      })
-                    }
-                    sx={{ p: 0.2, color: 'primary.main' }}
+                    onClick={() => onFilter(key, String(val), true)}
+                    sx={{ p: 0.2, color: 'error.main' }}
                   >
-                    <TimelineIcon sx={{ fontSize: 13 }} />
+                    <ExcludeIcon sx={{ fontSize: 13 }} />
                   </IconButton>
                 </Tooltip>
-              )}
+              </Box>
             </Box>
           </Box>
-        </Box>
-      ))}
+        );
+      })}
     </Box>
   );
 
