@@ -10,6 +10,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { BugReport as BugReportIcon } from '@mui/icons-material';
+import ArgusIcon from '@/components/icons/ArgusIcon';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, {
@@ -685,7 +686,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <PageHeader
-        icon={<BugReportIcon />}
+        icon={<ArgusIcon />}
         title={
           <ArgusBreadcrumbs
             size="title"
@@ -919,7 +920,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
             >
               {issues.length === 0 ? (
                 <EmptyPlaceholder
-                  icon={<BugReportIcon sx={{ fontSize: 48 }} />}
+                  icon={<ArgusIcon sx={{ fontSize: 48 }} />}
                   message={t('argus.issues.noIssues')}
                   description={t(
                     'argus.issues.noIssuesDescription',

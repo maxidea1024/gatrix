@@ -79,6 +79,7 @@ import {
   Speed as SpeedIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
+import ArgusIcon from '@/components/icons/ArgusIcon';
 
 // Icon name to component mapping
 const ICON_MAP: Record<string, React.ReactElement> = {
@@ -155,6 +156,7 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   NotificationsActive: <NotificationsActiveIcon />,
   Speed: <SpeedIcon />,
   Ripple: <RippleIcon />,
+  Argus: <ArgusIcon />,
 };
 
 /**

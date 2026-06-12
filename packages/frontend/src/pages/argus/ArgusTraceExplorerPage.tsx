@@ -285,6 +285,64 @@ const ArgusTraceExplorerPage: React.FC = () => {
     });
   }, []);
 
+  // Detail panel resize
+  const MIN_DETAIL_WIDTH = 280;
+  const MAX_DETAIL_WIDTH = 700;
+  const DEFAULT_DETAIL_WIDTH = 400;
+  const DETAIL_WIDTH_KEY = 'argus-trace-detail-width';
+
+  const [detailWidth, setDetailWidth] = useState(() => {
+    try {
+      const saved = parseInt(localStorage.getItem(DETAIL_WIDTH_KEY) || '', 10);
+      return !isNaN(saved) &&
+        saved >= MIN_DETAIL_WIDTH &&
+        saved <= MAX_DETAIL_WIDTH
+        ? saved
+        : DEFAULT_DETAIL_WIDTH;
+    } catch {
+      return DEFAULT_DETAIL_WIDTH;
+    }
+  });
+  const [isDetailDragging, setIsDetailDragging] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(DETAIL_WIDTH_KEY, String(detailWidth));
+    } catch {}
+  }, [detailWidth]);
+
+  const handleDetailSplitterMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      setIsDetailDragging(true);
+      const startX = e.clientX;
+      const startWidth = detailWidth;
+
+      const onMouseMove = (ev: MouseEvent) => {
+        // Dragging left = wider detail panel (inverted delta)
+        const delta = startX - ev.clientX;
+        setDetailWidth(
+          Math.min(
+            MAX_DETAIL_WIDTH,
+            Math.max(MIN_DETAIL_WIDTH, startWidth + delta)
+          )
+        );
+      };
+      const onMouseUp = () => {
+        setIsDetailDragging(false);
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      };
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    },
+    [detailWidth]
+  );
+
   // Pagination
   const [spansHasMore, setSpansHasMore] = useState(false);
   const [tracesHasMore, setTracesHasMore] = useState(false);
@@ -536,21 +594,51 @@ const ArgusTraceExplorerPage: React.FC = () => {
     [projectId, filters, currentPeriod, aggGroupBys]
   );
 
-  const fetchAll = useCallback(() => {
+  // Fetch data for the currently active tab only
+  const fetchTabData = useCallback(() => {
     if (activeTab === 0) fetchSpans();
     else if (activeTab === 1) fetchTraceSamples();
     else if (activeTab === 2) fetchAggregates();
-    fetchVolume();
-  }, [activeTab, fetchSpans, fetchTraceSamples, fetchAggregates, fetchVolume]);
+  }, [activeTab, fetchSpans, fetchTraceSamples, fetchAggregates]);
 
-  useEffect(() => {
-    fetchAll();
+  // Keep a ref so the main effect can call the latest fetchTabData without depending on it
+  const fetchTabDataRef = useRef(fetchTabData);
+  fetchTabDataRef.current = fetchTabData;
+
+  // Fetch shared data (volume, tags) — does NOT depend on activeTab
+  const fetchCommon = useCallback(() => {
+    fetchVolume();
     fetchTags();
-    argusService
-      .listSavedQueries(projectId, 'traces')
-      .then(setSavedQueries)
-      .catch(() => setSavedQueries([]));
-  }, [fetchAll, fetchTags, projectId]);
+  }, [fetchVolume, fetchTags]);
+
+  // Full refetch (for manual refresh button)
+  const fetchAll = useCallback(() => {
+    fetchTabData();
+    fetchCommon();
+  }, [fetchTabData, fetchCommon]);
+
+  // Main data load: re-fetch when filters/search/period change
+  const initialLoadRef = useRef(true);
+  useEffect(() => {
+    fetchTabDataRef.current();
+    fetchCommon();
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      argusService
+        .listSavedQueries(projectId, 'traces')
+        .then(setSavedQueries)
+        .catch(() => setSavedQueries([]));
+    }
+  }, [fetchCommon, projectId]);
+
+  // Tab-only switch: fetch just the new tab's data without re-fetching volume/tags
+  const prevTabRef = useRef(activeTab);
+  useEffect(() => {
+    if (prevTabRef.current !== activeTab) {
+      prevTabRef.current = activeTab;
+      fetchTabData();
+    }
+  }, [activeTab, fetchTabData]);
 
   // ─── Handlers ───
   const handleSearchKey = useCallback(
@@ -1241,7 +1329,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
             )}
 
             {activeTab === 2 && (
-              <Box sx={{ px: 2, pt: 1 }}>
+              <Box
+                sx={{
+                  flex: 1,
+                  minHeight: 0,
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
                 {aggGroupBys.map((gKey, gIdx) => (
                   <AggregatePanel
                     key={gKey}
@@ -1308,27 +1404,59 @@ const ArgusTraceExplorerPage: React.FC = () => {
           </Box>
         </Box>
 
-        {/* Right: Span Detail Drawer */}
+        {/* Right: Span Detail Drawer (resizable) */}
         {selectedSpan && activeTab === 0 && (
-          <Box
-            sx={{
-              width: 400,
-              flexShrink: 0,
-              borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-              overflow: 'auto',
-            }}
-          >
-            <SpanDetailPanel
-              span={selectedSpan}
-              onClose={() => {
-                setSelectedSpan(null);
-                setSelectedSpanIndex(null);
+          <>
+            {/* Splitter handle */}
+            <Box
+              onMouseDown={handleDetailSplitterMouseDown}
+              sx={{
+                width: '1px',
+                flexShrink: 0,
+                cursor: 'col-resize',
+                bgcolor: isDetailDragging ? 'primary.main' : 'divider',
+                position: 'relative',
+                zIndex: 10,
+                transition: 'background-color 0.15s, transform 0.15s',
+                transformOrigin: 'center',
+                ...(isDetailDragging && {
+                  bgcolor: 'primary.main',
+                  transform: 'scaleX(4)',
+                }),
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: '-5px',
+                  right: '-5px',
+                  cursor: 'col-resize',
+                },
+                '&:hover, &:active': {
+                  bgcolor: 'primary.main',
+                  transform: 'scaleX(4)',
+                },
               }}
-              isDark={isDark}
-              totalDuration={Number(selectedSpan.duration) || 0}
-              allSpans={spans}
             />
-          </Box>
+            <Box
+              sx={{
+                width: detailWidth,
+                flexShrink: 0,
+                overflow: 'auto',
+              }}
+            >
+              <SpanDetailPanel
+                span={selectedSpan}
+                onClose={() => {
+                  setSelectedSpan(null);
+                  setSelectedSpanIndex(null);
+                }}
+                isDark={isDark}
+                totalDuration={Number(selectedSpan.duration) || 0}
+                allSpans={spans}
+              />
+            </Box>
+          </>
         )}
       </Box>
 

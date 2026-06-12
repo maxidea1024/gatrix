@@ -23,6 +23,7 @@ import {
   Cloud as EnvIcon,
   NewReleases as ReleaseIcon,
 } from '@mui/icons-material';
+import ArgusIcon from '@/components/icons/ArgusIcon';
 import {
   getCrosshairPlugin,
   getDragSelectPlugin,
@@ -293,7 +294,7 @@ const ArgusOverviewPage: React.FC = () => {
       borderColor: alpha('#f44336', 0.3),
       color: '#f44336',
       label: t('argus.overview.totalErrors'),
-      value: es?.total_errors,
+      value: es?.total_errors != null ? Number(es.total_errors) : undefined,
       change: errorChange,
       sparkData: errorTrendData,
       invertChange: true,
@@ -306,7 +307,7 @@ const ArgusOverviewPage: React.FC = () => {
       borderColor: alpha('#ff9800', 0.3),
       color: '#ff9800',
       label: t('argus.overview.affectedUsers'),
-      value: es?.affected_users,
+      value: es?.affected_users != null ? Number(es.affected_users) : undefined,
       change: userChange,
       sparkData: errorTrendData,
       invertChange: true,
@@ -319,7 +320,7 @@ const ArgusOverviewPage: React.FC = () => {
       borderColor: alpha('#7c4dff', 0.3),
       color: '#7c4dff',
       label: t('argus.overview.transactions'),
-      value: ts?.total_transactions,
+      value: ts?.total_transactions != null ? Number(ts.total_transactions) : undefined,
       change: txnChange,
       sparkData: txnTrendData,
       invertChange: false,
@@ -364,7 +365,7 @@ const ArgusOverviewPage: React.FC = () => {
     <Box>
       {/* Header */}
       <PageHeader
-        icon={<BugReportIcon />}
+        icon={<ArgusIcon />}
         title={
           <ArgusBreadcrumbs
             size="title"
