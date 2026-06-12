@@ -9,16 +9,32 @@ import {
   Dialog,
   DialogContent,
   Divider,
+  Popover,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Select,
   useTheme,
   alpha,
 } from '@mui/material';
 import {
+  Settings as SettingsIcon,
   Info as InfoIcon,
   Close as CloseIcon,
   MenuBook as MenuBookIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+  BrightnessAuto as BrightnessAutoIcon,
+  Palette as PaletteIcon,
+  Translate as TranslateIcon,
+  Tune as TuneIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type { MenuCategory } from '@/config/navigation';
+import { useTheme as useAppTheme } from '@/contexts/ThemeContext';
+import { useI18n, getLanguageDisplayName } from '@/contexts/I18nContext';
+import type { ThemeMode } from '@/types';
+import type { Language } from '@/types';
 
 declare const __APP_VERSION__: string;
 
@@ -61,6 +77,19 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
   const clickCountRef = useRef(0);
   const clickTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
+  // Settings popover state — use fixed position to prevent jitter on theme change
+  const [settingsMenuPos, setSettingsMenuPos] =
+    useState<{ top: number; left: number } | null>(null);
+  const settingsMenuOpen = Boolean(settingsMenuPos);
+
+  // Theme and language contexts
+  const { mode: currentThemeMode, setTheme: setAppTheme } = useAppTheme();
+  const {
+    language: currentLanguage,
+    changeLanguage,
+    supportedLanguages,
+  } = useI18n();
+
   const handleCatImageClick = useCallback(() => {
     clickCountRef.current++;
     if (clickTimerRef.current) clearTimeout(clickTimerRef.current);
@@ -99,6 +128,65 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
     if (!subPanelOpen && !aboutOpen) {
       onRailClick();
     }
+  };
+
+  // Settings menu handlers
+  const handleSettingsClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setSettingsMenuPos({ top: rect.top, left: rect.right });
+  };
+
+  const handleSettingsClose = () => {
+    setSettingsMenuPos(null);
+  };
+
+  const handleThemeChange = (mode: ThemeMode) => {
+    setAppTheme(mode);
+  };
+
+  const handleLanguageChange = (lang: Language) => {
+    changeLanguage(lang);
+  };
+
+  const handleSettingsNavigate = () => {
+    handleSettingsClose();
+    onDirectNavigate('/settings');
+  };
+
+  const handleAboutOpen = () => {
+    handleSettingsClose();
+    setAboutOpen(true);
+  };
+
+  // Theme options config
+  const themeOptions: {
+    mode: ThemeMode;
+    icon: React.ReactElement;
+    labelKey: string;
+  }[] = [
+    {
+      mode: 'light',
+      icon: <LightModeIcon sx={{ fontSize: 16 }} />,
+      labelKey: 'common.themeLight',
+    },
+    {
+      mode: 'dark',
+      icon: <DarkModeIcon sx={{ fontSize: 16 }} />,
+      labelKey: 'common.themeDark',
+    },
+    {
+      mode: 'auto',
+      icon: <BrightnessAutoIcon sx={{ fontSize: 16 }} />,
+      labelKey: 'common.themeAuto',
+    },
+  ];
+
+  // Language flag emojis
+  const langFlags: Record<string, string> = {
+    en: '🇺🇸',
+    ko: '🇰🇷',
+    zh: '🇨🇳',
   };
 
   return (
@@ -282,28 +370,183 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
         })}
       </Box>
 
-      {/* About button */}
-      <Tooltip title={t('common.about')} placement="right" arrow>
+      {/* Settings button (replaces old About button) */}
+      <Tooltip title={t('common.settings')} placement="right" arrow>
         <IconButton
-          onClick={(e) => {
-            e.stopPropagation();
-            setAboutOpen(true);
-          }}
+          onClick={handleSettingsClick}
           size="medium"
           sx={{
             mt: 0.5,
             mb: 0.5,
-            color: 'text.disabled',
-            transition: 'all 0.2s',
+            color: settingsMenuOpen ? 'text.primary' : 'text.disabled',
+            transition: 'all 0.3s',
+            transform: settingsMenuOpen ? 'rotate(45deg)' : 'rotate(0deg)',
             '&:hover': {
               color: 'text.secondary',
               bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
             },
           }}
         >
-          <InfoIcon sx={{ fontSize: 22 }} />
+          <SettingsIcon sx={{ fontSize: 22 }} />
         </IconButton>
       </Tooltip>
+
+      {/* Settings Popover — single panel, no nested menus */}
+      <Popover
+        open={settingsMenuOpen}
+        onClose={handleSettingsClose}
+        anchorReference="anchorPosition"
+        anchorPosition={settingsMenuPos ?? undefined}
+        transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        disableScrollLock
+        slotProps={{
+          paper: {
+            sx: {
+              width: 220,
+              borderRadius: 2,
+              py: 1,
+            },
+          },
+        }}
+      >
+        {/* Theme section */}
+        <Box sx={{ px: 1.5, pt: 0.5, pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+            <PaletteIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              fontWeight={600}
+            >
+              {t('common.theme')}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 0.5,
+              bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+              borderRadius: 1.5,
+              p: 0.5,
+            }}
+          >
+            {themeOptions.map((opt) => (
+              <Box
+                key={opt.mode}
+                onClick={() => handleThemeChange(opt.mode)}
+                sx={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 0.5,
+                  py: 0.625,
+                  borderRadius: 1,
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  fontWeight: currentThemeMode === opt.mode ? 600 : 400,
+                  color:
+                    currentThemeMode === opt.mode
+                      ? theme.palette.primary.main
+                      : 'text.secondary',
+                  bgcolor:
+                    currentThemeMode === opt.mode
+                      ? isDark
+                        ? alpha(theme.palette.primary.main, 0.15)
+                        : alpha(theme.palette.primary.main, 0.08)
+                      : 'transparent',
+                  transition: 'all 0.15s',
+                  '&:hover': {
+                    bgcolor:
+                      currentThemeMode === opt.mode
+                        ? isDark
+                          ? alpha(theme.palette.primary.main, 0.2)
+                          : alpha(theme.palette.primary.main, 0.12)
+                        : isDark
+                          ? 'rgba(255,255,255,0.06)'
+                          : 'rgba(0,0,0,0.04)',
+                  },
+                }}
+              >
+                {opt.icon}
+                {t(opt.labelKey)}
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        {/* Language section */}
+        <Box sx={{ px: 1.5, pb: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
+            <TranslateIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+              {t('common.languages')}
+            </Typography>
+          </Box>
+          <Select
+            value={currentLanguage}
+            onChange={(e) => handleLanguageChange(e.target.value as Language)}
+            size="small"
+            fullWidth
+            MenuProps={{ disableScrollLock: true }}
+            sx={{
+              fontSize: '0.8125rem',
+              '& .MuiSelect-select': {
+                py: 0.75,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+              },
+            }}
+            renderValue={(value) => (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography sx={{ fontSize: 14, lineHeight: 1 }}>
+                  {langFlags[value] || '🌐'}
+                </Typography>
+                {getLanguageDisplayName(value as Language)}
+              </Box>
+            )}
+          >
+            {supportedLanguages.map((lang) => (
+              <MenuItem key={lang} value={lang} sx={{ fontSize: '0.8125rem', gap: 1 }}>
+                <Typography sx={{ fontSize: 14, lineHeight: 1 }}>
+                  {langFlags[lang] || '🌐'}
+                </Typography>
+                {getLanguageDisplayName(lang)}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+
+        <Divider sx={{ my: 0.5 }} />
+
+        {/* Settings page */}
+        <MenuItem
+          onClick={handleSettingsNavigate}
+          sx={{ py: 0.75, px: 1.5, gap: 1 }}
+        >
+          <ListItemIcon sx={{ minWidth: '28px !important' }}>
+            <TuneIcon sx={{ fontSize: 18 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('settings.general.title')}
+            primaryTypographyProps={{ fontSize: '0.8125rem' }}
+          />
+        </MenuItem>
+
+        <Divider sx={{ my: 0.5 }} />
+
+        {/* About */}
+        <MenuItem onClick={handleAboutOpen} sx={{ py: 0.75, px: 1.5, gap: 1 }}>
+          <ListItemIcon sx={{ minWidth: '28px !important' }}>
+            <InfoIcon sx={{ fontSize: 18 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('common.about')}
+            primaryTypographyProps={{ fontSize: '0.8125rem' }}
+          />
+        </MenuItem>
+      </Popover>
 
       {/* About Dialog */}
       <Dialog

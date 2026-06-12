@@ -8,17 +8,12 @@ import {
   TextField,
   Autocomplete,
   MenuItem,
-  Divider,
-  useTheme,
-  alpha,
+  Tabs,
+  Tab,
 } from '@mui/material';
-import {
-  AccessTime as AccessTimeIcon,
-  Public as PublicIcon,
-  Timer as TimerIcon,
-  Speed as SpeedIcon,
-} from '@mui/icons-material';
+
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import dayjsTimezone from 'dayjs/plugin/timezone';
@@ -27,8 +22,8 @@ import {
   getStoredDateTimeFormat,
   setStoredTimezone,
   setStoredDateTimeFormat,
-  formatDateTimeDetailed,
   formatUptime,
+  formatDuration,
 } from '@/utils/dateFormat';
 import { useI18n, getLanguageDisplayName } from '@/contexts/I18nContext';
 import { useTheme as useAppTheme } from '@/contexts/ThemeContext';
@@ -37,6 +32,8 @@ import { AuthService } from '@/services/auth';
 import { useSnackbar } from 'notistack';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
+
+import AnalogClock from '@/components/common/AnalogClock';
 import { timeService, ServerTimeData } from '@/services/timeService';
 
 dayjs.extend(utc);
@@ -51,74 +48,32 @@ const formatPresets = [
   'DD/MM/YYYY HH:mm:ss',
 ];
 
-/** Small info row used in the Server Info card */
-const InfoRow: React.FC<{
-  icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-}> = ({ icon, label, value }) => {
-  const theme = useTheme();
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1.5,
-        py: 0.75,
-      }}
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 28,
-          height: 28,
-          borderRadius: '6px',
-          bgcolor:
-            theme.palette.mode === 'dark'
-              ? alpha(theme.palette.primary.main, 0.12)
-              : alpha(theme.palette.primary.main, 0.08),
-          color: theme.palette.primary.main,
-          flexShrink: 0,
-          '& .MuiSvgIcon-root': { fontSize: 16 },
-        }}
-      >
-        {icon}
-      </Box>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontSize: '0.7rem', lineHeight: 1.2 }}
-        >
-          {label}
-        </Typography>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 500, fontSize: '0.85rem', lineHeight: 1.3 }}
-        >
-          {value}
-        </Typography>
-      </Box>
-    </Box>
-  );
-};
+const TAB_KEYS = ['general', 'time'] as const;
+type TabKey = (typeof TAB_KEYS)[number];
+
+
 
 // General Settings Page - accessible to all users
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
-  const theme = useTheme();
   const { language, changeLanguage, supportedLanguages } = useI18n();
   const { mode, setTheme: setAppTheme } = useAppTheme();
   const { user, refreshAuth } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Tab state synced with URL
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabFromUrl = searchParams.get('tab') as TabKey | null;
+  const [tab, setTab] = useState<TabKey>(
+    tabFromUrl && TAB_KEYS.includes(tabFromUrl) ? tabFromUrl : 'general'
+  );
 
   const tzOptions = useMemo(() => Intl.supportedValuesOf('timeZone'), []);
   const [timezone, setTimezone] = useState<string>(getStoredTimezone());
   const [dtFormat, setDtFormat] = useState<string>(getStoredDateTimeFormat());
 
   // Server time state (migrated from TimezoneSelector)
+  const [localTime, setLocalTime] = useState<Date>(new Date());
   const [serverTime, setServerTime] = useState<Date>(new Date());
   const [serverTimeData, setServerTimeData] = useState<ServerTimeData | null>(
     null
@@ -136,6 +91,7 @@ const SettingsPage: React.FC = () => {
     timeService.addListener(handleServerTimeUpdate);
 
     const interval = setInterval(() => {
+      setLocalTime(new Date());
       setServerTime(timeService.getCurrentServerTime());
       setCurrentUptime(timeService.getCurrentUptime());
     }, 1000);
@@ -147,10 +103,40 @@ const SettingsPage: React.FC = () => {
     };
   }, []);
 
+  // UTC times derived from local/server times (for analog clock display)
+  const localUtcTime = useMemo(() => {
+    const d = new Date(localTime);
+    return new Date(
+      d.getUTCFullYear(),
+      d.getUTCMonth(),
+      d.getUTCDate(),
+      d.getUTCHours(),
+      d.getUTCMinutes(),
+      d.getUTCSeconds()
+    );
+  }, [localTime]);
+
+  const serverUtcTime = useMemo(() => {
+    const d = new Date(serverTime);
+    return new Date(
+      d.getUTCFullYear(),
+      d.getUTCMonth(),
+      d.getUTCDate(),
+      d.getUTCHours(),
+      d.getUTCMinutes(),
+      d.getUTCSeconds()
+    );
+  }, [serverTime]);
+
   // Format timezone with UTC offset
   const formatTimezone = (tz: string) => {
     const offset = dayjs().tz(tz).format('Z');
     return `${tz} (UTC${offset})`;
+  };
+
+  // Format UTC time string
+  const formatUTCTime = (date: Date) => {
+    return dayjs(date).utc().format('YYYY-MM-DD HH:mm:ss');
   };
 
   // Auto-save on change
@@ -186,140 +172,236 @@ const SettingsPage: React.FC = () => {
           subtitle={t('settings.general.subtitle')}
         />
 
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+          <Tabs
+            value={TAB_KEYS.indexOf(tab)}
+            onChange={(_, newValue) => {
+              const key = TAB_KEYS[newValue];
+              setTab(key);
+              setSearchParams({ tab: key });
+            }}
+          >
+            <Tab label={t('settings.general.tabGeneral')} />
+            <Tab label={t('settings.general.tabTime')} />
+          </Tabs>
+        </Box>
+
         <Stack spacing={2} sx={{ maxWidth: 640 }}>
-          {/* General Settings Card */}
-          <Card>
-            <CardContent>
-              <Stack spacing={2}>
-                {/* Language */}
-                <Autocomplete
-                  options={supportedLanguages}
-                  getOptionLabel={(opt) => getLanguageDisplayName(opt)}
-                  value={language}
-                  onChange={(_, v) => v && handleLanguageChange(v)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t('language.changeLanguage')}
-                    />
-                  )}
-                />
+          {/* ─── General Tab ─── */}
+          {tab === 'general' && (
+            <Card>
+              <CardContent>
+                <Stack spacing={2}>
+                  {/* Language */}
+                  <Autocomplete
+                    options={supportedLanguages}
+                    getOptionLabel={(opt) => getLanguageDisplayName(opt)}
+                    value={language}
+                    onChange={(_, v) => v && handleLanguageChange(v)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label={t('language.changeLanguage')}
+                      />
+                    )}
+                  />
 
-                {/* Theme */}
-                <TextField
-                  select
-                  label={t('theme')}
-                  value={mode}
-                  onChange={(e) => setAppTheme(e.target.value as any)}
-                >
-                  <MenuItem value="light">Light</MenuItem>
-                  <MenuItem value="dark">Dark</MenuItem>
-                  <MenuItem value="auto">Auto</MenuItem>
-                </TextField>
+                  {/* Theme */}
+                  <TextField
+                    select
+                    label={t('theme')}
+                    value={mode}
+                    onChange={(e) => setAppTheme(e.target.value as any)}
+                  >
+                    <MenuItem value="light">
+                      {t('common.themeLight')}
+                    </MenuItem>
+                    <MenuItem value="dark">
+                      {t('common.themeDark')}
+                    </MenuItem>
+                    <MenuItem value="auto">
+                      {t('common.themeAuto')}
+                    </MenuItem>
+                  </TextField>
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
 
-                {/* Timezone */}
-                <Autocomplete
-                  options={tzOptions}
-                  value={timezone}
-                  onChange={(_, v) => v && setTimezone(v)}
-                  getOptionLabel={formatTimezone}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Timezone"
-                      placeholder="Search timezone"
-                    />
-                  )}
-                  renderOption={(props, option) => (
-                    <li {...props}>
-                      <Box>
-                        <Typography variant="body2">{option}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          UTC{dayjs().tz(option).format('Z')}
-                        </Typography>
-                      </Box>
-                    </li>
-                  )}
-                />
-
-                {/* Datetime format */}
-                <Autocomplete
-                  freeSolo
-                  options={formatPresets}
-                  value={dtFormat}
-                  onChange={(_, v) => v && setDtFormat(v)}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Datetime Format"
-                      placeholder="e.g. YYYY-MM-DD HH:mm:ss"
-                      onChange={(e) => setDtFormat(e.target.value)}
-                    />
-                  )}
-                />
-              </Stack>
-            </CardContent>
-          </Card>
-
-          {/* Server Info Card (migrated from TimezoneSelector popover) */}
-          <Card>
-            <CardContent>
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: 700, mb: 1.5 }}
-              >
-                {t('settings.serverInfo', 'Server Info')}
-              </Typography>
-              <Divider sx={{ mb: 1.5 }} />
-
-              <Stack spacing={0.5}>
-                {/* Local time */}
-                <InfoRow
-                  icon={<AccessTimeIcon />}
-                  label={t('common.currentLocalTime')}
-                  value={formatDateTimeDetailed(new Date())}
-                />
-
-                {/* Server time */}
-                <InfoRow
-                  icon={<PublicIcon />}
-                  label={t('common.serverTime')}
-                  value={
-                    <>
-                      {formatDateTimeDetailed(serverTime)}
-                      {serverTimeData && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ ml: 1 }}
-                        >
-                          ({t('common.ping')}: {serverTimeData.ping}ms)
-                        </Typography>
+          {/* ─── Time Tab ─── */}
+          {tab === 'time' && (
+            <>
+              {/* Time settings */}
+              <Card>
+                <CardContent>
+                  <Stack spacing={2}>
+                    {/* Timezone */}
+                    <Autocomplete
+                      options={tzOptions}
+                      value={timezone}
+                      onChange={(_, v) => v && setTimezone(v)}
+                      getOptionLabel={formatTimezone}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={t('common.timezone')}
+                          placeholder={t('common.searchTimezone')}
+                        />
                       )}
-                    </>
-                  }
-                />
+                      renderOption={(props, option) => (
+                        <li {...props}>
+                          <Box>
+                            <Typography variant="body2">{option}</Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              UTC{dayjs().tz(option).format('Z')}
+                            </Typography>
+                          </Box>
+                        </li>
+                      )}
+                    />
 
-                {/* Server uptime */}
-                {serverTimeData && (
-                  <InfoRow
-                    icon={<TimerIcon />}
-                    label={t('common.serverUptime')}
-                    value={formatUptime(currentUptime)}
-                  />
-                )}
+                    {/* Datetime format */}
+                    <Autocomplete
+                      freeSolo
+                      options={formatPresets}
+                      value={dtFormat}
+                      onChange={(_, v) => v && setDtFormat(v)}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label={t('settings.general.dateTimeFormat')}
+                          placeholder="e.g. YYYY-MM-DD HH:mm:ss"
+                          onChange={(e) => setDtFormat(e.target.value)}
+                        />
+                      )}
+                    />
+                  </Stack>
+                </CardContent>
+              </Card>
 
-                {/* Ping */}
-                {serverTimeData && (
-                  <InfoRow
-                    icon={<SpeedIcon />}
-                    label={t('common.ping', 'Ping')}
-                    value={`${serverTimeData.ping}ms`}
-                  />
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
+              {/* Current Time Card - Local */}
+              <Card>
+                <CardContent>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, mb: 2 }}
+                  >
+                    {t('settings.general.currentTime')}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: { xs: 6, sm: 10 },
+                      py: 1,
+                    }}
+                  >
+                    <AnalogClock
+                      time={localTime}
+                      label={t('settings.general.localTime')}
+                      size={120}
+                    />
+                    <AnalogClock
+                      time={localUtcTime}
+                      label="UTC"
+                      size={120}
+                    />
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Current Time Card - Server */}
+              <Card>
+                <CardContent>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, mb: 2 }}
+                  >
+                    {t('common.serverTime')}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      gap: { xs: 6, sm: 10 },
+                      py: 1,
+                      mb: serverTimeData ? 1.5 : 0,
+                    }}
+                  >
+                    <AnalogClock
+                      time={serverTime}
+                      label={t('settings.general.serverTimeLabel')}
+                      size={120}
+                    />
+                    <AnalogClock
+                      time={serverUtcTime}
+                      label="UTC"
+                      size={120}
+                    />
+                  </Box>
+
+                  {serverTimeData && (
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        flexWrap: 'wrap',
+                        gap: 0.5,
+                        mt: 1,
+                        pt: 1.5,
+                        borderTop: 1,
+                        borderColor: 'divider',
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                      >
+                        {t('common.serverUptime')}: {formatUptime(currentUptime)}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        ·
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                      >
+                        {t('common.ping', 'Ping')}: {serverTimeData.ping}ms
+                      </Typography>
+                      {(() => {
+                        const diffMs = Math.abs(
+                          serverTime.getTime() - localTime.getTime()
+                        );
+                        if (diffMs < 1000) return null;
+                        const sign =
+                          serverTime.getTime() > localTime.getTime()
+                            ? '+'
+                            : '-';
+                        return (
+                          <>
+                            <Typography variant="caption" color="text.secondary">
+                              ·
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'warning.main', fontWeight: 600 }}
+                            >
+                              {t('settings.general.timeDiff', 'Diff')}: {sign}{formatDuration(diffMs)}
+                            </Typography>
+                          </>
+                        );
+                      })()}
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
         </Stack>
       </Box>
     </PageContentLoader>
