@@ -270,9 +270,7 @@ const AppBarPageHeader: React.FC<{
                 <IconButton
                   size="small"
                   onClick={
-                    headerProps.onBack
-                      ? headerProps.onBack
-                      : () => navigate(-1)
+                    headerProps.onBack ? headerProps.onBack : () => navigate(-1)
                   }
                   sx={{
                     mr: 0.25,
@@ -467,7 +465,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
 
-
   // Expanded submenu items state
   const [expandedSubmenus, setExpandedSubmenus] = useState<{
     [key: string]: boolean;
@@ -530,7 +527,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   // Computed sidebar width for offset calculations
   const sidebarCollapsed = !subPanelOpen;
   const sidebarWidth = subPanelOpen ? RAIL_WIDTH + SUBPANEL_WIDTH : RAIL_WIDTH;
-
 
   const location = useLocation();
   const { user, logout, hasPermission, permissions, permissionsLoading } =
@@ -1353,9 +1349,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     };
   }, [loadUnreadMailCount]);
 
-
-
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -1781,155 +1774,93 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         }}
       >
         <PageHeaderProvider>
-        {/* Top bar - Positioned next to sidebar */}
-        <AppBar
-          position="static"
-          sx={{
-            backgroundColor: theme.palette.background.paper,
-            color: theme.palette.text.primary,
-            boxShadow: 'none',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            zIndex: (theme) => theme.zIndex.appBar,
-          }}
-        >
-          <Toolbar
+          {/* Top bar - Positioned next to sidebar */}
+          <AppBar
+            position="static"
             sx={{
-              justifyContent: 'space-between',
-              minHeight: '63px !important',
-              px: { xs: 1, sm: 2 },
+              backgroundColor: theme.palette.background.paper,
+              color: theme.palette.text.primary,
+              boxShadow: 'none',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              zIndex: (theme) => theme.zIndex.appBar,
             }}
           >
-            {/* Left: Mobile hamburger + PageHeader content from context */}
-            <AppBarPageHeader
-              showSidebar={showSidebar}
-              isMobile={isMobile}
-              onDrawerToggle={handleDrawerToggle}
-            />
-          </Toolbar>
-        </AppBar>
+            <Toolbar
+              sx={{
+                justifyContent: 'space-between',
+                minHeight: '63px !important',
+                px: { xs: 1, sm: 2 },
+              }}
+            >
+              {/* Left: Mobile hamburger + PageHeader content from context */}
+              <AppBarPageHeader
+                showSidebar={showSidebar}
+                isMobile={isMobile}
+                onDrawerToggle={handleDrawerToggle}
+              />
+            </Toolbar>
+          </AppBar>
 
-        {/* Maintenance banner - Outside AppBar, only when active */}
-        <Slide
-          direction="down"
-          in={maintenanceStatus.isMaintenance}
-          mountOnEnter
-          unmountOnExit
-        >
-          <Tooltip
-            title={
-              <Box sx={{ minWidth: 280, maxWidth: 320 }}>
-                {/* Header with accent bar */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    p: 1.5,
-                    pb: 1,
-                    borderBottom: '1px solid rgba(255,255,255,0.1)',
-                  }}
-                >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}
-                  >
-                    {t('maintenance.tooltipTitle')}
-                  </Typography>
+          {/* Maintenance banner - Outside AppBar, only when active */}
+          <Slide
+            direction="down"
+            in={maintenanceStatus.isMaintenance}
+            mountOnEnter
+            unmountOnExit
+          >
+            <Tooltip
+              title={
+                <Box sx={{ minWidth: 280, maxWidth: 320 }}>
+                  {/* Header with accent bar */}
                   <Box
                     sx={{
-                      px: 1,
-                      py: 0.25,
-                      borderRadius: 0.75,
-                      bgcolor: getMaintenanceStatusDisplay(
-                        maintenanceStatus.status
-                      ).color,
-                      color: '#fff',
-                      fontSize: '0.675rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.02em',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      p: 1.5,
+                      pb: 1,
+                      borderBottom: '1px solid rgba(255,255,255,0.1)',
                     }}
                   >
-                    {t(
-                      getMaintenanceStatusDisplay(maintenanceStatus.status)
-                        .label
-                    )}
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontWeight: 700, letterSpacing: '-0.01em' }}
+                    >
+                      {t('maintenance.tooltipTitle')}
+                    </Typography>
+                    <Box
+                      sx={{
+                        px: 1,
+                        py: 0.25,
+                        borderRadius: 0.75,
+                        bgcolor: getMaintenanceStatusDisplay(
+                          maintenanceStatus.status
+                        ).color,
+                        color: '#fff',
+                        fontSize: '0.675rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.02em',
+                      }}
+                    >
+                      {t(
+                        getMaintenanceStatusDisplay(maintenanceStatus.status)
+                          .label
+                      )}
+                    </Box>
                   </Box>
-                </Box>
 
-                {/* Info rows */}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'auto 1fr',
-                    gap: '6px 12px',
-                    p: 1.5,
-                    fontSize: '0.8rem',
-                  }}
-                >
-                  {maintenanceStatus.detail?.type && (
-                    <>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'rgba(255,255,255,0.5)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('maintenance.tooltipType')}
-                      </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                        {(() => {
-                          switch (maintenanceStatus.detail.type) {
-                            case 'emergency':
-                              return t('maintenance.emergencyLabel');
-                            case 'regular':
-                              return t('maintenance.regularLabel');
-                            default:
-                              return t('maintenance.immediateStartLabel');
-                          }
-                        })()}
-                      </Typography>
-                    </>
-                  )}
-                  {maintenanceStatus.detail?.startsAt && (
-                    <>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'rgba(255,255,255,0.5)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('maintenance.tooltipStartTime')}
-                      </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                        {formatDateTimeDetailed(
-                          maintenanceStatus.detail.startsAt
-                        )}
-                      </Typography>
-                    </>
-                  )}
-                  {maintenanceStatus.detail?.endsAt && (
-                    <>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'rgba(255,255,255,0.5)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {t('maintenance.tooltipEndTime')}
-                      </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                        {formatDateTimeDetailed(
-                          maintenanceStatus.detail.endsAt
-                        )}
-                      </Typography>
-                    </>
-                  )}
-                  {maintenanceStatus.detail?.startsAt &&
-                    maintenanceStatus.detail?.endsAt && (
+                  {/* Info rows */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: 'auto 1fr',
+                      gap: '6px 12px',
+                      p: 1.5,
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    {maintenanceStatus.detail?.type && (
                       <>
                         <Typography
                           variant="caption"
@@ -1938,332 +1869,472 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                             whiteSpace: 'nowrap',
                           }}
                         >
-                          {t('maintenance.tooltipDuration')}
+                          {t('maintenance.tooltipType')}
                         </Typography>
                         <Typography variant="caption" sx={{ fontWeight: 500 }}>
                           {(() => {
-                            const start = new Date(
-                              maintenanceStatus.detail.startsAt
-                            );
-                            const end = new Date(
-                              maintenanceStatus.detail.endsAt
-                            );
-                            const diffMs = end.getTime() - start.getTime();
-                            const diffHours = Math.floor(
-                              diffMs / (1000 * 60 * 60)
-                            );
-                            const diffMinutes = Math.floor(
-                              (diffMs % (1000 * 60 * 60)) / (1000 * 60)
-                            );
-                            if (diffHours > 0) {
-                              return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            switch (maintenanceStatus.detail.type) {
+                              case 'emergency':
+                                return t('maintenance.emergencyLabel');
+                              case 'regular':
+                                return t('maintenance.regularLabel');
+                              default:
+                                return t('maintenance.immediateStartLabel');
                             }
-                            return `${diffMinutes}${t('maintenance.minutesUnit')}`;
                           })()}
                         </Typography>
                       </>
                     )}
-                </Box>
+                    {maintenanceStatus.detail?.startsAt && (
+                      <>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'rgba(255,255,255,0.5)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('maintenance.tooltipStartTime')}
+                        </Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                          {formatDateTimeDetailed(
+                            maintenanceStatus.detail.startsAt
+                          )}
+                        </Typography>
+                      </>
+                    )}
+                    {maintenanceStatus.detail?.endsAt && (
+                      <>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'rgba(255,255,255,0.5)',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {t('maintenance.tooltipEndTime')}
+                        </Typography>
+                        <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                          {formatDateTimeDetailed(
+                            maintenanceStatus.detail.endsAt
+                          )}
+                        </Typography>
+                      </>
+                    )}
+                    {maintenanceStatus.detail?.startsAt &&
+                      maintenanceStatus.detail?.endsAt && (
+                        <>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'rgba(255,255,255,0.5)',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            {t('maintenance.tooltipDuration')}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontWeight: 500 }}
+                          >
+                            {(() => {
+                              const start = new Date(
+                                maintenanceStatus.detail.startsAt
+                              );
+                              const end = new Date(
+                                maintenanceStatus.detail.endsAt
+                              );
+                              const diffMs = end.getTime() - start.getTime();
+                              const diffHours = Math.floor(
+                                diffMs / (1000 * 60 * 60)
+                              );
+                              const diffMinutes = Math.floor(
+                                (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+                              );
+                              if (diffHours > 0) {
+                                return `${diffHours}${t('maintenance.hoursUnit')} ${diffMinutes}${t('maintenance.minutesUnit')}`;
+                              }
+                              return `${diffMinutes}${t('maintenance.minutesUnit')}`;
+                            })()}
+                          </Typography>
+                        </>
+                      )}
+                  </Box>
 
-                {maintenanceStatus.detail?.message && (
+                  {maintenanceStatus.detail?.message && (
+                    <Box
+                      sx={{
+                        mx: 1.5,
+                        mb: 1,
+                        p: 1,
+                        bgcolor: 'rgba(255,255,255,0.06)',
+                        borderRadius: 1,
+                        borderLeft: '2px solid rgba(255,255,255,0.2)',
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          wordBreak: 'break-word',
+                          lineHeight: 1.5,
+                          display: 'block',
+                        }}
+                      >
+                        {maintenanceStatus.detail.message}
+                      </Typography>
+                    </Box>
+                  )}
+
                   <Box
+                    onClick={handleMaintenanceBannerClick}
                     sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 0.5,
+                      py: 1,
                       mx: 1.5,
                       mb: 1,
-                      p: 1,
-                      bgcolor: 'rgba(255,255,255,0.06)',
                       borderRadius: 1,
-                      borderLeft: '2px solid rgba(255,255,255,0.2)',
+                      bgcolor: 'rgba(255,255,255,0.08)',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.15s',
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.15)' },
                     }}
                   >
                     <Typography
                       variant="caption"
-                      sx={{
-                        wordBreak: 'break-word',
-                        lineHeight: 1.5,
-                        display: 'block',
-                      }}
+                      sx={{ fontWeight: 600, fontSize: '0.7rem' }}
                     >
-                      {maintenanceStatus.detail.message}
+                      {t('maintenance.clickToManageTooltip')}
                     </Typography>
                   </Box>
-                )}
-
-                <Box
-                  onClick={handleMaintenanceBannerClick}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 0.5,
-                    py: 1,
-                    mx: 1.5,
-                    mb: 1,
-                    borderRadius: 1,
-                    bgcolor: 'rgba(255,255,255,0.08)',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s',
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.15)' },
-                  }}
-                >
-                  <Typography
-                    variant="caption"
-                    sx={{ fontWeight: 600, fontSize: '0.7rem' }}
-                  >
-                    {t('maintenance.clickToManageTooltip')}
-                  </Typography>
                 </Box>
-              </Box>
-            }
-            arrow
-            placement="bottom"
-            enterDelay={500}
-            leaveDelay={300}
-            open={maintenanceTooltipOpen}
-            onOpen={() => setMaintenanceTooltipOpen(true)}
-            onClose={() => setMaintenanceTooltipOpen(false)}
-          >
-            <Box
-              onClick={handleMaintenanceBannerClick}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                height: 34,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                border:
-                  maintenanceStatus.status === 'active'
-                    ? '1.5px solid #ef5350'
-                    : '1.5px solid #ffa726',
-                background:
-                  maintenanceStatus.status === 'active'
-                    ? 'linear-gradient(135deg, #ef5350 0%, #e53935 100%)'
-                    : 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
-                boxShadow:
-                  maintenanceStatus.status === 'active'
-                    ? '0 2px 12px rgba(239, 83, 80, 0.4)'
-                    : '0 2px 12px rgba(255, 167, 38, 0.4)',
-                transition: 'all 0.3s ease',
-                animation:
-                  maintenanceStatus.status === 'active'
-                    ? `${maintenancePulseAnimation} 2s ease-in-out infinite`
-                    : 'none',
-                '&:hover': {
+              }
+              arrow
+              placement="bottom"
+              enterDelay={500}
+              leaveDelay={300}
+              open={maintenanceTooltipOpen}
+              onOpen={() => setMaintenanceTooltipOpen(true)}
+              onClose={() => setMaintenanceTooltipOpen(false)}
+            >
+              <Box
+                onClick={handleMaintenanceBannerClick}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: 34,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  border:
+                    maintenanceStatus.status === 'active'
+                      ? '1.5px solid #ef5350'
+                      : '1.5px solid #ffa726',
+                  background:
+                    maintenanceStatus.status === 'active'
+                      ? 'linear-gradient(135deg, #ef5350 0%, #e53935 100%)'
+                      : 'linear-gradient(135deg, #ffa726 0%, #fb8c00 100%)',
                   boxShadow:
                     maintenanceStatus.status === 'active'
-                      ? '0 4px 16px rgba(239, 83, 80, 0.5)'
-                      : '0 4px 16px rgba(255, 167, 38, 0.5)',
-                },
-              }}
-            >
-              {/* Icon + Status */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.75,
-                  px: 1.5,
-                  height: '100%',
-                  flexShrink: 0,
-                  bgcolor: '#424242',
-                  borderRight: '1px solid rgba(255,255,255,0.2)',
-                }}
-              >
-                <Box
-                  sx={{
-                    fontSize: '1rem',
-                    animation: `${maintenanceIconPulse} 1.5s ease-in-out infinite`,
-                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
-                  }}
-                >
-                  {maintenanceStatus.status === 'active' ? '🔧' : '⏳'}
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Typography
-                    sx={{
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      color: '#fff',
-                      lineHeight: 1.2,
-                      textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                    }}
-                  >
-                    {t(
-                      getMaintenanceStatusDisplay(maintenanceStatus.status)
-                        .label
-                    )}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: '0.6rem',
-                      fontWeight: 600,
-                      color: 'rgba(255,255,255,0.85)',
-                      lineHeight: 1.1,
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {maintenanceStatus.detail?.type === 'emergency'
-                      ? t('maintenance.types.emergency')
-                      : t('maintenance.types.regular')}
-                  </Typography>
-                </Box>
-              </Box>
-
-              {/* Message - Marquee scrolling */}
-              <Box
-                sx={{
-                  flex: 1,
-                  minWidth: 0,
-                  overflow: 'hidden',
-                  position: 'relative',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  '&::before, &::after': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    width: 20,
-                    zIndex: 1,
-                    pointerEvents: 'none',
-                  },
-                  '&::before': {
-                    left: 0,
-                    background:
+                      ? '0 2px 12px rgba(239, 83, 80, 0.4)'
+                      : '0 2px 12px rgba(255, 167, 38, 0.4)',
+                  transition: 'all 0.3s ease',
+                  animation:
+                    maintenanceStatus.status === 'active'
+                      ? `${maintenancePulseAnimation} 2s ease-in-out infinite`
+                      : 'none',
+                  '&:hover': {
+                    boxShadow:
                       maintenanceStatus.status === 'active'
-                        ? 'linear-gradient(90deg, #e53935 0%, transparent 100%)'
-                        : 'linear-gradient(90deg, #fb8c00 0%, transparent 100%)',
-                  },
-                  '&::after': {
-                    right: 0,
-                    background:
-                      maintenanceStatus.status === 'active'
-                        ? 'linear-gradient(90deg, transparent 0%, #e53935 100%)'
-                        : 'linear-gradient(90deg, transparent 0%, #fb8c00 100%)',
+                        ? '0 4px 16px rgba(239, 83, 80, 0.5)'
+                        : '0 4px 16px rgba(255, 167, 38, 0.5)',
                   },
                 }}
               >
+                {/* Icon + Status */}
                 <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    whiteSpace: 'nowrap',
-                    animation: `${marqueeScroll} 15s linear infinite`,
-                    '&:hover': { animationPlayState: 'paused' },
-                  }}
-                >
-                  {[0, 1].map((idx) => (
-                    <Typography
-                      key={idx}
-                      sx={{
-                        fontSize: '0.8rem',
-                        color: '#fff',
-                        fontWeight: 600,
-                        px: 4,
-                        textShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                      }}
-                    >
-                      {maintenanceStatus.detail?.message
-                        ? maintenanceStatus.detail.message
-                        : maintenanceStatus.detail?.startsAt &&
-                            maintenanceStatus.detail?.endsAt
-                          ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
-                          : t('maintenance.clickToManageTooltip')}
-                    </Typography>
-                  ))}
-                </Box>
-              </Box>
-            </Box>
-          </Tooltip>
-        </Slide>
-
-        {/* Floating CR notification - DraftBanner-style top pill */}
-        <Slide
-          direction="down"
-          in={
-            !!(
-              !location.pathname.startsWith('/admin/change-requests') &&
-              (myPendingReviewCount > 0 ||
-                pendingCRCount > 0 ||
-                myDraftCount > 0)
-            )
-          }
-          mountOnEnter
-          unmountOnExit
-        >
-          <Box
-            sx={{
-              position: 'fixed',
-              top: 72,
-              left: { xs: 0, md: sidebarWidth },
-              right: 0,
-              zIndex: (theme) => theme.zIndex.appBar - 1,
-              display: 'flex',
-              justifyContent: 'center',
-              pointerEvents: 'none',
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                py: 0.75,
-                px: 2,
-                borderRadius: 3,
-                bgcolor: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? 'rgba(255, 167, 38, 0.25)'
-                    : 'rgba(255, 152, 0, 0.22)',
-                backdropFilter: 'blur(12px)',
-                boxShadow: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? '0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08)'
-                    : '0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05)',
-                pointerEvents: 'auto',
-                maxWidth: 640,
-                animation: `${crRumbleAnimation} 0.6s ease-in-out`,
-              }}
-            >
-              {/* Lock warning */}
-              {myPendingReviewCount > 0 && (
-                <Box
-                  onClick={() => navigate('/admin/change-requests?status=open')}
                   sx={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 0.75,
-                    cursor: 'pointer',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.08)'
-                          : 'rgba(0,0,0,0.04)',
+                    px: 1.5,
+                    height: '100%',
+                    flexShrink: 0,
+                    bgcolor: '#424242',
+                    borderRight: '1px solid rgba(255,255,255,0.2)',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      fontSize: '1rem',
+                      animation: `${maintenanceIconPulse} 1.5s ease-in-out infinite`,
+                      filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
+                    }}
+                  >
+                    {maintenanceStatus.status === 'active' ? '🔧' : '⏳'}
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Typography
+                      sx={{
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        color: '#fff',
+                        lineHeight: 1.2,
+                        textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                      }}
+                    >
+                      {t(
+                        getMaintenanceStatusDisplay(maintenanceStatus.status)
+                          .label
+                      )}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: '0.6rem',
+                        fontWeight: 600,
+                        color: 'rgba(255,255,255,0.85)',
+                        lineHeight: 1.1,
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {maintenanceStatus.detail?.type === 'emergency'
+                        ? t('maintenance.types.emergency')
+                        : t('maintenance.types.regular')}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Message - Marquee scrolling */}
+                <Box
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    '&::before, &::after': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      bottom: 0,
+                      width: 20,
+                      zIndex: 1,
+                      pointerEvents: 'none',
+                    },
+                    '&::before': {
+                      left: 0,
+                      background:
+                        maintenanceStatus.status === 'active'
+                          ? 'linear-gradient(90deg, #e53935 0%, transparent 100%)'
+                          : 'linear-gradient(90deg, #fb8c00 0%, transparent 100%)',
+                    },
+                    '&::after': {
+                      right: 0,
+                      background:
+                        maintenanceStatus.status === 'active'
+                          ? 'linear-gradient(90deg, transparent 0%, #e53935 100%)'
+                          : 'linear-gradient(90deg, transparent 0%, #fb8c00 100%)',
                     },
                   }}
                 >
-                  <LockIcon sx={{ fontSize: 14, color: 'error.main' }} />
-                  <Typography
-                    variant="body2"
+                  <Box
                     sx={{
-                      fontWeight: 600,
-                      fontSize: '0.78rem',
-                      color: 'error.main',
+                      display: 'flex',
+                      alignItems: 'center',
                       whiteSpace: 'nowrap',
+                      animation: `${marqueeScroll} 15s linear infinite`,
+                      '&:hover': { animationPlayState: 'paused' },
                     }}
                   >
-                    {t('changeRequest.pendingReviewLockBanner')}
-                  </Typography>
+                    {[0, 1].map((idx) => (
+                      <Typography
+                        key={idx}
+                        sx={{
+                          fontSize: '0.8rem',
+                          color: '#fff',
+                          fontWeight: 600,
+                          px: 4,
+                          textShadow: '0 1px 2px rgba(0,0,0,0.2)',
+                        }}
+                      >
+                        {maintenanceStatus.detail?.message
+                          ? maintenanceStatus.detail.message
+                          : maintenanceStatus.detail?.startsAt &&
+                              maintenanceStatus.detail?.endsAt
+                            ? `${formatDateTimeDetailed(maintenanceStatus.detail.startsAt)} → ${formatDateTimeDetailed(maintenanceStatus.detail.endsAt)}`
+                            : t('maintenance.clickToManageTooltip')}
+                      </Typography>
+                    ))}
+                  </Box>
                 </Box>
-              )}
+              </Box>
+            </Tooltip>
+          </Slide>
 
-              {/* Separator */}
-              {myPendingReviewCount > 0 &&
-                (myDraftCount > 0 || pendingCRCount > 0) && (
+          {/* Floating CR notification - DraftBanner-style top pill */}
+          <Slide
+            direction="down"
+            in={
+              !!(
+                !location.pathname.startsWith('/admin/change-requests') &&
+                (myPendingReviewCount > 0 ||
+                  pendingCRCount > 0 ||
+                  myDraftCount > 0)
+              )
+            }
+            mountOnEnter
+            unmountOnExit
+          >
+            <Box
+              sx={{
+                position: 'fixed',
+                top: 72,
+                left: { xs: 0, md: sidebarWidth },
+                right: 0,
+                zIndex: (theme) => theme.zIndex.appBar - 1,
+                display: 'flex',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+              }}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  py: 0.75,
+                  px: 2,
+                  borderRadius: 3,
+                  bgcolor: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? 'rgba(255, 167, 38, 0.25)'
+                      : 'rgba(255, 152, 0, 0.22)',
+                  backdropFilter: 'blur(12px)',
+                  boxShadow: (theme) =>
+                    theme.palette.mode === 'dark'
+                      ? '0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08)'
+                      : '0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05)',
+                  pointerEvents: 'auto',
+                  maxWidth: 640,
+                  animation: `${crRumbleAnimation} 0.6s ease-in-out`,
+                }}
+              >
+                {/* Lock warning */}
+                {myPendingReviewCount > 0 && (
+                  <Box
+                    onClick={() =>
+                      navigate('/admin/change-requests?status=open')
+                    }
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      cursor: 'pointer',
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: 2,
+                      '&:hover': {
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.08)'
+                            : 'rgba(0,0,0,0.04)',
+                      },
+                    }}
+                  >
+                    <LockIcon sx={{ fontSize: 14, color: 'error.main' }} />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        color: 'error.main',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {t('changeRequest.pendingReviewLockBanner')}
+                    </Typography>
+                  </Box>
+                )}
+
+                {/* Separator */}
+                {myPendingReviewCount > 0 &&
+                  (myDraftCount > 0 || pendingCRCount > 0) && (
+                    <Box
+                      sx={{
+                        width: '1px',
+                        height: 16,
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.12)'
+                            : 'rgba(0,0,0,0.12)',
+                      }}
+                    />
+                  )}
+
+                {/* My drafts */}
+                {myDraftCount > 0 && (
+                  <Box
+                    onClick={() =>
+                      navigate('/admin/change-requests?status=draft')
+                    }
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      cursor: 'pointer',
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: 2,
+                      '&:hover': {
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.08)'
+                            : 'rgba(0,0,0,0.04)',
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        bgcolor: 'warning.main',
+                        animation: 'crPulse 2s infinite',
+                        '@keyframes crPulse': {
+                          '0%': { opacity: 1 },
+                          '50%': { opacity: 0.4 },
+                          '100%': { opacity: 1 },
+                        },
+                      }}
+                    />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        color: 'text.primary',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {t('changeRequest.myDraftsBanner', {
+                        count: myDraftCount,
+                      })}
+                    </Typography>
+                    <ArrowBackIcon
+                      sx={{
+                        transform: 'rotate(180deg)',
+                        fontSize: 12,
+                        color: 'text.secondary',
+                      }}
+                    />
+                  </Box>
+                )}
+
+                {/* Separator */}
+                {myDraftCount > 0 && pendingCRCount > 0 && (
                   <Box
                     sx={{
                       width: '1px',
@@ -2276,140 +2347,69 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   />
                 )}
 
-              {/* My drafts */}
-              {myDraftCount > 0 && (
-                <Box
-                  onClick={() =>
-                    navigate('/admin/change-requests?status=draft')
-                  }
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.75,
-                    cursor: 'pointer',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.08)'
-                          : 'rgba(0,0,0,0.04)',
-                    },
-                  }}
-                >
+                {/* Pending approvals */}
+                {pendingCRCount > 0 && (
                   <Box
+                    onClick={() =>
+                      navigate('/admin/change-requests?status=open')
+                    }
                     sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      bgcolor: 'warning.main',
-                      animation: 'crPulse 2s infinite',
-                      '@keyframes crPulse': {
-                        '0%': { opacity: 1 },
-                        '50%': { opacity: 0.4 },
-                        '100%': { opacity: 1 },
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      cursor: 'pointer',
+                      px: 1,
+                      py: 0.25,
+                      borderRadius: 2,
+                      '&:hover': {
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255,255,255,0.08)'
+                            : 'rgba(0,0,0,0.04)',
                       },
                     }}
-                  />
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: '0.78rem',
-                      color: 'text.primary',
-                      whiteSpace: 'nowrap',
-                    }}
                   >
-                    {t('changeRequest.myDraftsBanner', {
-                      count: myDraftCount,
-                    })}
-                  </Typography>
-                  <ArrowBackIcon
-                    sx={{
-                      transform: 'rotate(180deg)',
-                      fontSize: 12,
-                      color: 'text.secondary',
-                    }}
-                  />
-                </Box>
-              )}
-
-              {/* Separator */}
-              {myDraftCount > 0 && pendingCRCount > 0 && (
-                <Box
-                  sx={{
-                    width: '1px',
-                    height: 16,
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.12)'
-                        : 'rgba(0,0,0,0.12)',
-                  }}
-                />
-              )}
-
-              {/* Pending approvals */}
-              {pendingCRCount > 0 && (
-                <Box
-                  onClick={() => navigate('/admin/change-requests?status=open')}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.75,
-                    cursor: 'pointer',
-                    px: 1,
-                    py: 0.25,
-                    borderRadius: 2,
-                    '&:hover': {
-                      bgcolor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255,255,255,0.08)'
-                          : 'rgba(0,0,0,0.04)',
-                    },
-                  }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: '0.78rem',
-                      color: 'text.primary',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {t('changeRequest.pendingReviewBanner', {
-                      count: pendingCRCount,
-                    })}
-                  </Typography>
-                  <ArrowBackIcon
-                    sx={{
-                      transform: 'rotate(180deg)',
-                      fontSize: 12,
-                      color: 'text.secondary',
-                    }}
-                  />
-                </Box>
-              )}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                        color: 'text.primary',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {t('changeRequest.pendingReviewBanner', {
+                        count: pendingCRCount,
+                      })}
+                    </Typography>
+                    <ArrowBackIcon
+                      sx={{
+                        transform: 'rotate(180deg)',
+                        fontSize: 12,
+                        color: 'text.secondary',
+                      }}
+                    />
+                  </Box>
+                )}
+              </Box>
             </Box>
-          </Box>
-        </Slide>
+          </Slide>
 
-        {/* Main content */}
-        <Box
-          component="main"
-          id="main-scroll-container"
-          sx={{
-            flexGrow: 1,
-            p: 2,
-            backgroundColor: 'background.default',
-            overflow: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {children}
-        </Box>
+          {/* Main content */}
+          <Box
+            component="main"
+            id="main-scroll-container"
+            sx={{
+              flexGrow: 1,
+              p: 2,
+              backgroundColor: 'background.default',
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            {children}
+          </Box>
         </PageHeaderProvider>
       </Box>
 
@@ -2470,7 +2470,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </Zoom>
       {/* SSE Notifications */}
       {/* SSE connection status is shown via G logo color */}
-
 
       {/* Recent Page Confirm Dialog */}
       <Dialog

@@ -47,10 +47,7 @@ import { getOpColor } from './components/traceExplorerHelpers';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import AggregatePanel from '@/components/argus/AggregatePanel';
-import {
-  SpansTab,
-  TracesTab,
-} from './components/TraceExplorerTabs';
+import { SpansTab, TracesTab } from './components/TraceExplorerTabs';
 import {
   SaveQueryDialog,
   SavedQueriesPanel,
@@ -147,7 +144,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
   // ─── Transform volume for ArgusVolumeChart ───
   const { volumeLabels, volumeDatasets } = useMemo(() => {
     if (volume.length === 0)
-      return { volumeLabels: [] as string[], volumeDatasets: [] as ChartDataset[] };
+      return {
+        volumeLabels: [] as string[],
+        volumeDatasets: [] as ChartDataset[],
+      };
 
     const bucketSet = new Set<string>();
     const opSet = new Set<string>();
@@ -170,13 +170,17 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
     // Build lookup
     const lookup = new Map<string, number>();
-    volume.forEach((p) => lookup.set(`${p.bucket}::${p.op}`, Number(p.count) || 0));
+    volume.forEach((p) =>
+      lookup.set(`${p.bucket}::${p.op}`, Number(p.count) || 0)
+    );
 
     const labels = sorted.map((b) => {
       try {
         const d = new Date(b);
         return `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:00`;
-      } catch { return b; }
+      } catch {
+        return b;
+      }
     });
 
     const datasets: ChartDataset[] = topOps.map((op) => ({
@@ -203,7 +207,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   // Span detail drawer
   const [selectedSpan, setSelectedSpan] = useState<any | null>(null);
-  const [selectedSpanIndex, setSelectedSpanIndex] = useState<number | null>(null);
+  const [selectedSpanIndex, setSelectedSpanIndex] = useState<number | null>(
+    null
+  );
 
   // Facet sidebar
   const MIN_FACET_WIDTH = 180;
@@ -221,7 +227,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [facetWidth, setFacetWidth] = useState(() => {
     try {
       const saved = parseInt(localStorage.getItem(FACET_WIDTH_KEY) || '', 10);
-      return !isNaN(saved) && saved >= MIN_FACET_WIDTH && saved <= MAX_FACET_WIDTH
+      return !isNaN(saved) &&
+        saved >= MIN_FACET_WIDTH &&
+        saved <= MAX_FACET_WIDTH
         ? saved
         : DEFAULT_FACET_WIDTH;
     } catch {
@@ -231,7 +239,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [isFacetDragging, setIsFacetDragging] = useState(false);
 
   useEffect(() => {
-    try { localStorage.setItem(FACET_WIDTH_KEY, String(facetWidth)); } catch {}
+    try {
+      localStorage.setItem(FACET_WIDTH_KEY, String(facetWidth));
+    } catch {}
   }, [facetWidth]);
 
   const handleFacetSplitterMouseDown = useCallback(
@@ -244,7 +254,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
       const onMouseMove = (ev: MouseEvent) => {
         const delta = ev.clientX - startX;
         setFacetWidth(
-          Math.min(MAX_FACET_WIDTH, Math.max(MIN_FACET_WIDTH, startWidth + delta))
+          Math.min(
+            MAX_FACET_WIDTH,
+            Math.max(MIN_FACET_WIDTH, startWidth + delta)
+          )
         );
       };
       const onMouseUp = () => {
@@ -265,7 +278,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const handleToggleFacetCollapse = useCallback(() => {
     setFacetCollapsed((v) => {
       const next = !v;
-      try { localStorage.setItem('argus-trace-facet-collapsed', String(next)); } catch {}
+      try {
+        localStorage.setItem('argus-trace-facet-collapsed', String(next));
+      } catch {}
       return next;
     });
   }, []);
@@ -320,21 +335,30 @@ const ArgusTraceExplorerPage: React.FC = () => {
       facets.push({
         key: 'op',
         label: 'Operation',
-        values: tags.op.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 })),
+        values: tags.op.map((v: any) => ({
+          value: v.value,
+          count: Number(v.count) || 0,
+        })),
       });
     }
     if (tags.status?.length > 0) {
       facets.push({
         key: 'status',
         label: 'Status',
-        values: tags.status.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 })),
+        values: tags.status.map((v: any) => ({
+          value: v.value,
+          count: Number(v.count) || 0,
+        })),
       });
     }
     if (tags.domain?.length > 0) {
       facets.push({
         key: 'domain',
         label: 'Domain',
-        values: tags.domain.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 })),
+        values: tags.domain.map((v: any) => ({
+          value: v.value,
+          count: Number(v.count) || 0,
+        })),
       });
     }
     return facets;
@@ -716,7 +740,14 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   /* ═══ RENDER ═══ */
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+      }}
+    >
       <PageHeader
         icon={<TraceIcon />}
         title={
@@ -745,7 +776,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
         )}
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <SafeTooltip title={t('argus.traces.savedQueries', 'Saved Queries')}>
+            <SafeTooltip
+              title={t('argus.traces.savedQueries', 'Saved Queries')}
+            >
               <IconButton
                 size="small"
                 onClick={() => setSavedPanelOpen(true)}
@@ -800,7 +833,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
         loading={loading}
         hideFilters={['browser', 'os']}
         extraControls={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
             <Box
               ref={searchContainerRef}
               sx={{
@@ -879,7 +920,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
                   alignItems: 'center',
                 }}
               >
-                <SafeTooltip title={t('argus.builder.open', 'Open Query Builder')}>
+                <SafeTooltip
+                  title={t('argus.builder.open', 'Open Query Builder')}
+                >
                   <IconButton
                     size="small"
                     onClick={() => setBuilderOpen((prev) => !prev)}
@@ -1101,7 +1144,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
         )}
 
         {/* Center: Main content */}
-        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
           {/* Volume Chart */}
           <Box sx={{ px: 2, pt: 2 }}>
             <ArgusVolumeChart
@@ -1110,14 +1161,18 @@ const ArgusTraceExplorerPage: React.FC = () => {
               loading={loading}
               title="count(spans)"
               onZoom={(startIdx, endIdx) => {
-                const buckets = [...new Set(volume.map((v) => v.bucket))].sort();
+                const buckets = [
+                  ...new Set(volume.map((v) => v.bucket)),
+                ].sort();
                 const si = Math.min(startIdx, endIdx);
                 const ei = Math.max(startIdx, endIdx);
                 if (buckets[si] && buckets[ei]) {
                   const startDate = new Date(buckets[si]);
                   let endDate = new Date(buckets[ei]);
                   if (buckets.length > 1) {
-                    const gap = new Date(buckets[1]).getTime() - new Date(buckets[0]).getTime();
+                    const gap =
+                      new Date(buckets[1]).getTime() -
+                      new Date(buckets[0]).getTime();
                     endDate = new Date(endDate.getTime() + gap);
                   } else {
                     endDate = new Date(endDate.getTime() + 3600000);
@@ -1137,7 +1192,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
               items={[
                 { key: '0', label: t('argus.traces.spansTab', 'Spans') },
                 { key: '1', label: t('argus.traces.tracesTab', 'Traces') },
-                { key: '2', label: t('argus.traces.aggregatesTab', 'Aggregates') },
+                {
+                  key: '2',
+                  label: t('argus.traces.aggregatesTab', 'Aggregates'),
+                },
               ]}
               value={String(activeTab)}
               onChange={handleTabChange}
@@ -1145,7 +1203,17 @@ const ArgusTraceExplorerPage: React.FC = () => {
           </Box>
 
           {/* Tab Content */}
-          <Box sx={{ px: 2, pb: 2, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <Box
+            sx={{
+              px: 2,
+              pb: 2,
+              flex: 1,
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
             {activeTab === 0 && (
               <SpansTab
                 spans={spans}
@@ -1205,8 +1273,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 {aggGroupBys.length < 3 && (
                   <Box
                     onClick={() => {
-                      const defaults = ['op', 'status', 'domain', 'action', 'service'];
-                      const next = defaults.find((d) => !aggGroupBys.includes(d)) || 'op';
+                      const defaults = [
+                        'op',
+                        'status',
+                        'domain',
+                        'action',
+                        'service',
+                      ];
+                      const next =
+                        defaults.find((d) => !aggGroupBys.includes(d)) || 'op';
                       const newKeys = [...aggGroupBys, next];
                       setUrlState({ groupBy: newKeys.join(',') });
                       fetchAggregates(newKeys);

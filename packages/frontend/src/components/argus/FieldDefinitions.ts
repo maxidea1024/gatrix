@@ -430,8 +430,7 @@ export const FIELD_NAVIGATIONS: Record<string, FieldNavLink> = {
   },
   release: {
     tooltip: 'argus.logs.nav.viewRelease',
-    buildPath: (v, pid) =>
-      `/argus/releases/${pid}/${encodeURIComponent(v)}`,
+    buildPath: (v, pid) => `/argus/releases/${pid}/${encodeURIComponent(v)}`,
   },
   issue_id: {
     tooltip: 'argus.logs.nav.viewIssue',

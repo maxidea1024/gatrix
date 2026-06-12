@@ -38,12 +38,9 @@ export const PageHeaderProvider: React.FC<{ children: React.ReactNode }> = ({
     null
   );
 
-  const setHeaderProps = useCallback(
-    (props: PageHeaderProps | null) => {
-      setHeaderPropsRaw(props);
-    },
-    []
-  );
+  const setHeaderProps = useCallback((props: PageHeaderProps | null) => {
+    setHeaderPropsRaw(props);
+  }, []);
 
   return (
     <PageHeaderContext.Provider value={{ headerProps, setHeaderProps }}>

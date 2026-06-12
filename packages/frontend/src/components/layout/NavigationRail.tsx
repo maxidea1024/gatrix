@@ -78,8 +78,10 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
   const clickTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Settings popover state — use fixed position to prevent jitter on theme change
-  const [settingsMenuPos, setSettingsMenuPos] =
-    useState<{ top: number; left: number } | null>(null);
+  const [settingsMenuPos, setSettingsMenuPos] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const settingsMenuOpen = Boolean(settingsMenuPos);
 
   // Theme and language contexts
@@ -479,7 +481,11 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
         <Box sx={{ px: 1.5, pb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1 }}>
             <TranslateIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-            <Typography variant="caption" color="text.secondary" fontWeight={600}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              fontWeight={600}
+            >
               {t('common.languages')}
             </Typography>
           </Box>
@@ -508,7 +514,11 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
             )}
           >
             {supportedLanguages.map((lang) => (
-              <MenuItem key={lang} value={lang} sx={{ fontSize: '0.8125rem', gap: 1 }}>
+              <MenuItem
+                key={lang}
+                value={lang}
+                sx={{ fontSize: '0.8125rem', gap: 1 }}
+              >
                 <Typography sx={{ fontSize: 14, lineHeight: 1 }}>
                   {langFlags[lang] || '🌐'}
                 </Typography>

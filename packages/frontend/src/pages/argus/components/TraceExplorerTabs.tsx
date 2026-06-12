@@ -29,10 +29,7 @@ import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
 import { CopyButton } from '@/components/common/CopyButton';
 import { formatWith } from '@/utils/dateFormat';
 import { getOpColor, formatDuration } from './traceExplorerHelpers';
-import {
-  TablePaper,
-  SortableHeaderCell,
-} from './TraceExplorerTabs.styles';
+import { TablePaper, SortableHeaderCell } from './TraceExplorerTabs.styles';
 
 const SPAN_COLUMNS = [
   'timestamp',
@@ -116,7 +113,10 @@ const MiniWaterfallBar: React.FC<{
       title={
         <Box sx={{ fontSize: '0.7rem' }}>
           {[...opCounts.entries()].map(([op, count]) => (
-            <Box key={op} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <Box
+              key={op}
+              sx={{ display: 'flex', gap: 1, alignItems: 'center' }}
+            >
               <Box
                 sx={{
                   width: 8,
@@ -200,7 +200,17 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
 
     return (
       <TablePaper elevation={0} isDark={isDark}>
-        <PageContentLoader loading={loading} skeleton={<TableSkeleton />} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <PageContentLoader
+          loading={loading}
+          skeleton={<TableSkeleton />}
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}
+        >
           {spans.length > 0 ? (
             <>
               <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
@@ -216,233 +226,237 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                         : 'rgba(0,0,0,0.04)',
                     },
                     '& th': {
-                      backgroundColor: isDark
-                        ? '#1a1a2e'
-                        : '#fafafa',
+                      backgroundColor: isDark ? '#1a1a2e' : '#fafafa',
                     },
                   }}
                 >
-                <TableHead>
-                  <TableRow>
-                    {SPAN_COLUMNS.map((col) => (
-                      <SortableHeaderCell
-                        key={col}
-                        onClick={() =>
-                          ['duration', 'timestamp'].includes(col)
-                            ? onColumnSort(col)
-                            : undefined
-                        }
-                        isActive={orderCol === col}
-                        isSortable={['duration', 'timestamp'].includes(col)}
-                      >
-                        <Box
-                          sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}
-                        >
-                          {col === 'trace_id' ? 'TRACE' : col.toUpperCase()}
-                          {orderCol === col &&
-                            (orderDir === 'desc' ? (
-                              <SortDescIcon sx={{ fontSize: 13 }} />
-                            ) : (
-                              <SortAscIcon sx={{ fontSize: 13 }} />
-                            ))}
-                        </Box>
-                      </SortableHeaderCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {spans.map((span, idx) => (
-                    <TableRow
-                      key={idx}
-                      hover
-                      onClick={() => onSelectSpan?.(span, idx)}
-                      sx={{
-                        cursor: onSelectSpan ? 'pointer' : 'default',
-                        backgroundColor:
-                          selectedSpanIndex === idx
-                            ? alpha(theme.palette.primary.main, 0.06)
-                            : 'transparent',
-                        '&:hover': {
-                          backgroundColor: alpha(
-                            theme.palette.primary.main,
-                            selectedSpanIndex === idx ? 0.08 : 0.02
-                          ),
-                        },
-                      }}
-                    >
-                      <TableCell sx={{ py: 0.8 }}>
-                        <Typography
-                          sx={{
-                            fontSize: '0.73rem',
-                            color: 'text.secondary',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {formatWith(span.timestamp, 'MMM D, HH:mm:ss')}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ py: 0.8 }}>
-                        <Chip
-                          label={span.op || '—'}
-                          size="small"
-                          onClick={
-                            onFilterTag
-                              ? (e) => {
-                                  e.stopPropagation();
-                                  onFilterTag('op', span.op);
-                                }
+                  <TableHead>
+                    <TableRow>
+                      {SPAN_COLUMNS.map((col) => (
+                        <SortableHeaderCell
+                          key={col}
+                          onClick={() =>
+                            ['duration', 'timestamp'].includes(col)
+                              ? onColumnSort(col)
                               : undefined
                           }
-                          sx={{
-                            height: 20,
-                            fontSize: '0.68rem',
-                            fontWeight: 700,
-                            backgroundColor: alpha(getOpColor(span.op), 0.12),
-                            color: getOpColor(span.op),
-                            borderRadius: '4px',
-                            cursor: onFilterTag ? 'pointer' : 'default',
-                            '&:hover': onFilterTag
-                              ? {
-                                  backgroundColor: alpha(
-                                    getOpColor(span.op),
-                                    0.25
-                                  ),
-                                }
-                              : {},
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell sx={{ py: 0.8, maxWidth: 400 }}>
-                        <SafeTooltip
-                          title={
-                            span.description && span.description.length >= 50
-                              ? span.description
-                              : ''
-                          }
+                          isActive={orderCol === col}
+                          isSortable={['duration', 'timestamp'].includes(col)}
                         >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.3,
+                            }}
+                          >
+                            {col === 'trace_id' ? 'TRACE' : col.toUpperCase()}
+                            {orderCol === col &&
+                              (orderDir === 'desc' ? (
+                                <SortDescIcon sx={{ fontSize: 13 }} />
+                              ) : (
+                                <SortAscIcon sx={{ fontSize: 13 }} />
+                              ))}
+                          </Box>
+                        </SortableHeaderCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {spans.map((span, idx) => (
+                      <TableRow
+                        key={idx}
+                        hover
+                        onClick={() => onSelectSpan?.(span, idx)}
+                        sx={{
+                          cursor: onSelectSpan ? 'pointer' : 'default',
+                          backgroundColor:
+                            selectedSpanIndex === idx
+                              ? alpha(theme.palette.primary.main, 0.06)
+                              : 'transparent',
+                          '&:hover': {
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              selectedSpanIndex === idx ? 0.08 : 0.02
+                            ),
+                          },
+                        }}
+                      >
+                        <TableCell sx={{ py: 0.8 }}>
                           <Typography
                             sx={{
                               fontSize: '0.73rem',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
+                              color: 'text.secondary',
                               whiteSpace: 'nowrap',
                             }}
                           >
-                            {span.description || '—'}
+                            {formatWith(span.timestamp, 'MMM D, HH:mm:ss')}
                           </Typography>
-                        </SafeTooltip>
-                      </TableCell>
-                      <TableCell sx={{ py: 0.8 }}>
-                        <Typography
-                          sx={{
-                            fontSize: '0.73rem',
-                            fontWeight: 600,
-                            color:
-                              Number(span.duration) > 1000
-                                ? theme.palette.error.main
-                                : 'text.primary',
-                          }}
-                        >
-                          {formatDuration(Number(span.duration))}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ py: 0.8 }}>
-                        <Typography
-                          onClick={
-                            onFilterTag && span.status
-                              ? (e) => {
-                                  e.stopPropagation();
-                                  onFilterTag('status', span.status);
-                                }
-                              : undefined
-                          }
-                          sx={{
-                            fontSize: '0.72rem',
-                            cursor:
-                              onFilterTag && span.status ? 'pointer' : 'default',
-                            color:
-                              span.status === 'ok'
-                                ? theme.palette.success.main
-                                : span.status && span.status !== ''
-                                  ? theme.palette.error.main
-                                  : 'text.disabled',
-                            '&:hover':
-                              onFilterTag && span.status
-                                ? { textDecoration: 'underline' }
-                                : {},
-                          }}
-                        >
-                          {span.status || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ py: 0.8 }}>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5,
-                          }}
-                        >
-                          <Typography
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (span.trace_id) {
-                                navigate(
-                                  `/argus/performance?trace=${span.trace_id}`,
-                                  { state: { allowBack: true } }
-                                );
-                              }
-                            }}
+                        </TableCell>
+                        <TableCell sx={{ py: 0.8 }}>
+                          <Chip
+                            label={span.op || '—'}
+                            size="small"
+                            onClick={
+                              onFilterTag
+                                ? (e) => {
+                                    e.stopPropagation();
+                                    onFilterTag('op', span.op);
+                                  }
+                                : undefined
+                            }
                             sx={{
-                              fontSize: '0.72rem',
-                              color: theme.palette.primary.main,
-                              cursor: 'pointer',
-                              '&:hover': { textDecoration: 'underline' },
+                              height: 20,
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              backgroundColor: alpha(getOpColor(span.op), 0.12),
+                              color: getOpColor(span.op),
+                              borderRadius: '4px',
+                              cursor: onFilterTag ? 'pointer' : 'default',
+                              '&:hover': onFilterTag
+                                ? {
+                                    backgroundColor: alpha(
+                                      getOpColor(span.op),
+                                      0.25
+                                    ),
+                                  }
+                                : {},
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ py: 0.8, maxWidth: 400 }}>
+                          <SafeTooltip
+                            title={
+                              span.description && span.description.length >= 50
+                                ? span.description
+                                : ''
+                            }
+                          >
+                            <Typography
+                              sx={{
+                                fontSize: '0.73rem',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {span.description || '—'}
+                            </Typography>
+                          </SafeTooltip>
+                        </TableCell>
+                        <TableCell sx={{ py: 0.8 }}>
+                          <Typography
+                            sx={{
+                              fontSize: '0.73rem',
+                              fontWeight: 600,
+                              color:
+                                Number(span.duration) > 1000
+                                  ? theme.palette.error.main
+                                  : 'text.primary',
                             }}
                           >
-                            {span.trace_id
-                              ? String(span.trace_id).slice(0, 12) + '…'
-                              : '—'}
+                            {formatDuration(Number(span.duration))}
                           </Typography>
-                          {span.trace_id && (
-                            <>
-                              <SafeTooltip
-                                title={t(
-                                  'argus.traces.viewLogs',
-                                  'View Logs'
-                                )}
-                              >
-                                <IconButton
-                                  size="small"
-                                  onClick={(e) => {
+                        </TableCell>
+                        <TableCell sx={{ py: 0.8 }}>
+                          <Typography
+                            onClick={
+                              onFilterTag && span.status
+                                ? (e) => {
                                     e.stopPropagation();
-                                    navigate(
-                                      `/argus/explore/logs?q=trace_id:"${span.trace_id}"`
-                                    );
-                                  }}
-                                  sx={{ p: 0.2 }}
+                                    onFilterTag('status', span.status);
+                                  }
+                                : undefined
+                            }
+                            sx={{
+                              fontSize: '0.72rem',
+                              cursor:
+                                onFilterTag && span.status
+                                  ? 'pointer'
+                                  : 'default',
+                              color:
+                                span.status === 'ok'
+                                  ? theme.palette.success.main
+                                  : span.status && span.status !== ''
+                                    ? theme.palette.error.main
+                                    : 'text.disabled',
+                              '&:hover':
+                                onFilterTag && span.status
+                                  ? { textDecoration: 'underline' }
+                                  : {},
+                            }}
+                          >
+                            {span.status || '—'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 0.8 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                            }}
+                          >
+                            <Typography
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (span.trace_id) {
+                                  navigate(
+                                    `/argus/performance?trace=${span.trace_id}`,
+                                    { state: { allowBack: true } }
+                                  );
+                                }
+                              }}
+                              sx={{
+                                fontSize: '0.72rem',
+                                color: theme.palette.primary.main,
+                                cursor: 'pointer',
+                                '&:hover': { textDecoration: 'underline' },
+                              }}
+                            >
+                              {span.trace_id
+                                ? String(span.trace_id).slice(0, 12) + '…'
+                                : '—'}
+                            </Typography>
+                            {span.trace_id && (
+                              <>
+                                <SafeTooltip
+                                  title={t(
+                                    'argus.traces.viewLogs',
+                                    'View Logs'
+                                  )}
                                 >
-                                  <LogsIcon
-                                    sx={{
-                                      fontSize: 12,
-                                      color: 'text.disabled',
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(
+                                        `/argus/explore/logs?q=trace_id:"${span.trace_id}"`
+                                      );
                                     }}
-                                  />
-                                </IconButton>
-                              </SafeTooltip>
-                              <CopyButton
-                                text={span.trace_id}
-                                size={12}
-                                sx={{ p: 0.2 }}
-                              />
-                            </>
-                          )}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                                    sx={{ p: 0.2 }}
+                                  >
+                                    <LogsIcon
+                                      sx={{
+                                        fontSize: 12,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  </IconButton>
+                                </SafeTooltip>
+                                <CopyButton
+                                  text={span.trace_id}
+                                  size={12}
+                                  sx={{ p: 0.2 }}
+                                />
+                              </>
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
                 <LoadMoreFooter
                   hasMore={hasMore}
                   loading={loadingMore}
@@ -491,7 +505,13 @@ interface TracesTabProps {
 }
 
 export const TracesTab: React.FC<TracesTabProps> = React.memo(
-  ({ traceSamples, loading, hasMore = false, loadingMore = false, onLoadMore }) => {
+  ({
+    traceSamples,
+    loading,
+    hasMore = false,
+    loadingMore = false,
+    onLoadMore,
+  }) => {
     const theme = useTheme();
     const { t } = useTranslation();
     const isDark = theme.palette.mode === 'dark';
@@ -499,7 +519,17 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
 
     return (
       <TablePaper elevation={0} isDark={isDark}>
-        <PageContentLoader loading={loading} skeleton={<TableSkeleton />} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <PageContentLoader
+          loading={loading}
+          skeleton={<TableSkeleton />}
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}
+        >
           {traceSamples.length > 0 ? (
             <>
               <Box sx={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
@@ -515,150 +545,148 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
                         : 'rgba(0,0,0,0.04)',
                     },
                     '& th': {
-                      backgroundColor: isDark
-                        ? '#1a1a2e'
-                        : '#fafafa',
+                      backgroundColor: isDark ? '#1a1a2e' : '#fafafa',
                     },
                   }}
                 >
-                <TableHead>
-                  <TableRow>
-                    {[
-                      'TRACE ID',
-                      t('argus.traces.startTime', 'START TIME'),
-                      t('argus.traces.spanCount', 'SPANS'),
-                      t('argus.traces.totalDuration', 'TOTAL DURATION'),
-                      t('argus.traces.operations', 'OPERATIONS'),
-                      t('argus.traces.errors', 'ERRORS'),
-                      '',
-                    ].map((header, idx) => (
-                      <SortableHeaderCell
-                        key={idx}
-                        sx={idx === 6 ? { width: 40 } : {}}
-                      >
-                        {header}
-                      </SortableHeaderCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {traceSamples.map((trace, idx) => {
-                    const ops: string[] = Array.isArray(trace.operations)
-                      ? trace.operations
-                      : [];
-                    return (
-                      <TableRow
-                        key={idx}
-                        hover
-                        sx={{
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              0.02
-                            ),
-                          },
-                        }}
-                        onClick={() =>
-                          navigate(
-                            `/argus/performance?trace=${trace.trace_id}`,
-                            {
-                              state: { allowBack: true },
-                            }
-                          )
-                        }
-                      >
-                        <TableCell sx={{ py: 0.8 }}>
-                          <Typography
-                            sx={{
-                              fontSize: '0.73rem',
-                              color: theme.palette.primary.main,
-                              fontWeight: 600,
-                            }}
-                          >
-                            {String(trace.trace_id).slice(0, 16)}…
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 0.8 }}>
-                          <Typography
-                            sx={{
-                              fontSize: '0.73rem',
-                              color: 'text.secondary',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {new Date(trace.start_time).toLocaleString(
-                              'en-US',
+                  <TableHead>
+                    <TableRow>
+                      {[
+                        'TRACE ID',
+                        t('argus.traces.startTime', 'START TIME'),
+                        t('argus.traces.spanCount', 'SPANS'),
+                        t('argus.traces.totalDuration', 'TOTAL DURATION'),
+                        t('argus.traces.operations', 'OPERATIONS'),
+                        t('argus.traces.errors', 'ERRORS'),
+                        '',
+                      ].map((header, idx) => (
+                        <SortableHeaderCell
+                          key={idx}
+                          sx={idx === 6 ? { width: 40 } : {}}
+                        >
+                          {header}
+                        </SortableHeaderCell>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {traceSamples.map((trace, idx) => {
+                      const ops: string[] = Array.isArray(trace.operations)
+                        ? trace.operations
+                        : [];
+                      return (
+                        <TableRow
+                          key={idx}
+                          hover
+                          sx={{
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: alpha(
+                                theme.palette.primary.main,
+                                0.02
+                              ),
+                            },
+                          }}
+                          onClick={() =>
+                            navigate(
+                              `/argus/performance?trace=${trace.trace_id}`,
                               {
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit',
-                                hour12: false,
+                                state: { allowBack: true },
                               }
-                            )}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 0.8 }}>
-                          <Typography
-                            sx={{ fontSize: '0.73rem', fontWeight: 600 }}
-                          >
-                            {Number(trace.span_count).toLocaleString()}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 0.8 }}>
-                          <Typography
-                            sx={{ fontSize: '0.73rem', fontWeight: 600 }}
-                          >
-                            {formatDuration(Number(trace.total_duration))}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 0.8 }}>
-                          <MiniWaterfallBar
-                            operations={ops}
-                            totalDuration={Number(trace.total_duration)}
-                          />
-                        </TableCell>
-                        <TableCell sx={{ py: 0.8 }}>
-                          <Typography
-                            sx={{
-                              fontSize: '0.73rem',
-                              fontWeight: 600,
-                              color:
-                                Number(trace.error_count) > 0
-                                  ? theme.palette.error.main
-                                  : 'text.disabled',
-                            }}
-                          >
-                            {Number(trace.error_count)}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 0.8 }}>
-                          <SafeTooltip
-                            title={t('argus.traces.viewLogs', 'View Logs')}
-                          >
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(
-                                  `/argus/explore/logs?q=trace_id:"${trace.trace_id}"`
-                                );
+                            )
+                          }
+                        >
+                          <TableCell sx={{ py: 0.8 }}>
+                            <Typography
+                              sx={{
+                                fontSize: '0.73rem',
+                                color: theme.palette.primary.main,
+                                fontWeight: 600,
                               }}
-                              sx={{ p: 0.3 }}
                             >
-                              <LogsIcon
-                                sx={{ fontSize: 14, color: 'text.disabled' }}
-                              />
-                            </IconButton>
-                          </SafeTooltip>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+                              {String(trace.trace_id).slice(0, 16)}…
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 0.8 }}>
+                            <Typography
+                              sx={{
+                                fontSize: '0.73rem',
+                                color: 'text.secondary',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {new Date(trace.start_time).toLocaleString(
+                                'en-US',
+                                {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  second: '2-digit',
+                                  hour12: false,
+                                }
+                              )}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 0.8 }}>
+                            <Typography
+                              sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                            >
+                              {Number(trace.span_count).toLocaleString()}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 0.8 }}>
+                            <Typography
+                              sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                            >
+                              {formatDuration(Number(trace.total_duration))}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 0.8 }}>
+                            <MiniWaterfallBar
+                              operations={ops}
+                              totalDuration={Number(trace.total_duration)}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ py: 0.8 }}>
+                            <Typography
+                              sx={{
+                                fontSize: '0.73rem',
+                                fontWeight: 600,
+                                color:
+                                  Number(trace.error_count) > 0
+                                    ? theme.palette.error.main
+                                    : 'text.disabled',
+                              }}
+                            >
+                              {Number(trace.error_count)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 0.8 }}>
+                            <SafeTooltip
+                              title={t('argus.traces.viewLogs', 'View Logs')}
+                            >
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(
+                                    `/argus/explore/logs?q=trace_id:"${trace.trace_id}"`
+                                  );
+                                }}
+                                sx={{ p: 0.3 }}
+                              >
+                                <LogsIcon
+                                  sx={{ fontSize: 14, color: 'text.disabled' }}
+                                />
+                              </IconButton>
+                            </SafeTooltip>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
                 <LoadMoreFooter
                   hasMore={hasMore}
                   loading={loadingMore}

@@ -82,7 +82,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
           offset: parsedOffset,
         });
 
-        return reply.send({ data: result.data, hasMore: result.data.length >= parsedLimit });
+        return reply.send({
+          data: result.data,
+          hasMore: result.data.length >= parsedLimit,
+        });
       } catch (error) {
         logger.error('Failed to search spans', {
           projectId,
@@ -150,7 +153,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
           offset: parsedOffset,
         });
 
-        return reply.send({ data: result.data, hasMore: result.data.length >= parsedLimit });
+        return reply.send({
+          data: result.data,
+          hasMore: result.data.length >= parsedLimit,
+        });
       } catch (error) {
         logger.error('Failed to get trace samples', {
           projectId,

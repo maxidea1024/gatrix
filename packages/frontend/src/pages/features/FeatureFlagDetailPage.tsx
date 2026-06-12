@@ -2199,11 +2199,19 @@ const FeatureFlagDetailPage: React.FC = () => {
       <PageHeader
         title={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="subtitle1" fontWeight={700} sx={{ fontSize: '1rem' }}>
+            <Typography
+              variant="subtitle1"
+              fontWeight={700}
+              sx={{ fontSize: '1rem' }}
+            >
               {flag.flagName}
             </Typography>
             {flag.isArchived && (
-              <Chip label={t('featureFlags.archived')} size="small" color="warning" />
+              <Chip
+                label={t('featureFlags.archived')}
+                size="small"
+                color="warning"
+              />
             )}
             <CopyButton text={flag.flagName} size={13} />
           </Box>
@@ -2216,8 +2224,16 @@ const FeatureFlagDetailPage: React.FC = () => {
             onChange={(key) => setTabValue(Number(key))}
             items={[
               { key: '0', label: t('featureFlags.overview') },
-              { key: '1', label: t('featureFlags.flagValues'), disabled: isCreating },
-              { key: '2', label: t('featureFlags.metrics'), disabled: isCreating },
+              {
+                key: '1',
+                label: t('featureFlags.flagValues'),
+                disabled: isCreating,
+              },
+              {
+                key: '2',
+                label: t('featureFlags.metrics'),
+                disabled: isCreating,
+              },
               {
                 key: '3',
                 label: (
@@ -2228,14 +2244,23 @@ const FeatureFlagDetailPage: React.FC = () => {
                         label={codeReferenceCount}
                         size="small"
                         variant="filled"
-                        sx={{ height: 20, minWidth: 20, fontSize: '0.7rem', bgcolor: 'action.selected' }}
+                        sx={{
+                          height: 20,
+                          minWidth: 20,
+                          fontSize: '0.7rem',
+                          bgcolor: 'action.selected',
+                        }}
                       />
                     )}
                   </>
                 ),
                 disabled: isCreating,
               },
-              { key: '4', label: t('featureFlags.tabs.history'), disabled: isCreating },
+              {
+                key: '4',
+                label: t('featureFlags.tabs.history'),
+                disabled: isCreating,
+              },
             ]}
           />
         }

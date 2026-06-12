@@ -93,9 +93,7 @@ export const AttrRow: React.FC<{
       >
         {linkContent ? (
           tooltipKey ? (
-            <SafeTooltip title={t(tooltipKey)}>
-              {linkContent}
-            </SafeTooltip>
+            <SafeTooltip title={t(tooltipKey)}>{linkContent}</SafeTooltip>
           ) : (
             linkContent
           )

@@ -235,7 +235,9 @@ const CustomQueueMonitorPage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2 }}>
-      <PageHeader title={t('monitoring.customQueue.title', 'Custom Queue Monitor')} />
+      <PageHeader
+        title={t('monitoring.customQueue.title', 'Custom Queue Monitor')}
+      />
       <Box
         sx={{
           display: 'flex',

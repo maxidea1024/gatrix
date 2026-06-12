@@ -114,9 +114,7 @@ const LogDetail: React.FC<LogDetailProps> = ({ log, isDark, onFilter }) => {
             >
               {linkEl ? (
                 tooltipKey ? (
-                  <Tooltip title={t(tooltipKey)}>
-                    {linkEl}
-                  </Tooltip>
+                  <Tooltip title={t(tooltipKey)}>{linkEl}</Tooltip>
                 ) : (
                   linkEl
                 )

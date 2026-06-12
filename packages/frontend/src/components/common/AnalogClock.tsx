@@ -141,14 +141,10 @@ const AnalogClock: React.FC<AnalogClockProps> = ({
           x1={center}
           y1={center}
           x2={
-            center +
-            (radius * 0.5) *
-              Math.cos(((hourAngle - 90) * Math.PI) / 180)
+            center + radius * 0.5 * Math.cos(((hourAngle - 90) * Math.PI) / 180)
           }
           y2={
-            center +
-            (radius * 0.5) *
-              Math.sin(((hourAngle - 90) * Math.PI) / 180)
+            center + radius * 0.5 * Math.sin(((hourAngle - 90) * Math.PI) / 180)
           }
           stroke={hourHandColor}
           strokeWidth={2.5}
@@ -161,13 +157,11 @@ const AnalogClock: React.FC<AnalogClockProps> = ({
           y1={center}
           x2={
             center +
-            (radius * 0.7) *
-              Math.cos(((minuteAngle - 90) * Math.PI) / 180)
+            radius * 0.7 * Math.cos(((minuteAngle - 90) * Math.PI) / 180)
           }
           y2={
             center +
-            (radius * 0.7) *
-              Math.sin(((minuteAngle - 90) * Math.PI) / 180)
+            radius * 0.7 * Math.sin(((minuteAngle - 90) * Math.PI) / 180)
           }
           stroke={minuteHandColor}
           strokeWidth={1.5}
@@ -180,13 +174,11 @@ const AnalogClock: React.FC<AnalogClockProps> = ({
           y1={center}
           x2={
             center +
-            (radius * 0.75) *
-              Math.cos(((secondAngle - 90) * Math.PI) / 180)
+            radius * 0.75 * Math.cos(((secondAngle - 90) * Math.PI) / 180)
           }
           y2={
             center +
-            (radius * 0.75) *
-              Math.sin(((secondAngle - 90) * Math.PI) / 180)
+            radius * 0.75 * Math.sin(((secondAngle - 90) * Math.PI) / 180)
           }
           stroke={secondHandColor}
           strokeWidth={0.75}

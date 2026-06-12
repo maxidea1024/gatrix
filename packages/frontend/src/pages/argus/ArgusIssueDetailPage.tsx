@@ -401,9 +401,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                     variant="outlined"
                     startIcon={<TraceIcon sx={{ fontSize: 15 }} />}
                     onClick={() =>
-                      navigate(
-                        `/argus/explore/traces?q=trace_id:"${traceId}"`
-                      )
+                      navigate(`/argus/explore/traces?q=trace_id:"${traceId}"`)
                     }
                     sx={{
                       textTransform: 'none',
@@ -412,7 +410,10 @@ const ArgusIssueDetailPage: React.FC = () => {
                       borderRadius: '6px',
                     }}
                   >
-                    {t('argus.issues.searchRelatedSpans', 'Search related spans')}
+                    {t(
+                      'argus.issues.searchRelatedSpans',
+                      'Search related spans'
+                    )}
                   </Button>
                 </Box>
               )}

@@ -51,8 +51,6 @@ const formatPresets = [
 const TAB_KEYS = ['general', 'time'] as const;
 type TabKey = (typeof TAB_KEYS)[number];
 
-
-
 // General Settings Page - accessible to all users
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -213,15 +211,9 @@ const SettingsPage: React.FC = () => {
                     value={mode}
                     onChange={(e) => setAppTheme(e.target.value as any)}
                   >
-                    <MenuItem value="light">
-                      {t('common.themeLight')}
-                    </MenuItem>
-                    <MenuItem value="dark">
-                      {t('common.themeDark')}
-                    </MenuItem>
-                    <MenuItem value="auto">
-                      {t('common.themeAuto')}
-                    </MenuItem>
+                    <MenuItem value="light">{t('common.themeLight')}</MenuItem>
+                    <MenuItem value="dark">{t('common.themeDark')}</MenuItem>
+                    <MenuItem value="auto">{t('common.themeAuto')}</MenuItem>
                   </TextField>
                 </Stack>
               </CardContent>
@@ -305,11 +297,7 @@ const SettingsPage: React.FC = () => {
                       label={t('settings.general.localTime')}
                       size={120}
                     />
-                    <AnalogClock
-                      time={localUtcTime}
-                      label="UTC"
-                      size={120}
-                    />
+                    <AnalogClock time={localUtcTime} label="UTC" size={120} />
                   </Box>
                 </CardContent>
               </Card>
@@ -338,11 +326,7 @@ const SettingsPage: React.FC = () => {
                       label={t('settings.general.serverTimeLabel')}
                       size={120}
                     />
-                    <AnalogClock
-                      time={serverUtcTime}
-                      label="UTC"
-                      size={120}
-                    />
+                    <AnalogClock time={serverUtcTime} label="UTC" size={120} />
                   </Box>
 
                   {serverTimeData && (
@@ -358,19 +342,14 @@ const SettingsPage: React.FC = () => {
                         borderColor: 'divider',
                       }}
                     >
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                      >
-                        {t('common.serverUptime')}: {formatUptime(currentUptime)}
+                      <Typography variant="caption" color="text.secondary">
+                        {t('common.serverUptime')}:{' '}
+                        {formatUptime(currentUptime)}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
                         ·
                       </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                      >
+                      <Typography variant="caption" color="text.secondary">
                         {t('common.ping', 'Ping')}: {serverTimeData.ping}ms
                       </Typography>
                       {(() => {
@@ -384,14 +363,18 @@ const SettingsPage: React.FC = () => {
                             : '-';
                         return (
                           <>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
                               ·
                             </Typography>
                             <Typography
                               variant="caption"
                               sx={{ color: 'warning.main', fontWeight: 600 }}
                             >
-                              {t('settings.general.timeDiff', 'Diff')}: {sign}{formatDuration(diffMs)}
+                              {t('settings.general.timeDiff', 'Diff')}: {sign}
+                              {formatDuration(diffMs)}
                             </Typography>
                           </>
                         );
