@@ -86,7 +86,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [urlState, setUrlState] = useArgusUrlState(URL_PARAMS);
 
   const activeTab = parseInt(urlState.tab, 10) || 0;
-  const aggGroupBys = (urlState.groupBy || 'op').split(',').filter(Boolean);
+  const aggGroupBys = useMemo(
+    () => (urlState.groupBy || 'op').split(',').filter(Boolean),
+    [urlState.groupBy]
+  );
   const orderBy = urlState.orderBy;
   const orderDir: 'asc' | 'desc' = orderBy.startsWith('-') ? 'desc' : 'asc';
   const orderCol = orderBy.replace(/^-/, '');
