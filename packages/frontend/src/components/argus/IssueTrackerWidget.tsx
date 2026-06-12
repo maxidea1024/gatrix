@@ -14,6 +14,7 @@ import {
   Button,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import useSWR from 'swr';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -91,6 +92,7 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -304,19 +306,42 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
               {t('argus.issues.createExternalIssue', 'Create External Issue')}
             </Button>
           ) : (
-            <Typography
-              variant="body2"
+            <Box
               sx={{
-                color: 'text.disabled',
-                fontStyle: 'italic',
-                fontSize: '0.8rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 0.75,
               }}
             >
-              {t(
-                'argus.issues.noTrackersConfigured',
-                'No issue trackers configured for this project.'
-              )}
-            </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'text.disabled',
+                  fontStyle: 'italic',
+                  fontSize: '0.8rem',
+                }}
+              >
+                {t(
+                  'argus.issues.noTrackersConfigured',
+                  'No issue trackers configured for this project.'
+                )}
+              </Typography>
+              <Link
+                component="button"
+                onClick={() => navigate('/argus/settings#issue-trackers')}
+                sx={{
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  color: theme.palette.primary.main,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
+              >
+                {t('argus.issues.configureTrackers', 'Configure in Settings →')}
+              </Link>
+            </Box>
           )}
         </Box>
       )}

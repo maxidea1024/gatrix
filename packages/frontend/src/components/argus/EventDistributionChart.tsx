@@ -208,14 +208,25 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({
             {t('argus.common.events', 'events')}
           </Typography>
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'baseline', px: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'baseline',
+            backgroundColor: isDark
+              ? alpha('#7c4dff', 0.15)
+              : alpha('#7c4dff', 0.08),
+            px: 1,
+            py: 0.25,
+            borderRadius: 0.5,
+          }}
+        >
           <Typography
             sx={{
               minWidth: 36,
               textAlign: 'right',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              color: 'text.primary',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              color: isDark ? '#bb86fc' : '#6200ea',
               lineHeight: 1.2,
             }}
           >
@@ -225,7 +236,8 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({
             sx={{
               ml: 0.75,
               fontSize: '0.65rem',
-              color: 'text.secondary',
+              color: isDark ? '#bb86fc' : '#6200ea',
+              fontWeight: 600,
               lineHeight: 1,
             }}
           >

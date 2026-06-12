@@ -46,14 +46,7 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.2 }}>
           {/* Last Seen */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'baseline',
-              flexWrap: 'wrap',
-              gap: 0.5,
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <Typography
               sx={{
                 fontSize: '0.78rem',
@@ -64,51 +57,37 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
             >
               {t('argus.issues.lastSeen')}
             </Typography>
-            <Typography
-              component="span"
-              sx={{
-                fontSize: '0.78rem',
-                fontWeight: 400,
-                color: 'text.secondary',
-              }}
-            >
-              {issue.last_seen
-                ? formatRelativeTime(issue.last_seen, undefined, i18n.language)
-                : '—'}
-            </Typography>
-            {latestEvent?.release && releaseLink && (
-              <>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
-                >
-                  ·
-                </Typography>
-                <Typography
-                  component="span"
-                  onClick={() => navigate(releaseLink)}
-                  sx={{
-                    fontSize: '0.68rem',
-                    color: theme.palette.info.main,
-                    cursor: 'pointer',
-                    '&:hover': { textDecoration: 'underline' },
-                  }}
-                >
-                  {latestEvent.release}
-                </Typography>
-              </>
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
+              <Typography
+                component="span"
+                sx={{ fontSize: '0.78rem', fontWeight: 400, color: 'text.secondary' }}
+              >
+                {issue.last_seen
+                  ? formatRelativeTime(issue.last_seen, undefined, i18n.language)
+                  : '—'}
+              </Typography>
+              {latestEvent?.release && releaseLink && (
+                <>
+                  <Typography component="span" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>·</Typography>
+                  <Typography
+                    component="span"
+                    onClick={() => navigate(releaseLink)}
+                    sx={{
+                      fontSize: '0.68rem',
+                      color: theme.palette.info.main,
+                      cursor: 'pointer',
+                      '&:hover': { textDecoration: 'underline' },
+                    }}
+                  >
+                    {latestEvent.release}
+                  </Typography>
+                </>
+              )}
+            </Box>
           </Box>
 
           {/* First Seen */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'baseline',
-              flexWrap: 'wrap',
-              gap: 0.5,
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <Typography
               sx={{
                 fontSize: '0.78rem',
@@ -119,40 +98,33 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
             >
               {t('argus.issues.firstSeen')}
             </Typography>
-            <Typography
-              component="span"
-              sx={{
-                fontSize: '0.78rem',
-                fontWeight: 400,
-                color: 'text.secondary',
-              }}
-            >
-              {issue.first_seen
-                ? formatRelativeTime(issue.first_seen, undefined, i18n.language)
-                : '—'}
-            </Typography>
-            {latestEvent?.release && releaseLink && (
-              <>
-                <Typography
-                  component="span"
-                  sx={{ fontSize: '0.68rem', color: 'text.disabled' }}
-                >
-                  ·
-                </Typography>
-                <Typography
-                  component="span"
-                  onClick={() => navigate(releaseLink)}
-                  sx={{
-                    fontSize: '0.68rem',
-                    color: theme.palette.info.main,
-                    cursor: 'pointer',
-                    '&:hover': { textDecoration: 'underline' },
-                  }}
-                >
-                  {latestEvent.release}
-                </Typography>
-              </>
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
+              <Typography
+                component="span"
+                sx={{ fontSize: '0.78rem', fontWeight: 400, color: 'text.secondary' }}
+              >
+                {issue.first_seen
+                  ? formatRelativeTime(issue.first_seen, undefined, i18n.language)
+                  : '—'}
+              </Typography>
+              {latestEvent?.release && releaseLink && (
+                <>
+                  <Typography component="span" sx={{ fontSize: '0.68rem', color: 'text.disabled' }}>·</Typography>
+                  <Typography
+                    component="span"
+                    onClick={() => navigate(releaseLink)}
+                    sx={{
+                      fontSize: '0.68rem',
+                      color: theme.palette.info.main,
+                      cursor: 'pointer',
+                      '&:hover': { textDecoration: 'underline' },
+                    }}
+                  >
+                    {latestEvent.release}
+                  </Typography>
+                </>
+              )}
+            </Box>
           </Box>
 
           {/* Release (standalone row, clickable) */}

@@ -1193,6 +1193,7 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
             />
           }
           storageKey="trace"
+          hideActionsOnCollapse
           actions={
             traceDetail && traceDetail.spans.length > 0 ? (
               <ActionChip
