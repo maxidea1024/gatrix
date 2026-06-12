@@ -17,6 +17,7 @@
  *   - Complex combinations
  */
 import { QueryParser } from '../utils/queryParser';
+import { TableSchema } from '../utils/tableSchemas';
 
 // ─── Test Fixtures ───────────────────────────────────────────────────────────
 
@@ -419,5 +420,256 @@ describe('List value (IN / NOT IN) SQL generation', () => {
   test('key:!= [val1, val2] → column NOT IN (param1, param2)', () => {
     const { where } = parseSql('logger_name:!=[UE4Core, LuaVM]');
     expect(where).toContain('logger_name NOT IN (');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 10. Map column fallback (schema-based)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+
+
+const MAP_SCHEMA: TableSchema = {
+  columns: {
+    level: 'string',
+    message: 'string',
+    service: 'string',
+    timestamp: 'number',
+  },
+  mapColumns: [{ name: 'tags', valueType: 'String' }],
+  aliases: { severity: 'level' },
+};
+
+function createMapParser() {
+  return new QueryParser(MAP_SCHEMA);
+}
+
+function parseMapSql(query: string) {
+  const parser = createMapParser();
+  const ast = parser.parse(query);
+  const params: Record<string, string> = {};
+  const result = parser.generateSQL(ast, params);
+  return { ...result, params, ast };
+}
+
+describe('Map column fallback — basic operations', () => {
+  test('known key → top-level column SQL (no map fallback)', () => {
+    const { where } = parseMapSql('level:error');
+    expect(where).toContain('level =');
+    expect(where).not.toContain('mapContains');
+    expect(where).not.toContain('tags[');
+  });
+
+  test('unknown key + map config → mapContains + tags[key] = value', () => {
+    const { where, params } = parseMapSql('build:10234');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('tags[');
+    expect(where).toContain('=');
+    expect(Object.values(params)).toContain('build');
+    expect(Object.values(params)).toContain('10234');
+  });
+
+  test('unknown key + no map config → 1=1 (backward compat)', () => {
+    // Use legacy constructor without map columns
+    const parser = new QueryParser(
+      new Set(['level', 'message']),
+      new Set()
+    );
+    const ast = parser.parse('build:10234');
+    const params: Record<string, string> = {};
+    const { where } = parser.generateSQL(ast, params);
+    // Unknown column should be silently ignored → empty or no filter
+    expect(where).not.toContain('build');
+    expect(where).not.toContain('mapContains');
+  });
+});
+
+describe('Map column fallback — operators', () => {
+  test('map key: != (inequality)', () => {
+    const { where } = parseMapSql('build:!=10234');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('!=');
+  });
+
+  test('map key: *wildcard* (ILIKE)', () => {
+    const { where, params } = parseMapSql('build:*beta*');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('ILIKE');
+    // Value should be converted: *beta* → %beta%
+    expect(Object.values(params)).toContain('%beta%');
+  });
+
+  test('map key: != *wildcard* (NOT ILIKE)', () => {
+    const { where } = parseMapSql('build:!=*beta*');
+    expect(where).toContain('NOT ILIKE');
+  });
+
+  test('map key: [list, values] (IN)', () => {
+    const { where, params } = parseMapSql('build:[v1, v2, v3]');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('IN (');
+    expect(Object.values(params)).toContain('v1');
+    expect(Object.values(params)).toContain('v2');
+    expect(Object.values(params)).toContain('v3');
+  });
+
+  test('map key: != [list] (NOT IN)', () => {
+    const { where } = parseMapSql('build:!=[v1, v2]');
+    expect(where).toContain('NOT IN');
+  });
+
+  test('map key: .contains (compound)', () => {
+    const { where, params } = parseMapSql('build.contains:beta');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('ILIKE');
+    expect(Object.values(params)).toContain('%beta%');
+  });
+
+  test('map key: .not_contains (compound negated)', () => {
+    const { where, params } = parseMapSql('build.not_contains:beta');
+    expect(where).toContain('NOT ILIKE');
+    expect(Object.values(params)).toContain('%beta%');
+  });
+
+  test('map key: .starts_with', () => {
+    const { where, params } = parseMapSql('build.starts_with:v3');
+    expect(where).toContain('ILIKE');
+    expect(Object.values(params)).toContain('v3%');
+  });
+
+  test('map key: .ends_with', () => {
+    const { where, params } = parseMapSql('build.ends_with:rc1');
+    expect(where).toContain('ILIKE');
+    expect(Object.values(params)).toContain('%rc1');
+  });
+
+  test('map key: .not_starts_with', () => {
+    const { where } = parseMapSql('build.not_starts_with:dev');
+    expect(where).toContain('NOT ILIKE');
+  });
+
+  test('map key: .not_ends_with', () => {
+    const { where } = parseMapSql('build.not_ends_with:snapshot');
+    expect(where).toContain('NOT ILIKE');
+  });
+
+  test('map key: > (greater than)', () => {
+    const { where } = parseMapSql('version:>100');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('>');
+  });
+});
+
+describe('Map column fallback — has: keyword', () => {
+  test('has:known_column → column != ""', () => {
+    const { where } = parseMapSql('has:level');
+    expect(where).toContain("level != ''");
+    expect(where).toContain('IS NOT NULL');
+    expect(where).not.toContain('mapContains');
+  });
+
+  test('has:unknown_key + map → mapContains(tags, key)', () => {
+    const { where, params } = parseMapSql('has:build');
+    expect(where).toContain('mapContains(tags,');
+    expect(Object.values(params)).toContain('build');
+    expect(where).not.toContain("!= ''");
+  });
+
+  test('!has:unknown_key + map → NOT mapContains(tags, key)', () => {
+    const { where } = parseMapSql('!has:build');
+    expect(where).toContain('NOT');
+    expect(where).toContain('mapContains(tags,');
+  });
+
+  test('has:aliased_key resolves alias then checks top-level', () => {
+    const { where } = parseMapSql('has:severity');
+    // 'severity' alias → 'level' which IS a top-level column
+    expect(where).toContain("level != ''");
+    expect(where).not.toContain('mapContains');
+  });
+});
+
+describe('Map column fallback — negation', () => {
+  test('!map_key:value → NOT(mapContains AND tags[key] = val)', () => {
+    const { where } = parseMapSql('!build:10234');
+    expect(where).toContain('NOT');
+    expect(where).toContain('mapContains(tags,');
+  });
+});
+
+describe('Map column fallback — combinations', () => {
+  test('top-level AND map key combined', () => {
+    const { where, params } = parseMapSql('level:error AND build:10234');
+    expect(where).toContain('level =');
+    expect(where).toContain('mapContains(tags,');
+    expect(where).toContain('AND');
+    expect(Object.values(params)).toContain('error');
+    expect(Object.values(params)).toContain('10234');
+  });
+
+  test('map key OR map key', () => {
+    const { where } = parseMapSql('build:v1 OR build:v2');
+    expect(where).toContain('OR');
+    // Should have two mapContains checks
+    const matches = where.match(/mapContains/g) || [];
+    expect(matches.length).toBe(2);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 11. Map(String, Float64) support
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe('Map(String, Float64) support', () => {
+  const FLOAT_SCHEMA: TableSchema = {
+    columns: { transaction: 'string' },
+    mapColumns: [{ name: 'measurements', valueType: 'Float64' }],
+  };
+
+  function parseFloatSql(query: string) {
+    const parser = new QueryParser(FLOAT_SCHEMA);
+    const ast = parser.parse(query);
+    const params: Record<string, string> = {};
+    const result = parser.generateSQL(ast, params);
+    return { ...result, params };
+  }
+
+  test('numeric comparison → Float64 param type', () => {
+    const { where } = parseFloatSql('lcp:>2500');
+    expect(where).toContain('mapContains(measurements,');
+    expect(where).toContain(':Float64}');
+  });
+
+  test('string equality → String param type', () => {
+    const { where } = parseFloatSql('lcp:slow');
+    expect(where).toContain('mapContains(measurements,');
+    expect(where).toContain(':String}');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 12. Legacy constructor backward compatibility
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe('Legacy constructor compatibility', () => {
+  test('Set<string> constructor still works without map support', () => {
+    const parser = new QueryParser(
+      new Set(['level', 'message']),
+      new Set(),
+      { severity: 'level' }
+    );
+    const ast = parser.parse('severity:error');
+    const params: Record<string, string> = {};
+    const { where } = parser.generateSQL(ast, params);
+    expect(where).toContain('level =');
+    expect(Object.values(params)).toContain('error');
+  });
+
+  test('unknown column with legacy constructor → silently ignored', () => {
+    const parser = new QueryParser(new Set(['level']), new Set());
+    const ast = parser.parse('unknown:value');
+    const params: Record<string, string> = {};
+    const { where } = parser.generateSQL(ast, params);
+    expect(where).not.toContain('unknown');
   });
 });

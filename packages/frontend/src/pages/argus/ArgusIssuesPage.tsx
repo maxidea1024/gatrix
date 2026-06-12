@@ -552,10 +552,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const sortOptions = getSortOptions(t);
 
   // Lazy-loading callback for QueryAQLEditor: fetch values for a specific field on demand
+  // Uses the errors table (not logs) so release/environment values match error events.
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
-        const data = await argusService.getAttributeFacet(projectId, fieldKey);
+        const data = await argusService.getIssueAttributeFacet(projectId, fieldKey);
         return data.map((d) => d.attr_value);
       } catch {
         return [];
@@ -581,8 +582,22 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         substatus: substatus || undefined,
         assigned_to: assignedTo || undefined,
       };
-      const result = await argusService.listIssues(projectId, params);
-      setFacetData(buildFacetCounts(result.data));
+
+      // Fetch MySQL-based issue counts + ClickHouse event facets in parallel
+      const [result, chFacets] = await Promise.all([
+        argusService.listIssues(projectId, params),
+        argusService.getIssueFacets(projectId, dateParams).catch(() => ({})),
+      ]);
+
+      const issueFacets = buildFacetCounts(result.data);
+      setFacetData({
+        ...issueFacets,
+        // Merge ClickHouse event-level facets
+        release: (chFacets as any).release || [],
+        environment: (chFacets as any).environment || [],
+        browser_name: (chFacets as any).browser_name || [],
+        os_name: (chFacets as any).os_name || [],
+      });
     } catch {
       /* ignore */
     }
@@ -631,6 +646,27 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           key: 'priority',
           label: t('argus.issues.priority', 'Priority'),
           values: mappedFacets.priority,
+        },
+        // ClickHouse event-level facets (discovered from errors table)
+        {
+          key: 'release',
+          label: t('argus.issues.release', 'Release'),
+          values: mappedFacets.release,
+        },
+        {
+          key: 'environment',
+          label: t('argus.issues.environment', 'Environment'),
+          values: mappedFacets.environment,
+        },
+        {
+          key: 'browser_name',
+          label: t('argus.issues.browser', 'Browser'),
+          values: mappedFacets.browser_name,
+        },
+        {
+          key: 'os_name',
+          label: t('argus.issues.os', 'OS'),
+          values: mappedFacets.os_name,
         },
       ].filter((g) => g.values.length > 0),
     [mappedFacets, t]

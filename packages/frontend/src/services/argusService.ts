@@ -132,6 +132,7 @@ export interface ArgusErrorEvent {
   breadcrumbs: string;
   contexts: string | Record<string, any>;
   extra?: string | Record<string, any>;
+  message?: string;
 }
 
 export interface ArgusIssueActivity {
@@ -1498,6 +1499,39 @@ class ArgusService {
   ): Promise<ArgusIssueTagGroup[]> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/issues/${issueId}/tags`
+    );
+    return response.data?.data || [];
+  }
+
+  /**
+   * Get aggregated facet counts from the ClickHouse errors table.
+   * Returns release, environment, browser_name, os_name distributions.
+   */
+  async getIssueFacets(
+    projectId: number | string,
+    params?: { period?: string; start?: string; end?: string }
+  ): Promise<
+    Record<string, { value: string; count: number }[]>
+  > {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/${projectId}/issues/facets`,
+      { params }
+    );
+    return response.data?.data || {};
+  }
+
+  /**
+   * Get top values for a single field from the errors table.
+   * Used by the AQL editor to suggest values for issue-domain fields.
+   */
+  async getIssueAttributeFacet(
+    projectId: number | string,
+    key: string,
+    params?: { period?: string; start?: string; end?: string }
+  ): Promise<{ attr_value: string; count: number }[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/${projectId}/issues/attribute-facet`,
+      { params: { key, ...params } }
     );
     return response.data?.data || [];
   }

@@ -5,30 +5,10 @@ import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { CACHE, STREAMS, KNOWN_STREAMS } from '../config/redis-keys';
+import { LOGS_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('logs-api');
 
-const LOGS_ALLOWED_COLUMNS = new Set([
-  'log_id',
-  'trace_id',
-  'span_id',
-  'issue_id',
-  'timestamp',
-  'level',
-  'logger_name',
-  'message',
-  'body',
-  'service',
-  'environment',
-  'release',
-]);
-
-// User-friendly aliases ??actual DB column names.
-// The UI displays "severity" but the DB column is "level".
-const LOGS_COLUMN_ALIASES: Record<string, string> = {
-  severity: 'level',
-  logger: 'logger_name',
-};
 
 export default async function logsRoutes(app: FastifyInstance) {
   // ?�?�?� Browse Logs (independent explorer ??no trace_id required) ?�?�?�
@@ -92,11 +72,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(
-            LOGS_ALLOWED_COLUMNS,
-            new Set(),
-            LOGS_COLUMN_ALIASES
-          );
+          const parser = new QueryParser(LOGS_SCHEMA);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -164,11 +140,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(
-            LOGS_ALLOWED_COLUMNS,
-            new Set(),
-            LOGS_COLUMN_ALIASES
-          );
+          const parser = new QueryParser(LOGS_SCHEMA);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -355,11 +327,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(
-            LOGS_ALLOWED_COLUMNS,
-            new Set(),
-            LOGS_COLUMN_ALIASES
-          );
+          const parser = new QueryParser(LOGS_SCHEMA);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -458,11 +426,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(
-            LOGS_ALLOWED_COLUMNS,
-            new Set(),
-            LOGS_COLUMN_ALIASES
-          );
+          const parser = new QueryParser(LOGS_SCHEMA);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -654,11 +618,7 @@ export default async function logsRoutes(app: FastifyInstance) {
         }
 
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(
-            LOGS_ALLOWED_COLUMNS,
-            new Set(),
-            LOGS_COLUMN_ALIASES
-          );
+          const parser = new QueryParser(LOGS_SCHEMA);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, params);
@@ -1154,11 +1114,7 @@ export default async function logsRoutes(app: FastifyInstance) {
           }
 
           if (search && typeof search === 'string' && search.trim()) {
-            const parser = new QueryParser(
-              LOGS_ALLOWED_COLUMNS,
-              new Set(),
-              LOGS_COLUMN_ALIASES
-            );
+            const parser = new QueryParser(LOGS_SCHEMA);
             const ast = parser.parse(search);
             if (ast) {
               const { where } = parser.generateSQL(ast, params);

@@ -2044,11 +2044,12 @@ export const QueryAQLEditor = forwardRef<
         commitPendingInput();
         return;
       }
-      // Re-click on already-focused input → toggle (disabled — dropdown now opens via ArrowDown only)
-      // setShowDropdown((prev) => !prev);
-      // setSelectedIndex(-1);
+      // Click on input dismisses dropdown (re-open via typing or ArrowDown)
+      if (showDropdown) {
+        setShowDropdown(false);
+      }
     },
-    [inputValue, commitPendingInput]
+    [inputValue, commitPendingInput, showDropdown]
   );
 
   const handleClickAway = useCallback(() => {
@@ -2087,8 +2088,11 @@ export const QueryAQLEditor = forwardRef<
       // Force-complete any pending input
       if (inputValue.trim()) {
         commitPendingInput();
-        setShowDropdown(false);
       }
+      // Close suggestion dropdown on background click
+      setShowDropdown(false);
+      // Suppress the dropdown that handleFocus would re-open
+      suppressDropdownRef.current = true;
       // Clear token selection and focus input
       setSelectedTokenIdx(-1);
       inputRef.current?.focus();

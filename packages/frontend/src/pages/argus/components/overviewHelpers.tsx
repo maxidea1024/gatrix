@@ -45,7 +45,7 @@ export const ChangeIndicator: React.FC<{ value: number; invert?: boolean }> = ({
         variant="caption"
         sx={{ fontSize: '0.65rem', fontWeight: 700, color }}
       >
-        {Math.abs(value).toFixed(0)}%
+        {Math.abs(Math.round(value)).toLocaleString()}%
       </Typography>
     </Box>
   );

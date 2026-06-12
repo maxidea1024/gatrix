@@ -3,6 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-sql';
 import BreadcrumbExpandedDetail from './BreadcrumbExpandedDetail';
+import { useResizableSplit } from '@/hooks/useResizableSplit';
 import {
   Box,
   Typography,
@@ -422,12 +423,25 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [filterLevel, setFilterLevel] = useState<string | null>(null);
-  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [collapsedSet, setCollapsedSet] = useState<Set<number>>(new Set());
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [copyMenuAnchor, setCopyMenuAnchor] = useState<null | HTMLElement>(
     null
   );
   const [snackbar, setSnackbar] = useState<string | null>(null);
+
+  // Resizable drawer
+  const {
+    splitWidth: drawerWidth,
+    isDragging: isDrawerDragging,
+    handleMouseDown: handleDrawerResizeMouseDown,
+  } = useResizableSplit({
+    storageKey: 'argus_breadcrumb_drawer_width',
+    defaultWidth: 700,
+    minWidth: 400,
+    maxWidth: 1200,
+    invertDelta: true,
+  });
 
   // Persist sort/time
   const handleSortChange = useCallback(() => {
@@ -576,7 +590,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
     const hasData =
       crumb.data &&
       Object.keys(crumb.data).filter((k) => k !== '_virtual').length > 0;
-    const isExpanded = fullyExpanded || expandedIdx === idx;
+    const isExpanded = fullyExpanded || !collapsedSet.has(idx);
     const isError = crumb.level === 'error' || crumb.level === 'fatal';
     const isVirtual = crumb.data?._virtual;
     const isHttp = isHttpBreadcrumb(crumb);
@@ -613,7 +627,12 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           cursor: hasData ? 'pointer' : 'default',
         }}
         onClick={() =>
-          hasData && !fullyExpanded && setExpandedIdx(isExpanded ? null : idx)
+          hasData && !fullyExpanded && setCollapsedSet((prev) => {
+            const next = new Set(prev);
+            if (next.has(idx)) next.delete(idx);
+            else next.add(idx);
+            return next;
+          })
         }
       >
         {/* Timeline line */}
@@ -1136,54 +1155,86 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           onClose={() => setDrawerOpen(false)}
           PaperProps={{
             sx: {
-              width: { xs: '100%', sm: '65%', md: '55%', lg: '45%' },
-              maxWidth: 700,
+              width: { xs: '100%', md: drawerWidth },
+              maxWidth: '90vw',
               backgroundColor: theme.palette.background.default,
+              overflow: 'hidden',
             },
           }}
         >
           <Box
-            sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+            sx={{ display: 'flex', height: '100%' }}
           >
-            {/* Drawer header */}
+            {/* Resize handle (left edge) */}
             <Box
+              onMouseDown={handleDrawerResizeMouseDown}
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                px: 2.5,
-                py: 1.5,
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                backgroundColor: theme.palette.background.paper,
+                width: '4px',
+                flexShrink: 0,
+                cursor: 'col-resize',
+                bgcolor: isDrawerDragging ? 'primary.main' : 'transparent',
+                position: 'relative',
+                zIndex: 10,
+                transition: 'background-color 0.15s',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: '-4px',
+                  right: '-4px',
+                  cursor: 'col-resize',
+                },
+                '&:hover': {
+                  bgcolor: 'primary.main',
+                },
               }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight={700}
-                  sx={{ fontSize: '0.95rem' }}
-                >
-                  {t('argus.breadcrumbs.title')}
-                </Typography>
-                <Chip
-                  label={allBreadcrumbs.length}
-                  size="small"
-                  sx={{ height: 20, fontSize: '0.7rem', fontWeight: 700 }}
-                />
-              </Box>
-              <IconButton size="small" onClick={() => setDrawerOpen(false)}>
-                <CloseIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </Box>
+            />
 
-            {/* Drawer body */}
-            <Box sx={{ flex: 1, overflow: 'auto', px: 2.5, py: 2 }}>
-              {renderToolbar(true)}
-              {filtered.length > 50 ? (
-                <VirtualizedTimeline items={filtered} />
-              ) : (
-                renderTimeline(filtered)
-              )}
+            {/* Drawer content */}
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, height: '100%' }}
+            >
+              {/* Drawer header */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  px: 2.5,
+                  py: 1.5,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  backgroundColor: theme.palette.background.paper,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    sx={{ fontSize: '0.95rem' }}
+                  >
+                    {t('argus.breadcrumbs.title')}
+                  </Typography>
+                  <Chip
+                    label={allBreadcrumbs.length}
+                    size="small"
+                    sx={{ height: 20, fontSize: '0.7rem', fontWeight: 700 }}
+                  />
+                </Box>
+                <IconButton size="small" onClick={() => setDrawerOpen(false)}>
+                  <CloseIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Box>
+
+              {/* Drawer body */}
+              <Box sx={{ flex: 1, overflow: 'auto', px: 2.5, py: 2 }}>
+                {renderToolbar(true)}
+                {filtered.length > 50 ? (
+                  <VirtualizedTimeline items={filtered} />
+                ) : (
+                  renderTimeline(filtered)
+                )}
+              </Box>
             </Box>
           </Box>
         </Drawer>

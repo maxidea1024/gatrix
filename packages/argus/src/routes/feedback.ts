@@ -4,39 +4,9 @@ import db from '../config/knex';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
+import { FEEDBACK_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('feedback-api');
-
-// ─── Feedback table: allowed columns for QueryParser ───
-const FEEDBACK_ALLOWED_COLUMNS = new Set([
-  'feedback_id',
-  'message',
-  'name',
-  'email',
-  'contact_email',
-  'url',
-  'status',
-  'assigned_to',
-  'environment',
-  'release',
-  'source',
-  'browser',
-  'os',
-  'device',
-  'user_id',
-  'locale',
-  'category',
-  'sentiment',
-  'timestamp',
-]);
-
-// Frontend field keys → ClickHouse column names
-const FEEDBACK_COLUMN_ALIASES: Record<string, string> = {
-  browser_name: 'browser',
-  os_name: 'os',
-  feedback: 'message',
-  assigned: 'assigned_to',
-};
 
 export default async function feedbackRoutes(app: FastifyInstance) {
   // List user feedback with enriched stats + issue linking
@@ -91,11 +61,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       // Search filter — parse AQL query via QueryParser
       let searchClause = '';
       if (search && search.trim()) {
-        const parser = new QueryParser(
-          FEEDBACK_ALLOWED_COLUMNS,
-          new Set(),
-          FEEDBACK_COLUMN_ALIASES
-        );
+        const parser = new QueryParser(FEEDBACK_SCHEMA);
         const ast = parser.parse(search);
         if (ast) {
           const { where } = parser.generateSQL(ast, qp);
@@ -877,9 +843,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
     '/feedback/:projectId/filter-options',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '30d' } = request.query as { period?: string };
+      const { period = '30d', start, end } = request.query as { period?: string; start?: string; end?: string };
 
-      const bucket = getBucketingConfig(period);
+      const bucket = getBucketingConfig(period, start, end);
       const qp: Record<string, any> = {
         projectId: String(projectId),
         fillStart: bucket.queryParams.fillStart,

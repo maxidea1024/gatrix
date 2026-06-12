@@ -26,6 +26,8 @@ interface WidgetConfig {
     orderBy?: string;
     limit?: number;
     period?: string;
+    start?: string;
+    end?: string;
     dataset?: 'errors' | 'spans' | 'logs' | 'metrics';
   };
   layout: { x: number; y: number; w: number; h: number };
@@ -466,9 +468,11 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           limit = 20,
           period = '24h',
           dataset = 'errors',
+          start,
+          end,
         } = query;
 
-        const bucket = getBucketingConfig(period);
+        const bucket = getBucketingConfig(period, start, end);
 
         // Determine table based on dataset
         const datasetTableMap: Record<string, string> = {

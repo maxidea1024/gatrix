@@ -248,20 +248,13 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
       MuiButtonGroup: {
         styleOverrides: {
           contained: {
-            boxShadow:
-              mode === 'dark'
-                ? '0 3px 0 rgba(0,0,0,0.5)'
-                : '0 3px 0 rgba(0,0,0,0.15)',
-            '&:active': {
-              boxShadow: 'none !important',
-              transform: 'translateY(3px)',
-            },
+            boxShadow: 'none',
           },
         },
       },
       MuiButton: {
         defaultProps: {
-          disableElevation: false,
+          disableElevation: true,
         },
         styleOverrides: {
           root: {
@@ -269,15 +262,10 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             fontWeight: 600,
             borderRadius: 4,
             border: 'none',
-            transition: 'all 0.1s ease-in-out',
-            // Tactile bottom shadow elevation
-            boxShadow:
-              mode === 'dark'
-                ? '0 3px 0 rgba(0,0,0,0.5)'
-                : '0 3px 0 rgba(0,0,0,0.15)',
+            boxShadow: 'none',
+            transition: 'background-color 0.15s, border-color 0.15s, opacity 0.15s',
             '&:active': {
-              boxShadow: 'none !important',
-              transform: 'translateY(3px)',
+              opacity: 0.8,
             },
           },
           sizeMedium: {
@@ -294,43 +282,24 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             fontSize: '1rem',
           },
           containedPrimary: {
-            // Stronger bottom shadow for primary button
-            boxShadow: mode === 'dark' ? '0 3px 0 #312A66' : '0 3px 0 #4A42B0',
             '&:hover': {
-              boxShadow:
-                mode === 'dark' ? '0 3px 0 #2A2459' : '0 3px 0 #3D3692',
+              backgroundColor: p.dark,
             },
           },
           containedSecondary: {
-            backgroundColor: mode === 'dark' ? '#3F3B55' : '#FFFFFF',
+            backgroundColor: mode === 'dark' ? '#3F3B55' : '#F3F2F7',
             color: mode === 'dark' ? '#EBEAED' : '#2B2836',
-            boxShadow:
-              mode === 'dark'
-                ? '0 3px 0 rgba(0,0,0,0.3)'
-                : '0 3px 0 rgba(0,0,0,0.15)',
             '&:hover': {
-              backgroundColor: mode === 'dark' ? '#534E6B' : '#F9F9FB',
-              boxShadow:
-                mode === 'dark'
-                  ? '0 3px 0 rgba(0,0,0,0.4)'
-                  : '0 3px 0 rgba(0,0,0,0.2)',
+              backgroundColor: mode === 'dark' ? '#534E6B' : '#E8E6EF',
             },
           },
           outlined: {
-            backgroundColor:
-              mode === 'dark' ? 'rgba(255,255,255,0.02)' : '#FFFFFF',
+            backgroundColor: 'transparent',
             color: txt.primary,
-            boxShadow:
-              mode === 'dark'
-                ? '0 3px 0 rgba(0,0,0,0.3)'
-                : '0 3px 0 rgba(0,0,0,0.15)',
+            border: `1px solid ${colors.border}`,
             '&:hover': {
-              backgroundColor:
-                mode === 'dark' ? 'rgba(255,255,255,0.05)' : '#F9F9FB',
-              boxShadow:
-                mode === 'dark'
-                  ? '0 3px 0 rgba(0,0,0,0.4)'
-                  : '0 3px 0 rgba(0,0,0,0.2)',
+              backgroundColor: colors.hoverBg,
+              borderColor: colors.borderHover,
             },
           },
           text: {
@@ -338,10 +307,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             '&:hover': {
               backgroundColor:
                 mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-            },
-            '&:active': {
-              boxShadow: 'none !important',
-              transform: 'none', // Text buttons usually don't press down
             },
           },
         },

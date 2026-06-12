@@ -80,7 +80,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
         projectId: string;
         txnName: string;
       };
-      const { period = '24h' } = request.query as { period?: string };
+      const { period = '24h', start, end } = request.query as { period?: string; start?: string; end?: string };
 
       try {
         const txnFilter = {
@@ -169,7 +169,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
 
           // Duration histogram ??uses multiIf, needs rawQuery
           (() => {
-            const bucket = getBucketingConfig(period);
+            const bucket = getBucketingConfig(period, start, end);
             return optic.rawQuery({
               query: `SELECT
                 multiIf(
@@ -194,7 +194,7 @@ export default async function performanceRoutes(app: FastifyInstance) {
 
           // Suspect tags ??UNION ALL pattern, rawQuery
           (() => {
-            const bucket = getBucketingConfig(period);
+            const bucket = getBucketingConfig(period, start, end);
             return optic.rawQuery({
               query: `
                 SELECT 'browser' AS tag_key, tags['browser'] AS tag_value, count() AS count, avg(duration) AS avg_duration, quantile(0.95)(duration) AS p95

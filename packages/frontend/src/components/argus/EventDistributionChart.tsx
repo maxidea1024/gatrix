@@ -151,13 +151,13 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({
         alignItems: 'center',
         gap: 2,
         border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-        borderRadius: 1.5,
+        borderRadius: 2,
         px: 2,
-        py: 1,
-        mb: 2,
+        py: 1.2,
+        mb: 1.5,
         backgroundColor: isDark
           ? 'rgba(255,255,255,0.02)'
-          : 'rgba(0,0,0,0.015)',
+          : 'rgba(0,0,0,0.01)',
         minHeight: 72,
         overflow: 'hidden',
         opacity: loading ? 0.6 : 1,
@@ -269,7 +269,7 @@ const EventDistributionChart: React.FC<EventDistributionChartProps> = ({
       </Box>
 
       {/* ── 2. Chart (center, flex) ── */}
-      <Box sx={{ flex: 1, minWidth: 120, height: 44, position: 'relative' }}>
+      <Box sx={{ flex: 1, minWidth: 0, height: 44, position: 'relative' }}>
         <InteractiveTimeSeriesChart
           data={chartData}
           type="bar"

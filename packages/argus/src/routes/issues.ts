@@ -5,6 +5,11 @@ import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { ConfigBroadcaster } from '../utils/config-broadcaster';
 import { CONFIG_TYPES } from '../config/redis-keys';
+import {
+  PERIOD_TO_SQL_INTERVAL,
+  buildTimeRangeConditions,
+  getBucketingConfig,
+} from '../utils/timeBucket';
 
 const logger = createLogger('issues-api');
 const broadcaster = new ConfigBroadcaster(redis);
@@ -28,46 +33,13 @@ export default async function issuesRoutes(app: FastifyInstance) {
       } = request.query as Record<string, string>;
 
       try {
-        let startDt: Date;
-        let endDt: Date;
-
-        if (start && end) {
-          startDt = new Date(start);
-          endDt = new Date(end);
-        } else {
-          const periodMap: Record<string, number> = {
-            '1h': 3600,
-            '6h': 21600,
-            '24h': 86400,
-            '7d': 604800,
-            '14d': 1209600,
-            '30d': 2592000,
-            '90d': 7776000,
-          };
-          const deltaSecs = periodMap[period] || 86400;
-          endDt = new Date();
-          startDt = new Date(endDt.getTime() - deltaSecs * 1000);
-        }
-
-        if (isNaN(startDt.getTime()) || isNaN(endDt.getTime())) {
-          return reply.code(400).send({ error: 'Invalid start or end date' });
-        }
-
-        const deltaSeconds = Math.max(
-          1,
-          (endDt.getTime() - startDt.getTime()) / 1000
-        );
-        let interval = '1 DAY';
-        if (deltaSeconds <= 3600) interval = '1 MINUTE';
-        else if (deltaSeconds <= 6 * 3600) interval = '5 MINUTE';
-        else if (deltaSeconds <= 24 * 3600) interval = '30 MINUTE';
-        else if (deltaSeconds <= 7 * 86400) interval = '4 HOUR';
-        else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';
+        const bucket = getBucketingConfig(period, start, end);
+        const { interval, queryParams } = bucket;
 
         const qp: Record<string, any> = {
           projectId: String(projectId),
-          fillStart: Math.floor(startDt.getTime() / 1000),
-          fillEnd: Math.floor(endDt.getTime() / 1000),
+          fillStart: queryParams.fillStart,
+          fillEnd: queryParams.fillEnd,
         };
 
         const conditions = [
@@ -107,7 +79,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
           qp.os = os;
         }
 
-        // Text query filter ??search in title/culprit by matching issue_ids from MySQL
+        // Text query filter — search in title/culprit by matching issue_ids from MySQL
         if (query) {
           try {
             const queryRows = await db('g_argus_issues')
@@ -210,16 +182,7 @@ export default async function issuesRoutes(app: FastifyInstance) {
             qp.startTs = Math.floor(new Date(start).getTime() / 1000);
             qp.endTs = Math.floor(new Date(end).getTime() / 1000);
           } else if (period) {
-            const periodMap: Record<string, string> = {
-              '1h': '1 HOUR',
-              '6h': '6 HOUR',
-              '24h': '24 HOUR',
-              '7d': '7 DAY',
-              '14d': '14 DAY',
-              '30d': '30 DAY',
-              '90d': '90 DAY',
-            };
-            const interval = periodMap[period];
+            const interval = PERIOD_TO_SQL_INTERVAL[period];
             if (interval) {
               conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
             }
@@ -704,25 +667,8 @@ export default async function issuesRoutes(app: FastifyInstance) {
       };
       const { period = '14d' } = request.query as { period?: string };
 
-      const periodMap: Record<string, number> = {
-        '1h': 3600,
-        '6h': 21600,
-        '24h': 86400,
-        '7d': 604800,
-        '14d': 1209600,
-        '30d': 2592000,
-        '90d': 7776000,
-      };
-      const deltaSeconds = periodMap[period] || 1209600;
-      const endDt = new Date();
-      const startDt = new Date(endDt.getTime() - deltaSeconds * 1000);
-
-      let interval = '1 DAY';
-      if (deltaSeconds <= 3600) interval = '1 MINUTE';
-      else if (deltaSeconds <= 6 * 3600) interval = '5 MINUTE';
-      else if (deltaSeconds <= 24 * 3600) interval = '30 MINUTE';
-      else if (deltaSeconds <= 7 * 86400) interval = '4 HOUR';
-      else if (deltaSeconds <= 14 * 86400) interval = '8 HOUR';
+      const bucket = getBucketingConfig(period);
+      const { interval, queryParams } = bucket;
 
       try {
         const result = await optic.rawQuery({
@@ -746,8 +692,8 @@ export default async function issuesRoutes(app: FastifyInstance) {
           params: {
             projectId: String(projectId),
             issueId: parseInt(issueId, 10),
-            fillStart: Math.floor(startDt.getTime() / 1000),
-            fillEnd: Math.floor(endDt.getTime() / 1000),
+            fillStart: queryParams.fillStart,
+            fillEnd: queryParams.fillEnd,
           },
         });
 
@@ -1186,6 +1132,173 @@ export default async function issuesRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to add comment' });
+      }
+    }
+  );
+
+  // ─── Issues Facets (ClickHouse-based, for sidebar) ───
+  // Returns aggregated counts for key dimensions from the errors table.
+  // Unlike the per-issue /tags endpoint, this covers ALL issues within
+  // the time range, providing facets for the issues list sidebar.
+  app.get(
+    '/:projectId/issues/facets',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const {
+        period = '14d',
+        start,
+        end,
+      } = request.query as Record<string, string>;
+
+      try {
+        const qp: Record<string, any> = {
+          projectId: String(projectId),
+        };
+
+        const conditions = ['project_id = {projectId:String}'];
+
+        // Time range
+        const timeRange = buildTimeRangeConditions(period, start, end);
+        conditions.push(...timeRange.conditions);
+        Object.assign(qp, timeRange.params);
+
+        const whereClause = conditions.join(' AND ');
+
+        // Query all facet dimensions in parallel
+        const facetQueries = [
+          { key: 'release', column: 'release' },
+          { key: 'environment', column: 'environment' },
+          { key: 'browser_name', column: 'browser_name' },
+          { key: 'os_name', column: 'os_name' },
+        ];
+
+        const results: Record<
+          string,
+          { value: string; count: number }[]
+        > = {};
+
+        await Promise.all(
+          facetQueries.map(async ({ key, column }) => {
+            try {
+              const sql = `
+                SELECT ${column} AS value, count() AS count
+                FROM argus.errors
+                WHERE ${whereClause} AND ${column} != ''
+                GROUP BY value
+                ORDER BY count DESC
+                LIMIT 30
+              `;
+              const result = await optic.rawQuery({ query: sql, params: qp });
+              results[key] = (result.data as any[]).map((r) => ({
+                value: String(r.value),
+                count: Number(r.count),
+              }));
+            } catch {
+              results[key] = [];
+            }
+          })
+        );
+
+        return reply.send({ data: results });
+      } catch (error) {
+        logger.error('Failed to get issue facets', {
+          projectId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get issue facets' });
+      }
+    }
+  );
+
+  // ─── Issues Attribute Facet (single field value lookup from errors) ───
+  // Same pattern as /logs/attribute-facet but queries the errors table.
+  // Used by the AQL editor to suggest values for fields like release, environment, etc.
+  app.get(
+    '/:projectId/issues/attribute-facet',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId } = request.params as { projectId: string };
+      const {
+        key,
+        period = '14d',
+        start,
+        end,
+      } = request.query as Record<string, string>;
+
+      if (!key) {
+        return reply.code(400).send({ error: 'key parameter is required' });
+      }
+
+      try {
+        const qp: Record<string, any> = {
+          projectId: String(projectId),
+        };
+
+        const conditions = ['project_id = {projectId:String}'];
+
+        const timeRange = buildTimeRangeConditions(period, start, end);
+        conditions.push(...timeRange.conditions);
+        Object.assign(qp, timeRange.params);
+
+        // Top-level columns that can be queried directly
+        const TOP_LEVEL_COLUMNS = new Set([
+          'level',
+          'type',
+          'value',
+          'platform',
+          'environment',
+          'release',
+          'transaction',
+          'browser_name',
+          'os_name',
+          'device_name',
+          'device_family',
+          'runtime_name',
+          'sdk_name',
+          'server_name',
+          'http_method',
+          'http_url',
+          'user_id',
+          'user_email',
+        ]);
+
+        const whereClause = conditions.join(' AND ');
+        let sql: string;
+
+        if (TOP_LEVEL_COLUMNS.has(key)) {
+          sql = `
+            SELECT ${key} AS attr_value, count() AS count
+            FROM argus.errors
+            WHERE ${whereClause} AND ${key} != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 30
+          `;
+        } else {
+          // Try tags Map column
+          qp.attrKey = key;
+          sql = `
+            SELECT tags[{attrKey:String}] AS attr_value, count() AS count
+            FROM argus.errors
+            WHERE ${whereClause}
+              AND mapContains(tags, {attrKey:String})
+              AND attr_value != ''
+            GROUP BY attr_value
+            ORDER BY count DESC
+            LIMIT 30
+          `;
+        }
+
+        const result = await optic.rawQuery({ query: sql, params: qp });
+        return reply.send({ data: result.data });
+      } catch (error) {
+        logger.error('Failed to get issue attribute facet', {
+          projectId,
+          key,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to get issue attribute facet' });
       }
     }
   );

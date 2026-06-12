@@ -211,13 +211,13 @@ export default async function tracesRoutes(app: FastifyInstance) {
             projectId,
             timeRange,
             select: [
-              { field: '$bucket', alias: 'hour' },
+              { field: '$bucket', alias: 'bucket' },
               { field: safeGroupBy, alias: 'group_value' },
               { field: 'count()', alias: 'count' },
             ],
             groupBy: ['$bucket', safeGroupBy],
             orderBy: [
-              { field: 'hour', direction: 'ASC' },
+              { field: 'bucket', direction: 'ASC' },
               { field: 'count', direction: 'DESC' },
             ],
           },

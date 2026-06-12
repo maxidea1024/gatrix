@@ -72,12 +72,17 @@ export const ActionBarRow = styled(Box, {
 })<{ isDark: boolean }>(({ isDark }) => ({
   paddingTop: 8,
   paddingBottom: 8,
-  marginBottom: 16,
+  paddingLeft: 12,
+  paddingRight: 12,
+  marginBottom: 12,
   display: 'flex',
   gap: 6,
   alignItems: 'center',
   flexWrap: 'wrap',
-  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+  borderRadius: 10,
+  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+  background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+  backdropFilter: 'blur(8px)',
 }));
 
 /** Status text inside the status badge */

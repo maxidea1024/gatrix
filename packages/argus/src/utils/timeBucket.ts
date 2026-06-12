@@ -1,3 +1,87 @@
+// ─── Shared Period Maps ──────────────────────────────────────────────────────
+// Centralised so every route file can reference the same constants instead of
+// duplicating inline `periodMap` literals.
+
+/** Maps a UI period string (e.g. '14d') to seconds. */
+export const PERIOD_TO_SECONDS: Record<string, number> = {
+  '5min': 300,
+  '10min': 600,
+  '15min': 900,
+  '30min': 1800,
+  '1h': 3600,
+  '3h': 10800,
+  '6h': 21600,
+  '12h': 43200,
+  '24h': 86400,
+  '2d': 172800,
+  '7d': 604800,
+  '14d': 1209600,
+  '30d': 2592000,
+  '90d': 7776000,
+};
+
+/** Maps a UI period string to a ClickHouse SQL INTERVAL literal. */
+export const PERIOD_TO_SQL_INTERVAL: Record<string, string> = {
+  '1h': '1 HOUR',
+  '6h': '6 HOUR',
+  '24h': '24 HOUR',
+  '7d': '7 DAY',
+  '14d': '14 DAY',
+  '30d': '30 DAY',
+  '90d': '90 DAY',
+};
+
+/**
+ * Build ClickHouse time-range WHERE conditions + query params from
+ * period / start / end inputs.
+ *
+ * Returns { conditions, params } that can be spread into existing
+ * condition arrays and param objects.
+ */
+export function buildTimeRangeConditions(
+  period: string = '14d',
+  start?: string,
+  end?: string
+): {
+  conditions: string[];
+  params: Record<string, any>;
+} {
+  const conditions: string[] = [];
+  const params: Record<string, any> = {};
+
+  if (start && end) {
+    conditions.push('timestamp >= toDateTime({startTs:UInt32})');
+    conditions.push('timestamp <= toDateTime({endTs:UInt32})');
+    params.startTs = Math.floor(new Date(start).getTime() / 1000);
+    params.endTs = Math.floor(new Date(end).getTime() / 1000);
+  } else {
+    const interval = PERIOD_TO_SQL_INTERVAL[period] || '14 DAY';
+    conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
+  }
+
+  return { conditions, params };
+}
+
+/**
+ * Simple WHERE clause builder — returns a raw SQL string.
+ * Use when you just need a string to concatenate into a query.
+ * For parameterized queries, use `buildTimeRangeConditions` instead.
+ */
+export function buildTimeFilter(
+  period?: string,
+  start?: string,
+  end?: string,
+  defaultPeriod: string = '24h'
+): string {
+  if (start && end) {
+    return `timestamp >= '${start}' AND timestamp <= '${end}'`;
+  }
+  const interval = PERIOD_TO_SQL_INTERVAL[period || defaultPeriod] || '24 HOUR';
+  return `timestamp >= now() - INTERVAL ${interval}`;
+}
+
+// ─── Bucketing Config ────────────────────────────────────────────────────────
+
 export interface BucketingConfig {
   interval: string;
   selectExpr: string;
@@ -18,23 +102,7 @@ export function getBucketingConfig(
     startDt = new Date(start);
     endDt = new Date(end);
   } else {
-    const periodMap: Record<string, number> = {
-      '5min': 300,
-      '10min': 600,
-      '15min': 900,
-      '30min': 1800,
-      '1h': 3600,
-      '3h': 10800,
-      '6h': 21600,
-      '12h': 43200,
-      '24h': 86400,
-      '2d': 172800,
-      '7d': 604800,
-      '14d': 1209600,
-      '30d': 2592000,
-      '90d': 7776000,
-    };
-    const deltaSecs = periodMap[period || '24h'] || 86400;
+    const deltaSecs = PERIOD_TO_SECONDS[period || '24h'] || 86400;
     endDt = new Date();
     startDt = new Date(endDt.getTime() - deltaSecs * 1000);
   }
@@ -84,3 +152,4 @@ export function getBucketingConfig(
     },
   };
 }
+

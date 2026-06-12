@@ -79,6 +79,11 @@ export interface FacetCounts {
   platform: { value: string; count: number }[];
   assigned_to: { value: string; count: number }[];
   priority: { value: string; count: number }[];
+  // ClickHouse-based event facets (populated separately from /issues/facets)
+  release: { value: string; count: number }[];
+  environment: { value: string; count: number }[];
+  browser_name: { value: string; count: number }[];
+  os_name: { value: string; count: number }[];
 }
 
 export const EMPTY_FACET_COUNTS: FacetCounts = {
@@ -87,6 +92,10 @@ export const EMPTY_FACET_COUNTS: FacetCounts = {
   platform: [],
   assigned_to: [],
   priority: [],
+  release: [],
+  environment: [],
+  browser_name: [],
+  os_name: [],
 };
 
 export function buildFacetCounts(issues: ArgusIssue[]): FacetCounts {
@@ -110,5 +119,10 @@ export function buildFacetCounts(issues: ArgusIssue[]): FacetCounts {
     platform: countByField('platform'),
     assigned_to: countByField('assigned_to'),
     priority: countByField('priority'),
+    // ClickHouse event-level facets — populated separately by the caller
+    release: [],
+    environment: [],
+    browser_name: [],
+    os_name: [],
   };
 }

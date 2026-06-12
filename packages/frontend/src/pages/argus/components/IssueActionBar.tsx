@@ -17,7 +17,7 @@ import {
   Archive as ArchiveIcon,
   NewReleases as NextReleaseIcon,
   Verified as CurrentReleaseIcon,
-  AutoAwesome as AutoAwesomeIcon,
+
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusIssueDetail, ArgusErrorEvent } from '@/services/argusService';
@@ -32,7 +32,6 @@ import PageHeader from '@/components/common/PageHeader';
 import {
   LevelIndicator,
   LevelChip,
-  AiAnalysisButton,
   StatNumber,
   StatLabel,
   ActionBarRow,
@@ -54,7 +53,7 @@ export interface IssueActionBarProps {
   onStatusChange: (status: string) => Promise<void>;
   onPriorityChange: (priority: string) => Promise<void>;
   onAssigneeClick: (e: React.MouseEvent<HTMLElement>) => void;
-  onAiAnalysis: () => void;
+
   onBack?: () => void;
   /** Subscription / Bookmark */
   isSubscribed: boolean;
@@ -77,7 +76,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
   onStatusChange,
   onPriorityChange,
   onAssigneeClick,
-  onAiAnalysis,
+
   onBack,
   isSubscribed,
   isBookmarked,
@@ -147,14 +146,6 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               alignItems: 'center',
             }}
           >
-            <AiAnalysisButton
-              size="small"
-              variant="outlined"
-              startIcon={<AutoAwesomeIcon sx={{ fontSize: 18 }} />}
-              onClick={onAiAnalysis}
-            >
-              {t('argus.issues.aiAnalysis', 'AI Analysis')}
-            </AiAnalysisButton>
             <Box sx={{ display: 'flex', gap: 3 }}>
               <Box sx={{ textAlign: 'center' }}>
                 <Tooltip
@@ -425,16 +416,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           ))}
         </Menu>
 
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.3 }} />
 
-        {/* AI Analysis */}
-        <ActionChip
-          label={t('argus.issues.aiAnalysis', 'AI 분석')}
-          variant="tinted"
-          tintColor={theme.palette.primary.main}
-          onClick={onAiAnalysis}
-          sx={{ fontWeight: 700 }}
-        />
 
         {/* Right side items */}
         <RightSideContainer>

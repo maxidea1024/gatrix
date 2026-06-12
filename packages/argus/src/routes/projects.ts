@@ -462,9 +462,9 @@ export default async function projectsRoutes(app: FastifyInstance) {
         projectId: string;
         keyId: string;
       };
-      const { period = '7d' } = request.query as { period?: string };
+      const { period = '7d', start, end } = request.query as { period?: string; start?: string; end?: string };
 
-      const bucket = getBucketingConfig(period);
+      const bucket = getBucketingConfig(period, start, end);
       const rawParams = {
         projectId: String(projectId),
         dsnKeyId: Number(keyId),

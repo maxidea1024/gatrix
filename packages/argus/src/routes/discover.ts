@@ -3,42 +3,13 @@ import { optic } from '@gatrix/argus-optic';
 import db from '../config/knex';
 import { createLogger } from '../utils/logger';
 import { QueryParser } from '../utils/queryParser';
-import { getBucketingConfig } from '../utils/timeBucket';
+import { getBucketingConfig, buildTimeFilter } from '../utils/timeBucket';
+import { ERRORS_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('argus-discover');
 
-// Allowed columns for query safety
-const ALLOWED_COLUMNS = new Set([
-  'event_id',
-  'timestamp',
-  'platform',
-  'level',
-  'type',
-  'value',
-  'logger',
-  'transaction',
-  'server_name',
-  'release',
-  'dist',
-  'environment',
-  'http_url',
-  'browser_name',
-  'browser_version',
-  'os_name',
-  'os_version',
-  'device_name',
-  'device_family',
-  'issue_id',
-  'project_id',
-  'user_id',
-  'user_email',
-  'sdk_name',
-  'sdk_version',
-  'runtime_name',
-  'runtime_version',
-  'geo_country',
-  'http_method',
-]);
+// Allowed columns for field validation (derived from centralised schema)
+const ALLOWED_COLUMNS = new Set(Object.keys(ERRORS_SCHEMA.columns));
 
 const ALLOWED_AGGREGATES = new Set([
   'count',
@@ -165,28 +136,6 @@ function parseField(field: string): { sql: string; alias: string } {
   return { sql: expr, alias: customAlias || expr };
 }
 
-function buildTimeFilter(
-  period?: string,
-  start?: string,
-  end?: string
-): string {
-  if (start && end) {
-    return `timestamp >= '${start}' AND timestamp <= '${end}'`;
-  }
-  const periodMap: Record<string, string> = {
-    '1h': '1 HOUR',
-    '6h': '6 HOUR',
-    '12h': '12 HOUR',
-    '24h': '24 HOUR',
-    '7d': '7 DAY',
-    '14d': '14 DAY',
-    '30d': '30 DAY',
-    '90d': '90 DAY',
-  };
-  const interval = periodMap[period || '24h'] || '24 HOUR';
-  return `timestamp >= now() - INTERVAL ${interval}`;
-}
-
 export default async function discoverRoutes(app: FastifyInstance) {
   // Discover query endpoint
   app.post(
@@ -224,7 +173,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         // Advanced conditions using QueryParser
         if (conditions && conditions.trim()) {
-          const parser = new QueryParser(ALLOWED_COLUMNS, ALLOWED_AGGREGATES);
+          const parser = new QueryParser(ERRORS_SCHEMA, ALLOWED_AGGREGATES);
           const ast = parser.parse(conditions);
           if (ast) {
             const { where, having } = parser.generateSQL(ast, queryParams);
@@ -317,6 +266,8 @@ export default async function discoverRoutes(app: FastifyInstance) {
     '/:projectId/discover/tags',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
+      const { period = '30d', start, end } = request.query as { period?: string; start?: string; end?: string };
+      const timeFilter = buildTimeFilter(period, start, end, '30d');
 
       try {
         // Get distinct values for key columns
@@ -331,7 +282,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
               uniq(release) as release_count
             FROM argus.errors
             WHERE project_id = {projectId:String}
-              AND timestamp >= now() - INTERVAL 30 DAY
+              AND ${timeFilter}
           `,
           params: { projectId },
         });
@@ -341,70 +292,70 @@ export default async function discoverRoutes(app: FastifyInstance) {
           query: `
             SELECT 'level' AS tag, level AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY
+            WHERE project_id = {projectId:String} AND ${timeFilter}
             GROUP BY level ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'platform' AS tag, platform AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY
+            WHERE project_id = {projectId:String} AND ${timeFilter}
             GROUP BY platform ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'environment' AS tag, environment AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND environment != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND environment != ''
             GROUP BY environment ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'browser_name' AS tag, browser_name AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND browser_name != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND browser_name != ''
             GROUP BY browser_name ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'os_name' AS tag, os_name AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND os_name != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND os_name != ''
             GROUP BY os_name ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'release' AS tag, release AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND release != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND release != ''
             GROUP BY release ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'transaction' AS tag, transaction AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND transaction != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND transaction != ''
             GROUP BY transaction ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'server_name' AS tag, server_name AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND server_name != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND server_name != ''
             GROUP BY server_name ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'type' AS tag, type AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND type != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND type != ''
             GROUP BY type ORDER BY cnt DESC LIMIT 20
 
             UNION ALL
 
             SELECT 'device_name' AS tag, device_name AS value, count() AS cnt
             FROM argus.errors
-            WHERE project_id = {projectId:String} AND timestamp >= now() - INTERVAL 30 DAY AND device_name != ''
+            WHERE project_id = {projectId:String} AND ${timeFilter} AND device_name != ''
             GROUP BY device_name ORDER BY cnt DESC LIMIT 20
           `,
           params: { projectId },
@@ -465,7 +416,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         // Parse conditions from search param using QueryParser
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(ALLOWED_COLUMNS, ALLOWED_AGGREGATES);
+          const parser = new QueryParser(ERRORS_SCHEMA, ALLOWED_AGGREGATES);
           const ast = parser.parse(search);
           if (ast) {
             const { where } = parser.generateSQL(ast, queryParams);

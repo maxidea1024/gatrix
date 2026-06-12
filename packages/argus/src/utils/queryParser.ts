@@ -1,4 +1,5 @@
 import { createLogger } from './logger';
+import type { TableSchema, MapColumnDef } from './tableSchemas';
 
 const logger = createLogger('query-parser');
 
@@ -99,23 +100,52 @@ export class QueryParser {
   private current = 0;
   /** Map of user-friendly names → actual DB column names (e.g. severity → level) */
   private columnAliases: Record<string, string>;
+  /** Set of valid top-level DB column names */
+  private allowedColumns: Set<string>;
+  /** Set of allowed aggregate function names (e.g. 'count', 'sum') */
+  private allowedAggregates: Set<string>;
+  /** Map(String, T) columns for dynamic key access fallback */
+  private mapColumns: MapColumnDef[];
 
   /**
-   * @param allowedColumns    Set of valid DB column names. Any key not in this
-   *                          set (and not an aggregate or special key) is silently
-   *                          ignored to prevent SQL injection or invalid queries.
-   * @param allowedAggregates Set of allowed aggregate function names (e.g. 'count', 'sum').
-   *                          Used for HAVING clause generation in Discover queries.
-   * @param columnAliases     Optional map of alias → real column name. Allows the
-   *                          UI to display user-friendly names (e.g. "severity")
-   *                          while the DB column is actually "level".
+   * Overload 1: Schema-based construction (recommended).
+   * The schema defines all columns, Map columns, and aliases in one place.
+   *
+   * @param schema            Table schema from tableSchemas.ts
+   * @param allowedAggregates Optional set of aggregate function names for HAVING.
+   */
+  constructor(schema: TableSchema, allowedAggregates?: Set<string>);
+  /**
+   * Overload 2: Legacy construction (backward-compatible).
+   *
+   * @param allowedColumns    Set of valid DB column names.
+   * @param allowedAggregates Set of allowed aggregate function names.
+   * @param columnAliases     Optional map of alias → real column name.
    */
   constructor(
-    private allowedColumns: Set<string>,
-    private allowedAggregates: Set<string>,
-    columnAliases: Record<string, string> = {}
+    allowedColumns: Set<string>,
+    allowedAggregates: Set<string>,
+    columnAliases?: Record<string, string>,
+  );
+  constructor(
+    arg1: Set<string> | TableSchema,
+    arg2: Set<string> = new Set(),
+    arg3: Record<string, string> = {},
   ) {
-    this.columnAliases = columnAliases;
+    if (arg1 instanceof Set) {
+      // Legacy: Set<string>, Set<string>, aliases
+      this.allowedColumns = arg1;
+      this.allowedAggregates = arg2;
+      this.columnAliases = arg3;
+      this.mapColumns = [];
+    } else {
+      // Schema-based: TableSchema, aggregates?
+      const schema = arg1;
+      this.allowedColumns = new Set(Object.keys(schema.columns));
+      this.allowedAggregates = arg2;
+      this.columnAliases = schema.aliases || {};
+      this.mapColumns = schema.mapColumns || [];
+    }
   }
 
   /**
@@ -539,7 +569,99 @@ export class QueryParser {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // PHASE 3: SQL GENERATION
+  // MAP COLUMN HELPER
+  // ═══════════════════════════════════════════════════════════════════════════
+  // Generates parameterised SQL for accessing dynamic keys stored in
+  // ClickHouse Map(String, T) columns.
+  //
+  // Pattern:  mapContains(colName, key) AND colName[key] op value
+  //
+  // This is called by generateSQL when a search key is NOT found in
+  // allowedColumns but mapColumns are configured.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Generate a WHERE clause for a Map column access.
+   *
+   * @param mapKey  The dynamic key to access inside the Map (e.g. 'build')
+   * @param op      SQL operator (=, !=, ILIKE, CONTAINS, IN, etc.)
+   * @param value   Value or array of values to compare against
+   * @param params  Mutable params map — will be populated with new entries
+   * @returns       SQL fragment like `(mapContains(tags, {mk:String}) AND tags[{mk:String}] = {mv:String})`
+   */
+  private genMapCondition(
+    mapKey: string,
+    op: string,
+    value: string | string[],
+    params: Record<string, string>,
+  ): string {
+    const mapCol = this.mapColumns[0]; // Default fallback: first Map column
+    const keyParam = `mk_${Math.random().toString(36).substring(7)}`;
+    params[keyParam] = mapKey;
+
+    const mapRef = `${mapCol.name}[{${keyParam}:String}]`;
+    const existCheck = `mapContains(${mapCol.name}, {${keyParam}:String})`;
+
+    // ── List values (IN / NOT IN) ──
+    if (Array.isArray(value)) {
+      if (op === '!=') op = 'NOT IN';
+      if (op !== 'IN' && op !== 'NOT IN') op = 'IN';
+
+      const arrParams = value.map((v) => {
+        const p = `mv_${Math.random().toString(36).substring(7)}`;
+        params[p] = v.replace(/\*/g, '%');
+        return `{${p}:String}`;
+      });
+
+      return `(${existCheck} AND ${mapRef} ${op} (${arrParams.join(', ')}))`;
+    }
+
+    // ── Single value ──
+    let val = String(value);
+
+    // Wildcard → ILIKE
+    if (val.includes('*')) {
+      val = val.replace(/\*/g, '%');
+      if (op === '=') op = 'ILIKE';
+      if (op === '!=') op = 'NOT ILIKE';
+    }
+
+    // Compound text-matching operators → ILIKE patterns
+    if (op === 'CONTAINS') {
+      op = 'ILIKE';
+      val = `%${val}%`;
+    } else if (op === 'NOT_CONTAINS') {
+      op = 'NOT ILIKE';
+      val = `%${val}%`;
+    } else if (op === 'STARTS_WITH') {
+      op = 'ILIKE';
+      val = `${val}%`;
+    } else if (op === 'ENDS_WITH') {
+      op = 'ILIKE';
+      val = `%${val}`;
+    } else if (op === 'NOT_STARTS_WITH') {
+      op = 'NOT ILIKE';
+      val = `${val}%`;
+    } else if (op === 'NOT_ENDS_WITH') {
+      op = 'NOT ILIKE';
+      val = `%${val}`;
+    }
+
+    const valParam = `mv_${Math.random().toString(36).substring(7)}`;
+    params[valParam] = val;
+
+    // Numeric comparison on Float64 Map columns (e.g. measurements)
+    if (
+      ['>', '<', '>=', '<='].includes(op) &&
+      mapCol.valueType === 'Float64' &&
+      !isNaN(Number(val))
+    ) {
+      return `(${existCheck} AND ${mapRef} ${op} {${valParam}:Float64})`;
+    }
+
+    return `(${existCheck} AND ${mapRef} ${op} {${valParam}:String})`;
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // Walks the AST and produces two SQL clause strings:
   //
@@ -716,17 +838,35 @@ export class QueryParser {
           // Syntax: has:environment  →  environment != '' AND environment IS NOT NULL
           // Checks that the given column has a non-empty, non-null value.
           // The value is also alias-resolved (e.g. has:severity → level != '' ...).
+          // For Map columns: has:build → mapContains(tags, 'build')
         } else if (key === 'has') {
           const val = this.resolveKey(String(n.value));
-          if (!this.allowedColumns.has(val)) {
-            return { w: '1=1', h: '' }; // Unknown column → ignore
+          if (this.allowedColumns.has(val)) {
+            return { w: `${val} != '' AND ${val} IS NOT NULL`, h: '' };
           }
-          return { w: `${val} != '' AND ${val} IS NOT NULL`, h: '' };
+          // Map column fallback: check key existence in Map
+          if (this.mapColumns.length > 0) {
+            const pName = `mk_${Math.random().toString(36).substring(7)}`;
+            params[pName] = val;
+            return {
+              w: `mapContains(${this.mapColumns[0].name}, {${pName}:String})`,
+              h: '',
+            };
+          }
+          return { w: '1=1', h: '' }; // No map columns configured → ignore
 
-          // ── Unknown column → silently ignore ──
-          // This prevents SQL injection via arbitrary column names and also
-          // gracefully handles typos or columns that don't exist in this table.
+          // ── Unknown column → fall back to Map column or silently ignore ──
+          // Top-level columns are always checked first. If the key is not a
+          // known column AND Map columns are configured, we generate map-access
+          // SQL (mapContains + map[key]). Otherwise, emit 1=1 to prevent SQL
+          // injection from arbitrary column names.
         } else if (!this.allowedColumns.has(key)) {
+          if (this.mapColumns.length > 0) {
+            return {
+              w: this.genMapCondition(key, op, n.value, params),
+              h: '',
+            };
+          }
           return { w: '1=1', h: '' };
         }
 

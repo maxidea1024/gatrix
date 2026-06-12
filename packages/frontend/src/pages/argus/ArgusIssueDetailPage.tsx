@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
   Button,
   useTheme,
-  alpha,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -20,7 +19,9 @@ import {
   ArrowBack as ArrowBackIcon,
   BugReport as BugReportIcon,
   Person as PersonIcon,
-  Timeline as TraceIcon,
+  Warning as SpanEvidenceIcon,
+  Code as StackTraceIcon,
+  Article as LogIcon,
 } from '@mui/icons-material';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -33,13 +34,16 @@ import { LEVEL_COLORS, stringToColor, getInitials } from '@/utils/argusHelpers';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EventNavigator from '@/components/argus/EventNavigator';
 import EventDistributionChart from '@/components/argus/EventDistributionChart';
-import EventHighlights from '@/components/argus/EventHighlights';
 import AiRootCausePanel from '@/components/argus/AiRootCausePanel';
 import IssueLogsSection from '@/components/argus/IssueLogsSection';
+import CollapsibleSection from '@/components/argus/CollapsibleSection';
 
 // Page-specific components
 import IssueActionBar from './components/IssueActionBar';
-import IssueStacktraceSection from './components/IssueStacktraceSection';
+import IssueStacktraceSection, {
+  StacktraceControls,
+  useStacktraceState,
+} from './components/IssueStacktraceSection';
 import IssueContextSection from './components/IssueContextSection';
 import SpanEvidenceSection from '@/components/argus/SpanEvidenceSection';
 import IssueDetailSidebar from './components/IssueDetailSidebar';
@@ -79,6 +83,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [showAiAnalysis, setShowAiAnalysis] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { mode: stMode, setMode: setStMode, order: stOrder, setOrder: setStOrder } = useStacktraceState();
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     status: string;
@@ -274,7 +279,14 @@ const ArgusIssueDetailPage: React.FC = () => {
           </Button>
         </Box>
       ) : (
-        <Box sx={{ mt: -0.5 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: 'calc(100vh - 120px)',
+            mt: -0.5,
+          }}
+        >
           {/* Action Bar (Header + Controls) */}
           <IssueActionBar
             issue={issue}
@@ -285,7 +297,6 @@ const ArgusIssueDetailPage: React.FC = () => {
             onStatusChange={handleStatusChange}
             onPriorityChange={handlePriorityChange}
             onAssigneeClick={handleAssigneeOpen}
-            onAiAnalysis={handleOpenAiAnalysis}
             onBack={handleBack}
             isSubscribed={isSubscribed}
             isBookmarked={isBookmarked}
@@ -297,13 +308,57 @@ const ArgusIssueDetailPage: React.FC = () => {
             onToggleSidebar={handleToggleSidebar}
           />
 
-          {/* Main Content + Sidebar Layout */}
+          {/* AI Analysis Dialog */}
+          <Dialog
+            open={showAiAnalysis}
+            onClose={() => setShowAiAnalysis(false)}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{
+              sx: {
+                borderRadius: 3,
+                overflow: 'hidden',
+                backgroundImage: 'none',
+              },
+            }}
+          >
+            <DialogContent sx={{ p: 0, overflowX: 'hidden' }}>
+              {projectId && issueId && (
+                <AiRootCausePanel
+                  projectId={projectId}
+                  issueId={issueId}
+                  issueTitle={issue.title}
+                  exceptionType={latestEvent?.exception_type}
+                  exceptionValue={latestEvent?.exception_value}
+                  stacktrace={latestEvent?.stacktrace_raw}
+                  tags={
+                    latestEvent?.tags
+                      ? typeof latestEvent.tags === 'string'
+                        ? (() => {
+                            try {
+                              return JSON.parse(latestEvent.tags);
+                            } catch {
+                              return undefined;
+                            }
+                          })()
+                        : latestEvent.tags
+                      : undefined
+                  }
+                  isDark={isDark}
+                  onClose={() => setShowAiAnalysis(false)}
+                />
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* ═══════ CARD CONTAINER ═══════ */}
           <Box
             sx={{
+              flex: 1,
               display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              alignItems: 'stretch',
-              position: 'relative',
+              overflow: 'hidden',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+              borderRadius: 2,
             }}
           >
             {/* Left Column: Main Content */}
@@ -311,54 +366,11 @@ const ArgusIssueDetailPage: React.FC = () => {
               sx={{
                 flex: 1,
                 minWidth: 0,
-                pr: { md: sidebarCollapsed ? 0 : 3 },
-                py: 1,
-                transition: 'padding 0.2s ease',
+                overflow: 'auto',
+                px: 2.5,
+                py: 2,
               }}
             >
-              {/* AI Analysis Dialog */}
-              <Dialog
-                open={showAiAnalysis}
-                onClose={() => setShowAiAnalysis(false)}
-                maxWidth="md"
-                fullWidth
-                PaperProps={{
-                  sx: {
-                    borderRadius: 3,
-                    overflow: 'hidden',
-                    backgroundImage: 'none',
-                  },
-                }}
-              >
-                <DialogContent sx={{ p: 0, overflowX: 'hidden' }}>
-                  {projectId && issueId && (
-                    <AiRootCausePanel
-                      projectId={projectId}
-                      issueId={issueId}
-                      issueTitle={issue.title}
-                      exceptionType={latestEvent?.exception_type}
-                      exceptionValue={latestEvent?.exception_value}
-                      stacktrace={latestEvent?.stacktrace_raw}
-                      tags={
-                        latestEvent?.tags
-                          ? typeof latestEvent.tags === 'string'
-                            ? (() => {
-                                try {
-                                  return JSON.parse(latestEvent.tags);
-                                } catch {
-                                  return undefined;
-                                }
-                              })()
-                            : latestEvent.tags
-                          : undefined
-                      }
-                      isDark={isDark}
-                      onClose={() => setShowAiAnalysis(false)}
-                    />
-                  )}
-                </DialogContent>
-              </Dialog>
-
               {/* Event Navigator */}
               {projectId && issueId && (
                 <Box sx={{ mb: 2 }}>
@@ -372,77 +384,94 @@ const ArgusIssueDetailPage: React.FC = () => {
                 </Box>
               )}
 
-              {/* Event Distribution Chart */}
+              {/* Event Distribution Chart — always visible, no collapse */}
               {projectId && issueId && (
-                <Box sx={{ mb: 2 }}>
-                  <EventDistributionChart
-                    projectId={projectId}
-                    issueId={issueId}
-                    isDark={isDark}
-                  />
-                </Box>
-              )}
-
-              {/* Event Highlights */}
-              <EventHighlights event={latestEvent} />
-
-              {/* Span Evidence */}
-              {spanEvidence.length > 0 && (
-                <Box sx={{ mb: 2 }}>
-                  <SpanEvidenceSection spans={spanEvidence} />
-                </Box>
-              )}
-
-              {/* Trace Explorer Link */}
-              {traceId && (
-                <Box sx={{ mb: 2 }}>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    startIcon={<TraceIcon sx={{ fontSize: 15 }} />}
-                    onClick={() =>
-                      navigate(`/argus/explore/traces?q=trace_id:"${traceId}"`)
-                    }
-                    sx={{
-                      textTransform: 'none',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      borderRadius: '6px',
-                    }}
-                  >
-                    {t(
-                      'argus.issues.searchRelatedSpans',
-                      'Search related spans'
-                    )}
-                  </Button>
-                </Box>
-              )}
-
-              {/* Stacktrace */}
-              {latestEvent && (
-                <IssueStacktraceSection event={latestEvent} isDark={isDark} />
-              )}
-
-              {/* Context, Tags, Trace, Breadcrumbs, Extra, Contexts */}
-              {latestEvent && (
-                <IssueContextSection
-                  event={latestEvent}
-                  traceId={traceId}
-                  traceDetail={traceDetail}
-                  loadingTrace={loadingTrace}
+                <EventDistributionChart
+                  projectId={projectId}
+                  issueId={issueId}
                   isDark={isDark}
                 />
               )}
 
+              {/* Context, Tags, Stacktrace */}
+              {latestEvent && (
+                <IssueContextSection
+                  event={latestEvent}
+                  highlightEvent={latestEvent}
+                  traceId={traceId}
+                  traceDetail={traceDetail}
+                  loadingTrace={loadingTrace}
+                  isDark={isDark}
+                  stacktraceSlot={
+                    <CollapsibleSection
+                      title={t('argus.issues.stackTraceTitle', 'Stack Trace')}
+                      icon={
+                        <StackTraceIcon
+                          fontSize="small"
+                          sx={{ color: theme.palette.error.main }}
+                        />
+                      }
+                      storageKey="stacktrace"
+                      hideActionsOnCollapse
+                      actions={
+                        <Box sx={{ display: 'flex', gap: 0.75, alignItems: 'center' }}>
+                          <StacktraceControls
+                            mode={stMode}
+                            setMode={setStMode}
+                            order={stOrder}
+                            setOrder={setStOrder}
+                            event={latestEvent}
+                            isDark={isDark}
+                          />
+                        </Box>
+                      }
+                    >
+                      <IssueStacktraceSection
+                        event={latestEvent}
+                        isDark={isDark}
+                        mode={stMode}
+                        order={stOrder}
+                      />
+                    </CollapsibleSection>
+                  }
+                />
+              )}
+
+
+
+              {/* Span Evidence */}
+              <CollapsibleSection
+                title={t('argus.spanEvidence.title', 'Span Evidence')}
+                icon={
+                  <SpanEvidenceIcon
+                    fontSize="small"
+                    sx={{ color: '#ff9800' }}
+                  />
+                }
+                storageKey="span_evidence"
+                hidden={spanEvidence.length === 0}
+              >
+                <SpanEvidenceSection spans={spanEvidence} />
+              </CollapsibleSection>
+
               {/* Structured Logs */}
               {issue && projectId && issueId && (
-                <Box sx={{ mt: 4 }}>
+                <CollapsibleSection
+                  title={t('argus.issues.logs', 'Logs')}
+                  icon={
+                    <LogIcon
+                      fontSize="small"
+                      sx={{ color: theme.palette.info.main }}
+                    />
+                  }
+                  storageKey="logs"
+                >
                   <IssueLogsSection
                     projectId={projectId}
                     issueId={issueId}
                     isDark={isDark}
                   />
-                </Box>
+                </CollapsibleSection>
               )}
             </Box>
 
@@ -487,7 +516,9 @@ const ArgusIssueDetailPage: React.FC = () => {
                     width: { xs: '100%', md: splitWidth },
                     minWidth: { md: MIN_SPLIT_WIDTH },
                     flexShrink: 0,
-                    pl: { md: 3 },
+                    overflow: 'auto',
+                    pl: 1.5,
+                    pr: 2.5,
                     py: 2,
                   }}
                 >
