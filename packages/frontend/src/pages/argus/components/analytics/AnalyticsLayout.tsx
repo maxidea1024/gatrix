@@ -57,7 +57,9 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
             overflowY: 'auto',
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.1)',
               borderRadius: '3px',
             },
           }}
@@ -122,7 +124,11 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
             }}
           >
             {title ? (
-              <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1.1rem' }}>
+              <Typography
+                variant="h6"
+                fontWeight={700}
+                sx={{ fontSize: '1.1rem' }}
+              >
                 {title}
               </Typography>
             ) : (
@@ -144,7 +150,9 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
             flexDirection: 'column',
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.1)',
               borderRadius: '3px',
             },
           }}

@@ -365,9 +365,7 @@ const ArgusFunnelsPage = React.lazy(
 const ArgusRetentionPage = React.lazy(
   () => import('./pages/argus/ArgusRetentionPage')
 );
-const ArgusFlowsPage = React.lazy(
-  () => import('./pages/argus/ArgusFlowsPage')
-);
+const ArgusFlowsPage = React.lazy(() => import('./pages/argus/ArgusFlowsPage'));
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 

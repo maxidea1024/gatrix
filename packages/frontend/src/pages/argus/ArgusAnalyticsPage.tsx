@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, Typography, useTheme, alpha, Grid, Skeleton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  useTheme,
+  alpha,
+  Grid,
+  Skeleton,
+} from '@mui/material';
 import {
   Insights as InsightsIcon,
   FilterAlt as FunnelIcon,
@@ -89,10 +96,7 @@ const ArgusAnalyticsPage: React.FC = () => {
   const fetchEventNames = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await argusService.getAnalyticsEventNames(
-        projectId,
-        '14d'
-      );
+      const data = await argusService.getAnalyticsEventNames(projectId, '14d');
       setEventNames(data);
     } catch {
       setEventNames([]);
@@ -143,7 +147,11 @@ const ArgusAnalyticsPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}
+                  sx={{
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
                 >
                   {t('argus.analytics.eventNames', 'Event Types')}
                 </Typography>
@@ -169,7 +177,11 @@ const ArgusAnalyticsPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}
+                  sx={{
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
                 >
                   {t('argus.analytics.total', 'Total Events')} (14d)
                 </Typography>
@@ -195,7 +207,11 @@ const ArgusAnalyticsPage: React.FC = () => {
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}
+                  sx={{
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
                 >
                   Top Event
                 </Typography>
@@ -225,7 +241,12 @@ const ArgusAnalyticsPage: React.FC = () => {
             <Typography
               variant="subtitle2"
               color="text.secondary"
-              sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.7rem' }}
+              sx={{
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                fontSize: '0.7rem',
+              }}
             >
               Features
             </Typography>
@@ -267,7 +288,12 @@ const ArgusAnalyticsPage: React.FC = () => {
               <Typography
                 variant="subtitle2"
                 color="text.secondary"
-                sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.7rem' }}
+                sx={{
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.5,
+                  fontSize: '0.7rem',
+                }}
               >
                 {t('argus.analytics.eventNames', 'Event List')} (14d)
               </Typography>
@@ -314,10 +340,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                         top: 0,
                         bottom: 0,
                         width: `${pct}%`,
-                        background: alpha(
-                          isDark ? '#818cf8' : '#6366f1',
-                          0.06
-                        ),
+                        background: alpha(isDark ? '#818cf8' : '#6366f1', 0.06),
                         transition: 'width 0.3s ease',
                       }}
                     />

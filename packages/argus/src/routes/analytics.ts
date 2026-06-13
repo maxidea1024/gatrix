@@ -249,7 +249,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             ORDER BY bucket ASC ${bucketing.fillExpr}
           `;
 
-          const { data: rows } = (await optic.rawQuery({ query: sql, params })) as { data: any[] };
+          const { data: rows } = (await optic.rawQuery({
+            query: sql,
+            params,
+          })) as { data: any[] };
 
           // Group by breakdown_value
           const grouped = new Map<string, any[]>();
@@ -281,7 +284,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             ORDER BY bucket ASC ${bucketing.fillExpr}
           `;
 
-          const { data: rows } = (await optic.rawQuery({ query: sql, params })) as { data: any[] };
+          const { data: rows } = (await optic.rawQuery({
+            query: sql,
+            params,
+          })) as { data: any[] };
           series.push({
             event: event.name,
             data: rows.map((r: any) => ({
@@ -297,7 +303,12 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       if (body.compare_period) {
         compareSeries = [];
         // Calculate offset based on compare_period
-        const offsetMs = getCompareOffsetMs(body.compare_period, body.period || '14d', body.start, body.end);
+        const offsetMs = getCompareOffsetMs(
+          body.compare_period,
+          body.period || '14d',
+          body.start,
+          body.end
+        );
         if (offsetMs > 0) {
           const compareStart = body.start
             ? new Date(new Date(body.start).getTime() - offsetMs).toISOString()
@@ -307,9 +318,19 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             : undefined;
 
           // Re-run the same queries with offset time range
-          const { conditions: compareTimeConditions, params: compareTimeParams } =
-            buildTimeRangeConditions(body.period || '14d', compareStart, compareEnd);
-          const compareBucketing = getBucketingConfig(body.period || '14d', compareStart, compareEnd);
+          const {
+            conditions: compareTimeConditions,
+            params: compareTimeParams,
+          } = buildTimeRangeConditions(
+            body.period || '14d',
+            compareStart,
+            compareEnd
+          );
+          const compareBucketing = getBucketingConfig(
+            body.period || '14d',
+            compareStart,
+            compareEnd
+          );
 
           for (const event of body.events) {
             const cParams: Record<string, any> = {
@@ -319,7 +340,8 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               eventName: event.name,
             };
             const cPropConditions = buildPropertyConditions(
-              event.conditions, cParams,
+              event.conditions,
+              cParams,
               `cev_${event.name.replace(/[^a-zA-Z0-9]/g, '')}`
             );
             const cConditions = [
@@ -330,11 +352,26 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             ];
             let cAggExpr = 'count()';
             switch (event.aggregation) {
-              case 'unique': cAggExpr = 'uniq(user_id)'; break;
-              case 'frequency': cAggExpr = 'count() / greatest(uniq(user_id), 1)'; break;
-              case 'sum': if (event.property) { cAggExpr = `sum(numeric_properties[{aggProp:String}])`; cParams.aggProp = event.property; } break;
-              case 'avg': if (event.property) { cAggExpr = `avg(numeric_properties[{aggProp:String}])`; cParams.aggProp = event.property; } break;
-              default: break;
+              case 'unique':
+                cAggExpr = 'uniq(user_id)';
+                break;
+              case 'frequency':
+                cAggExpr = 'count() / greatest(uniq(user_id), 1)';
+                break;
+              case 'sum':
+                if (event.property) {
+                  cAggExpr = `sum(numeric_properties[{aggProp:String}])`;
+                  cParams.aggProp = event.property;
+                }
+                break;
+              case 'avg':
+                if (event.property) {
+                  cAggExpr = `avg(numeric_properties[{aggProp:String}])`;
+                  cParams.aggProp = event.property;
+                }
+                break;
+              default:
+                break;
             }
             const cSql = `
               SELECT ${compareBucketing.selectExpr} AS bucket, ${cAggExpr} AS value
@@ -343,10 +380,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               GROUP BY bucket
               ORDER BY bucket ASC ${compareBucketing.fillExpr}
             `;
-            const { data: cRows } = (await optic.rawQuery({ query: cSql, params: cParams })) as { data: any[] };
+            const { data: cRows } = (await optic.rawQuery({
+              query: cSql,
+              params: cParams,
+            })) as { data: any[] };
             compareSeries.push({
               event: event.name,
-              data: cRows.map((r: any) => ({ bucket: r.bucket, value: Number(r.value) })),
+              data: cRows.map((r: any) => ({
+                bucket: r.bucket,
+                value: Number(r.value),
+              })),
             });
           }
         }
@@ -354,7 +397,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
 
       return reply.send({
         success: true,
-        data: { series, ...(compareSeries ? { compare_series: compareSeries } : {}) },
+        data: {
+          series,
+          ...(compareSeries ? { compare_series: compareSeries } : {}),
+        },
       });
     }
   );
@@ -444,7 +490,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         ORDER BY level ASC
       `;
 
-      const { data: stepsRows } = (await optic.rawQuery({ query: stepsSql, params })) as { data: any[] };
+      const { data: stepsRows } = (await optic.rawQuery({
+        query: stepsSql,
+        params,
+      })) as { data: any[] };
 
       const levelCounts = new Array(totalSteps + 1).fill(0);
       for (const row of stepsRows) {
@@ -463,14 +512,14 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       const steps = eventNames.map((name, i) => ({
         name,
         count: stepCounts[i],
-        conversion_rate: Math.round((stepCounts[i] / firstStepCount) * 1000) / 10,
+        conversion_rate:
+          Math.round((stepCounts[i] / firstStepCount) * 1000) / 10,
       }));
 
       const overallConversion =
         firstStepCount > 0
-          ? Math.round(
-              (stepCounts[totalSteps - 1] / firstStepCount) * 1000
-            ) / 10
+          ? Math.round((stepCounts[totalSteps - 1] / firstStepCount) * 1000) /
+            10
           : 0;
 
       const baseResult: Record<string, any> = {
@@ -716,16 +765,28 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       // Build dynamic period columns
       const periodSelects: string[] = [];
       for (let i = 0; i <= numPeriods; i++) {
-        periodSelects.push(
-          `countIf(return_period = ${i}) AS p${i}`
-        );
+        periodSelects.push(`countIf(return_period = ${i}) AS p${i}`);
       }
 
-      const firstEventConds = buildPropertyConditions(body.first_event.conditions, params, 'fCond');
-      const returnEventConds = buildPropertyConditions(body.return_event.conditions, params, 'rCond');
+      const firstEventConds = buildPropertyConditions(
+        body.first_event.conditions,
+        params,
+        'fCond'
+      );
+      const returnEventConds = buildPropertyConditions(
+        body.return_event.conditions,
+        params,
+        'rCond'
+      );
 
-      const firstEventWhere = firstEventConds.length > 0 ? `AND ${firstEventConds.join(' AND ')}` : '';
-      const returnEventWhere = returnEventConds.length > 0 ? `AND ${returnEventConds.join(' AND ')}` : '';
+      const firstEventWhere =
+        firstEventConds.length > 0
+          ? `AND ${firstEventConds.join(' AND ')}`
+          : '';
+      const returnEventWhere =
+        returnEventConds.length > 0
+          ? `AND ${returnEventConds.join(' AND ')}`
+          : '';
 
       const sql = `
         SELECT
@@ -760,16 +821,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         ORDER BY cohort_date ASC
       `;
 
-      const { data: rows } = (await optic.rawQuery({ query: sql, params })) as { data: any[] };
+      const { data: rows } = (await optic.rawQuery({ query: sql, params })) as {
+        data: any[];
+      };
 
       const cohorts = rows.map((row: any) => {
         const cohortSize = Number(row.cohort_size) || 1;
         const retention: number[] = [];
         for (let i = 0; i <= numPeriods; i++) {
           const periodCount = Number(row[`p${i}`]) || 0;
-          retention.push(
-            Math.round((periodCount / cohortSize) * 1000) / 10
-          );
+          retention.push(Math.round((periodCount / cohortSize) * 1000) / 10);
         }
         return {
           cohort_date: row.cohort_date,
@@ -854,13 +915,18 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         LIMIT 500
       `;
 
-      const { data: rows } = (await optic.rawQuery({ query: sql, params })) as { data: any[] };
+      const { data: rows } = (await optic.rawQuery({ query: sql, params })) as {
+        data: any[];
+      };
 
       // Build nodes and links
       const nodeMap = new Map<string, number>();
       const links: { source: string; target: string; value: number }[] = [];
 
-      const totalUsers = rows.reduce((sum: number, r: any) => sum + Number(r.value), 0);
+      const totalUsers = rows.reduce(
+        (sum: number, r: any) => sum + Number(r.value),
+        0
+      );
       const threshold = totalUsers * minFrequency;
 
       for (const row of rows) {
@@ -914,10 +980,14 @@ function getCompareOffsetMs(
       if (match) {
         const n = parseInt(match[1], 10);
         switch (match[2]) {
-          case 'd': return n * DAY;
-          case 'h': return n * 3600000;
-          case 'w': return n * 7 * DAY;
-          case 'm': return n * 30 * DAY;
+          case 'd':
+            return n * DAY;
+          case 'h':
+            return n * 3600000;
+          case 'w':
+            return n * 7 * DAY;
+          case 'm':
+            return n * 30 * DAY;
         }
       }
       return 14 * DAY; // fallback
@@ -980,16 +1050,24 @@ export function buildPropertyConditions(
         break;
       case 'gt':
         // For gt, lt we should ideally cast to numeric if possible, but fallback to string comparison
-        sqlConditions.push(`toFloat64OrNull(${col}) > toFloat64OrNull({${pKey}:String})`);
+        sqlConditions.push(
+          `toFloat64OrNull(${col}) > toFloat64OrNull({${pKey}:String})`
+        );
         break;
       case 'lt':
-        sqlConditions.push(`toFloat64OrNull(${col}) < toFloat64OrNull({${pKey}:String})`);
+        sqlConditions.push(
+          `toFloat64OrNull(${col}) < toFloat64OrNull({${pKey}:String})`
+        );
         break;
       case 'gte':
-        sqlConditions.push(`toFloat64OrNull(${col}) >= toFloat64OrNull({${pKey}:String})`);
+        sqlConditions.push(
+          `toFloat64OrNull(${col}) >= toFloat64OrNull({${pKey}:String})`
+        );
         break;
       case 'lte':
-        sqlConditions.push(`toFloat64OrNull(${col}) <= toFloat64OrNull({${pKey}:String})`);
+        sqlConditions.push(
+          `toFloat64OrNull(${col}) <= toFloat64OrNull({${pKey}:String})`
+        );
         break;
       case 'set':
         sqlConditions.push(`${col} != ''`);
@@ -1019,8 +1097,16 @@ interface Condition {
 interface InsightsRequest {
   events: {
     name: string;
-    aggregation?: 'total' | 'unique' | 'avg' | 'median' | 'sum'
-                | 'frequency' | 'p25' | 'p75' | 'p90';
+    aggregation?:
+      | 'total'
+      | 'unique'
+      | 'avg'
+      | 'median'
+      | 'sum'
+      | 'frequency'
+      | 'p25'
+      | 'p75'
+      | 'p90';
     property?: string;
     conditions?: Condition[];
   }[];
@@ -1029,7 +1115,11 @@ interface InsightsRequest {
   period?: string;
   start?: string;
   end?: string;
-  compare_period?: 'previous_period' | 'previous_week' | 'previous_month' | 'previous_year';
+  compare_period?:
+    | 'previous_period'
+    | 'previous_week'
+    | 'previous_month'
+    | 'previous_year';
 }
 
 interface FunnelsRequest {
@@ -1051,7 +1141,11 @@ interface RetentionRequest {
   retention_type?: 'day' | 'week' | 'month';
   num_periods?: number;
   criteria?: 'on' | 'on_or_after';
-  measurement?: 'retention_rate' | 'unique_users' | 'property_sum' | 'property_avg';
+  measurement?:
+    | 'retention_rate'
+    | 'unique_users'
+    | 'property_sum'
+    | 'property_avg';
   measurement_property?: string;
   breakdown?: { property: string };
   min_frequency?: number;

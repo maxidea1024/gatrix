@@ -18,13 +18,17 @@ export function useBreakdownLimit(projectId: string | number): number {
       try {
         const project: ArgusProject = await argusService.getProject(projectId);
         if (!cancelled) {
-          setLimit(project.analytics_breakdown_limit || DEFAULT_BREAKDOWN_LIMIT);
+          setLimit(
+            project.analytics_breakdown_limit || DEFAULT_BREAKDOWN_LIMIT
+          );
         }
       } catch {
         // keep default
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   return limit;
@@ -36,7 +40,7 @@ export function useBreakdownLimit(projectId: string | number): number {
  */
 export function limitBreakdownSeries<T extends { data: { value: number }[] }>(
   series: T[],
-  limit: number,
+  limit: number
 ): T[] {
   if (series.length <= limit) return series;
   return [...series]

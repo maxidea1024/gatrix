@@ -184,7 +184,11 @@ interface RetentionState {
   returnEvent: RetentionEventEntry;
   retentionType: 'day' | 'week' | 'month';
   criteria: 'on' | 'on_or_after';
-  measurement: 'retention_rate' | 'unique_users' | 'property_sum' | 'property_avg';
+  measurement:
+    | 'retention_rate'
+    | 'unique_users'
+    | 'property_sum'
+    | 'property_avg';
   measurementProperty: string;
   minFrequency: number;
   breakdownProperty: string;
@@ -226,7 +230,8 @@ export const useRetentionStore = create<RetentionState>()(
       setRetentionType: (retentionType) => set({ retentionType }),
       setCriteria: (criteria) => set({ criteria }),
       setMeasurement: (measurement) => set({ measurement }),
-      setMeasurementProperty: (measurementProperty) => set({ measurementProperty }),
+      setMeasurementProperty: (measurementProperty) =>
+        set({ measurementProperty }),
       setMinFrequency: (minFrequency) => set({ minFrequency }),
       setBreakdownProperty: (breakdownProperty) => set({ breakdownProperty }),
       setViewMode: (viewMode) => set({ viewMode }),

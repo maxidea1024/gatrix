@@ -42,8 +42,7 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({
 
     // Determine columns
     const cols: CsvColumn[] =
-      columns ||
-      Object.keys(data[0]).map((key) => ({ key, label: key }));
+      columns || Object.keys(data[0]).map((key) => ({ key, label: key }));
 
     // Build CSV string
     const header = cols.map((c) => escapeCsvValue(c.label)).join(',');

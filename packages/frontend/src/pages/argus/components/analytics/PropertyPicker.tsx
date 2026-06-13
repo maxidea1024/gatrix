@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 import {
   Box,
   Typography,
@@ -67,15 +73,22 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
       );
 
       // Always call API - when eventName is undefined, backend returns all project properties
-      const data = await argusService.getAnalyticsEventProperties(projectId, eventName || undefined);
-      const stringProps: PropertyOption[] = (data.string_keys || []).map((k: string) => ({
-        key: k,
-        type: 'string' as const,
-      }));
-      const numericProps: PropertyOption[] = (data.numeric_keys || []).map((k: string) => ({
-        key: k,
-        type: 'numeric' as const,
-      }));
+      const data = await argusService.getAnalyticsEventProperties(
+        projectId,
+        eventName || undefined
+      );
+      const stringProps: PropertyOption[] = (data.string_keys || []).map(
+        (k: string) => ({
+          key: k,
+          type: 'string' as const,
+        })
+      );
+      const numericProps: PropertyOption[] = (data.numeric_keys || []).map(
+        (k: string) => ({
+          key: k,
+          type: 'numeric' as const,
+        })
+      );
       setProperties([...builtinProps, ...stringProps, ...numericProps]);
     } catch {
       // Fallback to builtin only
@@ -119,9 +132,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
     return groups;
   }, [filtered]);
 
-  const displayLabel = value
-    ? BUILTIN_LABELS[value] || value
-    : emptyLabel;
+  const displayLabel = value ? BUILTIN_LABELS[value] || value : emptyLabel;
 
   const isEmpty = !value;
 
@@ -139,9 +150,8 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
           borderRadius: 1,
           fontSize: '0.8rem',
           fontWeight: 500,
-          color: isEmpty && highlightEmpty
-            ? theme.palette.primary.main
-            : 'inherit',
+          color:
+            isEmpty && highlightEmpty ? theme.palette.primary.main : 'inherit',
           border: `1px solid ${
             isEmpty && highlightEmpty
               ? alpha(theme.palette.primary.main, 0.3)
@@ -189,7 +199,12 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
         }}
       >
         {/* Search */}
-        <Box sx={{ p: 1, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+        <Box
+          sx={{
+            p: 1,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          }}
+        >
           <TextField
             size="small"
             fullWidth
@@ -215,7 +230,15 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
               <CircularProgress size={20} />
             </Box>
           ) : filtered.length === 0 ? (
-            <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', py: 3, opacity: 0.5 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                textAlign: 'center',
+                py: 3,
+                opacity: 0.5,
+              }}
+            >
               No properties found
             </Typography>
           ) : (
@@ -234,7 +257,11 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                   fontSize: '0.8rem',
                   color: 'text.secondary',
                   fontStyle: 'italic',
-                  '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)' },
+                  '&:hover': {
+                    bgcolor: isDark
+                      ? 'rgba(255,255,255,0.04)'
+                      : 'rgba(0,0,0,0.04)',
+                  },
                 }}
               >
                 None
@@ -285,12 +312,21 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                           cursor: 'pointer',
                           fontSize: '0.8rem',
                           fontWeight: value === prop.key ? 600 : 400,
-                          color: value === prop.key ? 'primary.main' : 'text.primary',
-                          bgcolor: value === prop.key
-                            ? alpha(theme.palette.primary.main, isDark ? 0.1 : 0.05)
-                            : 'transparent',
+                          color:
+                            value === prop.key
+                              ? 'primary.main'
+                              : 'text.primary',
+                          bgcolor:
+                            value === prop.key
+                              ? alpha(
+                                  theme.palette.primary.main,
+                                  isDark ? 0.1 : 0.05
+                                )
+                              : 'transparent',
                           '&:hover': {
-                            bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                            bgcolor: isDark
+                              ? 'rgba(255,255,255,0.04)'
+                              : 'rgba(0,0,0,0.04)',
                           },
                         }}
                       >
@@ -307,7 +343,8 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                                 groupType === 'string' ? '#3b82f6' : '#f59e0b',
                                 isDark ? 0.15 : 0.1
                               ),
-                              color: groupType === 'string' ? '#3b82f6' : '#f59e0b',
+                              color:
+                                groupType === 'string' ? '#3b82f6' : '#f59e0b',
                             }}
                           />
                         )}

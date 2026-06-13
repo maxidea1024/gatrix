@@ -64,7 +64,14 @@ function weightedPick<T>(items: readonly T[], weights: readonly number[]): T {
 
 // ═══════════════════ CONSTANTS ═══════════════════
 
-const PLATFORMS = ['Steam', 'Epic', 'Direct', 'PlayStation', 'Xbox', 'iOS'] as const;
+const PLATFORMS = [
+  'Steam',
+  'Epic',
+  'Direct',
+  'PlayStation',
+  'Xbox',
+  'iOS',
+] as const;
 const PLATFORM_WEIGHTS = [35, 20, 10, 15, 12, 8];
 
 const ENVIRONMENTS = ['production', 'staging'] as const;
@@ -73,7 +80,18 @@ const ENV_WEIGHTS = [95, 5];
 const RELEASES = ['1.14.0', '1.13.2', '1.13.1', '1.12.5'] as const;
 const RELEASE_WEIGHTS = [50, 30, 15, 5];
 
-const COUNTRIES = ['KR', 'JP', 'US', 'CN', 'TW', 'TH', 'DE', 'FR', 'BR', 'RU'] as const;
+const COUNTRIES = [
+  'KR',
+  'JP',
+  'US',
+  'CN',
+  'TW',
+  'TH',
+  'DE',
+  'FR',
+  'BR',
+  'RU',
+] as const;
 const COUNTRY_WEIGHTS = [40, 15, 12, 10, 5, 4, 4, 3, 4, 3];
 
 const CITIES: Record<string, readonly string[]> = {
@@ -89,10 +107,24 @@ const CITIES: Record<string, readonly string[]> = {
   RU: ['Moscow', 'Saint Petersburg'],
 };
 
-const OS_LIST = ['Windows 11', 'Windows 10', 'macOS 14', 'macOS 15', 'iOS 17', 'Android 14', 'PlayStation 5', 'Xbox Series'] as const;
+const OS_LIST = [
+  'Windows 11',
+  'Windows 10',
+  'macOS 14',
+  'macOS 15',
+  'iOS 17',
+  'Android 14',
+  'PlayStation 5',
+  'Xbox Series',
+] as const;
 const OS_WEIGHTS = [35, 20, 10, 8, 8, 5, 8, 6];
 
-const APP_VERSIONS = ['1.14.0-b201', '1.14.0-b198', '1.13.2-b195', '1.13.1-b190'] as const;
+const APP_VERSIONS = [
+  '1.14.0-b201',
+  '1.14.0-b198',
+  '1.13.2-b195',
+  '1.13.1-b190',
+] as const;
 const APP_VERSION_WEIGHTS = [50, 25, 18, 7];
 
 // ═══════════════════ EVENT DEFINITIONS ═══════════════════
@@ -106,13 +138,17 @@ const EVENT_DEFS = {
   app_opened: {
     weight: 10,
     props: () => ({
-      properties: { source: randomPick(['direct', 'launcher', 'shortcut', 'deeplink']) },
+      properties: {
+        source: randomPick(['direct', 'launcher', 'shortcut', 'deeplink']),
+      },
     }),
   },
   user_login: {
     weight: 8,
     props: () => ({
-      properties: { method: randomPick(['password', 'social', 'sso', 'steam', 'epic']) },
+      properties: {
+        method: randomPick(['password', 'social', 'sso', 'steam', 'epic']),
+      },
     }),
   },
 
@@ -159,7 +195,9 @@ const EVENT_DEFS = {
   battle_lost: {
     weight: 3,
     props: () => ({
-      properties: { death_reason: randomPick(['boss_aoe', 'timeout', 'disconnect', 'wipe']) },
+      properties: {
+        death_reason: randomPick(['boss_aoe', 'timeout', 'disconnect', 'wipe']),
+      },
       numeric_properties: { duration_seconds: randomInt(30, 600) },
     }),
   },
@@ -178,7 +216,14 @@ const EVENT_DEFS = {
     weight: 6,
     props: () => ({
       properties: {
-        item_type: randomPick(['weapon', 'armor', 'potion', 'cosmetic', 'mount', 'pet']),
+        item_type: randomPick([
+          'weapon',
+          'armor',
+          'potion',
+          'cosmetic',
+          'mount',
+          'pet',
+        ]),
         currency: randomPick(['gold', 'diamond', 'cash']),
       },
       numeric_properties: {
@@ -190,14 +235,24 @@ const EVENT_DEFS = {
   item_sold: {
     weight: 4,
     props: () => ({
-      properties: { item_type: randomPick(['weapon', 'armor', 'potion', 'material']) },
+      properties: {
+        item_type: randomPick(['weapon', 'armor', 'potion', 'material']),
+      },
       numeric_properties: { price: randomInt(50, 5000) },
     }),
   },
   gold_earned: {
     weight: 7,
     props: () => ({
-      properties: { source: randomPick(['quest', 'mob_drop', 'trade', 'daily_reward', 'achievement']) },
+      properties: {
+        source: randomPick([
+          'quest',
+          'mob_drop',
+          'trade',
+          'daily_reward',
+          'achievement',
+        ]),
+      },
       numeric_properties: { amount: randomInt(100, 50000) },
     }),
   },
@@ -223,7 +278,16 @@ const EVENT_DEFS = {
     weight: 7,
     props: () => ({
       properties: {
-        menu: randomPick(['inventory', 'shop', 'settings', 'map', 'quest_log', 'character', 'guild', 'ranking']),
+        menu: randomPick([
+          'inventory',
+          'shop',
+          'settings',
+          'map',
+          'quest_log',
+          'character',
+          'guild',
+          'ranking',
+        ]),
       },
     }),
   },
@@ -231,7 +295,13 @@ const EVENT_DEFS = {
     weight: 2,
     props: () => ({
       properties: {
-        setting: randomPick(['graphics', 'sound', 'controls', 'language', 'notifications']),
+        setting: randomPick([
+          'graphics',
+          'sound',
+          'controls',
+          'language',
+          'notifications',
+        ]),
       },
     }),
   },
@@ -261,7 +331,7 @@ interface SimUser {
   city: string;
   os: string;
   app_version: string;
-  joinDay: number;        // day offset from start (0 = 14 days ago)
+  joinDay: number; // day offset from start (0 = 14 days ago)
   retentionClass: 'churned' | 'casual' | 'regular' | 'core';
 }
 
@@ -345,7 +415,9 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
     // Others play on random days after join
     daysToPlay.add(startDay); // always play on join day
     for (let i = 1; i < activeDays; i++) {
-      const day = startDay + randomInt(1, Math.min(activeDays + 2, DAYS_BACK - startDay - 1));
+      const day =
+        startDay +
+        randomInt(1, Math.min(activeDays + 2, DAYS_BACK - startDay - 1));
       if (day < DAYS_BACK) daysToPlay.add(day);
     }
   }
@@ -354,7 +426,8 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
   let isFirstSession = true;
 
   for (const day of sortedDays) {
-    const sessionsToday = user.retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
+    const sessionsToday =
+      user.retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
 
     for (let s = 0; s < sessionsToday; s++) {
       const sessionId = uuid();
@@ -362,10 +435,11 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
       const dayStart = new Date(NOW.getTime() - (DAYS_BACK - day) * 86400000);
       // Random hour with peak-time weighting (KST evening = UTC 11-15)
       const peakHours = [11, 12, 13, 14, 15, 16, 17];
-      const offPeakHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 0];
-      const hour = Math.random() < 0.7
-        ? randomPick(peakHours)
-        : randomPick(offPeakHours);
+      const offPeakHours = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 18, 19, 20, 21, 22, 23, 0,
+      ];
+      const hour =
+        Math.random() < 0.7 ? randomPick(peakHours) : randomPick(offPeakHours);
       dayStart.setUTCHours(hour, randomInt(0, 59), randomInt(0, 59));
       let ts = dayStart.getTime();
 
@@ -385,24 +459,34 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
       }
 
       // Random gameplay events
-      const numGameplayEvents = user.retentionClass === 'core'
-        ? randomInt(8, 20)
-        : user.retentionClass === 'regular'
-          ? randomInt(5, 12)
-          : randomInt(2, 6);
+      const numGameplayEvents =
+        user.retentionClass === 'core'
+          ? randomInt(8, 20)
+          : user.retentionClass === 'regular'
+            ? randomInt(5, 12)
+            : randomInt(2, 6);
 
       const gameplayEvents: EventName[] = [
-        'battle_started', 'battle_won', 'battle_lost',
-        'character_level_up', 'item_purchased', 'item_sold',
-        'gold_earned', 'guild_joined', 'chat_message_sent',
-        'menu_opened', 'settings_changed',
+        'battle_started',
+        'battle_won',
+        'battle_lost',
+        'character_level_up',
+        'item_purchased',
+        'item_sold',
+        'gold_earned',
+        'guild_joined',
+        'chat_message_sent',
+        'menu_opened',
+        'settings_changed',
       ];
 
       for (let e = 0; e < numGameplayEvents; e++) {
-        sessionEvents.push(weightedPick(
-          gameplayEvents,
-          gameplayEvents.map((n) => EVENT_DEFS[n].weight)
-        ));
+        sessionEvents.push(
+          weightedPick(
+            gameplayEvents,
+            gameplayEvents.map((n) => EVENT_DEFS[n].weight)
+          )
+        );
       }
 
       // End with logout (most of the time)
@@ -419,7 +503,10 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
         activities.push({
           event_id: uuid(),
           project_id: PROJECT_ID,
-          timestamp: new Date(ts).toISOString().replace('T', ' ').replace('Z', ''),
+          timestamp: new Date(ts)
+            .toISOString()
+            .replace('T', ' ')
+            .replace('Z', ''),
           event_name: eventName,
           user_id: user.user_id,
           device_id: `device_${user.user_id}`,
@@ -455,7 +542,10 @@ async function main() {
   console.log('✅ ClickHouse connected');
 
   // Run DDL (create table if not exists)
-  const ddlPath = path.join(__dirname, '../migrations/clickhouse/014_create_custom_events_table.sql');
+  const ddlPath = path.join(
+    __dirname,
+    '../migrations/clickhouse/014_create_custom_events_table.sql'
+  );
   const fs = await import('fs');
   const ddl = fs.readFileSync(ddlPath, 'utf-8');
   await ch.command({ query: ddl });
@@ -477,7 +567,9 @@ async function main() {
   // Stats
   const classCounts = { churned: 0, casual: 0, regular: 0, core: 0 };
   for (const u of users) classCounts[u.retentionClass]++;
-  console.log(`   Churned: ${classCounts.churned} | Casual: ${classCounts.casual} | Regular: ${classCounts.regular} | Core: ${classCounts.core}`);
+  console.log(
+    `   Churned: ${classCounts.churned} | Casual: ${classCounts.casual} | Regular: ${classCounts.regular} | Core: ${classCounts.core}`
+  );
 
   // Generate all activities
   console.log('\n📊 Generating activities...');
@@ -500,13 +592,17 @@ async function main() {
       });
       batchCount++;
       if (batchCount % 20 === 0) {
-        console.log(`   Inserted ${(batchCount * CHUNK_SIZE).toLocaleString()} events...`);
+        console.log(
+          `   Inserted ${(batchCount * CHUNK_SIZE).toLocaleString()} events...`
+        );
       }
     }
 
     // Progress
     if ((i + 1) % 1000 === 0) {
-      console.log(`   Processed ${i + 1}/${TOTAL_USERS} users (${totalEvents.toLocaleString()} events so far)`);
+      console.log(
+        `   Processed ${i + 1}/${TOTAL_USERS} users (${totalEvents.toLocaleString()} events so far)`
+      );
     }
   }
 
@@ -542,7 +638,9 @@ async function main() {
   const countRows = (await countResult.json()) as any;
   console.log('\n   Event Distribution:');
   for (const row of countRows.data || []) {
-    console.log(`     ${String(row.event_name).padEnd(25)} ${Number(row.cnt).toLocaleString()}`);
+    console.log(
+      `     ${String(row.event_name).padEnd(25)} ${Number(row.cnt).toLocaleString()}`
+    );
   }
 
   // Retention preview

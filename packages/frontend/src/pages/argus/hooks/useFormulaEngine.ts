@@ -77,7 +77,8 @@ function toRPN(tokens: Token[]): Token[] {
         while (
           opStack.length > 0 &&
           opStack[opStack.length - 1].type === 'OP' &&
-          precedence(opStack[opStack.length - 1].value) >= precedence(token.value)
+          precedence(opStack[opStack.length - 1].value) >=
+            precedence(token.value)
         ) {
           output.push(opStack.pop()!);
         }
@@ -87,7 +88,10 @@ function toRPN(tokens: Token[]): Token[] {
         opStack.push(token);
         break;
       case 'RPAREN':
-        while (opStack.length > 0 && opStack[opStack.length - 1].type !== 'LPAREN') {
+        while (
+          opStack.length > 0 &&
+          opStack[opStack.length - 1].type !== 'LPAREN'
+        ) {
           output.push(opStack.pop()!);
         }
         opStack.pop(); // Remove LPAREN

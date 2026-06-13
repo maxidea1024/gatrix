@@ -64,13 +64,20 @@ import {
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
 import InlineSelect from './components/analytics/InlineSelect';
-import ChartTypeSelector, { ChartType } from './components/analytics/ChartTypeSelector';
+import ChartTypeSelector, {
+  ChartType,
+} from './components/analytics/ChartTypeSelector';
 import PropertyPicker from './components/analytics/PropertyPicker';
 import CsvExportButton from './components/analytics/CsvExportButton';
-import CompareSelector, { ComparePeriod } from './components/analytics/CompareSelector';
+import CompareSelector, {
+  ComparePeriod,
+} from './components/analytics/CompareSelector';
 import FormulaInput from './components/analytics/FormulaInput';
 import { formatCompactNumber } from '@/utils/numberFormat';
-import { useBreakdownLimit, limitBreakdownSeries } from './components/analytics/useBreakdownLimit';
+import {
+  useBreakdownLimit,
+  limitBreakdownSeries,
+} from './components/analytics/useBreakdownLimit';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
 
@@ -82,16 +89,29 @@ type EventEntry = InsightsEventEntry;
 
 const SortableEventWrapper: React.FC<{
   id: string;
-  children: (props: { dragHandleProps: Record<string, any>; isDragging: boolean }) => React.ReactNode;
+  children: (props: {
+    dragHandleProps: Record<string, any>;
+    isDragging: boolean;
+  }) => React.ReactNode;
 }> = ({ id, children }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
   return (
     <Box ref={setNodeRef} style={style}>
-      {children({ dragHandleProps: { ...attributes, ...listeners }, isDragging })}
+      {children({
+        dragHandleProps: { ...attributes, ...listeners },
+        isDragging,
+      })}
     </Box>
   );
 };
@@ -110,7 +130,14 @@ const AGGREGATIONS = [
   { value: 'p90', label: 'P90 (90th percentile)' },
 ];
 
-const PROPERTY_AGGREGATIONS = new Set(['avg', 'median', 'sum', 'p25', 'p75', 'p90']);
+const PROPERTY_AGGREGATIONS = new Set([
+  'avg',
+  'median',
+  'sum',
+  'p25',
+  'p75',
+  'p90',
+]);
 
 const OPERATORS = [
   { value: 'is', label: 'is' },
@@ -126,8 +153,14 @@ const OPERATORS = [
 ];
 
 const SERIES_COLORS = [
-  '#6366f1', '#f59e0b', '#10b981', '#ec4899',
-  '#3b82f6', '#ef4444', '#8b5cf6', '#14b8a6',
+  '#6366f1',
+  '#f59e0b',
+  '#10b981',
+  '#ec4899',
+  '#3b82f6',
+  '#ef4444',
+  '#8b5cf6',
+  '#14b8a6',
 ];
 
 const COMPARE_DASH = '6 4';
@@ -187,9 +220,12 @@ const ArgusInsightsPage: React.FC = () => {
     setEvents([...events, { name: '', aggregation: 'total' }]);
   }, [events, setEvents]);
 
-  const handleRemoveEvent = useCallback((index: number) => {
-    setEvents(events.filter((_, i) => i !== index));
-  }, [events, setEvents]);
+  const handleRemoveEvent = useCallback(
+    (index: number) => {
+      setEvents(events.filter((_, i) => i !== index));
+    },
+    [events, setEvents]
+  );
 
   const handleEventChange = useCallback(
     (index: number, field: keyof EventEntry, value: any) => {
@@ -218,23 +254,34 @@ const ArgusInsightsPage: React.FC = () => {
     [events, eventIds, setEvents]
   );
 
-  const handleAddCondition = useCallback((eventIndex: number) => {
-    setEvents(
-      events.map((e, i) => {
-        if (i === eventIndex) {
-          const conditions = e.conditions || [];
-          return {
-            ...e,
-            conditions: [...conditions, { property: '', operator: 'is', value: '' }],
-          };
-        }
-        return e;
-      })
-    );
-  }, [events, setEvents]);
+  const handleAddCondition = useCallback(
+    (eventIndex: number) => {
+      setEvents(
+        events.map((e, i) => {
+          if (i === eventIndex) {
+            const conditions = e.conditions || [];
+            return {
+              ...e,
+              conditions: [
+                ...conditions,
+                { property: '', operator: 'is', value: '' },
+              ],
+            };
+          }
+          return e;
+        })
+      );
+    },
+    [events, setEvents]
+  );
 
   const handleConditionChange = useCallback(
-    (eventIndex: number, condIndex: number, field: keyof EventCondition, value: string) => {
+    (
+      eventIndex: number,
+      condIndex: number,
+      field: keyof EventCondition,
+      value: string
+    ) => {
       setEvents(
         events.map((e, i) => {
           if (i === eventIndex && e.conditions) {
@@ -254,7 +301,10 @@ const ArgusInsightsPage: React.FC = () => {
       setEvents(
         events.map((e, i) => {
           if (i === eventIndex && e.conditions) {
-            return { ...e, conditions: e.conditions.filter((_, ci) => ci !== condIndex) };
+            return {
+              ...e,
+              conditions: e.conditions.filter((_, ci) => ci !== condIndex),
+            };
           }
           return e;
         })
@@ -279,7 +329,9 @@ const ArgusInsightsPage: React.FC = () => {
           property: e.property,
           conditions: e.conditions?.filter((c) => c.property),
         })),
-        breakdown: breakdownProperty ? { property: breakdownProperty } : undefined,
+        breakdown: breakdownProperty
+          ? { property: breakdownProperty }
+          : undefined,
         period: apiParams.period,
         start: apiParams.start,
         end: apiParams.end,
@@ -300,7 +352,9 @@ const ArgusInsightsPage: React.FC = () => {
     if (series.length === 0) return [];
     const timeMap = new Map<string, Record<string, number>>();
     series.forEach((s) => {
-      const key = s.breakdown_value ? `${s.event}:${s.breakdown_value}` : s.event;
+      const key = s.breakdown_value
+        ? `${s.event}:${s.breakdown_value}`
+        : s.event;
       for (const point of s.data) {
         if (!timeMap.has(point.bucket)) timeMap.set(point.bucket, {});
         timeMap.get(point.bucket)![key] = point.value;
@@ -356,12 +410,15 @@ const ArgusInsightsPage: React.FC = () => {
 
   // Add formula data to chartData
   const chartDataWithFormula = useMemo(() => {
-    if (!formula || formulaResult.error || formulaResult.data.length === 0) return chartData;
+    if (!formula || formulaResult.error || formulaResult.data.length === 0)
+      return chartData;
     const formulaMap = new Map<string, number>();
-    formulaResult.data.forEach((d) => formulaMap.set(formatBucket(d.bucket), d.value));
+    formulaResult.data.forEach((d) =>
+      formulaMap.set(formatBucket(d.bucket), d.value)
+    );
     return chartData.map((row) => ({
       ...row,
-      'Formula': formulaMap.get(row.bucket) ?? 0,
+      Formula: formulaMap.get(row.bucket) ?? 0,
     }));
   }, [chartData, formula, formulaResult]);
 
@@ -403,135 +460,184 @@ const ArgusInsightsPage: React.FC = () => {
             modifiers={[restrictToVerticalAxis]}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={eventIds} strategy={verticalListSortingStrategy}>
+            <SortableContext
+              items={eventIds}
+              strategy={verticalListSortingStrategy}
+            >
               {events.map((ev, idx) => (
                 <SortableEventWrapper key={eventIds[idx]} id={eventIds[idx]}>
                   {({ dragHandleProps, isDragging }) => (
                     <EventBlock
                       indexLabel={String.fromCharCode(65 + idx)}
                       color={SERIES_COLORS[idx % SERIES_COLORS.length]}
-                      onRemove={events.length > 1 ? () => handleRemoveEvent(idx) : undefined}
+                      onRemove={
+                        events.length > 1
+                          ? () => handleRemoveEvent(idx)
+                          : undefined
+                      }
                       dragHandleProps={dragHandleProps}
                       isDragging={isDragging}
                     >
-              {/* Event name */}
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
-                <InlineSelect
-                  value={ev.name}
-                  onChange={(val) => handleEventChange(idx, 'name', val)}
-                  options={eventOptions}
-                  emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
-                  highlightEmpty
-                />
-              </Box>
+                      {/* Event name */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          gap: 0.5,
+                        }}
+                      >
+                        <InlineSelect
+                          value={ev.name}
+                          onChange={(val) =>
+                            handleEventChange(idx, 'name', val)
+                          }
+                          options={eventOptions}
+                          emptyLabel={t(
+                            'argus.analytics.selectEvent',
+                            'Select Event'
+                          )}
+                          highlightEmpty
+                        />
+                      </Box>
 
-              {/* Measurement */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, pl: 0.5 }}>
-                <Typography variant="caption" color="text.secondary">
-                  {t('argus.analytics.show', 'show')}
-                </Typography>
-                <InlineSelect
-                  value={ev.aggregation}
-                  onChange={(val) => handleEventChange(idx, 'aggregation', val)}
-                  options={AGGREGATIONS}
-                />
-              </Box>
+                      {/* Measurement */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 0.5,
+                          pl: 0.5,
+                        }}
+                      >
+                        <Typography variant="caption" color="text.secondary">
+                          {t('argus.analytics.show', 'show')}
+                        </Typography>
+                        <InlineSelect
+                          value={ev.aggregation}
+                          onChange={(val) =>
+                            handleEventChange(idx, 'aggregation', val)
+                          }
+                          options={AGGREGATIONS}
+                        />
+                      </Box>
 
-              {/* Property selector for aggregate measurements */}
-              {PROPERTY_AGGREGATIONS.has(ev.aggregation) && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, pl: 0.5 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    of
-                  </Typography>
-                  <PropertyPicker
-                    projectId={projectId}
-                    eventName={ev.name}
-                    value={ev.property || ''}
-                    onChange={(val) => handleEventChange(idx, 'property', val)}
-                    emptyLabel="Select Property"
-                    highlightEmpty
-                  />
-                </Box>
-              )}
+                      {/* Property selector for aggregate measurements */}
+                      {PROPERTY_AGGREGATIONS.has(ev.aggregation) && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                            pl: 0.5,
+                          }}
+                        >
+                          <Typography variant="caption" color="text.secondary">
+                            of
+                          </Typography>
+                          <PropertyPicker
+                            projectId={projectId}
+                            eventName={ev.name}
+                            value={ev.property || ''}
+                            onChange={(val) =>
+                              handleEventChange(idx, 'property', val)
+                            }
+                            emptyLabel="Select Property"
+                            highlightEmpty
+                          />
+                        </Box>
+                      )}
 
-              {/* Conditions */}
-              {ev.conditions?.map((cond, cIdx) => (
-                <Box
-                  key={cIdx}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    gap: 0.5,
-                    pl: 0.5,
-                  }}
-                >
-                  <Typography variant="caption" color="text.secondary">
-                    {t('argus.analytics.where', 'where')}
-                  </Typography>
-                  <PropertyPicker
-                    projectId={projectId}
-                    eventName={ev.name}
-                    value={cond.property}
-                    onChange={(val) => handleConditionChange(idx, cIdx, 'property', val)}
-                    emptyLabel={t('argus.analytics.property', 'Property')}
-                    highlightEmpty
-                  />
-                  <InlineSelect
-                    value={cond.operator}
-                    onChange={(val) => handleConditionChange(idx, cIdx, 'operator', val)}
-                    options={OPERATORS}
-                  />
-                  {!['set', 'not_set'].includes(cond.operator) && (
-                    <input
-                      value={cond.value}
-                      onChange={(e) =>
-                        handleConditionChange(idx, cIdx, 'value', e.target.value)
-                      }
-                      placeholder="value"
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
-                        color: 'inherit',
-                        outline: 'none',
-                        width: 80,
-                        fontSize: '0.8rem',
-                        fontFamily: 'inherit',
-                      }}
-                    />
-                  )}
-                  <IconButton
-                    size="small"
-                    onClick={() => handleRemoveCondition(idx, cIdx)}
-                    sx={{
-                      p: 0.25,
-                      ml: 0.5,
-                      opacity: 0.6,
-                      '&:hover': { opacity: 1 },
-                    }}
-                  >
-                    <CloseIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Box>
-              ))}
+                      {/* Conditions */}
+                      {ev.conditions?.map((cond, cIdx) => (
+                        <Box
+                          key={cIdx}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: 0.5,
+                            pl: 0.5,
+                          }}
+                        >
+                          <Typography variant="caption" color="text.secondary">
+                            {t('argus.analytics.where', 'where')}
+                          </Typography>
+                          <PropertyPicker
+                            projectId={projectId}
+                            eventName={ev.name}
+                            value={cond.property}
+                            onChange={(val) =>
+                              handleConditionChange(idx, cIdx, 'property', val)
+                            }
+                            emptyLabel={t(
+                              'argus.analytics.property',
+                              'Property'
+                            )}
+                            highlightEmpty
+                          />
+                          <InlineSelect
+                            value={cond.operator}
+                            onChange={(val) =>
+                              handleConditionChange(idx, cIdx, 'operator', val)
+                            }
+                            options={OPERATORS}
+                          />
+                          {!['set', 'not_set'].includes(cond.operator) && (
+                            <input
+                              value={cond.value}
+                              onChange={(e) =>
+                                handleConditionChange(
+                                  idx,
+                                  cIdx,
+                                  'value',
+                                  e.target.value
+                                )
+                              }
+                              placeholder="value"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
+                                color: 'inherit',
+                                outline: 'none',
+                                width: 80,
+                                fontSize: '0.8rem',
+                                fontFamily: 'inherit',
+                              }}
+                            />
+                          )}
+                          <IconButton
+                            size="small"
+                            onClick={() => handleRemoveCondition(idx, cIdx)}
+                            sx={{
+                              p: 0.25,
+                              ml: 0.5,
+                              opacity: 0.6,
+                              '&:hover': { opacity: 1 },
+                            }}
+                          >
+                            <CloseIcon sx={{ fontSize: 14 }} />
+                          </IconButton>
+                        </Box>
+                      ))}
 
-              <Button
-                size="small"
-                onClick={() => handleAddCondition(idx)}
-                sx={{
-                  alignSelf: 'flex-start',
-                  textTransform: 'none',
-                  opacity: 0.7,
-                  pl: 0.5,
-                  minWidth: 0,
-                  fontSize: '0.75rem',
-                  py: 0,
-                }}
-              >
-                {t('argus.analytics.filter', '+ Filter')}
-              </Button>
-            </EventBlock>
+                      <Button
+                        size="small"
+                        onClick={() => handleAddCondition(idx)}
+                        sx={{
+                          alignSelf: 'flex-start',
+                          textTransform: 'none',
+                          opacity: 0.7,
+                          pl: 0.5,
+                          minWidth: 0,
+                          fontSize: '0.75rem',
+                          py: 0,
+                        }}
+                      >
+                        {t('argus.analytics.filter', '+ Filter')}
+                      </Button>
+                    </EventBlock>
                   )}
                 </SortableEventWrapper>
               ))}
@@ -668,12 +774,35 @@ const ArgusInsightsPage: React.FC = () => {
 
     return (
       <Box sx={{ height: 360, width: '100%', pr: 2 }}>
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={0}
+        >
           {chartType === 'line' ? (
-            <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridStroke} />
-              <XAxis dataKey="bucket" tick={tickStyle} tickLine={false} axisLine={false} tickMargin={10} />
-              <YAxis tick={tickStyle} tickLine={false} axisLine={false} width={50} />
+            <LineChart
+              data={data}
+              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={gridStroke}
+              />
+              <XAxis
+                dataKey="bucket"
+                tick={tickStyle}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+              />
+              <YAxis
+                tick={tickStyle}
+                tickLine={false}
+                axisLine={false}
+                width={50}
+              />
               <RechartsTooltip contentStyle={commonTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
               {seriesKeys.map((key, idx) => (
@@ -715,10 +844,28 @@ const ArgusInsightsPage: React.FC = () => {
               )}
             </LineChart>
           ) : (
-            <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridStroke} />
-              <XAxis dataKey="bucket" tick={tickStyle} tickLine={false} axisLine={false} tickMargin={10} />
-              <YAxis tick={tickStyle} tickLine={false} axisLine={false} width={50} />
+            <BarChart
+              data={data}
+              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={gridStroke}
+              />
+              <XAxis
+                dataKey="bucket"
+                tick={tickStyle}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+              />
+              <YAxis
+                tick={tickStyle}
+                tickLine={false}
+                axisLine={false}
+                width={50}
+              />
               <RechartsTooltip contentStyle={commonTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
               {seriesKeys.map((key, idx) => (
@@ -816,7 +963,7 @@ const ArgusInsightsPage: React.FC = () => {
                   >
                     {typeof row[key] === 'number'
                       ? formatCompactNumber(row[key])
-                      : row[key] ?? '—'}
+                      : (row[key] ?? '—')}
                   </td>
                 ))}
               </tr>
@@ -839,7 +986,13 @@ const ArgusInsightsPage: React.FC = () => {
           mt: 2,
         }}
       >
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontSize: '0.8rem',
+          }}
+        >
           <thead>
             <tr>
               <th
@@ -853,16 +1006,48 @@ const ArgusInsightsPage: React.FC = () => {
               >
                 {t('argus.analytics.segment', 'Segment')}
               </th>
-              <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'right',
+                  padding: '12px 16px',
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 {t('argus.analytics.total', 'Total')}
               </th>
-              <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'right',
+                  padding: '12px 16px',
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 {t('argus.analytics.avg', 'Avg')}
               </th>
-              <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'right',
+                  padding: '12px 16px',
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 {t('argus.analytics.min', 'Min')}
               </th>
-              <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'right',
+                  padding: '12px 16px',
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 {t('argus.analytics.max', 'Max')}
               </th>
             </tr>
@@ -873,7 +1058,10 @@ const ArgusInsightsPage: React.FC = () => {
                 ? `${s.event} - ${s.breakdown_value}`
                 : s.event;
               const values = s.data.map((d: any) => d.value);
-              const total = values.reduce((acc: number, v: number) => acc + v, 0);
+              const total = values.reduce(
+                (acc: number, v: number) => acc + v,
+                0
+              );
               const avg = values.length > 0 ? total / values.length : 0;
               const min = values.length > 0 ? Math.min(...values) : 0;
               const max = values.length > 0 ? Math.max(...values) : 0;
@@ -910,16 +1098,41 @@ const ArgusInsightsPage: React.FC = () => {
                     />
                     {label}
                   </td>
-                  <td style={{ padding: '10px 16px', textAlign: 'right', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontWeight: 600,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {formatCompactNumber(total)}
                   </td>
-                  <td style={{ padding: '10px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {formatCompactNumber(Math.round(avg))}
                   </td>
-                  <td style={{ padding: '10px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {formatCompactNumber(min)}
                   </td>
-                  <td style={{ padding: '10px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {formatCompactNumber(max)}
                   </td>
                 </tr>
@@ -956,7 +1169,16 @@ const ArgusInsightsPage: React.FC = () => {
           />
         }
       />
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0, px: 2, pb: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          overflow: 'hidden',
+          minHeight: 0,
+          px: 2,
+          pb: 2,
+        }}
+      >
         <AnalyticsLayout leftPanel={leftPanel} toolbar={toolbar}>
           <PageContentLoader
             loading={queryLoading}
@@ -979,7 +1201,14 @@ const ArgusInsightsPage: React.FC = () => {
                 minHeight={300}
               />
             ) : (
-              <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
+              >
                 {renderChart()}
                 {chartType !== 'table' && renderSummaryTable()}
               </Box>

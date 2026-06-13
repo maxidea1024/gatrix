@@ -2587,7 +2587,11 @@ class ArgusService {
     numeric_keys: string[];
     builtin_columns: string[];
   }> {
-    const queryParams: Record<string, string | undefined> = { period, start, end };
+    const queryParams: Record<string, string | undefined> = {
+      period,
+      start,
+      end,
+    };
     if (eventName) {
       queryParams.event_name = eventName;
     }
@@ -2611,7 +2615,11 @@ class ArgusService {
         name: string;
         aggregation?: string;
         property?: string;
-        conditions?: { property: string; operator: string; value: string | number }[];
+        conditions?: {
+          property: string;
+          operator: string;
+          value: string | number;
+        }[];
       }[];
       breakdown?: { property: string; type?: string };
       interval?: string;
@@ -2641,7 +2649,14 @@ class ArgusService {
   async getAnalyticsFunnels(
     projectId: number | string,
     body: {
-      steps: { event_name: string; conditions?: { property: string; operator: string; value: string | number }[] }[];
+      steps: {
+        event_name: string;
+        conditions?: {
+          property: string;
+          operator: string;
+          value: string | number;
+        }[];
+      }[];
       conversion_window?: number;
       ordering?: 'specific' | 'any';
       hold_constant?: string[];
@@ -2655,8 +2670,18 @@ class ArgusService {
   ): Promise<{
     steps: { name: string; count: number; conversion_rate: number }[];
     overall_conversion: number;
-    breakdowns?: Record<string, { steps: { name: string; count: number; conversion_rate: number }[]; overall_conversion: number }>;
-    trending?: { date: string; conversion_rate: number; step_counts: number[] }[];
+    breakdowns?: Record<
+      string,
+      {
+        steps: { name: string; count: number; conversion_rate: number }[];
+        overall_conversion: number;
+      }
+    >;
+    trending?: {
+      date: string;
+      conversion_rate: number;
+      step_counts: number[];
+    }[];
     time_to_convert?: {
       distribution: { bucket: string; count: number }[];
       median_seconds: number;
@@ -2669,20 +2694,36 @@ class ArgusService {
       `${ARGUS_BASE}/projects/${projectId}/analytics/funnels`,
       body
     );
-    return (
-      response.data?.data || { steps: [], overall_conversion: 0 }
-    );
+    return response.data?.data || { steps: [], overall_conversion: 0 };
   }
 
   async getAnalyticsRetention(
     projectId: number | string,
     body: {
-      first_event: { name: string; conditions?: { property: string; operator: string; value: string | number }[] };
-      return_event: { name: string; conditions?: { property: string; operator: string; value: string | number }[] };
+      first_event: {
+        name: string;
+        conditions?: {
+          property: string;
+          operator: string;
+          value: string | number;
+        }[];
+      };
+      return_event: {
+        name: string;
+        conditions?: {
+          property: string;
+          operator: string;
+          value: string | number;
+        }[];
+      };
       retention_type?: 'day' | 'week' | 'month';
       num_periods?: number;
       criteria?: 'on' | 'on_or_after';
-      measurement?: 'retention_rate' | 'unique_users' | 'property_sum' | 'property_avg';
+      measurement?:
+        | 'retention_rate'
+        | 'unique_users'
+        | 'property_sum'
+        | 'property_avg';
       measurement_property?: string;
       breakdown?: { property: string };
       min_frequency?: number;

@@ -93,7 +93,9 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
             fontSize: '0.85rem',
             fontWeight: 500,
             height: 36,
-            bgcolor: isDark ? 'rgba(139, 92, 246, 0.05)' : 'rgba(139, 92, 246, 0.03)',
+            bgcolor: isDark
+              ? 'rgba(139, 92, 246, 0.05)'
+              : 'rgba(139, 92, 246, 0.03)',
             border: `1px solid ${
               hasError
                 ? theme.palette.error.main
@@ -107,9 +109,7 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
                 : alpha('#8b5cf6', 0.4),
             },
             '&.Mui-focused': {
-              borderColor: hasError
-                ? theme.palette.error.main
-                : '#8b5cf6',
+              borderColor: hasError ? theme.palette.error.main : '#8b5cf6',
             },
           },
         }}

@@ -72,7 +72,8 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
     if (!search) return options;
     const s = search.toLowerCase();
     return options.filter(
-      (o) => o.label.toLowerCase().includes(s) || o.value.toLowerCase().includes(s)
+      (o) =>
+        o.label.toLowerCase().includes(s) || o.value.toLowerCase().includes(s)
     );
   }, [options, search]);
 
@@ -93,7 +94,9 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
           '&:hover': disabled
             ? {}
             : {
-                background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                background: isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
               },
         }}
       >
@@ -101,9 +104,10 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
           variant="body2"
           sx={{
             fontWeight: 600,
-            color: isEmpty && highlightEmpty
-              ? theme.palette.primary.main
-              : theme.palette.text.primary,
+            color:
+              isEmpty && highlightEmpty
+                ? theme.palette.primary.main
+                : theme.palette.text.primary,
             whiteSpace: 'nowrap',
           }}
         >
@@ -112,9 +116,10 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
         <ExpandMoreIcon
           sx={{
             fontSize: 16,
-            color: isEmpty && highlightEmpty
-              ? theme.palette.primary.main
-              : theme.palette.text.secondary,
+            color:
+              isEmpty && highlightEmpty
+                ? theme.palette.primary.main
+                : theme.palette.text.secondary,
           }}
         />
       </Box>
@@ -139,7 +144,12 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
           },
         }}
       >
-        <Box sx={{ p: 1, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}` }}>
+        <Box
+          sx={{
+            p: 1,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+          }}
+        >
           <TextField
             autoFocus
             fullWidth
@@ -153,12 +163,12 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
                   <SearchIcon sx={{ fontSize: 18 }} />
                 </InputAdornment>
               ),
-              sx: { fontSize: '0.85rem' }
+              sx: { fontSize: '0.85rem' },
             }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 1.5,
-              }
+              },
             }}
           />
         </Box>
@@ -182,8 +192,8 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
                     bgcolor: alpha(theme.palette.primary.main, 0.08),
                     '&:hover': {
                       bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    }
-                  }
+                    },
+                  },
                 }}
               >
                 <ListItemText

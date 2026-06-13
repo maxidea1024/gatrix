@@ -1,11 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  Box,
-  Popover,
-  Typography,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Popover, Typography, useTheme, alpha } from '@mui/material';
 import { CompareArrows as CompareIcon } from '@mui/icons-material';
 
 export type ComparePeriod =
@@ -28,7 +22,10 @@ const OPTIONS: { value: ComparePeriod; label: string }[] = [
   { value: 'previous_year', label: 'Previous Year' },
 ];
 
-const CompareSelector: React.FC<CompareSelectorProps> = ({ value, onChange }) => {
+const CompareSelector: React.FC<CompareSelectorProps> = ({
+  value,
+  onChange,
+}) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const anchorRef = useRef<HTMLDivElement>(null);

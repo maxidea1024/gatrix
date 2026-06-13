@@ -1,5 +1,12 @@
 import { styled, alpha } from '@mui/material/styles';
-import { Box, Typography, Chip, ToggleButtonGroup, ToggleButton, IconButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Chip,
+  ToggleButtonGroup,
+  ToggleButton,
+  IconButton,
+} from '@mui/material';
 
 /* ─── Shared Analytics Styled Components ─── */
 

@@ -50,8 +50,16 @@ type FlowViewMode = 'sankey' | 'top_paths';
 /* ─── Constants ─── */
 
 const NODE_COLORS = [
-  '#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6',
-  '#ef4444', '#8b5cf6', '#14b8a6', '#f97316', '#a3e635',
+  '#6366f1',
+  '#ec4899',
+  '#f59e0b',
+  '#10b981',
+  '#3b82f6',
+  '#ef4444',
+  '#8b5cf6',
+  '#14b8a6',
+  '#f97316',
+  '#a3e635',
 ];
 
 /* ─── Component ─── */
@@ -101,7 +109,10 @@ const ArgusFlowsPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const data = await argusService.getAnalyticsEventNames(projectId, '30d');
+        const data = await argusService.getAnalyticsEventNames(
+          projectId,
+          '30d'
+        );
         setAvailableEvents(data.map((e) => e.name));
       } catch {
         setAvailableEvents([]);
@@ -119,13 +130,16 @@ const ArgusFlowsPage: React.FC = () => {
   }, [showSecondAnchor, anchorEventB]);
 
   // ── Exclude events toggle ──
-  const toggleExclude = useCallback((eventName: string) => {
-    setExcludeEvents(
-      excludeEvents.includes(eventName)
-        ? excludeEvents.filter((e) => e !== eventName)
-        : [...excludeEvents, eventName]
-    );
-  }, [excludeEvents, setExcludeEvents]);
+  const toggleExclude = useCallback(
+    (eventName: string) => {
+      setExcludeEvents(
+        excludeEvents.includes(eventName)
+          ? excludeEvents.filter((e) => e !== eventName)
+          : [...excludeEvents, eventName]
+      );
+    },
+    [excludeEvents, setExcludeEvents]
+  );
 
   // ── Run Query ──
   const handleRun = useCallback(async () => {
@@ -146,7 +160,9 @@ const ArgusFlowsPage: React.FC = () => {
         steps_after: stepsAfter,
         depth,
         view: viewMode,
-        breakdown: breakdownProperty ? { property: breakdownProperty } : undefined,
+        breakdown: breakdownProperty
+          ? { property: breakdownProperty }
+          : undefined,
         exclude_events: excludeEvents.length > 0 ? excludeEvents : undefined,
         period: apiParams.period,
         start: apiParams.start,
@@ -158,7 +174,20 @@ const ArgusFlowsPage: React.FC = () => {
     } finally {
       setQueryLoading(false);
     }
-  }, [anchorEventA, anchorEventB, showSecondAnchor, direction, stepsBefore, stepsAfter, depth, viewMode, breakdownProperty, excludeEvents, dateRange, projectId]);
+  }, [
+    anchorEventA,
+    anchorEventB,
+    showSecondAnchor,
+    direction,
+    stepsBefore,
+    stepsAfter,
+    depth,
+    viewMode,
+    breakdownProperty,
+    excludeEvents,
+    dateRange,
+    projectId,
+  ]);
 
   // ── Sankey data ──
   const sankeyData = useMemo(() => {
@@ -235,13 +264,23 @@ const ArgusFlowsPage: React.FC = () => {
     <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Anchor Events */}
       <Box>
-        <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}>
+        <Typography
+          variant="overline"
+          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+        >
           {t('argus.analytics.flowConfiguration', 'Flow Configuration')}
         </Typography>
         <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
           {/* Anchor A */}
           <EventBlock indexLabel="A" color="#ec4899">
-            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 0.5,
+              }}
+            >
               <Typography variant="caption" color="text.secondary">
                 {t('argus.analytics.anchor', 'Anchor')}
               </Typography>
@@ -259,7 +298,15 @@ const ArgusFlowsPage: React.FC = () => {
           {showSecondAnchor && (
             <>
               <Box sx={{ display: 'flex', justifyContent: 'center', my: -0.5 }}>
-                <Box sx={{ width: 2, height: 12, bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }} />
+                <Box
+                  sx={{
+                    width: 2,
+                    height: 12,
+                    bgcolor: isDark
+                      ? 'rgba(255,255,255,0.1)'
+                      : 'rgba(0,0,0,0.1)',
+                  }}
+                />
               </Box>
               <EventBlock
                 indexLabel="B"
@@ -269,7 +316,14 @@ const ArgusFlowsPage: React.FC = () => {
                   setAnchorEventB('');
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: 0.5,
+                  }}
+                >
                   <Typography variant="caption" color="text.secondary">
                     {t('argus.analytics.anchor', 'Anchor')}
                   </Typography>
@@ -277,7 +331,10 @@ const ArgusFlowsPage: React.FC = () => {
                     value={anchorEventB}
                     onChange={setAnchorEventB}
                     options={eventOptions}
-                    emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
+                    emptyLabel={t(
+                      'argus.analytics.selectEvent',
+                      'Select Event'
+                    )}
                     highlightEmpty
                   />
                 </Box>
@@ -290,7 +347,12 @@ const ArgusFlowsPage: React.FC = () => {
               size="small"
               startIcon={<AddIcon />}
               onClick={() => setShowSecondAnchor(true)}
-              sx={{ alignSelf: 'flex-start', textTransform: 'none', borderRadius: 1.5, mt: 0.5 }}
+              sx={{
+                alignSelf: 'flex-start',
+                textTransform: 'none',
+                borderRadius: 1.5,
+                mt: 0.5,
+              }}
             >
               {t('argus.analytics.addSecondAnchor', 'Add 2nd Anchor (Between)')}
             </Button>
@@ -302,20 +364,32 @@ const ArgusFlowsPage: React.FC = () => {
 
       {/* Settings */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-        <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}>
+        <Typography
+          variant="overline"
+          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+        >
           {t('argus.analytics.settings', 'Settings')}
         </Typography>
 
         {/* Direction */}
         {!showSecondAnchor && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="caption" color="text.secondary" sx={{ minWidth: 60 }}>{t('argus.analytics.direction', 'Direction')}</Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ minWidth: 60 }}
+            >
+              {t('argus.analytics.direction', 'Direction')}
+            </Typography>
             <InlineSelect
               value={direction}
               onChange={(val) => setDirection(val as any)}
               options={[
                 { value: 'after', label: t('argus.analytics.after', 'After') },
-                { value: 'before', label: t('argus.analytics.before', 'Before') },
+                {
+                  value: 'before',
+                  label: t('argus.analytics.before', 'Before'),
+                },
               ]}
             />
           </Box>
@@ -323,8 +397,14 @@ const ArgusFlowsPage: React.FC = () => {
 
         {/* Steps before/after */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 60 }}>
-            {direction === 'before' ? t('argus.analytics.stepsBefore', 'Steps Before') : t('argus.analytics.stepsAfter', 'Steps After')}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ minWidth: 60 }}
+          >
+            {direction === 'before'
+              ? t('argus.analytics.stepsBefore', 'Steps Before')
+              : t('argus.analytics.stepsAfter', 'Steps After')}
           </Typography>
           <InlineSelect
             value={String(direction === 'before' ? stepsBefore : stepsAfter)}
@@ -333,17 +413,29 @@ const ArgusFlowsPage: React.FC = () => {
               if (direction === 'before') setStepsBefore(n);
               else setStepsAfter(n);
             }}
-            options={[1, 2, 3, 4, 5, 6].map((n) => ({ value: String(n), label: String(n) }))}
+            options={[1, 2, 3, 4, 5, 6].map((n) => ({
+              value: String(n),
+              label: String(n),
+            }))}
           />
         </Box>
 
         {/* Depth */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ minWidth: 60 }}>{t('argus.analytics.depth', 'Depth')}</Typography>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ minWidth: 60 }}
+          >
+            {t('argus.analytics.depth', 'Depth')}
+          </Typography>
           <InlineSelect
             value={String(depth)}
             onChange={(val) => setDepth(Number(val))}
-            options={[2, 3, 4, 5, 6, 8].map((n) => ({ value: String(n), label: String(n) }))}
+            options={[2, 3, 4, 5, 6, 8].map((n) => ({
+              value: String(n),
+              label: String(n),
+            }))}
           />
         </Box>
       </Box>
@@ -352,10 +444,22 @@ const ArgusFlowsPage: React.FC = () => {
 
       {/* Exclude Events */}
       <Box>
-        <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}>
+        <Typography
+          variant="overline"
+          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+        >
           {t('argus.analytics.excludeEvents', 'Exclude Events')}
         </Typography>
-        <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 0.5, maxHeight: 150, overflowY: 'auto' }}>
+        <Box
+          sx={{
+            mt: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.5,
+            maxHeight: 150,
+            overflowY: 'auto',
+          }}
+        >
           {availableEvents.slice(0, 20).map((name) => (
             <Box
               key={name}
@@ -369,11 +473,17 @@ const ArgusFlowsPage: React.FC = () => {
                 borderRadius: 1,
                 cursor: 'pointer',
                 fontSize: '0.75rem',
-                color: excludeEvents.includes(name) ? 'error.main' : 'text.primary',
-                textDecoration: excludeEvents.includes(name) ? 'line-through' : 'none',
+                color: excludeEvents.includes(name)
+                  ? 'error.main'
+                  : 'text.primary',
+                textDecoration: excludeEvents.includes(name)
+                  ? 'line-through'
+                  : 'none',
                 opacity: excludeEvents.includes(name) ? 0.5 : 1,
                 '&:hover': {
-                  bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                  bgcolor: isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.04)',
                 },
               }}
             >
@@ -392,10 +502,20 @@ const ArgusFlowsPage: React.FC = () => {
 
       {/* Breakdown */}
       <Box>
-        <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}>
+        <Typography
+          variant="overline"
+          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+        >
           {t('argus.analytics.breakdownBy', 'Breakdown By')}
         </Typography>
-        <Box sx={{ mt: 1, p: 1.5, borderRadius: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+        <Box
+          sx={{
+            mt: 1,
+            p: 1.5,
+            borderRadius: 2,
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          }}
+        >
           <PropertyPicker
             projectId={projectId}
             eventName={anchorEventA}
@@ -408,7 +528,10 @@ const ArgusFlowsPage: React.FC = () => {
 
       <Box sx={{ mt: 'auto', pt: 2 }}>
         <Button
-          fullWidth variant="contained" size="small" startIcon={<RunIcon />}
+          fullWidth
+          variant="contained"
+          size="small"
+          startIcon={<RunIcon />}
           onClick={handleRun}
           disabled={queryLoading || !anchorEventA}
           sx={{ borderRadius: 1.5, textTransform: 'none', px: 2 }}
@@ -427,25 +550,45 @@ const ArgusFlowsPage: React.FC = () => {
         onChange={(val) => setViewMode(val as FlowViewMode)}
         options={[
           { value: 'sankey', label: t('argus.analytics.sankey', 'Sankey') },
-          { value: 'top_paths', label: t('argus.analytics.topPaths', 'Top Paths') },
+          {
+            value: 'top_paths',
+            label: t('argus.analytics.topPaths', 'Top Paths'),
+          },
         ]}
       />
       <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
-      <CsvExportButton data={csvData} filename="flows" disabled={csvData.length === 0} />
+      <CsvExportButton
+        data={csvData}
+        filename="flows"
+        disabled={csvData.length === 0}
+      />
     </>
   );
 
   // ── Render: Sankey ──
   const renderSankey = () => {
-    if (!sankeyData) return <EmptyPagePlaceholder message={t('argus.analytics.noFlowData', 'No flow data available.')} minHeight={300} />;
+    if (!sankeyData)
+      return (
+        <EmptyPagePlaceholder
+          message={t('argus.analytics.noFlowData', 'No flow data available.')}
+          minHeight={300}
+        />
+      );
 
     return (
       <Box sx={{ height: 500, width: '100%', pr: 2 }}>
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={0}
+        >
           <Sankey
             data={sankeyData}
             node={<CustomSankeyNode isDark={isDark} theme={theme} />}
-            link={{ stroke: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)' }}
+            link={{
+              stroke: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+            }}
             margin={{ top: 20, right: 100, bottom: 20, left: 100 }}
             nodePadding={24}
             nodeWidth={12}
@@ -455,7 +598,9 @@ const ArgusFlowsPage: React.FC = () => {
               contentStyle={{
                 background: isDark ? '#1e1e2e' : '#fff',
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                borderRadius: 8, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', fontSize: 12,
+                borderRadius: 8,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                fontSize: 12,
               }}
             />
           </Sankey>
@@ -470,7 +615,10 @@ const ArgusFlowsPage: React.FC = () => {
     if (!paths || paths.length === 0) {
       return (
         <EmptyPagePlaceholder
-          message={t('argus.analytics.topPathsEmpty', 'No top paths data available.')}
+          message={t(
+            'argus.analytics.topPathsEmpty',
+            'No top paths data available.'
+          )}
           minHeight={300}
         />
       );
@@ -478,31 +626,87 @@ const ArgusFlowsPage: React.FC = () => {
 
     return (
       <Box sx={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontSize: '0.8rem',
+          }}
+        >
           <thead>
             <tr>
-              <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 #
               </th>
-              <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 Path
               </th>
-              <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'right',
+                  padding: '12px 16px',
+                  borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 {t('argus.analytics.users', 'Users')}
               </th>
-              <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+              <th
+                style={{
+                  textAlign: 'right',
+                  padding: '12px 16px',
+                  borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                  color: theme.palette.text.secondary,
+                  fontWeight: 600,
+                }}
+              >
                 %
               </th>
             </tr>
           </thead>
           <tbody>
             {paths.map((p, idx) => (
-              <tr key={idx} style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
-                <td style={{ padding: '10px 16px', fontWeight: 600, color: theme.palette.text.secondary }}>
+              <tr
+                key={idx}
+                style={{
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                }}
+              >
+                <td
+                  style={{
+                    padding: '10px 16px',
+                    fontWeight: 600,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
                   {idx + 1}
                 </td>
                 <td style={{ padding: '10px 16px' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                    }}
+                  >
                     {p.path.map((step, sIdx) => (
                       <React.Fragment key={sIdx}>
                         <Chip
@@ -524,7 +728,11 @@ const ArgusFlowsPage: React.FC = () => {
                           }}
                         />
                         {sIdx < p.path.length - 1 && (
-                          <Typography variant="caption" color="text.disabled" sx={{ px: 0.25 }}>
+                          <Typography
+                            variant="caption"
+                            color="text.disabled"
+                            sx={{ px: 0.25 }}
+                          >
                             →
                           </Typography>
                         )}
@@ -532,10 +740,23 @@ const ArgusFlowsPage: React.FC = () => {
                     ))}
                   </Box>
                 </td>
-                <td style={{ padding: '10px 16px', textAlign: 'right', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                <td
+                  style={{
+                    padding: '10px 16px',
+                    textAlign: 'right',
+                    fontWeight: 600,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {p.count.toLocaleString()}
                 </td>
-                <td style={{ padding: '10px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                <td
+                  style={{
+                    padding: '10px 16px',
+                    textAlign: 'right',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {p.percentage}%
                 </td>
               </tr>
@@ -548,20 +769,39 @@ const ArgusFlowsPage: React.FC = () => {
 
   // ── Main render ──
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', overflow: 'hidden' }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100vh - 64px)',
+        overflow: 'hidden',
+      }}
+    >
       <PageHeader
         enableAutoBack
         title={
           <ArgusBreadcrumbs
             paths={[
-              { label: t('argus.analytics.title', 'Analytics'), to: '/argus/analytics' },
+              {
+                label: t('argus.analytics.title', 'Analytics'),
+                to: '/argus/analytics',
+              },
               { label: t('argus.analytics.flows', 'Flows') },
             ]}
             size="title"
           />
         }
       />
-      <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0, px: 2, pb: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          overflow: 'hidden',
+          minHeight: 0,
+          px: 2,
+          pb: 2,
+        }}
+      >
         <AnalyticsLayout leftPanel={leftPanel} toolbar={toolbar}>
           <PageContentLoader
             loading={queryLoading}
@@ -569,7 +809,10 @@ const ArgusFlowsPage: React.FC = () => {
           >
             {!hasQueried ? (
               <EmptyPagePlaceholder
-                message={t('argus.analytics.emptyFlows', 'Select an anchor event and click Run to see user flows.')}
+                message={t(
+                  'argus.analytics.emptyFlows',
+                  'Select an anchor event and click Run to see user flows.'
+                )}
                 minHeight={300}
               />
             ) : (

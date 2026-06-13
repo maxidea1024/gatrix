@@ -1,6 +1,16 @@
 import React from 'react';
-import { Box, Typography, IconButton, useTheme, Tooltip, alpha } from '@mui/material';
-import { Close as CloseIcon, DragIndicator as DragIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  IconButton,
+  useTheme,
+  Tooltip,
+  alpha,
+} from '@mui/material';
+import {
+  Close as CloseIcon,
+  DragIndicator as DragIcon,
+} from '@mui/icons-material';
 
 export interface EventBlockProps {
   /** The letter index, e.g., 'A', 'B' */
@@ -43,8 +53,8 @@ const EventBlock: React.FC<EventBlockProps> = ({
           isFocused
             ? alpha(color, 0.4)
             : isDark
-            ? 'rgba(255,255,255,0.06)'
-            : 'rgba(0,0,0,0.06)'
+              ? 'rgba(255,255,255,0.06)'
+              : 'rgba(0,0,0,0.06)'
         }`,
         background: isDark ? 'rgba(255,255,255,0.015)' : '#fff',
         transition: 'all 0.2s',
@@ -95,7 +105,10 @@ const EventBlock: React.FC<EventBlockProps> = ({
           mt: 0.25,
         }}
       >
-        <Typography variant="caption" sx={{ fontWeight: 800, fontSize: '0.75rem' }}>
+        <Typography
+          variant="caption"
+          sx={{ fontWeight: 800, fontSize: '0.75rem' }}
+        >
           {indexLabel}
         </Typography>
       </Box>
