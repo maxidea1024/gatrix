@@ -31,6 +31,7 @@ import {
   QueryAQLEditor,
   QueryAQLEditorHandle,
 } from '@/components/argus/query-aql/QueryAQLEditor';
+import { normalizeQuery } from '@/components/argus/query-aql';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 import SpanDetailPanel from '@/components/argus/SpanDetailDrawer';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
@@ -419,8 +420,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
     if (!savedSnapshot) {
       return !urlState.queryId;
     }
+    const normalizedSearch = normalizeQuery(search);
+    const normalizedSnapshot = normalizeQuery(savedSnapshot.search);
     return (
-      search !== savedSnapshot.search ||
+      normalizedSearch !== normalizedSnapshot ||
       urlState.groupBy !== savedSnapshot.groupBy ||
       orderBy !== savedSnapshot.orderBy
     );

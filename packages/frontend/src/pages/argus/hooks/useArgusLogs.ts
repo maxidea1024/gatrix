@@ -13,6 +13,7 @@ import {
   defaultArgusFilterState,
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
+import { normalizeQuery } from '@/components/argus/query-aql';
 export interface VolumePoint {
   bucket: string;
   level: string;
@@ -365,8 +366,14 @@ export function useArgusLogs() {
       // If loading a saved query, start as clean until snapshot is set
       return !urlState.queryId;
     }
+    // Normalize search strings so semantically equivalent queries compare equal.
+    // This prevents false dirty states when facets are added then removed —
+    // the chipsToQuery roundtrip may produce a string that differs in whitespace
+    // or quoting from the original saved query.
+    const normalizedSearch = normalizeQuery(search);
+    const normalizedSnapshot = normalizeQuery(savedSnapshot.search);
     return (
-      search !== savedSnapshot.search ||
+      normalizedSearch !== normalizedSnapshot ||
       JSON.stringify(columns) !== JSON.stringify(savedSnapshot.columns) ||
       (urlState.groupBy || 'level') !== savedSnapshot.groupBy
     );

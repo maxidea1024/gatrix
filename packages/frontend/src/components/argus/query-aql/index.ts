@@ -8,6 +8,7 @@ export { parse } from './parser';
 export { validate } from './validator';
 export { serializeForBackend } from './serializer';
 export { formatQuery, renderTokensToSpans } from './formatter';
+export { normalizeQuery } from './useFilterChips';
 export type { TokenSpan } from './formatter';
 
 // Autocomplete

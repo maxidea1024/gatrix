@@ -717,3 +717,20 @@ export function queryToChips(
 
   return chips;
 }
+
+// ─── Normalization ───────────────────────────────────────────────────────────
+
+/**
+ * Normalize a query string into canonical form via roundtrip:
+ * queryToChips → chipsToQuery.
+ *
+ * This ensures two semantically equivalent queries produce the same string,
+ * regardless of whitespace, quoting, or operator formatting differences.
+ */
+export function normalizeQuery(
+  query: string,
+  aggregateNames?: Set<string>
+): string {
+  if (!query.trim()) return '';
+  return chipsToQuery(queryToChips(query, aggregateNames));
+}
