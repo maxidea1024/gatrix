@@ -119,17 +119,34 @@ export const ReleaseHealthChart: React.FC<{
   const innerW = chartWidth - padding.left - padding.right;
   const innerH = chartHeight - padding.top - padding.bottom;
 
-  const points = data.map((d, i) => ({
+  const dataPoints = data.map((d, i) => ({
     x: padding.left + (i / (data.length - 1)) * innerW,
     y: padding.top + (1 - (d.crash_free_rate - minVal) / range) * innerH,
     value: d.crash_free_rate,
     ts: d.timestamp,
   }));
 
-  const linePath = points
+  // Extend line to chart edges so there's no blank whitespace before/after data
+  const firstY = dataPoints[0].y;
+  const lastY = dataPoints[dataPoints.length - 1].y;
+  const edgeLeft = { x: padding.left, y: firstY };
+  const edgeRight = { x: chartWidth - padding.right, y: lastY };
+
+  // If first point is not at the left edge, prepend an edge point
+  const needsLeftExtend = dataPoints[0].x > padding.left + 1;
+  const needsRightExtend =
+    dataPoints[dataPoints.length - 1].x < chartWidth - padding.right - 1;
+
+  const allPoints = [
+    ...(needsLeftExtend ? [edgeLeft] : []),
+    ...dataPoints,
+    ...(needsRightExtend ? [edgeRight] : []),
+  ];
+
+  const linePath = allPoints
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
     .join(' ');
-  const areaPath = `${linePath} L ${points[points.length - 1].x} ${padding.top + innerH} L ${points[0].x} ${padding.top + innerH} Z`;
+  const areaPath = `${linePath} L ${allPoints[allPoints.length - 1].x} ${padding.top + innerH} L ${allPoints[0].x} ${padding.top + innerH} Z`;
 
   const lineColor = '#4caf50';
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
@@ -185,7 +202,7 @@ export const ReleaseHealthChart: React.FC<{
         })}
         {/* X-axis labels */}
         {xLabels.map((idx) => {
-          const p = points[idx as number];
+          const p = dataPoints[idx as number];
           if (!p) return null;
           const label = new Date(
             data[idx as number].timestamp
@@ -213,8 +230,8 @@ export const ReleaseHealthChart: React.FC<{
           strokeWidth={2}
           strokeLinejoin="round"
         />
-        {/* Dots */}
-        {points.map((p, i) => (
+        {/* Dots — only for real data points, not edge extensions */}
+        {dataPoints.map((p, i) => (
           <Tooltip
             key={i}
             title={`${p.value.toFixed(2)}% — ${new Date(p.ts).toLocaleString()}`}
