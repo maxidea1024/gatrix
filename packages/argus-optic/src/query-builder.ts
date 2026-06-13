@@ -1,4 +1,11 @@
-import { DatasetConfig, OpticQuery, Condition, BuiltQuery, SearchSchema, MapColumnDef } from './types';
+import {
+  DatasetConfig,
+  OpticQuery,
+  Condition,
+  BuiltQuery,
+  SearchSchema,
+  MapColumnDef,
+} from './types';
 import { getDataset } from './datasets';
 import { getBucketingConfig } from './utils/timeBucket';
 import { QueryParser } from './utils/queryParser';
@@ -463,8 +470,14 @@ function deriveSearchSchema(dataset: DatasetConfig): SearchSchema {
     } else {
       // Regular columns
       const isNumeric = [
-        'UInt8', 'UInt16', 'UInt32', 'UInt64', 'Float64',
-        'Nullable(UInt64)', 'Nullable(UInt32)', 'Nullable(UInt16)',
+        'UInt8',
+        'UInt16',
+        'UInt32',
+        'UInt64',
+        'Float64',
+        'Nullable(UInt64)',
+        'Nullable(UInt32)',
+        'Nullable(UInt16)',
       ].includes(colDef.type);
       columns[name] = isNumeric ? 'number' : 'string';
     }
@@ -473,7 +486,10 @@ function deriveSearchSchema(dataset: DatasetConfig): SearchSchema {
   // String Map columns first (e.g. tags) — QueryParser uses mapColumns[0] as
   // the default fallback for unknown keys, and string tags are the most common
   // target. Float64 Maps (e.g. measurements) should come after.
-  mapCols.sort((a, b) => (a.valueType === 'String' ? -1 : 1) - (b.valueType === 'String' ? -1 : 1));
+  mapCols.sort(
+    (a, b) =>
+      (a.valueType === 'String' ? -1 : 1) - (b.valueType === 'String' ? -1 : 1)
+  );
 
   return {
     columns,

@@ -345,7 +345,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
                   projectId,
                   timeRange,
                   select: [
-                    { field: `tags['${key.replace(/'/g, "\\'")}']`, alias: 'value' },
+                    {
+                      field: `tags['${key.replace(/'/g, "\\'")}']`,
+                      alias: 'value',
+                    },
                     { field: 'count()', alias: 'count' },
                   ],
                   conditions: [
@@ -366,7 +369,10 @@ export default async function tracesRoutes(app: FastifyInstance) {
                     count: Number(r.count) || 0,
                   })),
                 }))
-                .catch(() => ({ key, values: [] as { value: string; count: number }[] }))
+                .catch(() => ({
+                  key,
+                  values: [] as { value: string; count: number }[],
+                }))
             )
           );
 

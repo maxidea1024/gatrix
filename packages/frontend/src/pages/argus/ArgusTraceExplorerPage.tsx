@@ -27,7 +27,10 @@ import ArgusFilterBar, {
   defaultArgusFilterState,
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
-import { QueryAQLEditor, QueryAQLEditorHandle } from '@/components/argus/query-aql/QueryAQLEditor';
+import {
+  QueryAQLEditor,
+  QueryAQLEditorHandle,
+} from '@/components/argus/query-aql/QueryAQLEditor';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 import SpanDetailPanel from '@/components/argus/SpanDetailDrawer';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
@@ -375,7 +378,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     }
   }, [urlState.queryId, savedQueries, currentQueryId]);
 
-
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
       return filters.dateRange.preset;
@@ -437,13 +439,22 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const mappedFacets = useMemo(() => {
     const result: Record<string, { value: string; count: number }[]> = {};
     if (tags.op?.length) {
-      result.op = tags.op.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 }));
+      result.op = tags.op.map((v: any) => ({
+        value: v.value,
+        count: Number(v.count) || 0,
+      }));
     }
     if (tags.status?.length) {
-      result.status = tags.status.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 }));
+      result.status = tags.status.map((v: any) => ({
+        value: v.value,
+        count: Number(v.count) || 0,
+      }));
     }
     if (tags.domain?.length) {
-      result.domain = tags.domain.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 }));
+      result.domain = tags.domain.map((v: any) => ({
+        value: v.value,
+        count: Number(v.count) || 0,
+      }));
     }
     // Discovered tag facets (e.g. server.region, http.method)
     for (const df of discoveredFacets) {
@@ -841,40 +852,37 @@ const ArgusTraceExplorerPage: React.FC = () => {
     [setUrlState]
   );
 
-  const addSearchTag = useCallback(
-    (key: string, value: string) => {
-      const ref = dslEditorRef.current;
-      if (!ref) return;
-      const current = ref.getFieldValues(key);
-      if (!current.includes(value)) {
-        ref.upsertFieldChip(key, [...current, value]);
-      }
-    },
-    []
-  );
+  const addSearchTag = useCallback((key: string, value: string) => {
+    const ref = dslEditorRef.current;
+    if (!ref) return;
+    const current = ref.getFieldValues(key);
+    if (!current.includes(value)) {
+      ref.upsertFieldChip(key, [...current, value]);
+    }
+  }, []);
 
   const handleSelectSpan = useCallback((span: any, index: number) => {
     setSelectedSpan(span);
     setSelectedSpanIndex(index);
   }, []);
 
-  const handleFacetFilter = useCallback(
-    (key: string, value: string) => {
-      const ref = dslEditorRef.current;
-      if (!ref) return;
-      // Discovered facets pass their raw key (e.g. "server.region"); QueryParser
-      // auto-maps unknown keys to tags['key'] via Map column fallback.
-      // Strip any legacy prefixes that may still be present.
-      const cleanKey = key.replace(/^(tags\.|discovered\.|attr\.)/, '');
-      const current = ref.getFieldValues(cleanKey);
-      if (current.includes(value)) {
-        ref.upsertFieldChip(cleanKey, current.filter((v) => v !== value));
-      } else {
-        ref.upsertFieldChip(cleanKey, [...current, value]);
-      }
-    },
-    []
-  );
+  const handleFacetFilter = useCallback((key: string, value: string) => {
+    const ref = dslEditorRef.current;
+    if (!ref) return;
+    // Discovered facets pass their raw key (e.g. "server.region"); QueryParser
+    // auto-maps unknown keys to tags['key'] via Map column fallback.
+    // Strip any legacy prefixes that may still be present.
+    const cleanKey = key.replace(/^(tags\.|discovered\.|attr\.)/, '');
+    const current = ref.getFieldValues(cleanKey);
+    if (current.includes(value)) {
+      ref.upsertFieldChip(
+        cleanKey,
+        current.filter((v) => v !== value)
+      );
+    } else {
+      ref.upsertFieldChip(cleanKey, [...current, value]);
+    }
+  }, []);
 
   /* ═══ RENDER ═══ */
   return (

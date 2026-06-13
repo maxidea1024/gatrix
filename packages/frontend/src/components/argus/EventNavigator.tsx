@@ -288,14 +288,15 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
                 goToEvent(matchIdx);
               } else {
                 // Wrap around
-                const wrapIdx = events.findIndex((evt) => (
-                  evt.exception_type?.toLowerCase().includes(q) ||
-                  evt.exception_value?.toLowerCase().includes(q) ||
-                  evt.user_email?.toLowerCase().includes(q) ||
-                  evt.user_id?.toLowerCase().includes(q) ||
-                  evt.transaction?.toLowerCase().includes(q) ||
-                  evt.event_id?.toLowerCase().includes(q)
-                ));
+                const wrapIdx = events.findIndex(
+                  (evt) =>
+                    evt.exception_type?.toLowerCase().includes(q) ||
+                    evt.exception_value?.toLowerCase().includes(q) ||
+                    evt.user_email?.toLowerCase().includes(q) ||
+                    evt.user_id?.toLowerCase().includes(q) ||
+                    evt.transaction?.toLowerCase().includes(q) ||
+                    evt.event_id?.toLowerCase().includes(q)
+                );
                 if (wrapIdx >= 0) goToEvent(wrapIdx);
               }
             }}

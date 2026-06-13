@@ -176,7 +176,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         // Advanced conditions using parseSearchToSQL
         if (conditions && conditions.trim()) {
-          const { where, having } = parseSearchToSQL('errors', conditions, queryParams);
+          const { where, having } = parseSearchToSQL(
+            'errors',
+            conditions,
+            queryParams
+          );
           if (where) query += ` AND (${where})`;
           if (having) havingClause = `HAVING ${having}`;
         }
@@ -419,7 +423,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         // Parse conditions from search param using parseSearchToSQL
         if (search && typeof search === 'string' && search.trim()) {
-          const { where: searchWhere } = parseSearchToSQL('errors', search, queryParams);
+          const { where: searchWhere } = parseSearchToSQL(
+            'errors',
+            search,
+            queryParams
+          );
           if (searchWhere) query += ` AND (${searchWhere})`;
         }
 

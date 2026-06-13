@@ -373,9 +373,7 @@ function FieldMenu({
   const filtered = useMemo(() => {
     if (filter) {
       const lowerFilter = filter.toLowerCase();
-      return allKeys.filter((f) =>
-        f.key.toLowerCase().includes(lowerFilter)
-      );
+      return allKeys.filter((f) => f.key.toLowerCase().includes(lowerFilter));
     }
     return allKeys.filter(
       (f) => f.key === currentField || f.key.startsWith(currentField + '.')

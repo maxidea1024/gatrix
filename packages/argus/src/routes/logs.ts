@@ -133,7 +133,6 @@ export default async function logsRoutes(app: FastifyInstance) {
         const { where: searchCond } = parseSearchToSQL('logs', search, params);
         if (searchCond) conditions.push(`(${searchCond})`);
 
-
         const sql = `
           SELECT ${bucket.selectExpr} AS bucket, level, count() AS count
           FROM argus.logs
@@ -314,7 +313,6 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         const { where: searchCond } = parseSearchToSQL('logs', search, params);
         if (searchCond) conditions.push(`(${searchCond})`);
-
 
         // 1) Top values by count
         const topSql = `
@@ -595,7 +593,6 @@ export default async function logsRoutes(app: FastifyInstance) {
 
         const { where: searchCond } = parseSearchToSQL('logs', search, params);
         if (searchCond) conditions.push(`(${searchCond})`);
-
 
         const patternExpr = `replaceRegexpAll(
           replaceRegexpAll(
@@ -1084,7 +1081,11 @@ export default async function logsRoutes(app: FastifyInstance) {
             params.lenvironment = environment;
           }
 
-          const { where: searchCond } = parseSearchToSQL('logs', search, params);
+          const { where: searchCond } = parseSearchToSQL(
+            'logs',
+            search,
+            params
+          );
           if (searchCond) conditions.push(`(${searchCond})`);
 
           const sql = `

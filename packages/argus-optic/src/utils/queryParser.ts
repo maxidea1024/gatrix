@@ -111,7 +111,10 @@ export class QueryParser {
    * @param schema            SearchSchema from types.ts
    * @param allowedAggregates Optional set of aggregate function names for HAVING.
    */
-  constructor(schema: SearchSchema, allowedAggregates: Set<string> = new Set()) {
+  constructor(
+    schema: SearchSchema,
+    allowedAggregates: Set<string> = new Set()
+  ) {
     this.allowedColumns = new Set(Object.keys(schema.columns));
     this.allowedAggregates = allowedAggregates;
     this.columnAliases = schema.aliases || {};
