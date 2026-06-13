@@ -219,7 +219,7 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                   size="small"
                   sx={{
                     width: '100%',
-                    tableLayout: 'auto',
+                    tableLayout: 'fixed',
                     '& td, & th': {
                       borderColor: isDark
                         ? 'rgba(255,255,255,0.04)'
@@ -228,6 +228,13 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                     '& th': {
                       backgroundColor: isDark ? '#1a1a2e' : '#fafafa',
                     },
+                    // Column widths for fixed layout
+                    '& th:nth-of-type(1), & td:nth-of-type(1)': { width: '14%' },  // TIMESTAMP
+                    '& th:nth-of-type(2), & td:nth-of-type(2)': { width: '8%' },   // OP
+                    '& th:nth-of-type(3), & td:nth-of-type(3)': { width: '40%' },  // DESCRIPTION
+                    '& th:nth-of-type(4), & td:nth-of-type(4)': { width: '10%' },  // DURATION
+                    '& th:nth-of-type(5), & td:nth-of-type(5)': { width: '8%' },   // STATUS
+                    '& th:nth-of-type(6), & td:nth-of-type(6)': { width: '20%' },  // TRACE
                   }}
                 >
                   <TableHead>
