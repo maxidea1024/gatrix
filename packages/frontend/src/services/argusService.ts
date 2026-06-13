@@ -47,6 +47,7 @@ export interface ArgusProject {
   session_sample_rate: number;
   retention_days: number;
   metrics_group_limit: number;
+  analytics_breakdown_limit: number;
   created_at: string;
   updated_at: string;
   unresolved_issues?: number;
@@ -1268,6 +1269,7 @@ class ArgusService {
         | 'session_sample_rate'
         | 'retention_days'
         | 'metrics_group_limit'
+        | 'analytics_breakdown_limit'
       >
     >
   ): Promise<void> {
@@ -2557,6 +2559,178 @@ class ArgusService {
     await argusApi.delete(
       `${ARGUS_BASE}/projects/${projectId}/uptime/${monitorId}`
     );
+  }
+
+  // --- Analytics (Product Analytics) ---
+
+  async getAnalyticsEventNames(
+    projectId: number | string,
+    period?: string,
+    start?: string,
+    end?: string
+  ): Promise<{ name: string; count: number }[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/event-names`,
+      { params: { period, start, end } }
+    );
+    return response.data?.data || response.data || [];
+  }
+
+  async getAnalyticsEventProperties(
+    projectId: number | string,
+    eventName?: string,
+    period?: string,
+    start?: string,
+    end?: string
+  ): Promise<{
+    string_keys: string[];
+    numeric_keys: string[];
+    builtin_columns: string[];
+  }> {
+    const queryParams: Record<string, string | undefined> = { period, start, end };
+    if (eventName) {
+      queryParams.event_name = eventName;
+    }
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/event-properties`,
+      { params: queryParams }
+    );
+    return (
+      response.data?.data || {
+        string_keys: [],
+        numeric_keys: [],
+        builtin_columns: [],
+      }
+    );
+  }
+
+  async getAnalyticsInsights(
+    projectId: number | string,
+    body: {
+      events: {
+        name: string;
+        aggregation?: string;
+        property?: string;
+        conditions?: { property: string; operator: string; value: string | number }[];
+      }[];
+      breakdown?: { property: string; type?: string };
+      interval?: string;
+      period?: string;
+      start?: string;
+      end?: string;
+      compare_period?: string;
+    }
+  ): Promise<{
+    series: {
+      event: string;
+      breakdown_value?: string;
+      data: { bucket: string; value: number }[];
+    }[];
+    compare_series?: {
+      event: string;
+      data: { bucket: string; value: number }[];
+    }[];
+  }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/insights`,
+      body
+    );
+    return response.data?.data || { series: [] };
+  }
+
+  async getAnalyticsFunnels(
+    projectId: number | string,
+    body: {
+      steps: { event_name: string; conditions?: { property: string; operator: string; value: string | number }[] }[];
+      conversion_window?: number;
+      ordering?: 'specific' | 'any';
+      hold_constant?: string[];
+      counting?: 'uniques' | 'totals';
+      breakdown?: { property: string };
+      mode?: 'steps' | 'trending' | 'time_to_convert';
+      period?: string;
+      start?: string;
+      end?: string;
+    }
+  ): Promise<{
+    steps: { name: string; count: number; conversion_rate: number }[];
+    overall_conversion: number;
+    breakdowns?: Record<string, { steps: { name: string; count: number; conversion_rate: number }[]; overall_conversion: number }>;
+    trending?: { date: string; conversion_rate: number; step_counts: number[] }[];
+    time_to_convert?: {
+      distribution: { bucket: string; count: number }[];
+      median_seconds: number;
+      avg_seconds: number;
+      p25_seconds: number;
+      p75_seconds: number;
+    };
+  }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/funnels`,
+      body
+    );
+    return (
+      response.data?.data || { steps: [], overall_conversion: 0 }
+    );
+  }
+
+  async getAnalyticsRetention(
+    projectId: number | string,
+    body: {
+      first_event: { name: string; conditions?: { property: string; operator: string; value: string | number }[] };
+      return_event: { name: string; conditions?: { property: string; operator: string; value: string | number }[] };
+      retention_type?: 'day' | 'week' | 'month';
+      num_periods?: number;
+      criteria?: 'on' | 'on_or_after';
+      measurement?: 'retention_rate' | 'unique_users' | 'property_sum' | 'property_avg';
+      measurement_property?: string;
+      breakdown?: { property: string };
+      min_frequency?: number;
+      period?: string;
+      start?: string;
+      end?: string;
+    }
+  ): Promise<{
+    cohorts: {
+      cohort_date: string;
+      cohort_size: number;
+      retention: number[];
+    }[];
+  }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/retention`,
+      body
+    );
+    return response.data?.data || { cohorts: [] };
+  }
+
+  async getAnalyticsFlows(
+    projectId: number | string,
+    body: {
+      anchor_event?: { name: string };
+      anchor_events?: { name: string }[];
+      direction?: string;
+      steps_before?: number;
+      steps_after?: number;
+      depth?: number;
+      view?: 'sankey' | 'top_paths';
+      breakdown?: { property: string };
+      exclude_events?: string[];
+      period?: string;
+      start?: string;
+      end?: string;
+      min_frequency?: number;
+    }
+  ): Promise<{
+    nodes: { id: string; count: number }[];
+    links: { source: string; target: string; value: number }[];
+    top_paths?: { path: string[]; count: number; percentage: number }[];
+  }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/flows`,
+      body
+    );
+    return response.data?.data || { nodes: [], links: [] };
   }
 }
 

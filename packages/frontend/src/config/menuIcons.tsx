@@ -77,6 +77,7 @@ import {
   NewReleases as NewReleasesIcon,
   NotificationsActive as NotificationsActiveIcon,
   Speed as SpeedIcon,
+  Analytics as AnalyticsIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 import ArgusIcon from '@/components/icons/ArgusIcon';
@@ -155,6 +156,7 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   NewReleases: <NewReleasesIcon />,
   NotificationsActive: <NotificationsActiveIcon />,
   Speed: <SpeedIcon />,
+  Analytics: <AnalyticsIcon />,
   Ripple: <RippleIcon />,
   Argus: <ArgusIcon />,
 };

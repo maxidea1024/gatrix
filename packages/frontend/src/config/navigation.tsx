@@ -461,6 +461,19 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         ],
       },
       {
+        text: 'sidebar.argusAnalytics',
+        icon: 'Analytics',
+        path: '/argus/analytics',
+        requiredPermission: P.CRASH_EVENTS_READ,
+        matchPaths: [
+          '/argus/analytics',
+          '/argus/analytics/insights',
+          '/argus/analytics/funnels',
+          '/argus/analytics/retention',
+          '/argus/analytics/flows',
+        ],
+      },
+      {
         text: 'sidebar.argusSessions',
         icon: 'Devices',
         path: '/argus/sessions',

@@ -64,6 +64,10 @@ export const config = {
       process.env.ARGUS_WORKER_SESSION_BATCH_SIZE || '500',
       10
     ),
+    activityBatchSize: parseInt(
+      process.env.ARGUS_WORKER_ACTIVITY_BATCH_SIZE || '500',
+      10
+    ),
     concurrency: parseInt(process.env.ARGUS_WORKER_CONCURRENCY || '5', 10),
   },
 

@@ -6,6 +6,7 @@ import { MetricWorker } from './workers/metric-worker';
 import { UptimeWorker } from './workers/uptime-worker';
 import { CronSupervisorWorker } from './workers/cron-supervisor-worker';
 import { LogWorker } from './workers/log-worker';
+import { ActivityWorker } from './workers/activity-worker';
 import { optic } from '@gatrix/argus-optic';
 import { testMySQLConnection, createLogger, dsnStore } from '@gatrix/argus';
 
@@ -52,6 +53,7 @@ async function start() {
     const uptimeWorker = new UptimeWorker();
     const cronSupervisorWorker = new CronSupervisorWorker();
     const logWorker = new LogWorker();
+    const activityWorker = new ActivityWorker();
 
     await errorWorker.start();
     await transactionWorker.start();
@@ -61,6 +63,7 @@ async function start() {
     await uptimeWorker.start();
     await cronSupervisorWorker.start();
     await logWorker.start();
+    await activityWorker.start();
 
     logger.info('All workers started successfully', {
       workers: [
@@ -72,6 +75,7 @@ async function start() {
         'uptime',
         'cron',
         'log',
+        'activity',
       ],
     });
 
@@ -89,6 +93,7 @@ async function start() {
           uptimeWorker.close(),
           cronSupervisorWorker.close(),
           logWorker.close(),
+          activityWorker.close(),
         ]);
 
         // Close stores and flusher after workers

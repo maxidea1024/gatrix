@@ -64,6 +64,7 @@ const ArgusSettingsPage: React.FC = () => {
   const [sessionRate, setSessionRate] = useState(1.0);
   const [retentionDays, setRetentionDays] = useState(90);
   const [metricsGroupLimit, setMetricsGroupLimit] = useState(10);
+  const [analyticsBreakdownLimit, setAnalyticsBreakdownLimit] = useState(20);
   const originalValues = React.useRef({
     name: '',
     platform: '',
@@ -72,6 +73,7 @@ const ArgusSettingsPage: React.FC = () => {
     sessionRate: 1.0,
     retentionDays: 90,
     metricsGroupLimit: 10,
+    analyticsBreakdownLimit: 20,
   });
   const isDirty =
     name !== originalValues.current.name ||
@@ -80,7 +82,8 @@ const ArgusSettingsPage: React.FC = () => {
     txnRate !== originalValues.current.txnRate ||
     sessionRate !== originalValues.current.sessionRate ||
     retentionDays !== originalValues.current.retentionDays ||
-    metricsGroupLimit !== originalValues.current.metricsGroupLimit;
+    metricsGroupLimit !== originalValues.current.metricsGroupLimit ||
+    analyticsBreakdownLimit !== originalValues.current.analyticsBreakdownLimit;
 
   // ── Fetch ──
   const fetchProject = useCallback(async () => {
@@ -100,6 +103,8 @@ const ArgusSettingsPage: React.FC = () => {
       setSessionRate(sr);
       setRetentionDays(rd);
       setMetricsGroupLimit(mgl);
+      const abl = Number(data.analytics_breakdown_limit) || 20;
+      setAnalyticsBreakdownLimit(abl);
       originalValues.current = {
         name: data.name,
         platform: data.platform,
@@ -108,6 +113,7 @@ const ArgusSettingsPage: React.FC = () => {
         sessionRate: sr,
         retentionDays: rd,
         metricsGroupLimit: mgl,
+        analyticsBreakdownLimit: abl,
       };
     } catch (err: any) {
       if (err?.response?.status === 404 || err?.status === 404) {
@@ -149,6 +155,7 @@ const ArgusSettingsPage: React.FC = () => {
         session_sample_rate: sessionRate,
         retention_days: retentionDays,
         metrics_group_limit: metricsGroupLimit,
+        analytics_breakdown_limit: analyticsBreakdownLimit,
       });
       enqueueSnackbar(t('argus.settings.saveSuccess'), { variant: 'success' });
       originalValues.current = {
@@ -159,6 +166,7 @@ const ArgusSettingsPage: React.FC = () => {
         sessionRate,
         retentionDays,
         metricsGroupLimit,
+        analyticsBreakdownLimit,
       };
     } catch {
       enqueueSnackbar(t('argus.settings.saveFailed'), { variant: 'error' });
@@ -317,6 +325,8 @@ const ArgusSettingsPage: React.FC = () => {
                 setSessionRate={setSessionRate}
                 metricsGroupLimit={metricsGroupLimit}
                 setMetricsGroupLimit={setMetricsGroupLimit}
+                analyticsBreakdownLimit={analyticsBreakdownLimit}
+                setAnalyticsBreakdownLimit={setAnalyticsBreakdownLimit}
                 saving={saving}
                 isDirty={isDirty}
                 handleSave={handleSave}

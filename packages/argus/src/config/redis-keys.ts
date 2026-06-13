@@ -37,6 +37,7 @@ export const STREAMS = {
   FEEDBACK: 'argus:feedback',
   METRICS: 'argus:metrics',
   LOGS: 'argus:logs',
+  ACTIVITIES: 'argus:activities',
 
   /** Build a per-project stream key: e.g. "argus:errors:proj_abc123" */
   streamKey: (base: string, projectId: string) => `${base}:${projectId}`,
@@ -51,6 +52,7 @@ export const KNOWN_STREAMS = {
   FEEDBACK: 'argus:known-streams:feedback',
   METRICS: 'argus:known-streams:metrics',
   LOGS: 'argus:known-streams:logs',
+  ACTIVITIES: 'argus:known-streams:activities',
 } as const;
 
 // ── GroupMQ Queue Namespaces ──
@@ -69,6 +71,7 @@ export const CONSUMER_GROUPS = {
   FEEDBACK: 'argus-feedback-workers',
   METRICS: 'argus-metric-workers',
   LOGS: 'argus-log-workers',
+  ACTIVITIES: 'argus-activity-workers',
 } as const;
 
 // ── Cache Keys ──

@@ -31,7 +31,8 @@ export type ArgusEventType =
   | 'session'
   | 'feedback'
   | 'checkin'
-  | 'metric';
+  | 'metric'
+  | 'activity';
 
 // =====================================================
 // Error Event
@@ -173,6 +174,24 @@ export interface ArgusMetricEvent extends ArgusBaseEvent {
 }
 
 // =====================================================
+// Activity Event (Product Analytics)
+// =====================================================
+
+export interface ArgusActivityEvent extends ArgusBaseEvent {
+  type: 'activity';
+  event_name: string;
+  user_id?: string;
+  device_id?: string;
+  session_id?: string;
+  country?: string;
+  city?: string;
+  os?: string;
+  app_version?: string;
+  properties?: Record<string, string>;
+  numeric_properties?: Record<string, number>;
+}
+
+// =====================================================
 // Shared Contexts
 // =====================================================
 
@@ -205,4 +224,5 @@ export type ArgusEvent =
   | ArgusSessionEvent
   | ArgusFeedbackEvent
   | ArgusCheckinEvent
-  | ArgusMetricEvent;
+  | ArgusMetricEvent
+  | ArgusActivityEvent;

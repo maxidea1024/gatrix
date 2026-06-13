@@ -353,6 +353,21 @@ const ArgusCronsPage = React.lazy(() => import('./pages/argus/ArgusCronsPage'));
 const ArgusUptimePage = React.lazy(
   () => import('./pages/argus/ArgusUptimePage')
 );
+const ArgusAnalyticsPage = React.lazy(
+  () => import('./pages/argus/ArgusAnalyticsPage')
+);
+const ArgusInsightsPage = React.lazy(
+  () => import('./pages/argus/ArgusInsightsPage')
+);
+const ArgusFunnelsPage = React.lazy(
+  () => import('./pages/argus/ArgusFunnelsPage')
+);
+const ArgusRetentionPage = React.lazy(
+  () => import('./pages/argus/ArgusRetentionPage')
+);
+const ArgusFlowsPage = React.lazy(
+  () => import('./pages/argus/ArgusFlowsPage')
+);
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 
@@ -1291,6 +1306,26 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="explore/metrics"
                                           element={<ArgusMetricsExplorerPage />}
+                                        />
+                                        <Route
+                                          path="analytics"
+                                          element={<ArgusAnalyticsPage />}
+                                        />
+                                        <Route
+                                          path="analytics/insights"
+                                          element={<ArgusInsightsPage />}
+                                        />
+                                        <Route
+                                          path="analytics/funnels"
+                                          element={<ArgusFunnelsPage />}
+                                        />
+                                        <Route
+                                          path="analytics/retention"
+                                          element={<ArgusRetentionPage />}
+                                        />
+                                        <Route
+                                          path="analytics/flows"
+                                          element={<ArgusFlowsPage />}
                                         />
                                         <Route
                                           path="explore/discover"

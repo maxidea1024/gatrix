@@ -14,6 +14,8 @@ interface SamplingSettingsProps {
   setSessionRate: (v: number) => void;
   metricsGroupLimit: number;
   setMetricsGroupLimit: (v: number) => void;
+  analyticsBreakdownLimit: number;
+  setAnalyticsBreakdownLimit: (v: number) => void;
   saving: boolean;
   isDirty: boolean;
   handleSave: () => Promise<void>;
@@ -32,6 +34,8 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
   setSessionRate,
   metricsGroupLimit,
   setMetricsGroupLimit,
+  analyticsBreakdownLimit,
+  setAnalyticsBreakdownLimit,
   saving,
   isDirty,
   handleSave,
@@ -138,6 +142,29 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">series</InputAdornment>
+            ),
+          }}
+        />
+      </FieldBlock>
+      <FieldBlock
+        label={t('argus.settings.analyticsBreakdownLimit', 'Analytics Breakdown Limit')}
+        desc={t(
+          'argus.settings.analyticsBreakdownDesc',
+          'Maximum number of breakdown values displayed in analytics charts. Higher values may reduce chart readability.'
+        )}
+        last
+      >
+        <TextField
+          type="number"
+          value={analyticsBreakdownLimit}
+          onChange={(e) =>
+            setAnalyticsBreakdownLimit(Math.max(1, Math.min(100, Number(e.target.value))))
+          }
+          size="small"
+          sx={{ ...inpSx, width: 120 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">{t('argus.analytics.breakdown', 'groups')}</InputAdornment>
             ),
           }}
         />

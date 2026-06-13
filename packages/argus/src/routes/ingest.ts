@@ -20,6 +20,7 @@ const STREAM_EVENT_TYPES: Record<string, { stream: string; knownSet: string }> =
     session: { stream: STREAMS.SESSIONS, knownSet: KNOWN_STREAMS.SESSIONS },
     feedback: { stream: STREAMS.FEEDBACK, knownSet: KNOWN_STREAMS.FEEDBACK },
     metric: { stream: STREAMS.METRICS, knownSet: KNOWN_STREAMS.METRICS },
+    activity: { stream: STREAMS.ACTIVITIES, knownSet: KNOWN_STREAMS.ACTIVITIES },
   };
 
 export default async function ingestRoutes(app: FastifyInstance) {

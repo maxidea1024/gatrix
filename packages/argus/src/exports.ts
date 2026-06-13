@@ -46,6 +46,7 @@ export type {
   ArgusFeedbackEvent,
   ArgusCheckinEvent,
   ArgusMetricEvent,
+  ArgusActivityEvent,
   ArgusUser,
   ArgusContexts,
   ArgusBatchPayload,
