@@ -110,8 +110,36 @@ export const ReleaseHealthChart: React.FC<{
     );
   }
 
+  // Trim leading/trailing entries with 0% crash_free_rate — those are outside
+  // the release's active period and would flatten the chart to the bottom.
+  let startIdx = 0;
+  let endIdx = data.length - 1;
+  while (startIdx < data.length && data[startIdx].crash_free_rate <= 0) startIdx++;
+  while (endIdx > startIdx && data[endIdx].crash_free_rate <= 0) endIdx--;
+  // Keep one zero-entry on each side as a visual anchor if available
+  if (startIdx > 0) startIdx--;
+  if (endIdx < data.length - 1) endIdx++;
+  const trimmed = data.slice(startIdx, endIdx + 1);
+
+  if (trimmed.length < 2) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: 180,
+        }}
+      >
+        <Typography variant="body2" color="text.disabled">
+          {t('argus.releaseDetail.noHealthData', 'No health data available')}
+        </Typography>
+      </Box>
+    );
+  }
+
   const maxVal = 100;
-  const minVal = Math.min(...data.map((d) => d.crash_free_rate), 90);
+  const minVal = Math.min(...trimmed.map((d) => d.crash_free_rate), 90);
   const range = maxVal - minVal || 1;
   const chartWidth = 800;
   const chartHeight = 160;
@@ -119,46 +147,28 @@ export const ReleaseHealthChart: React.FC<{
   const innerW = chartWidth - padding.left - padding.right;
   const innerH = chartHeight - padding.top - padding.bottom;
 
-  const dataPoints = data.map((d, i) => ({
-    x: padding.left + (i / (data.length - 1)) * innerW,
+  const dataPoints = trimmed.map((d, i) => ({
+    x: padding.left + (i / (trimmed.length - 1)) * innerW,
     y: padding.top + (1 - (d.crash_free_rate - minVal) / range) * innerH,
     value: d.crash_free_rate,
     ts: d.timestamp,
   }));
-
-  // Extend line to chart edges so there's no blank whitespace before/after data
-  const firstY = dataPoints[0].y;
-  const lastY = dataPoints[dataPoints.length - 1].y;
-  const edgeLeft = { x: padding.left, y: firstY };
-  const edgeRight = { x: chartWidth - padding.right, y: lastY };
-
-  // If first point is not at the left edge, prepend an edge point
-  const needsLeftExtend = dataPoints[0].x > padding.left + 1;
-  const needsRightExtend =
-    dataPoints[dataPoints.length - 1].x < chartWidth - padding.right - 1;
-
-  const allPoints = [
-    ...(needsLeftExtend ? [edgeLeft] : []),
-    ...dataPoints,
-    ...(needsRightExtend ? [edgeRight] : []),
-  ];
-
-  const linePath = allPoints
+  const linePath = dataPoints
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
     .join(' ');
-  const areaPath = `${linePath} L ${allPoints[allPoints.length - 1].x} ${padding.top + innerH} L ${allPoints[0].x} ${padding.top + innerH} Z`;
+  const areaPath = `${linePath} L ${dataPoints[dataPoints.length - 1].x} ${padding.top + innerH} L ${dataPoints[0].x} ${padding.top + innerH} Z`;
 
   const lineColor = '#4caf50';
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
   const xLabels =
-    data.length > 6
+    trimmed.length > 6
       ? [
           0,
-          Math.floor(data.length / 3),
-          Math.floor((2 * data.length) / 3),
-          data.length - 1,
+          Math.floor(trimmed.length / 3),
+          Math.floor((2 * trimmed.length) / 3),
+          trimmed.length - 1,
         ]
-      : data.map((_, i) => i);
+      : trimmed.map((_, i) => i);
 
   return (
     <Paper
@@ -205,7 +215,7 @@ export const ReleaseHealthChart: React.FC<{
           const p = dataPoints[idx as number];
           if (!p) return null;
           const label = new Date(
-            data[idx as number].timestamp
+            trimmed[idx as number].timestamp
           ).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
           return (
             <text
