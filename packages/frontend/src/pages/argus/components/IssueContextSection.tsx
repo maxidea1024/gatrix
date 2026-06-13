@@ -920,7 +920,7 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
             ? 'rgba(255,255,255,0.04)'
             : 'rgba(0,0,0,0.04)';
 
-          const renderTagColumn = (col: typeof rows) => (
+          const renderTagColumn = (col: TagRow[]) => (
             <Box
               sx={{
                 flex: 1,

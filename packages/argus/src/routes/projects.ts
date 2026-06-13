@@ -176,6 +176,7 @@ export default async function projectsRoutes(app: FastifyInstance) {
         transaction_sample_rate?: number;
         session_sample_rate?: number;
         retention_days?: number;
+        metrics_group_limit?: number;
       };
 
       const updates: string[] = [];
@@ -205,6 +206,10 @@ export default async function projectsRoutes(app: FastifyInstance) {
         updates.push('retention_days = ?');
         params.push(body.retention_days);
       }
+      if (body.metrics_group_limit !== undefined) {
+        updates.push('metrics_group_limit = ?');
+        params.push(body.metrics_group_limit);
+      }
 
       if (updates.length === 0) {
         return reply.code(400).send({ error: 'No fields to update' });
@@ -223,6 +228,8 @@ export default async function projectsRoutes(app: FastifyInstance) {
         updateObj.session_sample_rate = body.session_sample_rate;
       if (body.retention_days !== undefined)
         updateObj.retention_days = body.retention_days;
+      if (body.metrics_group_limit !== undefined)
+        updateObj.metrics_group_limit = body.metrics_group_limit;
 
       try {
         await db('g_argus_projects')

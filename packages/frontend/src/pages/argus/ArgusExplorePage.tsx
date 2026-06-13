@@ -45,6 +45,7 @@ import argusService, {
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
+import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 import {
   DATASET_CONFIG,
   QueryCard,
@@ -76,6 +77,7 @@ const ArgusExplorePage: React.FC = () => {
   const [duplicateTarget, setDuplicateTarget] =
     useState<ArgusSavedQuery | null>(null);
   const [duplicateName, setDuplicateName] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
 
   // Fetch
   const fetchQueries = useCallback(async () => {
@@ -142,13 +144,20 @@ const ArgusExplorePage: React.FC = () => {
   }, [queries, debouncedSearch, sort, filterTypes, favoritesOnly]);
 
   // Handlers
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
+    const target = queries.find((q) => q.id === id);
+    if (target) setDeleteTarget(target);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await argusService.deleteSavedQuery(projectId, id);
-      setQueries((prev) => prev.filter((q) => q.id !== id));
+      await argusService.deleteSavedQuery(projectId, deleteTarget.id);
+      setQueries((prev) => prev.filter((q) => q.id !== deleteTarget.id));
     } catch (err) {
       console.error('Failed to delete query', err);
     }
+    setDeleteTarget(null);
   };
 
   const handleToggleFavorite = async (id: number, favorite: boolean) => {
@@ -601,6 +610,14 @@ const ArgusExplorePage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Delete Confirm Dialog */}
+      <DeleteQueryConfirmDialog
+        open={!!deleteTarget}
+        queryName={deleteTarget?.name || ''}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+      />
     </Box>
   );
 };

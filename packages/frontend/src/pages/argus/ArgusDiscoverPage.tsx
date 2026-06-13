@@ -35,15 +35,9 @@ import {
   ArrowUpward as SortAscIcon,
   FilterList as FilterIcon,
   Block as ExcludeIcon,
+  NotificationsActive as AlertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip as ChartTooltip,
-} from 'chart.js';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
@@ -62,28 +56,32 @@ import {
 } from '@/components/argus/query-aql';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
-import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import {
   VolumeChart,
   GroupBySelector,
   DisplayModeChip,
+  DatasetSwitcher,
+  PrebuiltQueryCards,
+  PaginationControls,
   FALLBACK_COLUMNS,
+  DATASET_FALLBACK_COLUMNS,
   Y_AXIS_OPTIONS,
+  type PrebuiltQuery,
+  type DiscoverDataset,
 } from './components/discoverHelpers';
-import {
-  DiscoverSaveDialog,
-  DiscoverSavedPanel,
-} from './components/DiscoverDialogs';
+import { DiscoverSavedPanel } from './components/DiscoverDialogs';
+import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
+import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, ChartTooltip);
 
 const ArgusDiscoverPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
@@ -119,6 +117,7 @@ const ArgusDiscoverPage: React.FC = () => {
       display: { key: 'display', default: 'total' },
       yAxis: { key: 'yAxis', default: 'count()' },
       queryId: { key: 'queryId', default: '' },
+      dataset: { key: 'dataset', default: 'errors' },
     }),
     []
   );
@@ -129,6 +128,7 @@ const ArgusDiscoverPage: React.FC = () => {
   const displayMode = urlState.display;
   const yAxis = urlState.yAxis;
   const orderBy = urlState.orderBy;
+  const dataset = urlState.dataset as DiscoverDataset;
   const orderDir: 'asc' | 'desc' = orderBy.startsWith('-') ? 'desc' : 'asc';
 
   const [filters, setFilters] = useState<ArgusFilterState>(() =>
@@ -162,29 +162,80 @@ const ArgusDiscoverPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasQueried, setHasQueried] = useState(false);
+  const [queryOffset, setQueryOffset] = useState(0);
+  const QUERY_LIMIT = 50;
 
   const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveDialogMode, setSaveDialogMode] = useState<'new' | 'saveAs'>('new');
   const [saveName, setSaveName] = useState('');
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const lastProcessedUrlQueryIdRef = useRef<string | undefined>(undefined);
 
   const defaultQueryName = t('argus.discover.newQuery', 'New Discover Query');
   const [queryName, setQueryName] = useState(
     (location.state as any)?.queryName || defaultQueryName
   );
 
+  // Sync URL queryId to state — delegate to handleLoadSavedQuery
   useEffect(() => {
     if (urlState.queryId && savedQueries.length > 0) {
       const qId = parseInt(urlState.queryId, 10);
-      const matched = savedQueries.find((q) => q.id === qId);
-      if (matched && currentQueryId !== qId) {
-        setCurrentQueryId(matched.id);
-        setQueryName(matched.name);
+      if (currentQueryId !== qId) {
+        const matched = savedQueries.find((q) => q.id === qId);
+        if (matched) {
+          handleLoadSavedQuery(matched);
+        }
       }
+    } else if (!urlState.queryId && currentQueryId !== null) {
+      setCurrentQueryId(null);
+      setQueryName(defaultQueryName);
+      setSavedSnapshot(null);
     }
-  }, [urlState.queryId, savedQueries, currentQueryId]);
+  }, [urlState.queryId, savedQueries, currentQueryId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Dirty state tracking ───
+  type DiscoverSnapshot = {
+    fields: string[];
+    conditions: string;
+    groupBy: string[];
+    orderBy: string;
+    displayMode: string;
+    yAxis: string;
+    dataset: string;
+  };
+  const [savedSnapshot, setSavedSnapshot] = useState<DiscoverSnapshot | null>(null);
+
+  const takeSnapshot = useCallback(() => {
+    setSavedSnapshot({
+      fields: [...(fields as string[])],
+      conditions,
+      groupBy: [...(groupBy as string[])],
+      orderBy,
+      displayMode,
+      yAxis,
+      dataset,
+    });
+  }, [fields, conditions, groupBy, orderBy, displayMode, yAxis, dataset]);
+
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot) {
+      return !urlState.queryId;
+    }
+    return (
+      JSON.stringify(fields) !== JSON.stringify(savedSnapshot.fields) ||
+      conditions !== savedSnapshot.conditions ||
+      JSON.stringify(groupBy) !== JSON.stringify(savedSnapshot.groupBy) ||
+      orderBy !== savedSnapshot.orderBy ||
+      displayMode !== savedSnapshot.displayMode ||
+      yAxis !== savedSnapshot.yAxis ||
+      dataset !== savedSnapshot.dataset
+    );
+  }, [fields, conditions, groupBy, orderBy, displayMode, yAxis, dataset, hasQueried, savedSnapshot]);
 
   // ─── Tag/schema data ───
   const [facets, setFacets] = useState<Record<string, any[]>>({});
@@ -206,6 +257,19 @@ const ArgusDiscoverPage: React.FC = () => {
     return '24h';
   }, [filters.dateRange]);
 
+  const handleChartZoom = useCallback(
+    (start: string, end: string) => {
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+      setFilters((prev) => ({
+        ...prev,
+        dateRange: { type: 'custom', start: startDate, end: endDate },
+      }));
+    },
+    []
+  );
+
   // ─── API calls ───
   const buildConditions = useCallback(() => {
     return urlState.q || '';
@@ -219,12 +283,13 @@ const ArgusDiscoverPage: React.FC = () => {
         start: apiParams.start,
         end: apiParams.end,
         search: buildConditions(),
+        dataset,
       });
       setVolume(data);
     } catch (err) {
       console.error('Failed to fetch volume', err);
     }
-  }, [projectId, filters, currentPeriod, buildConditions]);
+  }, [projectId, filters, currentPeriod, buildConditions, dataset]);
 
   const runQuery = useCallback(async () => {
     setLoading(true);
@@ -242,10 +307,12 @@ const ArgusDiscoverPage: React.FC = () => {
         groupBy: groupBy.length > 0 ? groupBy : undefined,
         conditions: builtConditions || undefined,
         orderBy: orderBy || undefined,
-        limit: 50,
+        limit: QUERY_LIMIT,
+        offset: queryOffset,
         period: apiParams.period || currentPeriod,
         start: apiParams.start,
         end: apiParams.end,
+        dataset,
       });
       setResults(result.data || []);
       fetchVolume();
@@ -274,11 +341,11 @@ const ArgusDiscoverPage: React.FC = () => {
       .then(setSavedQueries)
       .catch(() => setSavedQueries([]));
     argusService
-      .discoverTags(projectId)
+      .discoverTags(projectId, dataset)
       .then((data) => {
         setFacets(data.tags || {});
         setAvailableColumns(
-          data.columns?.length ? data.columns : FALLBACK_COLUMNS
+          data.columns?.length ? data.columns : DATASET_FALLBACK_COLUMNS[dataset] || FALLBACK_COLUMNS
         );
         setAvailableAggregates(
           data.aggregates?.length
@@ -287,11 +354,11 @@ const ArgusDiscoverPage: React.FC = () => {
         );
       })
       .catch(() => {
-        setAvailableColumns(FALLBACK_COLUMNS);
+        setAvailableColumns(DATASET_FALLBACK_COLUMNS[dataset] || FALLBACK_COLUMNS);
         setAvailableAggregates(['count', 'uniq', 'avg', 'sum', 'p95']);
       });
     fetchVolume();
-  }, [projectId, fetchVolume]);
+  }, [projectId, fetchVolume, dataset]);
 
   useEffect(() => {
     runQuery();
@@ -307,70 +374,164 @@ const ArgusDiscoverPage: React.FC = () => {
   }, [yAxis, hasQueried, runQuery]);
 
   // ─── Handlers ───
-  const handleSaveQuery = useCallback(async () => {
-    if (!saveName.trim()) return;
-    try {
-      const res = await argusService.createSavedQuery(projectId, {
-        name: saveName.trim(),
-        query_config: {
-          fields,
-          conditions,
-          groupBy,
-          orderBy,
-          period: currentPeriod,
-        },
-        display_type: displayMode,
-      });
-      const updated = await argusService.listSavedQueries(projectId);
-      setSavedQueries(updated);
-      setQueryName(saveName.trim());
-      if (res.id) setCurrentQueryId(res.id);
-      setSaveDialogOpen(false);
-      setSaveName('');
-    } catch (err) {
-      console.error('Failed to save query:', err);
-    }
-  }, [
-    saveName,
-    projectId,
+  const buildQueryConfig = useCallback(() => ({
     fields,
     conditions,
     groupBy,
     orderBy,
-    currentPeriod,
-    displayMode,
-  ]);
+    period: currentPeriod,
+  }), [fields, conditions, groupBy, orderBy, currentPeriod]);
+
+  // Save: update existing or prompt name for new
+  const handleSave = useCallback(async () => {
+    if (currentQueryId) {
+      // Update existing query in-place
+      setSaving(true);
+      try {
+        await argusService.updateSavedQuery(projectId, currentQueryId, {
+          name: queryName,
+          query_config: buildQueryConfig(),
+          display_type: displayMode,
+        });
+        const updated = await argusService.listSavedQueries(projectId);
+        setSavedQueries(updated);
+        takeSnapshot();
+      } catch (err) {
+        console.error('Failed to update query:', err);
+      } finally {
+        setSaving(false);
+      }
+    } else if (queryName !== defaultQueryName && queryName.trim()) {
+      // New state with user-given name: check for duplicates
+      const duplicate = savedQueries.find(
+        (q) => q.name.toLowerCase() === queryName.trim().toLowerCase()
+      );
+      if (duplicate) {
+        // Name conflict: open dialog so user sees the warning
+        setSaveName(queryName.trim());
+        setSaveDialogMode('new');
+        setSaveDialogOpen(true);
+      } else {
+        // No conflict: save directly
+        setSaving(true);
+        try {
+          const res = await argusService.createSavedQuery(projectId, {
+            name: queryName.trim(),
+            query_config: buildQueryConfig(),
+            display_type: displayMode,
+          });
+          if (res.id) {
+            setCurrentQueryId(res.id);
+            setUrlState({ queryId: String(res.id) });
+            lastProcessedUrlQueryIdRef.current = String(res.id);
+          }
+          const updated = await argusService.listSavedQueries(projectId);
+          setSavedQueries(updated);
+          takeSnapshot();
+        } catch (err) {
+          console.error('Failed to create query:', err);
+        } finally {
+          setSaving(false);
+        }
+      }
+    } else {
+      // New state with default name: open name dialog
+      setSaveName('');
+      setSaveDialogMode('new');
+      setSaveDialogOpen(true);
+    }
+  }, [currentQueryId, projectId, queryName, defaultQueryName, buildQueryConfig, displayMode, takeSnapshot, setUrlState, savedQueries]);
+
+  // Save As: always open name dialog
+  const handleSaveAs = useCallback(() => {
+    setSaveName(queryName === defaultQueryName ? '' : queryName);
+    setSaveDialogMode('saveAs');
+    setSaveDialogOpen(true);
+  }, [queryName, defaultQueryName]);
+
+  // Dialog save callback
+  const handleDialogSave = useCallback(async (name: string, existingQueryId: number | null) => {
+    setSaving(true);
+    try {
+      if (existingQueryId) {
+        // Overwrite existing query with same name
+        await argusService.updateSavedQuery(projectId, existingQueryId, {
+          name,
+          query_config: buildQueryConfig(),
+          display_type: displayMode,
+        });
+        setCurrentQueryId(existingQueryId);
+        setQueryName(name);
+        setUrlState({ queryId: String(existingQueryId) });
+        lastProcessedUrlQueryIdRef.current = String(existingQueryId);
+      } else {
+        // Create new
+        const res = await argusService.createSavedQuery(projectId, {
+          name,
+          query_config: buildQueryConfig(),
+          display_type: displayMode,
+        });
+        if (res.id) {
+          setCurrentQueryId(res.id);
+          setQueryName(name);
+          setUrlState({ queryId: String(res.id) });
+          lastProcessedUrlQueryIdRef.current = String(res.id);
+        }
+      }
+      const updated = await argusService.listSavedQueries(projectId);
+      setSavedQueries(updated);
+
+      takeSnapshot();
+      setSaveDialogOpen(false);
+      setSaveName('');
+    } catch (err) {
+      console.error('Failed to save query:', err);
+    } finally {
+      setSaving(false);
+    }
+  }, [projectId, buildQueryConfig, displayMode, setUrlState, takeSnapshot]);
 
   const handleRename = useCallback(
     async (newName: string) => {
       setQueryName(newName);
-      if (currentQueryId) {
+      const effectiveId = currentQueryId || (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
+      if (effectiveId) {
+        setSaving(true);
         try {
-          await argusService.updateSavedQuery(projectId, currentQueryId, {
+          await argusService.updateSavedQuery(projectId, effectiveId, {
             name: newName,
           });
           const updated = await argusService.listSavedQueries(projectId);
           setSavedQueries(updated);
         } catch (err) {
           console.error('Failed to rename query:', err);
+        } finally {
+          setSaving(false);
         }
       }
     },
-    [currentQueryId, projectId]
+    [currentQueryId, projectId, urlState.queryId]
   );
 
   const handleDeleteSavedQuery = useCallback(
-    async (id: number) => {
-      try {
-        await argusService.deleteSavedQuery(projectId, id);
-        setSavedQueries((prev) => prev.filter((q) => q.id !== id));
-        if (currentQueryId === id) setCurrentQueryId(null);
-      } catch (err) {
-        console.error('Failed to delete query:', err);
-      }
+    (id: number) => {
+      const target = savedQueries.find((q) => q.id === id);
+      if (target) setDeleteTarget(target);
     },
-    [projectId, currentQueryId]
+    [savedQueries]
   );
+
+  const confirmDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    try {
+      await argusService.deleteSavedQuery(projectId, deleteTarget.id);
+      setSavedQueries((prev) => prev.filter((q) => q.id !== deleteTarget.id));
+      if (currentQueryId === deleteTarget.id) setCurrentQueryId(null);
+    } catch (err) {
+      console.error('Failed to delete query:', err);
+    }
+    setDeleteTarget(null);
+  }, [deleteTarget, projectId, currentQueryId]);
 
   const handleLoadSavedQuery = useCallback(
     (query: ArgusSavedQuery) => {
@@ -382,11 +543,23 @@ const ArgusDiscoverPage: React.FC = () => {
         fields: cfg.fields || ['count()'],
         groupBy: cfg.groupBy || [],
         orderBy: cfg.orderBy || '-count',
+        queryId: String(query.id),
       });
       setConditions(cfg.conditions || '');
       setQueryName(query.name);
       setCurrentQueryId(query.id);
       setSavedPanelOpen(false);
+      lastProcessedUrlQueryIdRef.current = String(query.id);
+      // Set snapshot after load so isDirty starts as false
+      setSavedSnapshot({
+        fields: cfg.fields || ['count()'],
+        conditions: cfg.conditions || '',
+        groupBy: cfg.groupBy || [],
+        orderBy: cfg.orderBy || '-count',
+        displayMode: cfg.display_type || 'total',
+        yAxis: cfg.yAxis || 'count()',
+        dataset: cfg.dataset || 'errors',
+      });
     },
     [setUrlState]
   );
@@ -460,14 +633,71 @@ const ArgusDiscoverPage: React.FC = () => {
 
   const handleExport = useCallback(() => {
     if (results.length === 0) return;
-    const blob = new Blob([JSON.stringify(results, null, 2)], {
-      type: 'application/json',
+    const headers = Object.keys(results[0]);
+    const csvRows = [
+      headers.join(','),
+      ...results.map((row) =>
+        headers
+          .map((h) => {
+            const val = row[h];
+            const str = val == null ? '' : String(val);
+            return str.includes(',') || str.includes('"') || str.includes('\n')
+              ? `"${str.replace(/"/g, '""')}"`
+              : str;
+          })
+          .join(',')
+      ),
+    ];
+    const blob = new Blob([csvRows.join('\n')], {
+      type: 'text/csv;charset=utf-8;',
     });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `discover-${new Date().toISOString()}.json`;
+    a.download = `discover-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
   }, [results]);
+
+  const handleSelectPrebuilt = useCallback(
+    (q: PrebuiltQuery) => {
+      setUrlState({
+        fields: q.fields,
+        groupBy: q.groupBy,
+        orderBy: q.orderBy,
+        yAxis: q.yAxis,
+      });
+      setQueryName(q.defaultName);
+      setQueryOffset(0);
+      // Trigger query on next tick after state update
+      setTimeout(() => runQuery(), 0);
+    },
+    [setUrlState, runQuery]
+  );
+
+  const handlePagePrev = useCallback(() => {
+    setQueryOffset((prev) => Math.max(0, prev - QUERY_LIMIT));
+  }, []);
+
+  const handlePageNext = useCallback(() => {
+    setQueryOffset((prev) => prev + QUERY_LIMIT);
+  }, []);
+
+  // Re-run query when offset changes (pagination)
+  useEffect(() => {
+    if (hasQueried && queryOffset > 0) {
+      runQuery();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryOffset]);
+
+  const handleRowClick = useCallback(
+    (row: Record<string, any>) => {
+      // Drill-down: navigate to issue detail if issue_id is available
+      if (row.issue_id) {
+        navigate(`/argus/issues/${projectId}/${row.issue_id}`);
+      }
+    },
+    [navigate, projectId]
+  );
 
   const resultsToChartData = useCallback(() => {
     if (results.length === 0) return [];
@@ -517,6 +747,8 @@ const ArgusDiscoverPage: React.FC = () => {
             ]}
           />
         }
+        titleUpdateTrigger={queryName}
+        actionsUpdateTrigger={`${isDirty}-${saving}-${currentQueryId}`}
         subtitle={t(
           'argus.discover.subtitle',
           'Query and explore your error data'
@@ -543,12 +775,24 @@ const ArgusDiscoverPage: React.FC = () => {
             </Tooltip>
             <Button
               size="small"
+              variant="contained"
+              startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
+              onClick={handleSave}
+              disabled={!isDirty}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderRadius: '6px',
+              }}
+            >
+              {t('argus.discover.save', 'Save')}
+            </Button>
+            <Button
+              size="small"
               variant="outlined"
               startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
-              onClick={() => {
-                setSaveName(queryName === defaultQueryName ? '' : queryName);
-                setSaveDialogOpen(true);
-              }}
+              onClick={handleSaveAs}
               disabled={fields.length === 0}
               sx={{
                 textTransform: 'none',
@@ -562,9 +806,61 @@ const ArgusDiscoverPage: React.FC = () => {
             >
               {t('argus.discover.saveAs', 'Save as...')}
             </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<AlertIcon sx={{ fontSize: 15 }} />}
+              onClick={() => {
+                navigate('/argus/alerts', {
+                  state: {
+                    fromDiscover: true,
+                    query: {
+                      conditions: buildConditions(),
+                      fields,
+                      groupBy,
+                      dataset,
+                      yAxis,
+                    },
+                  },
+                });
+              }}
+              disabled={!hasQueried}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderColor: isDark
+                  ? 'rgba(255,255,255,0.12)'
+                  : 'rgba(0,0,0,0.12)',
+                borderRadius: '6px',
+                color: theme.palette.warning.main,
+              }}
+            >
+              {t('argus.discover.createAlert', 'Create Alert')}
+            </Button>
           </Box>
         }
       />
+
+      {/* Dataset Switcher */}
+      <Box sx={{ mb: 1.5 }}>
+        <DatasetSwitcher
+          value={dataset}
+          onChange={(ds) => {
+            const fallback = DATASET_FALLBACK_COLUMNS[ds] || FALLBACK_COLUMNS;
+            setUrlState({
+              dataset: ds,
+              fields: fallback.slice(0, 4),
+              groupBy: [],
+              orderBy: '-count',
+              yAxis: 'count()',
+            });
+            setQueryOffset(0);
+            setHasQueried(false);
+            setResults([]);
+          }}
+        />
+      </Box>
 
       <ArgusFilterBar
         projectId={projectId}
@@ -624,90 +920,8 @@ const ArgusDiscoverPage: React.FC = () => {
       />
 
       {/* Volume Chart */}
-      <VolumeChart data={volume} isDark={isDark} period={currentPeriod} />
+      <VolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleChartZoom} />
 
-      {/* Interactive Chart */}
-      {hasQueried && results.length > 0 && (
-        <Paper
-          elevation={0}
-          sx={{
-            mb: 2,
-            p: 2,
-            borderRadius: 2,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          }}
-        >
-          <Box sx={{ display: 'flex', gap: 1, mb: 1.5, alignItems: 'center' }}>
-            <DisplayModeChip
-              value={displayMode}
-              onChange={(v: string) => setUrlState({ display: v })}
-              isDark={isDark}
-            />
-            <Box
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5,
-                height: 28,
-                px: 1.2,
-                borderRadius: '6px',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: '0.7rem',
-                  fontWeight: 600,
-                  color: 'text.secondary',
-                }}
-              >
-                {t('argus.discover.yAxis', 'Y-Axis')}:
-              </Typography>
-              <FormControl
-                size="small"
-                variant="standard"
-                sx={{ minWidth: 80 }}
-              >
-                <Select
-                  value={yAxis}
-                  onChange={(e) => setUrlState({ yAxis: e.target.value })}
-                  disableUnderline
-                  sx={{
-                    fontSize: '0.7rem',
-                    fontWeight: 700,
-                    '& .MuiSelect-select': { py: 0 },
-                  }}
-                >
-                  {Y_AXIS_OPTIONS.map((o) => (
-                    <MenuItem
-                      key={o.value}
-                      value={o.value}
-                      sx={{ fontSize: '0.75rem' }}
-                    >
-                      {o.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-            <Box sx={{ flex: 1 }} />
-            {results.length > 0 && (
-              <Typography variant="caption" sx={{ color: 'text.disabled' }}>
-                {results.length} {t('argus.discover.results', 'results')}
-              </Typography>
-            )}
-          </Box>
-          <InteractiveTimeSeriesChart
-            data={resultsToChartData()}
-            type={
-              displayMode === 'bar' || displayMode === 'daily' ? 'bar' : 'line'
-            }
-            height={180}
-            onZoom={() => {}}
-          />
-        </Paper>
-      )}
 
       {/* Results Table */}
       {hasQueried && (
@@ -809,6 +1023,7 @@ const ArgusDiscoverPage: React.FC = () => {
             skeleton={<TableSkeleton rows={8} cols={fields.length || 4} />}
           >
             {results.length > 0 ? (
+              <>
               <Box sx={{ overflowX: 'auto' }}>
                 <Table size="small">
                   <TableHead>
@@ -864,7 +1079,9 @@ const ArgusDiscoverPage: React.FC = () => {
                       <TableRow
                         key={idx}
                         hover
+                        onClick={() => handleRowClick(row)}
                         sx={{
+                          cursor: row.issue_id ? 'pointer' : 'default',
                           '&:hover': {
                             backgroundColor: isDark
                               ? 'rgba(255,255,255,0.015)'
@@ -890,7 +1107,16 @@ const ArgusDiscoverPage: React.FC = () => {
                                 gap: 0.5,
                               }}
                             >
-                              <span>
+                              <span
+                                style={{
+                                  ...(((colKey === 'event_id' && row.issue_id) || colKey === 'issue_id') ? {
+                                    color: theme.palette.primary.main,
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline',
+                                    textDecorationStyle: 'dotted' as const,
+                                  } : {}),
+                                }}
+                              >
                                 {typeof val === 'number'
                                   ? val.toLocaleString()
                                   : String(val)}
@@ -960,6 +1186,16 @@ const ArgusDiscoverPage: React.FC = () => {
                   </TableBody>
                 </Table>
               </Box>
+              {/* Pagination */}
+              <PaginationControls
+                offset={queryOffset}
+                limit={QUERY_LIMIT}
+                resultCount={results.length}
+                onPrev={handlePagePrev}
+                onNext={handlePageNext}
+                isDark={isDark}
+              />
+              </>
             ) : !loading && !error ? (
               <Box sx={{ py: 8, textAlign: 'center' }}>
                 <DiscoverIcon
@@ -977,50 +1213,32 @@ const ArgusDiscoverPage: React.FC = () => {
         </Paper>
       )}
 
-      {/* Empty initial state */}
+      {/* Empty initial state — Pre-built Query Cards */}
       {!hasQueried && (
-        <Paper
-          elevation={0}
-          sx={{
-            py: 10,
-            textAlign: 'center',
-            borderRadius: 2,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          }}
-        >
-          <DiscoverIcon
-            sx={{
-              fontSize: 48,
-              color: alpha(theme.palette.primary.main, 0.3),
-              mb: 1.5,
-            }}
-          />
-          <Typography
-            variant="h6"
-            fontWeight={600}
-            sx={{ mb: 0.5, fontSize: '1rem' }}
-          >
-            {t('argus.discover.title', 'Discover')}
-          </Typography>
-          <Typography
-            color="text.secondary"
-            sx={{ fontSize: '0.85rem', maxWidth: 400, mx: 'auto' }}
-          >
-            {t(
-              'argus.discover.emptyHint',
-              'Query and explore your error data. Add search conditions above or click Search to get started.'
-            )}
-          </Typography>
-        </Paper>
+        <PrebuiltQueryCards
+          onSelect={handleSelectPrebuilt}
+          isDark={isDark}
+        />
       )}
 
-      {/* Save Dialog */}
-      <DiscoverSaveDialog
+      {/* Save / Save As Dialog */}
+      <SaveQueryDialog
         open={saveDialogOpen}
         onClose={() => setSaveDialogOpen(false)}
-        saveName={saveName}
+        name={saveName}
         onNameChange={setSaveName}
-        onSave={handleSaveQuery}
+        onSave={handleDialogSave}
+        mode={saveDialogMode}
+        savedQueries={savedQueries}
+        currentQueryId={currentQueryId}
+      />
+
+      {/* Delete Confirm Dialog */}
+      <DeleteQueryConfirmDialog
+        open={!!deleteTarget}
+        queryName={deleteTarget?.name || ''}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
       />
 
       {/* Saved Queries Panel */}

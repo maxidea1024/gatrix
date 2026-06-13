@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS g_argus_projects (
   transaction_sample_rate DECIMAL(5,4) DEFAULT 1.0,
   session_sample_rate     DECIMAL(5,4) DEFAULT 1.0,
   retention_days          INT DEFAULT 90,
+  metrics_group_limit     INT DEFAULT 10,
   created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY uk_gatrix_project (gatrix_project_id),

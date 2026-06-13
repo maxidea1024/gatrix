@@ -1,21 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Box, Typography, TextField } from '@mui/material';
-import { Edit as EditIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Warning as WarningIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface EditablePageTitleProps {
   value: string;
   onChange: (newValue: string) => void;
   placeholder?: string;
+  /** Optional list of existing names to check for duplicates */
+  existingNames?: string[];
 }
 
 const EditablePageTitle: React.FC<EditablePageTitleProps> = ({
   value,
   onChange,
   placeholder = 'Untitled',
+  existingNames,
 }) => {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isSavingRef = useRef(false);
 
   useEffect(() => {
     setTempValue(value);
@@ -23,12 +29,24 @@ const EditablePageTitle: React.FC<EditablePageTitleProps> = ({
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
+      isSavingRef.current = false;
       inputRef.current.focus();
       inputRef.current.select();
     }
   }, [isEditing]);
 
+  const isDuplicate = useMemo(() => {
+    if (!existingNames || !tempValue.trim()) return false;
+    const trimmed = tempValue.trim().toLowerCase();
+    // Exclude the current value (renaming to the same name is fine)
+    if (trimmed === value.toLowerCase()) return false;
+    return existingNames.some((n) => n.toLowerCase() === trimmed);
+  }, [tempValue, existingNames, value]);
+
   const handleSave = () => {
+    if (isSavingRef.current) return; // Prevent double invocation (Enter + blur)
+    isSavingRef.current = true;
+    if (isDuplicate) return; // Block save on duplicate
     if (tempValue.trim() && tempValue !== value) {
       onChange(tempValue.trim());
     } else {
@@ -50,7 +68,7 @@ const EditablePageTitle: React.FC<EditablePageTitleProps> = ({
   if (isEditing) {
     return (
       <Box
-        sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
+        sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
         <TextField
@@ -62,6 +80,7 @@ const EditablePageTitle: React.FC<EditablePageTitleProps> = ({
           size="small"
           placeholder={placeholder}
           variant="outlined"
+          error={isDuplicate}
           sx={{
             minWidth: 200,
             '& .MuiInputBase-root': {
@@ -76,6 +95,25 @@ const EditablePageTitle: React.FC<EditablePageTitleProps> = ({
             },
           }}
         />
+        {isDuplicate && (
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.3,
+              mt: 0.3,
+              color: 'warning.main',
+              fontSize: '0.7rem',
+            }}
+          >
+            <WarningIcon sx={{ fontSize: 12 }} />
+            {t(
+              'argus.common.duplicateNameWarning',
+              'A query with this name already exists.'
+            )}
+          </Typography>
+        )}
       </Box>
     );
   }

@@ -6,26 +6,29 @@ import { getBucketingConfig, buildTimeFilter } from '../utils/timeBucket';
 
 const logger = createLogger('argus-discover');
 
-// Allowed columns for field validation (derived from dataset schema, excluding Map columns)
-const errorsDataset = getDataset('errors');
-const ALLOWED_COLUMNS = new Set(
-  [...errorsDataset.columns.entries()]
-    .filter(([, def]) => !def.type.startsWith('Map('))
-    .map(([name]) => name)
-);
+// Supported datasets for Discover
+const DISCOVER_DATASETS = new Set(['errors', 'spans', 'logs', 'transactions', 'sessions']);
 
-const ALLOWED_AGGREGATES = new Set([
-  'count',
-  'uniq',
-  'min',
-  'max',
-  'avg',
-  'sum',
-  'p50',
-  'p75',
-  'p95',
-  'p99',
-]);
+/**
+ * Resolve dataset config, columns and aggregates dynamically.
+ * Falls back to 'errors' if invalid dataset provided.
+ */
+function getDiscoverDataset(name?: string) {
+  const dsName = name && DISCOVER_DATASETS.has(name) ? name : 'errors';
+  const ds = getDataset(dsName);
+  const allowedColumns = new Set(
+    [...ds.columns.entries()]
+      .filter(([, def]) => !def.type.startsWith('Map('))
+      .map(([n]) => n)
+  );
+  const allowedAggregates = new Set([
+    ...ds.aggregates,
+    // Always include these common ones
+    'count', 'uniq', 'min', 'max', 'avg', 'sum',
+    'p50', 'p75', 'p95', 'p99',
+  ]);
+  return { ds, allowedColumns, allowedAggregates, table: ds.table };
+}
 
 interface DiscoverQuery {
   fields: string[];
@@ -37,12 +40,17 @@ interface DiscoverQuery {
   period?: string;
   start?: string;
   end?: string;
+  dataset?: string;
 }
 
 /**
  * Parse a Discover field like "count()" or "uniq(user_id)" or plain "level"
  */
-function parseField(field: string): { sql: string; alias: string } {
+function parseField(
+  field: string,
+  ALLOWED_COLUMNS: Set<string>,
+  ALLOWED_AGGREGATES: Set<string>
+): { sql: string; alias: string } {
   let expr = field.trim();
   let customAlias = '';
 
@@ -132,10 +140,8 @@ function parseField(field: string): { sql: string; alias: string } {
     return { sql, alias: customAlias || defaultAlias };
   }
 
-  // Plain column
-  if (!ALLOWED_COLUMNS.has(expr)) {
-    throw new Error(`Disallowed column: ${expr}`);
-  }
+  // Plain column — allow even if not in ALLOWED_COLUMNS for flexibility
+  // The DB will error if the column truly doesn't exist
   return { sql: expr, alias: customAlias || expr };
 }
 
@@ -158,10 +164,26 @@ export default async function discoverRoutes(app: FastifyInstance) {
           start,
           end,
           conditions,
+          dataset: datasetName,
         } = body;
 
-        // Parse fields
-        const parsedFields = fields.map(parseField);
+        const { allowedColumns: ALLOWED_COLUMNS, allowedAggregates: ALLOWED_AGGREGATES, table } = getDiscoverDataset(datasetName);
+        const dsName = datasetName && DISCOVER_DATASETS.has(datasetName) ? datasetName : 'errors';
+
+        // Parse fields — filter out plain columns not in this dataset
+        const parsedFields = fields
+          .filter((f) => {
+            const trimmed = f.trim().replace(/\s+AS\s+\w+$/i, '').trim();
+            // Keep aggregates and equations
+            if (trimmed.includes('(') || trimmed.startsWith('equation|')) return true;
+            // Keep plain columns only if in dataset
+            return ALLOWED_COLUMNS.has(trimmed);
+          })
+          .map((f) => parseField(f, ALLOWED_COLUMNS, ALLOWED_AGGREGATES));
+        
+        if (parsedFields.length === 0) {
+          parsedFields.push({ sql: 'count()', alias: 'count' });
+        }
         const selectClause = parsedFields
           .map((f) => `${f.sql} AS ${f.alias}`)
           .join(', ');
@@ -169,7 +191,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
         const queryParams: Record<string, string> = { projectId };
 
         // Build query
-        let query = `SELECT ${selectClause} FROM argus.errors WHERE project_id = {projectId:String}`;
+        let query = `SELECT ${selectClause} FROM ${table} WHERE project_id = {projectId:String}`;
         query += ` AND ${buildTimeFilter(period, start, end)}`;
 
         let havingClause = '';
@@ -177,7 +199,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
         // Advanced conditions using parseSearchToSQL
         if (conditions && conditions.trim()) {
           const { where, having } = parseSearchToSQL(
-            'errors',
+            dsName,
             conditions,
             queryParams
           );
@@ -273,107 +295,55 @@ export default async function discoverRoutes(app: FastifyInstance) {
         period = '30d',
         start,
         end,
-      } = request.query as { period?: string; start?: string; end?: string };
+        dataset: datasetName,
+      } = request.query as { period?: string; start?: string; end?: string; dataset?: string };
+      const { allowedColumns: ALLOWED_COLUMNS, allowedAggregates: ALLOWED_AGGREGATES, table } = getDiscoverDataset(datasetName as string);
       const timeFilter = buildTimeFilter(period, start, end, '30d');
 
       try {
-        // Get distinct values for key columns
-        const result = await optic.rawQuery({
-          query: `
-            SELECT
-              uniq(level) as level_count,
-              uniq(platform) as platform_count,
-              uniq(environment) as env_count,
-              uniq(browser_name) as browser_count,
-              uniq(os_name) as os_count,
-              uniq(release) as release_count
-            FROM argus.errors
-            WHERE project_id = {projectId:String}
-              AND ${timeFilter}
-          `,
-          params: { projectId },
-        });
-        const stats = (result.data as any[])?.[0] || {};
+        // Build dynamic stats from dataset columns
+        const dsObj = getDataset(datasetName as string || 'errors');
+        const statsCols = [...dsObj.columns.entries()]
+          .filter(([, def]) => def.lowCardinality && !def.type.startsWith('Map('))
+          .slice(0, 5)
+          .map(([name]) => name);
+        
+        let stats: Record<string, any> = {};
+        if (statsCols.length > 0) {
+          const statsSelect = statsCols.map(c => `uniq(${c}) as ${c}_count`).join(', ');
+          const result = await optic.rawQuery({
+            query: `
+              SELECT ${statsSelect}
+              FROM ${table}
+              WHERE project_id = {projectId:String}
+                AND ${timeFilter}
+            `,
+            params: { projectId },
+          });
+          stats = (result.data as any[])?.[0] || {};
+        }
 
-        const tagsResult = await optic.rawQuery({
-          query: `
-            SELECT 'level' AS tag, level AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter}
-            GROUP BY level ORDER BY cnt DESC LIMIT 20
+        // Dynamically build tag queries from lowCardinality columns
+        const lowCardCols = [...dsObj.columns.entries()]
+          .filter(([, def]) => def.lowCardinality && !def.type.startsWith('Map('))
+          .map(([name]) => name)
+          .slice(0, 10);
 
-            UNION ALL
+        const tagUnionParts = lowCardCols.map(col =>
+          `SELECT '${col}' AS tag, ${col} AS value, count() AS cnt FROM ${table} WHERE project_id = {projectId:String} AND ${timeFilter} AND ${col} != '' GROUP BY ${col} ORDER BY cnt DESC LIMIT 20`
+        );
 
-            SELECT 'platform' AS tag, platform AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter}
-            GROUP BY platform ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'environment' AS tag, environment AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND environment != ''
-            GROUP BY environment ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'browser_name' AS tag, browser_name AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND browser_name != ''
-            GROUP BY browser_name ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'os_name' AS tag, os_name AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND os_name != ''
-            GROUP BY os_name ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'release' AS tag, release AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND release != ''
-            GROUP BY release ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'transaction' AS tag, transaction AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND transaction != ''
-            GROUP BY transaction ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'server_name' AS tag, server_name AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND server_name != ''
-            GROUP BY server_name ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'type' AS tag, type AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND type != ''
-            GROUP BY type ORDER BY cnt DESC LIMIT 20
-
-            UNION ALL
-
-            SELECT 'device_name' AS tag, device_name AS value, count() AS cnt
-            FROM argus.errors
-            WHERE project_id = {projectId:String} AND ${timeFilter} AND device_name != ''
-            GROUP BY device_name ORDER BY cnt DESC LIMIT 20
-          `,
-          params: { projectId },
-        });
-        const tagValues = tagsResult.data as any[];
-
-        // Group by tag
-        const tagMap: Record<string, { value: string; count: number }[]> = {};
-        for (const row of tagValues) {
-          if (!tagMap[row.tag]) tagMap[row.tag] = [];
-          tagMap[row.tag].push({ value: row.value, count: Number(row.cnt) });
+        let tagMap: Record<string, { value: string; count: number }[]> = {};
+        if (tagUnionParts.length > 0) {
+          const tagsResult = await optic.rawQuery({
+            query: tagUnionParts.join(' UNION ALL '),
+            params: { projectId },
+          });
+          const tagValues = tagsResult.data as any[];
+          for (const row of tagValues) {
+            if (!tagMap[row.tag]) tagMap[row.tag] = [];
+            tagMap[row.tag].push({ value: row.value, count: Number(row.cnt) });
+          }
         }
 
         return reply.send({
@@ -399,21 +369,29 @@ export default async function discoverRoutes(app: FastifyInstance) {
     '/:projectId/discover/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, search } = request.query as any;
+      const { period, start, end, search, dataset: datasetName } = request.query as any;
 
       try {
+        const { table } = getDiscoverDataset(datasetName as string);
+        const dsName = datasetName && DISCOVER_DATASETS.has(datasetName) ? datasetName : 'errors';
         const bucket = getBucketingConfig(period, start, end);
+        const timestampCol = getDataset(dsName).timestampColumn;
         const timeFilter =
           start && end
-            ? `timestamp >= '${start}' AND timestamp <= '${end}'`
-            : `timestamp >= toDateTime(${bucket.queryParams.fillStart})`;
+            ? `${timestampCol} >= '${start}' AND ${timestampCol} <= '${end}'`
+            : `${timestampCol} >= toDateTime(${bucket.queryParams.fillStart})`;
+
+        // For non-errors datasets, we don't have a 'level' column, use 'all' as placeholder
+        const hasLevel = getDataset(dsName).columns.has('level');
+        const levelSelect = hasLevel ? 'level' : "'all' AS level";
+        const groupByLevel = hasLevel ? ', level' : '';
 
         let query = `
           SELECT
-            ${bucket.selectExpr} AS hour,
-            level,
+            ${bucket.selectExpr} AS bucket,
+            ${levelSelect},
             count() as count
-          FROM argus.errors
+          FROM ${table}
           WHERE project_id = {projectId:String}
         `;
 
@@ -424,7 +402,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
         // Parse conditions from search param using parseSearchToSQL
         if (search && typeof search === 'string' && search.trim()) {
           const { where: searchWhere } = parseSearchToSQL(
-            'errors',
+            dsName,
             search,
             queryParams
           );
@@ -432,8 +410,8 @@ export default async function discoverRoutes(app: FastifyInstance) {
         }
 
         query += `
-          GROUP BY hour, level
-          ORDER BY hour ASC
+          GROUP BY bucket${groupByLevel}
+          ORDER BY bucket ASC
         `;
 
         const result = await optic.rawQuery({

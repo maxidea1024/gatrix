@@ -9,6 +9,8 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 export interface PageHeaderProps {
   icon?: React.ReactNode;
   title: React.ReactNode;
+  titleUpdateTrigger?: any;
+  actionsUpdateTrigger?: any;
   subtitle?: string;
   tabs?: React.ReactNode;
   actions?: React.ReactNode;

@@ -12,6 +12,8 @@ interface SamplingSettingsProps {
   setTxnRate: (v: number) => void;
   sessionRate: number;
   setSessionRate: (v: number) => void;
+  metricsGroupLimit: number;
+  setMetricsGroupLimit: (v: number) => void;
   saving: boolean;
   isDirty: boolean;
   handleSave: () => Promise<void>;
@@ -28,6 +30,8 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
   setTxnRate,
   sessionRate,
   setSessionRate,
+  metricsGroupLimit,
+  setMetricsGroupLimit,
   saving,
   isDirty,
   handleSave,
@@ -108,12 +112,31 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
       <FieldBlock
         label={t('argus.settings.sessionSampleRate')}
         desc={t('argus.settings.sessionSampleDesc')}
-        last
       >
         <RateBar
           value={sessionRate}
           onChange={setSessionRate}
           isDark={isDark}
+        />
+      </FieldBlock>
+      <FieldBlock
+        label={t('argus.settings.metricsGroupLimit', 'Metrics Group Limit')}
+        desc={t('argus.settings.metricsGroupDesc', 'Maximum number of series shown in metrics explorer multi-group charts.')}
+        last
+      >
+        <TextField
+          type="number"
+          value={metricsGroupLimit}
+          onChange={(e) => setMetricsGroupLimit(Math.max(1, Number(e.target.value)))}
+          size="small"
+          sx={{ ...inpSx, width: 120 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                series
+              </InputAdornment>
+            ),
+          }}
         />
       </FieldBlock>
     </SettingsCard>

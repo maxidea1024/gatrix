@@ -19,6 +19,7 @@ import {
   DeleteOutline as DeleteIcon,
   DragIndicator as DragIcon,
   Add as AddIcon,
+  Functions as EquationIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -154,6 +155,35 @@ const SortableColumnRow: React.FC<{
         <DragIcon sx={{ fontSize: 18 }} />
       </Box>
 
+      {/* Equation: free-text input */}
+      {entry.expression.startsWith('equation|') ? (
+        <TextField
+          size="small"
+          value={entry.expression.replace('equation|', '')}
+          onChange={(e) =>
+            onChangeExpr(entry.id, `equation|${e.target.value}`)
+          }
+          placeholder="e.g. count() / uniq(user_id)"
+          sx={{
+            flex: 2,
+            minWidth: 300,
+            '& .MuiOutlinedInput-root': {
+              fontSize: '0.82rem',
+              fontFamily: 'monospace',
+              backgroundColor: isDark ? 'rgba(255,152,0,0.04)' : 'rgba(255,152,0,0.03)',
+            },
+            '& .MuiOutlinedInput-input': { py: 0.75 },
+          }}
+          InputProps={{
+            startAdornment: (
+              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#ff9800', mr: 1, whiteSpace: 'nowrap' }}>
+                ƒ(x)
+              </Typography>
+            ),
+          }}
+        />
+      ) : (
+        <>
       {/* Field / Function Selector */}
       <Select
         size="small"
@@ -248,6 +278,8 @@ const SortableColumnRow: React.FC<{
           sx={{ flex: 1, minWidth: 140 }}
         /> /* Spacer to align alias input */
       )}
+        </>
+      )}
 
       {/* Alias input */}
       <TextField
@@ -337,6 +369,13 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
     setEntries((prev) => [
       ...prev,
       { id: nextId(), expression: defaultExpr, alias: '' },
+    ]);
+  };
+
+  const handleAddEquation = () => {
+    setEntries((prev) => [
+      ...prev,
+      { id: nextId(), expression: 'equation|count() / uniq(user_id)', alias: '' },
     ]);
   };
 
@@ -477,20 +516,34 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
           )}
 
           {/* Add column button */}
-          <Button
-            startIcon={<AddIcon />}
-            onClick={handleAddColumn}
-            size="small"
-            sx={{
-              mt: 1.5,
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: '0.8rem',
-              color: theme.palette.primary.main,
-            }}
-          >
-            {t('argus.discover.column.add', 'Add a Column')}
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1, mt: 1.5 }}>
+            <Button
+              startIcon={<AddIcon />}
+              onClick={handleAddColumn}
+              size="small"
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: theme.palette.primary.main,
+              }}
+            >
+              {t('argus.discover.column.add', 'Add a Column')}
+            </Button>
+            <Button
+              startIcon={<EquationIcon />}
+              onClick={handleAddEquation}
+              size="small"
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.8rem',
+                color: theme.palette.warning.main,
+              }}
+            >
+              {t('argus.discover.column.addEquation', 'Add Equation')}
+            </Button>
+          </Box>
         </Box>
       </DialogContent>
 

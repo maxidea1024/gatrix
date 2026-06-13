@@ -9,7 +9,8 @@ export function getBucketingConfig(
   period?: string,
   start?: string,
   end?: string,
-  timestampColumn: string = 'timestamp'
+  timestampColumn: string = 'timestamp',
+  customInterval?: string
 ): BucketingConfig {
   let startDt: Date;
   let endDt: Date;
@@ -50,26 +51,37 @@ export function getBucketingConfig(
 
   // Choose interval to keep ~40-80 data points for smooth charts
   let interval = '1 DAY';
-  if (deltaSeconds <= 600)
-    interval = '10 SECOND'; // ≤10min → ~60 pts
-  else if (deltaSeconds <= 1800)
-    interval = '30 SECOND'; // ≤30min → ~60 pts
-  else if (deltaSeconds <= 3600)
-    interval = '1 MINUTE'; // ≤1h    → 60 pts
-  else if (deltaSeconds <= 6 * 3600)
-    interval = '5 MINUTE'; // ≤6h    → 72 pts
-  else if (deltaSeconds <= 12 * 3600)
-    interval = '15 MINUTE'; // ≤12h   → 48 pts
-  else if (deltaSeconds <= 24 * 3600)
-    interval = '30 MINUTE'; // ≤24h   → 48 pts
-  else if (deltaSeconds <= 2 * 86400)
-    interval = '1 HOUR'; // ≤2d    → 48 pts
-  else if (deltaSeconds <= 7 * 86400)
-    interval = '4 HOUR'; // ≤7d    → 42 pts
-  else if (deltaSeconds <= 14 * 86400)
-    interval = '8 HOUR'; // ≤14d   → 42 pts
-  else if (deltaSeconds <= 30 * 86400) interval = '1 DAY'; // ≤30d   → 30 pts
-  // >30d → 1 DAY (90d = 90 pts, acceptable)
+  if (customInterval && customInterval !== 'auto') {
+    const customMap: Record<string, string> = {
+      '1m': '1 MINUTE',
+      '5m': '5 MINUTE',
+      '15m': '15 MINUTE',
+      '1h': '1 HOUR',
+      '1d': '1 DAY',
+      '1w': '7 DAY',
+    };
+    interval = customMap[customInterval] || '1 DAY';
+  } else {
+    if (deltaSeconds <= 600)
+      interval = '10 SECOND'; // ≤10min → ~60 pts
+    else if (deltaSeconds <= 1800)
+      interval = '30 SECOND'; // ≤30min → ~60 pts
+    else if (deltaSeconds <= 3600)
+      interval = '1 MINUTE'; // ≤1h    → 60 pts
+    else if (deltaSeconds <= 6 * 3600)
+      interval = '5 MINUTE'; // ≤6h    → 72 pts
+    else if (deltaSeconds <= 12 * 3600)
+      interval = '15 MINUTE'; // ≤12h   → 48 pts
+    else if (deltaSeconds <= 24 * 3600)
+      interval = '30 MINUTE'; // ≤24h   → 48 pts
+    else if (deltaSeconds <= 2 * 86400)
+      interval = '1 HOUR'; // ≤2d    → 48 pts
+    else if (deltaSeconds <= 7 * 86400)
+      interval = '4 HOUR'; // ≤7d    → 42 pts
+    else if (deltaSeconds <= 14 * 86400)
+      interval = '8 HOUR'; // ≤14d   → 42 pts
+    else if (deltaSeconds <= 30 * 86400) interval = '1 DAY'; // ≤30d   → 30 pts
+  }
 
   const selectExpr = `toStartOfInterval(${timestampColumn}, INTERVAL ${interval})`;
   const fillExpr = `WITH FILL FROM toStartOfInterval(toDateTime({fillStart:UInt32}), INTERVAL ${interval}) TO toDateTime({fillEnd:UInt32}) STEP INTERVAL ${interval}`;

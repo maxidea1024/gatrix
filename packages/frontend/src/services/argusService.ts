@@ -46,6 +46,7 @@ export interface ArgusProject {
   transaction_sample_rate: number;
   session_sample_rate: number;
   retention_days: number;
+  metrics_group_limit: number;
   created_at: string;
   updated_at: string;
   unresolved_issues?: number;
@@ -743,8 +744,11 @@ class ArgusService {
       agg?: string;
       start?: string;
       end?: string;
+      filter?: string;
+      groupLimit?: number;
+      interval?: string;
     }
-  ): Promise<{ timeSeries: any[]; summary: any }> {
+  ): Promise<{ timeSeries: any[]; summary: any; metricType?: string; unit?: string }> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/metrics/${projectId}/query`,
       { params }
@@ -764,6 +768,36 @@ class ArgusService {
       response.data?.data ||
       response.data || { environment: [], release: [], metric_type: [] }
     );
+  }
+
+  async getMetricGroupByOptions(
+    projectId: number | string,
+    name?: string
+  ): Promise<{ key: string; source: string }[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/metrics/${projectId}/groupby-options`,
+      { params: { name } }
+    );
+    return response.data?.data || response.data || [];
+  }
+
+  async getMetricSamples(
+    projectId: number | string,
+    params: {
+      name: string;
+      period?: string;
+      start?: string;
+      end?: string;
+      limit?: number;
+      offset?: number;
+      filter?: string;
+    }
+  ): Promise<{ data: any[]; metricType?: string }> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/metrics/${projectId}/samples`,
+      { params }
+    );
+    return response.data || { data: [] };
   }
 
   async getMetricVolume(
@@ -1228,6 +1262,7 @@ class ArgusService {
         | 'transaction_sample_rate'
         | 'session_sample_rate'
         | 'retention_days'
+        | 'metrics_group_limit'
       >
     >
   ): Promise<void> {
@@ -1960,6 +1995,7 @@ class ArgusService {
       period?: string;
       start?: string;
       end?: string;
+      dataset?: string;
     }
   ): Promise<{
     data: Record<string, any>[];
@@ -1974,14 +2010,15 @@ class ArgusService {
       : { data: [], meta: { fields: [] } };
   }
 
-  async discoverTags(projectId: number | string): Promise<{
+  async discoverTags(projectId: number | string, dataset?: string): Promise<{
     columns: string[];
     aggregates: string[];
     stats: Record<string, any>;
     tags: Record<string, { value: string; count: number }[]>;
   }> {
     const response = await argusApi.get(
-      `${ARGUS_BASE}/${projectId}/discover/tags`
+      `${ARGUS_BASE}/${projectId}/discover/tags`,
+      { params: dataset ? { dataset } : undefined }
     );
     return (
       response.data?.data || {
@@ -1995,7 +2032,7 @@ class ArgusService {
 
   async getDiscoverVolume(
     projectId: number | string,
-    params: { period?: string; start?: string; end?: string; search?: string }
+    params: { period?: string; start?: string; end?: string; search?: string; dataset?: string }
   ): Promise<{ bucket: string; level: string; count: number }[]> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/discover/volume`,

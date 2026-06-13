@@ -179,6 +179,9 @@ export interface OpticQuery {
   /** Auto-apply WITH FILL for time-series charts */
   withFill?: boolean;
 
+  /** Force bucket interval selection (e.g. 1m, 5m, 1h, 1d) */
+  interval?: string;
+
   /** LIMIT (default: 1000, max: 10000) */
   limit?: number;
 

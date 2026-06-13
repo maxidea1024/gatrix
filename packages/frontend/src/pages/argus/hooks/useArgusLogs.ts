@@ -310,6 +310,8 @@ export function useArgusLogs() {
   // Saved Queries State
   const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
+  const lastProcessedUrlQueryIdRef = useRef<string | undefined>(undefined);
 
   // Editable Query Name
   const defaultQueryName = t('argus.logs.newQuery', 'New Logs Query');
@@ -317,17 +319,53 @@ export function useArgusLogs() {
     (location.state as any)?.queryName || defaultQueryName
   );
 
-  // Sync URL queryId to state
+  // Sync URL queryId to state — delegate to handleLoadSavedQuery
+  // so that the saved query's config (search, columns, groupBy, etc.) is applied.
   useEffect(() => {
     if (urlState.queryId && savedQueries.length > 0) {
       const qId = parseInt(urlState.queryId, 10);
-      const matched = savedQueries.find((q) => q.id === qId);
-      if (matched && currentQueryId !== qId) {
-        setCurrentQueryId(matched.id);
-        setQueryName(matched.name);
+      if (currentQueryId !== qId) {
+        const matched = savedQueries.find((q) => q.id === qId);
+        if (matched) {
+          handleLoadSavedQuery(matched);
+        }
       }
+    } else if (!urlState.queryId && currentQueryId !== null) {
+      setCurrentQueryId(null);
+      setQueryName(defaultQueryName);
+      setSavedSnapshot(null);
     }
-  }, [urlState.queryId, savedQueries, currentQueryId]);
+  }, [urlState.queryId, savedQueries, currentQueryId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ─── Dirty state tracking ───
+  type LogsSnapshot = {
+    search: string;
+    columns: string[];
+    groupBy: string;
+  };
+  const [savedSnapshot, setSavedSnapshot] = useState<LogsSnapshot | null>(null);
+
+  const takeSnapshot = useCallback(() => {
+    setSavedSnapshot({
+      search,
+      columns: [...columns],
+      groupBy: urlState.groupBy || 'level',
+    });
+  }, [search, columns, urlState.groupBy]);
+
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot) {
+      // If loading a saved query, start as clean until snapshot is set
+      return !urlState.queryId;
+    }
+    return (
+      search !== savedSnapshot.search ||
+      JSON.stringify(columns) !== JSON.stringify(savedSnapshot.columns) ||
+      (urlState.groupBy || 'level') !== savedSnapshot.groupBy
+    );
+  }, [search, columns, urlState.groupBy, savedSnapshot, urlState.queryId]);
+
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
@@ -718,61 +756,125 @@ export function useArgusLogs() {
   );
 
   // ─── Saved Query Handlers ───
-  const handleSaveQuery = async (
+  const buildQueryConfig = useCallback(() => ({
+    search: search.trim(),
+    columns,
+    columnNames,
+    period: currentPeriod,
+    groupBy: aggGroupBys.length > 0 ? aggGroupBys.join(',') : 'level',
+    activeTab,
+  }), [search, columns, columnNames, currentPeriod, aggGroupBys, activeTab]);
+
+  // Save: update existing or prompt name for new
+  const handleSave = async () => {
+    if (currentQueryId) {
+      setSaving(true);
+      try {
+        await argusService.updateSavedQuery(projectId, currentQueryId, {
+          name: queryName,
+          query_config: buildQueryConfig(),
+          display_type: 'table',
+        });
+        const updated = await argusService.listSavedQueries(projectId, 'logs');
+        setSavedQueries(updated);
+        takeSnapshot();
+      } catch (err) {
+        console.error('Failed to update log query:', err);
+      } finally {
+        setSaving(false);
+      }
+    }
+    // If no currentQueryId, the caller (page) should open the save dialog
+  };
+
+  // Dialog save callback (for both 'new' and 'saveAs' modes)
+  const handleDialogSave = async (
     finalName: string,
+    existingQueryId: number | null,
     extras?: Record<string, any>
   ) => {
     if (!finalName.trim()) return;
+    setSaving(true);
     try {
-      const res = await argusService.createSavedQuery(projectId, {
-        name: finalName.trim(),
-        query_config: {
-          search: search.trim(),
-          columns,
-          columnNames,
-          period: currentPeriod,
-          groupBy: aggGroupBys.length > 0 ? aggGroupBys.join(',') : 'level',
-          activeTab,
-          ...extras,
-        },
-        display_type: 'table',
-        query_type: 'logs',
-      });
+      if (existingQueryId) {
+        // Overwrite existing query with same name
+        await argusService.updateSavedQuery(projectId, existingQueryId, {
+          name: finalName.trim(),
+          query_config: {
+            ...buildQueryConfig(),
+            ...extras,
+          },
+          display_type: 'table',
+        });
+        setCurrentQueryId(existingQueryId);
+        setQueryName(finalName.trim());
+        setUrlState({ queryId: String(existingQueryId) });
+        lastProcessedUrlQueryIdRef.current = String(existingQueryId);
+      } else {
+        // Create new
+        const res = await argusService.createSavedQuery(projectId, {
+          name: finalName.trim(),
+          query_config: {
+            ...buildQueryConfig(),
+            ...extras,
+          },
+          display_type: 'table',
+          query_type: 'logs',
+        });
+        if (res.id) {
+          setCurrentQueryId(res.id);
+          setQueryName(finalName.trim());
+          setUrlState({ queryId: String(res.id) });
+          lastProcessedUrlQueryIdRef.current = String(res.id);
+        }
+      }
       const updated = await argusService.listSavedQueries(projectId, 'logs');
       setSavedQueries(updated);
-      setQueryName(finalName.trim());
-      if (res.id) setCurrentQueryId(res.id);
+      takeSnapshot();
     } catch (err) {
       console.error('Failed to save log query:', err);
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleRename = async (newName: string) => {
     setQueryName(newName);
-    if (currentQueryId) {
+    const effectiveId = currentQueryId || (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
+    if (effectiveId) {
+      setSaving(true);
       try {
-        await argusService.updateSavedQuery(projectId, currentQueryId, {
+        await argusService.updateSavedQuery(projectId, effectiveId, {
           name: newName,
         });
         const updated = await argusService.listSavedQueries(projectId, 'logs');
         setSavedQueries(updated);
       } catch (err) {
         console.error('Failed to rename query:', err);
+      } finally {
+        setSaving(false);
       }
     }
   };
 
-  const handleDeleteSavedQuery = async (id: number) => {
+  const handleDeleteSavedQuery = (id: number) => {
+    const target = savedQueries.find((q) => q.id === id);
+    if (target) setDeleteTarget(target);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await argusService.deleteSavedQuery(projectId, id);
-      setSavedQueries((prev) => prev.filter((q) => q.id !== id));
-      if (currentQueryId === id) setCurrentQueryId(null);
+      await argusService.deleteSavedQuery(projectId, deleteTarget.id);
+      setSavedQueries((prev) => prev.filter((q) => q.id !== deleteTarget.id));
+      if (currentQueryId === deleteTarget.id) setCurrentQueryId(null);
     } catch (err) {
       console.error('Failed to delete saved query:', err);
     }
+    setDeleteTarget(null);
   };
 
-  const handleLoadSavedQuery = (
+  const handleLoadSavedQuery = useCallback((
     sq: ArgusSavedQuery,
     onExtrasLoaded?: (extras: Record<string, any>) => void
   ) => {
@@ -791,8 +893,17 @@ export function useArgusLogs() {
       if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
       if (cfg.activeTab !== undefined)
         setUrlState({ tab: String(cfg.activeTab) });
+      setUrlState({ queryId: String(sq.id) });
       setQueryName(sq.name);
       setCurrentQueryId(sq.id);
+      lastProcessedUrlQueryIdRef.current = String(sq.id);
+
+      // Set snapshot after load so isDirty starts as false
+      setSavedSnapshot({
+        search: cfg.search || '',
+        columns: cfg.columns || [...DEFAULT_COLUMNS],
+        groupBy: cfg.groupBy || 'level',
+      });
 
       // Pass extra fields (displayDensity, wrapLines) to the caller
       if (onExtrasLoaded) {
@@ -803,7 +914,8 @@ export function useArgusLogs() {
       setQueryName(sq.name);
       setCurrentQueryId(sq.id);
     }
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setUrlState, setColumns, setColumnNames]);
 
   const totalLogCount =
     facets.levels?.reduce((s, l) => s + Number(l.count), 0) || 0;
@@ -864,10 +976,18 @@ export function useArgusLogs() {
     handleLoadMore,
     handleFilterChange,
     handleZoom,
-    handleSaveQuery,
+    handleSave,
+    handleDialogSave,
     handleRename,
     handleDeleteSavedQuery,
     handleLoadSavedQuery,
+    confirmDelete,
+    isDirty,
+    saving,
+    deleteTarget,
+    setDeleteTarget,
+    setQueryName,
+    setCurrentQueryId,
 
     // Patterns
     patterns,

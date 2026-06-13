@@ -41,6 +41,8 @@ const PageHeader: React.FC<PageHeaderProps> = (props) => {
     !!props.menuItems,
     !!props.onRefresh,
     !!props.onBack,
+    props.titleUpdateTrigger,
+    props.actionsUpdateTrigger,
     // Re-push on route change so the header updates for navigation
     location.pathname,
     setHeaderProps,

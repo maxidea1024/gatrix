@@ -62,7 +62,8 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
     query.timeRange.period,
     query.timeRange.start,
     query.timeRange.end,
-    tsCol
+    tsCol,
+    query.interval
   );
 
   const selectParts: string[] = query.select.map((field) => {

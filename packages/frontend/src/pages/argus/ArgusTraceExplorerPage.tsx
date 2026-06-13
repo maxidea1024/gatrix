@@ -48,9 +48,11 @@ import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import AggregatePanel from '@/components/argus/AggregatePanel';
 import { SpansTab, TracesTab } from './components/TraceExplorerTabs';
 import {
-  SaveQueryDialog,
+  SaveQueryDialog as TraceSaveQueryDialog,
   SavedQueriesPanel,
 } from './components/TraceExplorerDialogs';
+import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
+import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 
 const ArgusTraceExplorerPage: React.FC = () => {
   const theme = useTheme();
@@ -365,6 +367,8 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
+  const [saveDialogMode, setSaveDialogMode] = useState<'new' | 'saveAs'>('new');
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
 
   // Sync URL queryId to state
   useEffect(() => {
@@ -374,9 +378,42 @@ const ArgusTraceExplorerPage: React.FC = () => {
       if (matched && currentQueryId !== qId) {
         setCurrentQueryId(matched.id);
         setQueryName(matched.name);
+        // Initialize snapshot so isDirty starts as false
+        setSavedSnapshot({
+          search,
+          groupBy: urlState.groupBy,
+          orderBy,
+        });
       }
     }
-  }, [urlState.queryId, savedQueries, currentQueryId]);
+  }, [urlState.queryId, savedQueries, currentQueryId, search, urlState.groupBy, orderBy]);
+
+  // ─── Dirty state tracking ───
+  type TraceSnapshot = {
+    search: string;
+    groupBy: string;
+    orderBy: string;
+  };
+  const [savedSnapshot, setSavedSnapshot] = useState<TraceSnapshot | null>(null);
+
+  const takeSnapshot = useCallback(() => {
+    setSavedSnapshot({
+      search,
+      groupBy: urlState.groupBy,
+      orderBy,
+    });
+  }, [search, urlState.groupBy, orderBy]);
+
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot) {
+      return !urlState.queryId;
+    }
+    return (
+      search !== savedSnapshot.search ||
+      urlState.groupBy !== savedSnapshot.groupBy ||
+      orderBy !== savedSnapshot.orderBy
+    );
+  }, [search, urlState.groupBy, orderBy, savedSnapshot]);
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
@@ -766,37 +803,114 @@ const ArgusTraceExplorerPage: React.FC = () => {
     []
   );
 
-  const handleSaveQuery = useCallback(async () => {
-    if (!saveName.trim()) return;
+  const buildQueryConfig = useCallback(() => ({
+    search,
+    period: currentPeriod,
+    tab: activeTab,
+    groupBy: aggGroupBys.join(','),
+  }), [search, currentPeriod, activeTab, aggGroupBys]);
+
+  // Save: update existing or prompt name for new
+  const handleSave = useCallback(async () => {
+    if (currentQueryId) {
+      try {
+        await argusService.updateSavedQuery(projectId, currentQueryId, {
+          name: queryName,
+          query_config: buildQueryConfig(),
+          display_type: 'table',
+        });
+        const updated = await argusService.listSavedQueries(projectId, 'traces');
+        setSavedQueries(updated);
+        takeSnapshot();
+      } catch (err) {
+        console.error('Failed to update trace query:', err);
+      }
+    } else if (queryName !== defaultQueryName && queryName.trim()) {
+      const duplicate = savedQueries.find(
+        (q) => q.name.toLowerCase() === queryName.trim().toLowerCase()
+      );
+      if (duplicate) {
+        setSaveName(queryName.trim());
+        setSaveDialogMode('new');
+        setSaveDialogOpen(true);
+      } else {
+        try {
+          const res = await argusService.createSavedQuery(projectId, {
+            name: queryName.trim(),
+            query_config: buildQueryConfig(),
+            query_type: 'traces',
+            display_type: 'table',
+          });
+          if (res.id) {
+            setCurrentQueryId(res.id);
+            setUrlState({ queryId: String(res.id) });
+          }
+          const updated = await argusService.listSavedQueries(projectId, 'traces');
+          setSavedQueries(updated);
+          takeSnapshot();
+        } catch (err) {
+          console.error('Failed to create trace query:', err);
+        }
+      }
+    } else {
+      setSaveName('');
+      setSaveDialogMode('new');
+      setSaveDialogOpen(true);
+    }
+  }, [currentQueryId, projectId, queryName, defaultQueryName, buildQueryConfig, takeSnapshot, setUrlState, savedQueries]);
+
+  // Save As: always open name dialog
+  const handleSaveAs = useCallback(() => {
+    setSaveName(queryName === defaultQueryName ? '' : queryName);
+    setSaveDialogMode('saveAs');
+    setSaveDialogOpen(true);
+  }, [queryName, defaultQueryName]);
+
+  // Dialog save callback
+  const handleDialogSave = useCallback(async (name: string, existingQueryId: number | null) => {
     try {
-      const res = await argusService.createSavedQuery(projectId, {
-        name: saveName.trim(),
-        query_config: {
-          search,
-          period: currentPeriod,
-          tab: activeTab,
-          groupBy: aggGroupBys.join(','),
-        },
-        display_type: 'table',
-        query_type: 'traces',
-      });
+      if (existingQueryId) {
+        await argusService.updateSavedQuery(projectId, existingQueryId, {
+          name,
+          query_config: buildQueryConfig(),
+          display_type: 'table',
+        });
+        setCurrentQueryId(existingQueryId);
+        setQueryName(name);
+        setUrlState({ queryId: String(existingQueryId) });
+      } else {
+        const res = await argusService.createSavedQuery(projectId, {
+          name,
+          query_config: buildQueryConfig(),
+          display_type: 'table',
+          query_type: 'traces',
+        });
+        if (res.id) {
+          setCurrentQueryId(res.id);
+          setQueryName(name);
+          setUrlState({ queryId: String(res.id) });
+        }
+      }
       const updated = await argusService.listSavedQueries(projectId, 'traces');
       setSavedQueries(updated);
-      setQueryName(saveName.trim());
-      if (res.id) setCurrentQueryId(res.id);
+
+      takeSnapshot();
       setSaveDialogOpen(false);
       setSaveName('');
     } catch (err) {
       console.error('Failed to save trace query:', err);
     }
-  }, [saveName, projectId, search, currentPeriod, activeTab, aggGroupBys]);
+  }, [projectId, buildQueryConfig, setUrlState, takeSnapshot]);
 
   const handleRename = useCallback(
     async (newName: string) => {
       setQueryName(newName);
-      if (currentQueryId) {
+      const effectiveId =
+        currentQueryId ||
+        (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
+      if (effectiveId) {
         try {
-          await argusService.updateSavedQuery(projectId, currentQueryId, {
+          await argusService.updateSavedQuery(projectId, effectiveId, {
             name: newName,
           });
           const updated = await argusService.listSavedQueries(
@@ -809,21 +923,28 @@ const ArgusTraceExplorerPage: React.FC = () => {
         }
       }
     },
-    [currentQueryId, projectId]
+    [currentQueryId, projectId, urlState.queryId]
   );
 
   const handleDeleteSavedQuery = useCallback(
-    async (id: number) => {
-      try {
-        await argusService.deleteSavedQuery(projectId, id);
-        setSavedQueries((prev) => prev.filter((q) => q.id !== id));
-        if (currentQueryId === id) setCurrentQueryId(null);
-      } catch (err) {
-        console.error('Failed to delete saved query:', err);
-      }
+    (id: number) => {
+      const target = savedQueries.find((q) => q.id === id);
+      if (target) setDeleteTarget(target);
     },
-    [projectId, currentQueryId]
+    [savedQueries]
   );
+
+  const confirmDelete = useCallback(async () => {
+    if (!deleteTarget) return;
+    try {
+      await argusService.deleteSavedQuery(projectId, deleteTarget.id);
+      setSavedQueries((prev) => prev.filter((q) => q.id !== deleteTarget.id));
+      if (currentQueryId === deleteTarget.id) setCurrentQueryId(null);
+    } catch (err) {
+      console.error('Failed to delete saved query:', err);
+    }
+    setDeleteTarget(null);
+  }, [deleteTarget, projectId, currentQueryId]);
 
   const handleLoadSavedQuery = useCallback(
     (sq: ArgusSavedQuery) => {
@@ -838,9 +959,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
       if (cfg.period) setUrlState({ period: cfg.period });
       if (cfg.tab !== undefined) setUrlState({ tab: String(cfg.tab) });
       if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
+      setUrlState({ queryId: String(sq.id) });
       setQueryName(sq.name);
       setCurrentQueryId(sq.id);
       setSavedPanelOpen(false);
+      setSavedSnapshot({
+        search: cfg.search || '',
+        groupBy: cfg.groupBy || 'op',
+        orderBy: cfg.orderBy || '-duration',
+      });
     },
     [setUrlState]
   );
@@ -916,6 +1043,8 @@ const ArgusTraceExplorerPage: React.FC = () => {
             ]}
           />
         }
+        titleUpdateTrigger={queryName}
+        actionsUpdateTrigger={`${isDirty}-${currentQueryId}`}
         subtitle={t(
           'argus.traces.subtitle',
           'Search and analyze spans across all traces'
@@ -944,12 +1073,24 @@ const ArgusTraceExplorerPage: React.FC = () => {
             </SafeTooltip>
             <Button
               size="small"
+              variant="contained"
+              startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
+              onClick={handleSave}
+              disabled={!isDirty}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderRadius: '6px',
+              }}
+            >
+              {t('argus.traces.save', 'Save')}
+            </Button>
+            <Button
+              size="small"
               variant="outlined"
               startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
-              onClick={() => {
-                setSaveName(queryName === defaultQueryName ? '' : queryName);
-                setSaveDialogOpen(true);
-              }}
+              onClick={handleSaveAs}
               sx={{
                 textTransform: 'none',
                 fontSize: '0.75rem',
@@ -1291,13 +1432,24 @@ const ArgusTraceExplorerPage: React.FC = () => {
         )}
       </Box>
 
-      {/* Save Query Dialog */}
+      {/* Save / Save As Dialog */}
       <SaveQueryDialog
         open={saveDialogOpen}
         onClose={() => setSaveDialogOpen(false)}
-        saveName={saveName}
+        name={saveName}
         onNameChange={setSaveName}
-        onSave={handleSaveQuery}
+        onSave={handleDialogSave}
+        mode={saveDialogMode}
+        savedQueries={savedQueries}
+        currentQueryId={currentQueryId}
+      />
+
+      {/* Delete Confirm Dialog */}
+      <DeleteQueryConfirmDialog
+        open={!!deleteTarget}
+        queryName={deleteTarget?.name || ''}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
       />
 
       {/* Saved Queries Panel */}

@@ -41,6 +41,7 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageHeader from '@/components/common/PageHeader';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import AlertRuleList from './components/AlertRuleList';
 import AlertRuleEditorDialog from './components/AlertRuleEditorDialog';
@@ -61,6 +62,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const { enqueueSnackbar } = useSnackbar();
+  const location = useLocation();
   const projectId = propProjectId || currentProject?.id;
 
   // ─── State ───
@@ -114,6 +116,17 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({
   useEffect(() => {
     fetchRules();
   }, [fetchRules]);
+
+  // Auto-open create dialog from Discover navigation
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.fromDiscover && state?.query) {
+      setEditingRule(null);
+      setDialogOpen(true);
+      // Clear the state to prevent re-opening on navigation
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (!projectId) return;

@@ -1,8 +1,373 @@
 import React, { useMemo, useCallback } from 'react';
-import { Box, Typography, Popover, useTheme, alpha } from '@mui/material';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Popover,
+  Paper,
+  IconButton,
+  useTheme,
+  alpha,
+} from '@mui/material';
+import {
+  ExpandMore as ExpandMoreIcon,
+  ErrorOutline as ErrorIcon,
+  Link as UrlIcon,
+  Person as UserIcon,
+  NewReleases as ReleaseIcon,
+  List as AllEventsIcon,
+  ChevronLeft as PrevIcon,
+  ChevronRight as NextIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+
+// ─── Pre-built Queries ───
+
+export interface PrebuiltQuery {
+  id: string;
+  nameKey: string;
+  defaultName: string;
+  descKey: string;
+  defaultDesc: string;
+  icon: React.ReactNode;
+  color: string;
+  fields: string[];
+  groupBy: string[];
+  orderBy: string;
+  yAxis: string;
+}
+
+export const PREBUILT_QUERIES: PrebuiltQuery[] = [
+  {
+    id: 'all-events',
+    nameKey: 'argus.discover.prebuilt.allEvents',
+    defaultName: 'All Events',
+    descKey: 'argus.discover.prebuilt.allEventsDesc',
+    defaultDesc: 'Browse raw error events',
+    icon: <AllEventsIcon sx={{ fontSize: 20 }} />,
+    color: '#7c4dff',
+    fields: ['event_id', 'timestamp', 'level', 'type', 'value'],
+    groupBy: [],
+    orderBy: '-timestamp',
+    yAxis: 'count()',
+  },
+  {
+    id: 'errors-by-title',
+    nameKey: 'argus.discover.prebuilt.errorsByTitle',
+    defaultName: 'Errors by Title',
+    descKey: 'argus.discover.prebuilt.errorsByTitleDesc',
+    defaultDesc: 'Top errors by occurrence count',
+    icon: <ErrorIcon sx={{ fontSize: 20 }} />,
+    color: '#f44336',
+    fields: ['type', 'count()', 'uniq(user_id)'],
+    groupBy: ['type'],
+    orderBy: '-count',
+    yAxis: 'count()',
+  },
+  {
+    id: 'errors-by-url',
+    nameKey: 'argus.discover.prebuilt.errorsByUrl',
+    defaultName: 'Errors by URL',
+    descKey: 'argus.discover.prebuilt.errorsByUrlDesc',
+    defaultDesc: 'Which pages generate the most errors',
+    icon: <UrlIcon sx={{ fontSize: 20 }} />,
+    color: '#2196f3',
+    fields: ['http_url', 'count()', 'uniq(user_id)'],
+    groupBy: ['http_url'],
+    orderBy: '-count',
+    yAxis: 'count()',
+  },
+  {
+    id: 'top-users',
+    nameKey: 'argus.discover.prebuilt.topUsers',
+    defaultName: 'Top Users',
+    descKey: 'argus.discover.prebuilt.topUsersDesc',
+    defaultDesc: 'Users with the most errors',
+    icon: <UserIcon sx={{ fontSize: 20 }} />,
+    color: '#4caf50',
+    fields: ['user_id', 'user_email', 'count()'],
+    groupBy: ['user_id', 'user_email'],
+    orderBy: '-count',
+    yAxis: 'count()',
+  },
+  {
+    id: 'errors-by-release',
+    nameKey: 'argus.discover.prebuilt.errorsByRelease',
+    defaultName: 'Errors by Release',
+    descKey: 'argus.discover.prebuilt.errorsByReleaseDesc',
+    defaultDesc: 'Error distribution across releases',
+    icon: <ReleaseIcon sx={{ fontSize: 20 }} />,
+    color: '#ff9800',
+    fields: ['release', 'count()', 'uniq(user_id)'],
+    groupBy: ['release'],
+    orderBy: '-count',
+    yAxis: 'count()',
+  },
+];
+
+// ─── PrebuiltQueryCards ───
+
+export const PrebuiltQueryCards: React.FC<{
+  onSelect: (query: PrebuiltQuery) => void;
+  isDark: boolean;
+}> = ({ onSelect, isDark }) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Typography
+        sx={{
+          fontSize: '0.82rem',
+          fontWeight: 700,
+          mb: 1.5,
+          color: 'text.secondary',
+        }}
+      >
+        {t('argus.discover.prebuilt.title', 'Start with a query')}
+      </Typography>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: 1.5,
+        }}
+      >
+        {PREBUILT_QUERIES.map((q) => (
+          <Paper
+            key={q.id}
+            elevation={0}
+            onClick={() => onSelect(q)}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              cursor: 'pointer',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+              transition: 'all 0.2s',
+              '&:hover': {
+                borderColor: alpha(q.color, 0.4),
+                backgroundColor: alpha(q.color, 0.04),
+                transform: 'translateY(-1px)',
+                boxShadow: `0 4px 12px ${alpha(q.color, isDark ? 0.15 : 0.08)}`,
+              },
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '8px',
+                  backgroundColor: alpha(q.color, 0.12),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: q.color,
+                }}
+              >
+                {q.icon}
+              </Box>
+              <Typography sx={{ fontSize: '0.82rem', fontWeight: 700 }}>
+                {t(q.nameKey, q.defaultName)}
+              </Typography>
+            </Box>
+            <Typography
+              sx={{
+                fontSize: '0.7rem',
+                color: 'text.disabled',
+                lineHeight: 1.4,
+              }}
+            >
+              {t(q.descKey, q.defaultDesc)}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 0.5, mt: 1.2, flexWrap: 'wrap' }}>
+              {q.fields.slice(0, 3).map((f) => (
+                <Typography
+                  key={f}
+                  sx={{
+                    fontSize: '0.6rem',
+                    fontWeight: 600,
+                    px: 0.8,
+                    py: 0.15,
+                    borderRadius: '4px',
+                    backgroundColor: isDark
+                      ? 'rgba(255,255,255,0.04)'
+                      : 'rgba(0,0,0,0.04)',
+                    color: 'text.secondary',
+                  }}
+                >
+                  {f}
+                </Typography>
+              ))}
+              {q.fields.length > 3 && (
+                <Typography
+                  sx={{
+                    fontSize: '0.6rem',
+                    fontWeight: 600,
+                    px: 0.8,
+                    py: 0.15,
+                    borderRadius: '4px',
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  +{q.fields.length - 3}
+                </Typography>
+              )}
+            </Box>
+          </Paper>
+        ))}
+      </Box>
+    </Box>
+  );
+};
+
+// ─── PaginationControls ───
+
+export const PaginationControls: React.FC<{
+  offset: number;
+  limit: number;
+  resultCount: number;
+  onPrev: () => void;
+  onNext: () => void;
+  isDark: boolean;
+}> = ({ offset, limit, resultCount, onPrev, onNext, isDark }) => {
+  const { t } = useTranslation();
+  const page = Math.floor(offset / limit) + 1;
+  const hasNext = resultCount >= limit;
+  const hasPrev = offset > 0;
+
+  if (!hasPrev && !hasNext) return null;
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: 1,
+        py: 1,
+        px: 2,
+        borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+      }}
+    >
+      <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled' }}>
+        {t('argus.discover.showing', 'Showing')} {offset + 1}–
+        {offset + resultCount}
+      </Typography>
+      <IconButton
+        size="small"
+        onClick={onPrev}
+        disabled={!hasPrev}
+        sx={{ p: 0.3 }}
+      >
+        <PrevIcon sx={{ fontSize: 18 }} />
+      </IconButton>
+      <Typography
+        sx={{
+          fontSize: '0.72rem',
+          fontWeight: 700,
+          minWidth: 20,
+          textAlign: 'center',
+        }}
+      >
+        {page}
+      </Typography>
+      <IconButton
+        size="small"
+        onClick={onNext}
+        disabled={!hasNext}
+        sx={{ p: 0.3 }}
+      >
+        <NextIcon sx={{ fontSize: 18 }} />
+      </IconButton>
+    </Box>
+  );
+};
+
+// ─── Dataset Switcher ───
+
+export type DiscoverDataset = 'errors' | 'spans' | 'logs' | 'transactions' | 'sessions';
+
+export const DATASET_OPTIONS: { value: DiscoverDataset; label: string; color: string }[] = [
+  { value: 'errors', label: 'Errors', color: '#f44336' },
+  { value: 'spans', label: 'Spans', color: '#7c4dff' },
+  { value: 'logs', label: 'Logs', color: '#4caf50' },
+  { value: 'transactions', label: 'Transactions', color: '#2196f3' },
+  { value: 'sessions', label: 'Sessions', color: '#ff9800' },
+];
+
+export const DatasetSwitcher: React.FC<{
+  value: DiscoverDataset;
+  onChange: (ds: DiscoverDataset) => void;
+}> = ({ value, onChange }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  return (
+    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+      {DATASET_OPTIONS.map((opt) => {
+        const selected = opt.value === value;
+        return (
+          <Box
+            key={opt.value}
+            onClick={() => onChange(opt.value)}
+            sx={{
+              px: 1.5,
+              py: 0.4,
+              borderRadius: '6px',
+              fontSize: '0.72rem',
+              fontWeight: selected ? 700 : 500,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              userSelect: 'none',
+              color: selected ? '#fff' : 'text.secondary',
+              backgroundColor: selected
+                ? opt.color
+                : isDark
+                  ? 'rgba(255,255,255,0.04)'
+                  : 'rgba(0,0,0,0.04)',
+              border: `1px solid ${selected ? opt.color : 'transparent'}`,
+              '&:hover': {
+                backgroundColor: selected
+                  ? opt.color
+                  : alpha(opt.color, 0.1),
+                borderColor: alpha(opt.color, 0.3),
+              },
+            }}
+          >
+            {opt.label}
+          </Box>
+        );
+      })}
+    </Box>
+  );
+};
+
+// ─── Per-Dataset Fallback Columns ───
+
+export const DATASET_FALLBACK_COLUMNS: Record<DiscoverDataset, string[]> = {
+  errors: [
+    'event_id', 'timestamp', 'level', 'platform',
+    'environment', 'release', 'transaction',
+  ],
+  spans: [
+    'span_id', 'trace_id', 'timestamp', 'op',
+    'description', 'status', 'duration',
+  ],
+  logs: [
+    'log_id', 'timestamp', 'level', 'service',
+    'message', 'environment',
+  ],
+  transactions: [
+    'transaction_id', 'trace_id', 'timestamp', 'name',
+    'duration', 'status', 'op',
+  ],
+  sessions: [
+    'session_id', 'timestamp', 'status', 'duration',
+    'environment', 'release',
+  ],
+};
 
 // ─── Constants ───
 
@@ -31,6 +396,13 @@ export const Y_AXIS_OPTIONS = [
   { value: 'uniq(user_id)', label: 'count_unique(user_id)' },
 ];
 
+// Parse ClickHouse DateTime string safely (YYYY-MM-DD HH:MM:SS → ISO)
+const parseChDate = (s: string): Date => {
+  if (!s) return new Date(NaN);
+  const iso = s.replace(' ', 'T');
+  return new Date(iso.includes('T') ? iso : `${iso}T00:00:00`);
+};
+
 // ─── VolumeChart ───
 
 export const VolumeChart: React.FC<{
@@ -49,17 +421,27 @@ export const VolumeChart: React.FC<{
         chartDatasets: [],
       };
 
-    const bucketMap = new Map<string, number>();
+    // Group by level for stacked charts
+    const levels = new Set<string>();
+    const bucketLevelMap = new Map<string, Map<string, number>>();
     data.forEach((p) => {
       const count = Number(p.count) || 0;
-      bucketMap.set(p.bucket, (bucketMap.get(p.bucket) || 0) + count);
+      const level = p.level || 'all';
+      levels.add(level);
+      if (!bucketLevelMap.has(p.bucket)) {
+        bucketLevelMap.set(p.bucket, new Map());
+      }
+      const levelMap = bucketLevelMap.get(p.bucket)!;
+      levelMap.set(level, (levelMap.get(level) || 0) + count);
     });
-    const sorted = [...bucketMap.entries()].sort((a, b) =>
-      a[0].localeCompare(b[0])
+
+    const sortedKeys = [...bucketLevelMap.keys()].sort((a, b) =>
+      a.localeCompare(b)
     );
 
-    const labels = sorted.map(([b]) => {
-      const d = new Date(b);
+    const labels = sortedKeys.map((b) => {
+      const d = parseChDate(b);
+      if (isNaN(d.getTime())) return b; // fallback to raw string
       return d.toLocaleString(i18n.language || 'en', {
         month: 'short',
         day: 'numeric',
@@ -69,17 +451,42 @@ export const VolumeChart: React.FC<{
       });
     });
 
-    const datasets = [
-      {
-        label: t('argus.discover.volumeTitle', 'count(events)'),
-        data: sorted.map(([, c]) => c),
-        type: 'bar' as const,
-        color: '#7c4dff',
-      },
-    ];
+    const LEVEL_COLORS: Record<string, string> = {
+      fatal: '#d32f2f',
+      error: '#f44336',
+      warning: '#ff9800',
+      info: '#2196f3',
+      debug: '#9e9e9e',
+      all: '#7c4dff',
+    };
+
+    const sortedLevels = [...levels].sort((a, b) => {
+      const order = ['fatal', 'error', 'warning', 'info', 'debug', 'all'];
+      return (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) -
+             (order.indexOf(b) === -1 ? 99 : order.indexOf(b));
+    });
+
+    const datasets = sortedLevels.length <= 1
+      ? [{
+          label: t('argus.discover.volumeTitle', 'count(events)'),
+          data: sortedKeys.map((k) => {
+            const m = bucketLevelMap.get(k)!;
+            let total = 0;
+            m.forEach((v) => (total += v));
+            return total;
+          }),
+          type: 'bar' as const,
+          color: '#7c4dff',
+        }]
+      : sortedLevels.map((level) => ({
+          label: level,
+          data: sortedKeys.map((k) => bucketLevelMap.get(k)?.get(level) || 0),
+          type: 'bar' as const,
+          color: LEVEL_COLORS[level] || '#7c4dff',
+        }));
 
     return {
-      sortedBuckets: sorted.map(([b]) => b),
+      sortedBuckets: sortedKeys,
       chartLabels: labels,
       chartDatasets: datasets,
     };
@@ -91,12 +498,12 @@ export const VolumeChart: React.FC<{
       const si = Math.min(startIdx, endIdx);
       const ei = Math.max(startIdx, endIdx);
       if (sortedBuckets[si] && sortedBuckets[ei]) {
-        const start = new Date(sortedBuckets[si]);
-        let end = new Date(sortedBuckets[ei]);
+        const start = parseChDate(sortedBuckets[si]);
+        let end = parseChDate(sortedBuckets[ei]);
         if (sortedBuckets.length > 1) {
           const gap =
-            new Date(sortedBuckets[1]).getTime() -
-            new Date(sortedBuckets[0]).getTime();
+            parseChDate(sortedBuckets[1]).getTime() -
+            parseChDate(sortedBuckets[0]).getTime();
           end = new Date(end.getTime() + gap);
         } else {
           end = new Date(end.getTime() + 3600_000);
@@ -115,8 +522,8 @@ export const VolumeChart: React.FC<{
       title={t('argus.discover.volumeTitle', 'count(events)')}
       onZoom={onZoom ? handleZoom : undefined}
       storagePrefix="argus_discover_volume"
-      showChartTypeToggle={false}
-      showCompactToggle={false}
+      showChartTypeToggle={true}
+      showCompactToggle={true}
     />
   );
 };

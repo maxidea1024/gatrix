@@ -43,9 +43,11 @@ import type { PatternEntry } from './components/LogsPatternsPanel';
 import LogsLiveTailPanel from './components/LogsLiveTailPanel';
 import {
   EditTableDialog,
-  SaveQueryDialog,
+  SaveQueryDialog as LogsSaveQueryDialog,
   SavedQueriesDrawer,
 } from './components/LogsDialogs';
+import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
+import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 import FacetSidebar from '@/components/argus/FacetSidebar';
 import LogSidePanel from './components/LogSidePanel';
 
@@ -97,7 +99,6 @@ const ArgusLogsPage: React.FC = () => {
     totalLogCount,
     fetchFieldValues,
 
-    // Handlers
     setUrlState,
     fetchLogs,
     fetchFacets,
@@ -115,10 +116,18 @@ const ArgusLogsPage: React.FC = () => {
     handleLoadMore,
     handleFilterChange,
     handleZoom,
-    handleSaveQuery,
+    handleSave,
+    handleDialogSave,
     handleRename,
     handleDeleteSavedQuery,
     handleLoadSavedQuery,
+    confirmDelete,
+    isDirty,
+    saving,
+    deleteTarget,
+    setDeleteTarget,
+    setQueryName: _setQueryName,
+    setCurrentQueryId: _setCurrentQueryId,
 
     // Patterns
     patterns,
@@ -143,6 +152,7 @@ const ArgusLogsPage: React.FC = () => {
     null
   );
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveDialogMode, setSaveDialogMode] = useState<'new' | 'saveAs'>('new');
   const [saveName, setSaveName] = useState('');
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
   const [wrapLines, setWrapLines] = useLocalStorage<boolean>(
@@ -320,6 +330,8 @@ const ArgusLogsPage: React.FC = () => {
             ]}
           />
         }
+        titleUpdateTrigger={queryName}
+        actionsUpdateTrigger={`${isDirty}-${saving}-${currentQueryId}`}
         subtitle={t(
           'argus.logs.subtitle',
           'Structured log explorer with trace-connected debugging'
@@ -346,12 +358,50 @@ const ArgusLogsPage: React.FC = () => {
             </SafeTooltip>
             <Button
               size="small"
+              variant="contained"
+              startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
+              onClick={async () => {
+                if (saving) return;
+                if (currentQueryId) {
+                  handleSave();
+                } else if (queryName !== defaultQueryName && queryName.trim()) {
+                  const duplicate = savedQueries.find(
+                    (q) => q.name.toLowerCase() === queryName.trim().toLowerCase()
+                  );
+                  if (duplicate) {
+                    setSaveName(queryName.trim());
+                    setSaveDialogMode('new');
+                    setSaveDialogOpen(true);
+                  } else {
+                    // Save directly via dialog callback
+                    await handleDialogSave(queryName.trim(), null);
+                  }
+                } else {
+                  setSaveName('');
+                  setSaveDialogMode('new');
+                  setSaveDialogOpen(true);
+                }
+              }}
+              disabled={saving || !isDirty}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderRadius: '6px',
+              }}
+            >
+              {t('argus.logs.save', 'Save')}
+            </Button>
+            <Button
+              size="small"
               variant="outlined"
               startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
               onClick={() => {
                 setSaveName(queryName === defaultQueryName ? '' : queryName);
+                setSaveDialogMode('saveAs');
                 setSaveDialogOpen(true);
               }}
+              disabled={saving}
               sx={{
                 textTransform: 'none',
                 fontSize: '0.75rem',
@@ -980,14 +1030,28 @@ const ArgusLogsPage: React.FC = () => {
 
       <SaveQueryDialog
         open={saveDialogOpen}
-        initialName={saveName}
         onClose={() => setSaveDialogOpen(false)}
-        onSave={(name: string) =>
-          handleSaveQuery(name, {
+        name={saveName}
+        onNameChange={setSaveName}
+        onSave={async (name: string, existingQueryId: number | null) => {
+          await handleDialogSave(name, existingQueryId, {
             displayDensity,
             wrapLines,
-          })
-        }
+          });
+          setSaveDialogOpen(false);
+          setSaveName('');
+        }}
+        mode={saveDialogMode}
+        savedQueries={savedQueries}
+        currentQueryId={currentQueryId}
+      />
+
+      {/* Delete Confirm Dialog */}
+      <DeleteQueryConfirmDialog
+        open={!!deleteTarget}
+        queryName={deleteTarget?.name || ''}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
       />
 
       <SavedQueriesDrawer
