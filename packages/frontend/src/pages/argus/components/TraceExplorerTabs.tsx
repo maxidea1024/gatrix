@@ -234,12 +234,13 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                   }}
                 >
                   <colgroup>
-                    <col style={{ width: '13%' }} /> {/* TIMESTAMP */}
-                    <col style={{ width: '7%' }} /> {/* OP */}
-                    <col style={{ width: '40%' }} /> {/* DESCRIPTION */}
-                    <col style={{ width: '10%' }} /> {/* DURATION */}
-                    <col style={{ width: '8%' }} /> {/* STATUS */}
-                    <col style={{ width: '22%' }} /> {/* TRACE */}
+                    <col style={{ width: '13%' }} />  {/* TIMESTAMP */}
+                    <col style={{ width: '7%' }} />   {/* OP */}
+                    <col style={{ width: '40%' }} />  {/* DESCRIPTION */}
+                    <col style={{ width: '10%' }} />  {/* DURATION */}
+                    <col style={{ width: '8%' }} />   {/* STATUS */}
+                    <col style={{ width: '15%' }} />  {/* TRACE */}
+                    <col style={{ width: '7%' }} />   {/* ACTIONS */}
                   </colgroup>
                   <TableHead>
                     <TableRow>
@@ -271,6 +272,7 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                           </Box>
                         </SortableHeaderCell>
                       ))}
+                      <SortableHeaderCell key="actions" />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -401,34 +403,38 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 0.8 }}>
+                          <Typography
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (span.trace_id) {
+                                navigate(
+                                  `/argus/performance?trace=${span.trace_id}`,
+                                  { state: { allowBack: true } }
+                                );
+                              }
+                            }}
+                            sx={{
+                              fontSize: '0.72rem',
+                              color: theme.palette.primary.main,
+                              cursor: 'pointer',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              '&:hover': { textDecoration: 'underline' },
+                            }}
+                          >
+                            {span.trace_id
+                              ? String(span.trace_id).slice(0, 12) + '…'
+                              : '—'}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 0.8 }}>
                           <Box
                             sx={{
                               display: 'flex',
                               alignItems: 'center',
-                              gap: 0.5,
+                              gap: 0.25,
                             }}
                           >
-                            <Typography
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (span.trace_id) {
-                                  navigate(
-                                    `/argus/performance?trace=${span.trace_id}`,
-                                    { state: { allowBack: true } }
-                                  );
-                                }
-                              }}
-                              sx={{
-                                fontSize: '0.72rem',
-                                color: theme.palette.primary.main,
-                                cursor: 'pointer',
-                                '&:hover': { textDecoration: 'underline' },
-                              }}
-                            >
-                              {span.trace_id
-                                ? String(span.trace_id).slice(0, 12) + '…'
-                                : '—'}
-                            </Typography>
                             {span.trace_id && (
                               <>
                                 <SafeTooltip
