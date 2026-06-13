@@ -40,8 +40,8 @@ const columns = new Map<string, ColumnDef>([
   ['release', { name: 'release', type: 'String', lowCardinality: true }],
   ['user_id', { name: 'user_id', type: 'String' }],
 
-  ['measurements', { name: 'measurements', type: 'Map(String,Float64)' }],
   ['tags', { name: 'tags', type: 'Map(String,String)' }],
+  ['measurements', { name: 'measurements', type: 'Map(String,Float64)' }],
   ['span_count', { name: 'span_count', type: 'UInt32' }],
 ]);
 

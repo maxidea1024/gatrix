@@ -1,11 +1,9 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { optic } from '@gatrix/argus-optic';
+import { optic, parseSearchToSQL } from '@gatrix/argus-optic';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
-import { QueryParser } from '../utils/queryParser';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { CACHE, STREAMS, KNOWN_STREAMS } from '../config/redis-keys';
-import { LOGS_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('logs-api');
 
@@ -70,14 +68,8 @@ export default async function logsRoutes(app: FastifyInstance) {
           params.loggerName = logger_name;
         }
 
-        if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_SCHEMA);
-          const ast = parser.parse(search);
-          if (ast) {
-            const { where } = parser.generateSQL(ast, params);
-            if (where) conditions.push(`(${where})`);
-          }
-        }
+        const { where: searchCond } = parseSearchToSQL('logs', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
 
         const sql = `
           SELECT log_id, trace_id, span_id, timestamp, level, logger_name, message, body, service, environment, release, attributes
@@ -138,14 +130,9 @@ export default async function logsRoutes(app: FastifyInstance) {
           params.level = level;
         }
 
-        if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_SCHEMA);
-          const ast = parser.parse(search);
-          if (ast) {
-            const { where } = parser.generateSQL(ast, params);
-            if (where) conditions.push(`(${where})`);
-          }
-        }
+        const { where: searchCond } = parseSearchToSQL('logs', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
+
 
         const sql = `
           SELECT ${bucket.selectExpr} AS bucket, level, count() AS count
@@ -325,14 +312,9 @@ export default async function logsRoutes(app: FastifyInstance) {
           params.environment = environment;
         }
 
-        if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_SCHEMA);
-          const ast = parser.parse(search);
-          if (ast) {
-            const { where } = parser.generateSQL(ast, params);
-            if (where) conditions.push(`(${where})`);
-          }
-        }
+        const { where: searchCond } = parseSearchToSQL('logs', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
+
 
         // 1) Top values by count
         const topSql = `
@@ -424,14 +406,9 @@ export default async function logsRoutes(app: FastifyInstance) {
           params.level = level;
         }
 
-        if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_SCHEMA);
-          const ast = parser.parse(search);
-          if (ast) {
-            const { where } = parser.generateSQL(ast, params);
-            if (where) conditions.push(`(${where})`);
-          }
-        }
+        const { where: searchCond } = parseSearchToSQL('logs', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
+
         if (cursor) {
           const op = order === 'DESC' ? '<' : '>';
           conditions.push(`timestamp ${op} {cursor:DateTime64(3)}`);
@@ -616,14 +593,9 @@ export default async function logsRoutes(app: FastifyInstance) {
           params.penvironment = environment;
         }
 
-        if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(LOGS_SCHEMA);
-          const ast = parser.parse(search);
-          if (ast) {
-            const { where } = parser.generateSQL(ast, params);
-            if (where) conditions.push(`(${where})`);
-          }
-        }
+        const { where: searchCond } = parseSearchToSQL('logs', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
+
 
         const patternExpr = `replaceRegexpAll(
           replaceRegexpAll(
@@ -1112,14 +1084,8 @@ export default async function logsRoutes(app: FastifyInstance) {
             params.lenvironment = environment;
           }
 
-          if (search && typeof search === 'string' && search.trim()) {
-            const parser = new QueryParser(LOGS_SCHEMA);
-            const ast = parser.parse(search);
-            if (ast) {
-              const { where } = parser.generateSQL(ast, params);
-              if (where) conditions.push(`(${where})`);
-            }
-          }
+          const { where: searchCond } = parseSearchToSQL('logs', search, params);
+          if (searchCond) conditions.push(`(${searchCond})`);
 
           const sql = `
             SELECT log_id, trace_id, span_id, timestamp, level, logger_name, message, body, service, environment, release, attributes

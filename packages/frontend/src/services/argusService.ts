@@ -688,12 +688,19 @@ class ArgusService {
 
   async getSpanTags(
     projectId: number | string,
-    period?: string
-  ): Promise<{ op: any[]; status: any[]; domain: any[] }> {
+    period?: string,
+    start?: string,
+    end?: string
+  ): Promise<{
+    op: any[];
+    status: any[];
+    domain: any[];
+    discovered?: Record<string, { value: string; count: number }[]>;
+  }> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/traces/${projectId}/tags`,
       {
-        params: { period },
+        params: { period, start, end },
       }
     );
     return (

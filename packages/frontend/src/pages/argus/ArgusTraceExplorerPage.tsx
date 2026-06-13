@@ -9,16 +9,12 @@ import {
   Box,
   Typography,
   IconButton,
-  Popover,
   Button,
   useTheme,
   alpha,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
-  Close as CloseIcon,
   Timeline as TraceIcon,
-  Tune as TuneIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
   Save as SaveIcon,
@@ -31,7 +27,7 @@ import ArgusFilterBar, {
   defaultArgusFilterState,
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
-import QueryBuilderPanel from '@/components/argus/QueryBuilderPanel';
+import { QueryAQLEditor, QueryAQLEditorHandle } from '@/components/argus/query-aql/QueryAQLEditor';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 import SpanDetailPanel from '@/components/argus/SpanDetailDrawer';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
@@ -137,9 +133,12 @@ const ArgusTraceExplorerPage: React.FC = () => {
     { bucket: string; op: string; count: number }[]
   >([]);
   const [loading, setLoading] = useState(false);
-  const [tags, setTags] = useState<{ op: any[]; status: any[]; domain: any[] }>(
-    { op: [], status: [], domain: [] }
-  );
+  const [tags, setTags] = useState<{
+    op: any[];
+    status: any[];
+    domain: any[];
+    discovered?: Record<string, { value: string; count: number }[]>;
+  }>({ op: [], status: [], domain: [] });
 
   // ─── Transform volume for ArgusVolumeChart ───
   const { volumeLabels, volumeDatasets } = useMemo(() => {
@@ -348,9 +347,8 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [tracesHasMore, setTracesHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  // Search state
-  const [searchFocused, setSearchFocused] = useState(false);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
+  // AQL editor ref for programmatic chip insertion
+  const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
 
   // Editable Query Name
   const defaultQueryName = t('argus.traces.newQuery', 'New Trace Query');
@@ -377,8 +375,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     }
   }, [urlState.queryId, savedQueries, currentQueryId]);
 
-  // Search UI
-  const [builderOpen, setBuilderOpen] = useState(false);
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
@@ -422,7 +418,42 @@ const ArgusTraceExplorerPage: React.FC = () => {
     return facets;
   }, [tags]);
 
-  // ─── Fetch ───
+  // Dynamically discovered tag facets from span tags Map
+  const discoveredFacets = useMemo<FacetGroup[]>(() => {
+    if (!tags.discovered) return [];
+    return Object.entries(tags.discovered)
+      .filter(([, values]) => values && values.length > 0)
+      .map(([key, values]) => ({
+        key,
+        label: key,
+        values: values.map((v) => ({
+          value: v.value,
+          count: Number(v.count) || 0,
+        })),
+      }));
+  }, [tags.discovered]);
+
+  // Facet values for AQL editor autocomplete (initialFacets)
+  const mappedFacets = useMemo(() => {
+    const result: Record<string, { value: string; count: number }[]> = {};
+    if (tags.op?.length) {
+      result.op = tags.op.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 }));
+    }
+    if (tags.status?.length) {
+      result.status = tags.status.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 }));
+    }
+    if (tags.domain?.length) {
+      result.domain = tags.domain.map((v: any) => ({ value: v.value, count: Number(v.count) || 0 }));
+    }
+    // Discovered tag facets (e.g. server.region, http.method)
+    for (const df of discoveredFacets) {
+      if (!result[df.key]) {
+        result[df.key] = df.values;
+      }
+    }
+    return result;
+  }, [tags, discoveredFacets]);
+
   const SPAN_PAGE_SIZE = 50;
   const TRACE_PAGE_SIZE = 25;
 
@@ -535,12 +566,18 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   const fetchTags = useCallback(async () => {
     try {
-      const data = await argusService.getSpanTags(projectId, currentPeriod);
+      const apiParams = argusFilterStateToApiParams(filters);
+      const data = await argusService.getSpanTags(
+        projectId,
+        apiParams.period || currentPeriod,
+        apiParams.start,
+        apiParams.end
+      );
       setTags(data);
     } catch (err) {
       console.error('Failed to fetch span tags', err);
     }
-  }, [projectId, currentPeriod]);
+  }, [projectId, filters, currentPeriod]);
 
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
@@ -561,6 +598,12 @@ const ArgusTraceExplorerPage: React.FC = () => {
           return [];
         }
       }
+
+      // Discovered tag keys — return values from pre-fetched tags
+      if (tags.discovered?.[fieldKey]) {
+        return tags.discovered[fieldKey].map((v: any) => v.value);
+      }
+
       return [];
     },
     [projectId, currentPeriod, tags]
@@ -641,16 +684,12 @@ const ArgusTraceExplorerPage: React.FC = () => {
   }, [activeTab, fetchTabData]);
 
   // ─── Handlers ───
-  const handleSearchKey = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        setUrlState({ q: search.trim() });
-        setSearchFocused(false);
-        // No explicit fetchAll() — setUrlState triggers the
-        // search → fetchSpans/fetchAll → useEffect chain automatically.
-      }
+  const handleSearchSubmit = useCallback(
+    (query: string) => {
+      setSearch(query);
+      setUrlState({ q: query.trim() });
     },
-    [search, setUrlState]
+    [setUrlState]
   );
 
   const handleFilterChange = useCallback(
@@ -804,14 +843,14 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   const addSearchTag = useCallback(
     (key: string, value: string) => {
-      const appendStr = `${key}:"${value}"`;
-      const finalStr =
-        (search.trim() ? search.trim() + ' ' : '') + appendStr + ' ';
-      setSearch(finalStr);
-      setUrlState({ q: finalStr.trim() });
-      setSearchFocused(false);
+      const ref = dslEditorRef.current;
+      if (!ref) return;
+      const current = ref.getFieldValues(key);
+      if (!current.includes(value)) {
+        ref.upsertFieldChip(key, [...current, value]);
+      }
     },
-    [search, setUrlState]
+    []
   );
 
   const handleSelectSpan = useCallback((span: any, index: number) => {
@@ -821,9 +860,20 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   const handleFacetFilter = useCallback(
     (key: string, value: string) => {
-      addSearchTag(key, value);
+      const ref = dslEditorRef.current;
+      if (!ref) return;
+      // Discovered facets pass their raw key (e.g. "server.region"); QueryParser
+      // auto-maps unknown keys to tags['key'] via Map column fallback.
+      // Strip any legacy prefixes that may still be present.
+      const cleanKey = key.replace(/^(tags\.|discovered\.|attr\.)/, '');
+      const current = ref.getFieldValues(cleanKey);
+      if (current.includes(value)) {
+        ref.upsertFieldChip(cleanKey, current.filter((v) => v !== value));
+      } else {
+        ref.upsertFieldChip(cleanKey, [...current, value]);
+      }
     },
-    [addSearchTag]
+    []
   );
 
   /* ═══ RENDER ═══ */
@@ -930,249 +980,21 @@ const ArgusTraceExplorerPage: React.FC = () => {
               minWidth: 0,
             }}
           >
-            <Box
-              ref={searchContainerRef}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                flex: 1,
-                minWidth: 0,
-                px: 1,
-                py: 0.2,
-                borderRadius: '6px',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                transition: 'border-color 0.2s',
-                backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-                '&:focus-within': {
-                  borderColor: theme.palette.primary.main,
-                  boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}`,
-                },
-              }}
-            >
-              <SearchIcon
-                sx={{
-                  fontSize: 16,
-                  color: 'text.disabled',
-                  flexShrink: 0,
-                  ml: 0.5,
-                }}
-              />
-              <Box
-                component="input"
-                value={search}
-                spellCheck={false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setSearch(e.target.value)
-                }
-                onKeyDown={handleSearchKey as any}
-                onFocus={() => setSearchFocused(true)}
-                placeholder={t(
-                  'argus.traces.searchPlaceholder',
-                  'Search spans by description, op, or tag...'
-                )}
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  backgroundColor: 'transparent',
-                  color: 'inherit',
-                  fontFamily: 'inherit',
-                  fontSize: '0.85rem',
-                  fontWeight: 500,
-                  minWidth: 100,
-                  padding: '6px 8px',
-                }}
-              />
-              {search && (
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    setSearch('');
-                    setUrlState({ q: '' });
-                  }}
-                  sx={{ p: 0.2, flexShrink: 0 }}
-                >
-                  <CloseIcon sx={{ fontSize: 14 }} />
-                </IconButton>
-              )}
-
-              {/* Builder toggle */}
-              <Box
-                sx={{
-                  borderLeft: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                  ml: 0.5,
-                  pl: 0.5,
-                  height: 18,
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <SafeTooltip
-                  title={t('argus.builder.open', 'Open Query Builder')}
-                >
-                  <IconButton
-                    size="small"
-                    onClick={() => setBuilderOpen((prev) => !prev)}
-                    sx={{
-                      p: 0.3,
-                      color: builderOpen
-                        ? theme.palette.primary.main
-                        : 'text.disabled',
-                      transition: 'color 0.15s',
-                    }}
-                  >
-                    <TuneIcon sx={{ fontSize: 15 }} />
-                  </IconButton>
-                </SafeTooltip>
-              </Box>
-            </Box>
-
-            <QueryBuilderPanel
-              open={builderOpen}
-              onClose={() => setBuilderOpen(false)}
+            <QueryAQLEditor
+              ref={dslEditorRef}
               config={TRACES_CONFIG}
-              query={search}
-              facets={Object.fromEntries(
-                Object.entries(tags || {}).map(([k, list]) => [
-                  k,
-                  Array.isArray(list)
-                    ? list.map((item: any) => ({
-                        value: item.value,
-                        count: Number(item.count || 0),
-                      }))
-                    : [],
-                ])
+              initialQuery={search}
+              placeholder={t(
+                'argus.traces.searchPlaceholder',
+                'Search spans by description, op, or tag...'
               )}
-              fetchFieldValues={fetchFieldValues}
-              onApply={(q) => {
-                setSearch(q);
+              onSearch={handleSearchSubmit}
+              onChange={(q) => {
                 setUrlState({ q });
               }}
+              fetchFieldValues={fetchFieldValues}
+              initialFacets={mappedFacets}
             />
-
-            {/* Search Autocomplete */}
-            <Popover
-              open={searchFocused}
-              anchorEl={searchContainerRef.current}
-              onClose={() => setSearchFocused(false)}
-              disableAutoFocus
-              disableEnforceFocus
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-              slotProps={{
-                paper: {
-                  sx: {
-                    width: searchContainerRef.current?.offsetWidth || 300,
-                    mt: 0.5,
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-                    maxHeight: 320,
-                    overflow: 'auto',
-                  },
-                },
-              }}
-            >
-              <Box sx={{ p: 1 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    px: 1,
-                    color: 'text.disabled',
-                    fontWeight: 600,
-                    display: 'block',
-                    mb: 0.5,
-                  }}
-                >
-                  {t('argus.traces.opValues', 'Operations')}
-                </Typography>
-                {tags.op.slice(0, 10).map((v: any, idx: number) => (
-                  <Box
-                    key={idx}
-                    onClick={() => addSearchTag('op', v.value)}
-                    sx={{
-                      px: 1.5,
-                      py: 0.5,
-                      cursor: 'pointer',
-                      borderRadius: '4px',
-                      fontSize: '0.78rem',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      '&:hover': {
-                        backgroundColor: alpha(
-                          theme.palette.primary.main,
-                          0.08
-                        ),
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          bgcolor: getOpColor(v.value),
-                          flexShrink: 0,
-                        }}
-                      />
-                      <span
-                        style={{
-                          color: theme.palette.primary.main,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {v.value || '(empty)'}
-                      </span>
-                    </Box>
-                    <Typography
-                      sx={{ fontSize: '0.65rem', color: 'text.disabled' }}
-                    >
-                      {Number(v.count).toLocaleString()}
-                    </Typography>
-                  </Box>
-                ))}
-                {tags.status.length > 0 && (
-                  <>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        px: 1,
-                        color: 'text.disabled',
-                        fontWeight: 600,
-                        display: 'block',
-                        mt: 1,
-                        mb: 0.5,
-                      }}
-                    >
-                      {t('argus.traces.statusValues', 'Status')}
-                    </Typography>
-                    {tags.status.slice(0, 8).map((v: any, idx: number) => (
-                      <Box
-                        key={idx}
-                        onClick={() => addSearchTag('status', v.value)}
-                        sx={{
-                          px: 1.5,
-                          py: 0.5,
-                          cursor: 'pointer',
-                          borderRadius: '4px',
-                          fontSize: '0.78rem',
-                          '&:hover': {
-                            backgroundColor: alpha(
-                              theme.palette.primary.main,
-                              0.08
-                            ),
-                          },
-                        }}
-                      >
-                        <span style={{}}>{v.value}</span>
-                      </Box>
-                    ))}
-                  </>
-                )}
-              </Box>
-            </Popover>
           </Box>
         }
       />
@@ -1192,6 +1014,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         {/* Left: Facets */}
         <FacetSidebar
           facets={spanFacets}
+          discoveredFacets={discoveredFacets}
           onFilter={handleFacetFilter}
           collapsed={facetCollapsed}
           onToggleCollapse={handleToggleFacetCollapse}

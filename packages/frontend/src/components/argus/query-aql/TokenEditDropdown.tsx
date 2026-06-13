@@ -190,6 +190,7 @@ export function TokenEditDropdown({
         <FieldMenu
           config={config}
           currentField={chip.field ?? ''}
+          facets={facets}
           onSelect={handleFieldSelect}
           isDark={isDark}
         />
@@ -320,11 +321,13 @@ export function TokenEditDropdown({
 function FieldMenu({
   config,
   currentField,
+  facets,
   onSelect,
   isDark,
 }: {
   config: DomainConfig;
   currentField: string;
+  facets?: Map<string, string[]>;
   onSelect: (field: string) => void;
   isDark: boolean;
 }) {
@@ -332,17 +335,52 @@ function FieldMenu({
   const [filter, setFilter] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const listRef = useRef<HTMLUListElement>(null);
-  const allFields = config.fields;
 
-  // When no filter text: show only current field + fields starting with currentField.
+  // Build combined field list: static fields + discovered facet keys
+  const allKeys = useMemo(() => {
+    const seen = new Set<string>();
+    const result: { key: string; isDynamic: boolean }[] = [];
+
+    // 1. Static domain fields
+    for (const f of config.fields) {
+      if (!seen.has(f.key)) {
+        seen.add(f.key);
+        result.push({ key: f.key, isDynamic: false });
+      }
+    }
+
+    // 2. Discovered facet keys not already in static fields
+    if (facets) {
+      const reservedKeys = new Set(['has', '!has']);
+      for (const key of facets.keys()) {
+        if (!seen.has(key) && !reservedKeys.has(key.toLowerCase())) {
+          seen.add(key);
+          result.push({ key, isDynamic: true });
+        }
+      }
+    }
+
+    // 3. If currentField is not in the list at all, add it (edge case)
+    if (currentField && !seen.has(currentField)) {
+      result.push({ key: currentField, isDynamic: true });
+    }
+
+    return result;
+  }, [config.fields, facets, currentField]);
+
+  // When no filter text: show current field + sub-fields (e.g. message, message.template)
   // When filter text: search all fields
-  const filtered = filter
-    ? allFields.filter((f) =>
-        f.key.toLowerCase().includes(filter.toLowerCase())
-      )
-    : allFields.filter(
-        (f) => f.key === currentField || f.key.startsWith(currentField + '.')
+  const filtered = useMemo(() => {
+    if (filter) {
+      const lowerFilter = filter.toLowerCase();
+      return allKeys.filter((f) =>
+        f.key.toLowerCase().includes(lowerFilter)
       );
+    }
+    return allKeys.filter(
+      (f) => f.key === currentField || f.key.startsWith(currentField + '.')
+    );
+  }, [allKeys, filter, currentField]);
 
   useEffect(() => {
     setSelectedIndex(-1);
@@ -404,7 +442,8 @@ function FieldMenu({
         sx={{ py: 0.5, maxHeight: 280, overflow: 'auto' }}
       >
         {filtered.map((f, idx) => {
-          const isSelected = idx === selectedIndex || f.key === currentField;
+          const isCurrent = f.key === currentField;
+          const isSelected = idx === selectedIndex || isCurrent;
           return (
             <ListItemButton
               key={f.key}
@@ -428,7 +467,7 @@ function FieldMenu({
                   fontWeight: isSelected ? 600 : 400,
                 }}
               />
-              {f.key === currentField && (
+              {isCurrent && (
                 <CheckIcon
                   sx={{ fontSize: 14, ml: 1, color: 'primary.main' }}
                 />

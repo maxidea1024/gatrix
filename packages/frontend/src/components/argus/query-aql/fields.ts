@@ -266,6 +266,53 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     description: 'aql.field.duration.desc',
   },
 
+  // ── Span fields ──
+  {
+    key: 'op',
+    label: 'aql.field.op',
+    type: 'string',
+    category: 'trace',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.op.desc',
+  },
+  {
+    key: 'description',
+    label: 'aql.field.description',
+    type: 'string',
+    category: 'trace',
+    operators: [
+      '=',
+      '!=',
+      'contains',
+      '!contains',
+      'startsWith',
+      '!startsWith',
+      'endsWith',
+      '!endsWith',
+    ],
+    searchable: true,
+    description: 'aql.field.description.desc',
+  },
+  {
+    key: 'action',
+    label: 'aql.field.action',
+    type: 'string',
+    category: 'trace',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.action.desc',
+  },
+  {
+    key: 'domain',
+    label: 'aql.field.domain',
+    type: 'string',
+    category: 'trace',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.domain.desc',
+  },
+
   // ── Feedback fields ──
   {
     key: 'contact_email',
@@ -766,17 +813,19 @@ export const TRACES_CONFIG: DomainConfig = {
   name: 'traces',
   fields: pickFields(
     [
+      'op',
+      'description',
+      'status',
+      'action',
+      'domain',
+      'duration',
       'trace_id',
       'span_id',
       'transaction',
-      'duration',
-      'status',
       'service',
       'environment',
       'release',
       'timestamp',
-      'level',
-      'message',
     ],
     {
       status: {

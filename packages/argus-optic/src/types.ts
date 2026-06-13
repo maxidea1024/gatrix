@@ -41,6 +41,29 @@ export interface ColumnDef {
   searchable?: boolean;
 }
 
+/** Map(String, T) column definition for QueryParser dynamic key access */
+export interface MapColumnDef {
+  /** ClickHouse column name (e.g. 'tags', 'attributes', 'measurements') */
+  name: string;
+  /** Value type of the Map — determines parameter type hints in generated SQL */
+  valueType: 'String' | 'Float64';
+}
+
+/**
+ * Search schema used by QueryParser for Map column fallback.
+ * When a search key (e.g. 'server.region') is NOT a known column,
+ * QueryParser falls back to the first Map column and generates:
+ *   mapContains(tags, 'server.region') AND tags['server.region'] = value
+ */
+export interface SearchSchema {
+  /** Top-level columns: column name → simple type hint */
+  columns: Record<string, 'string' | 'number'>;
+  /** Map(String, T) columns that support dynamic key access */
+  mapColumns: MapColumnDef[];
+  /** User-friendly aliases → real column names (e.g. severity → level) */
+  aliases?: Record<string, string>;
+}
+
 /** Materialized View configuration for auto-routing */
 export interface MaterializedViewDef {
   /** MV target table name (e.g., 'argus.error_frequency_hourly') */

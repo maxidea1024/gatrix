@@ -20,22 +20,17 @@ import {
   alpha,
   useTheme,
   Skeleton,
-  TextField,
-  InputAdornment,
-  Collapse,
 } from '@mui/material';
 import {
   ChevronLeft as PrevIcon,
   ChevronRight as NextIcon,
   FirstPage as OldestIcon,
   LastPage as LatestIcon,
-  Search as SearchIcon,
-  Close as CloseIcon,
-  Keyboard as KeyboardIcon,
   Star as RecommendedIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusErrorEvent } from '@/services/argusService';
+import { QueryAQLEditor, ISSUES_CONFIG } from './query-aql';
 
 interface EventNavigatorProps {
   projectId: string | number;
@@ -57,7 +52,6 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
   const [events, setEvents] = useState<ArgusErrorEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch all events for this issue (paginated, up to 100)
@@ -130,39 +124,6 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, events.length, goToEvent]);
-
-  // Search within events
-  const handleSearch = useCallback(() => {
-    if (!searchQuery.trim()) return;
-    const query = searchQuery.toLowerCase();
-    const matchIdx = events.findIndex((evt, idx) => {
-      if (idx <= currentIndex) return false;
-      return (
-        evt.exception_type?.toLowerCase().includes(query) ||
-        evt.exception_value?.toLowerCase().includes(query) ||
-        evt.user_email?.toLowerCase().includes(query) ||
-        evt.user_id?.toLowerCase().includes(query) ||
-        evt.transaction?.toLowerCase().includes(query) ||
-        evt.event_id?.toLowerCase().includes(query)
-      );
-    });
-    if (matchIdx >= 0) {
-      goToEvent(matchIdx);
-    } else {
-      // Wrap around: search from beginning
-      const wrapIdx = events.findIndex((evt) => {
-        return (
-          evt.exception_type?.toLowerCase().includes(query) ||
-          evt.exception_value?.toLowerCase().includes(query) ||
-          evt.user_email?.toLowerCase().includes(query) ||
-          evt.user_id?.toLowerCase().includes(query) ||
-          evt.transaction?.toLowerCase().includes(query) ||
-          evt.event_id?.toLowerCase().includes(query)
-        );
-      });
-      if (wrapIdx >= 0) goToEvent(wrapIdx);
-    }
-  }, [searchQuery, events, currentIndex, goToEvent]);
 
   const total = events.length;
   const hasPrev = currentIndex > 0;
@@ -302,55 +263,47 @@ const EventNavigator: React.FC<EventNavigatorProps> = ({
           />
         )}
 
-        {/* Event Search Bar (Inline) + keyboard hint */}
-        <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TextField
-            size="small"
+        {/* Event Search Bar — AQL Editor */}
+        <Box sx={{ ml: 'auto', flex: 1, minWidth: 0 }}>
+          <QueryAQLEditor
+            config={ISSUES_CONFIG}
+            initialQuery={searchQuery}
+            onSearch={(query) => {
+              setSearchQuery(query);
+              if (!query.trim()) return;
+              // Simple client-side search within loaded events
+              const q = query.toLowerCase();
+              const matchIdx = events.findIndex((evt, idx) => {
+                if (idx <= currentIndex) return false;
+                return (
+                  evt.exception_type?.toLowerCase().includes(q) ||
+                  evt.exception_value?.toLowerCase().includes(q) ||
+                  evt.user_email?.toLowerCase().includes(q) ||
+                  evt.user_id?.toLowerCase().includes(q) ||
+                  evt.transaction?.toLowerCase().includes(q) ||
+                  evt.event_id?.toLowerCase().includes(q)
+                );
+              });
+              if (matchIdx >= 0) {
+                goToEvent(matchIdx);
+              } else {
+                // Wrap around
+                const wrapIdx = events.findIndex((evt) => (
+                  evt.exception_type?.toLowerCase().includes(q) ||
+                  evt.exception_value?.toLowerCase().includes(q) ||
+                  evt.user_email?.toLowerCase().includes(q) ||
+                  evt.user_id?.toLowerCase().includes(q) ||
+                  evt.transaction?.toLowerCase().includes(q) ||
+                  evt.event_id?.toLowerCase().includes(q)
+                ));
+                if (wrapIdx >= 0) goToEvent(wrapIdx);
+              }
+            }}
             placeholder={t(
               'argus.events.searchPlaceholder',
               'Search events...'
             )}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSearch();
-            }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: searchQuery && (
-                  <InputAdornment position="end">
-                    <IconButton
-                      size="small"
-                      onClick={() => setSearchQuery('')}
-                      sx={{ p: 0.2 }}
-                    >
-                      <CloseIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{
-              width: 220,
-              '& .MuiOutlinedInput-root': {
-                height: 26,
-                fontSize: '0.72rem',
-                borderRadius: 1.5,
-              },
-            }}
           />
-          <Tooltip
-            title={`${t('argus.events.keyboardShortcuts', 'Keyboard shortcuts')}: J/K ${t('argus.events.navigateEvents', 'navigate')}, [ / ] ${t('argus.events.jumpToEdge', 'jump')}`}
-          >
-            <KeyboardIcon
-              sx={{ fontSize: 14, color: 'text.disabled', cursor: 'help' }}
-            />
-          </Tooltip>
         </Box>
       </Box>
     </Box>

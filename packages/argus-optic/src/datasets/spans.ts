@@ -23,8 +23,8 @@ const columns = new Map<string, ColumnDef>([
   ['action', { name: 'action', type: 'String', lowCardinality: true }],
   ['domain', { name: 'domain', type: 'String', lowCardinality: true }],
 
-  ['data', { name: 'data', type: 'Map(String,String)' }],
   ['tags', { name: 'tags', type: 'Map(String,String)' }],
+  ['data', { name: 'data', type: 'Map(String,String)' }],
 ]);
 
 export const spansDataset: DatasetConfig = {

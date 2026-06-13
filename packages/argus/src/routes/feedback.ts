@@ -1,10 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { optic } from '@gatrix/argus-optic';
+import { optic, parseSearchToSQL } from '@gatrix/argus-optic';
 import db from '../config/knex';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
-import { QueryParser } from '../utils/queryParser';
-import { FEEDBACK_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('feedback-api');
 
@@ -58,16 +56,10 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       // Date filter
       const dateClause = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
-      // Search filter — parse AQL query via QueryParser
+      // Search filter — parse AQL query via parseSearchToSQL
       let searchClause = '';
-      if (search && search.trim()) {
-        const parser = new QueryParser(FEEDBACK_SCHEMA);
-        const ast = parser.parse(search);
-        if (ast) {
-          const { where } = parser.generateSQL(ast, qp);
-          if (where) searchClause = `AND (${where})`;
-        }
-      }
+      const { where: searchCond } = parseSearchToSQL('feedback', search, qp);
+      if (searchCond) searchClause = `AND (${searchCond})`;
 
       // Status filter
       let statusClause = '';

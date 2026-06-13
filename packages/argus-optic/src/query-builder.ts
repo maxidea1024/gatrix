@@ -1,4 +1,4 @@
-import { DatasetConfig, OpticQuery, Condition, BuiltQuery } from './types';
+import { DatasetConfig, OpticQuery, Condition, BuiltQuery, SearchSchema, MapColumnDef } from './types';
 import { getDataset } from './datasets';
 import { getBucketingConfig } from './utils/timeBucket';
 import { QueryParser } from './utils/queryParser';
@@ -92,14 +92,11 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
     }
   }
 
-  // 2d. Search (QueryParser integration)
+  // 2d. Search (QueryParser integration — schema-based with Map column fallback)
   let havingFromSearch = '';
   if (query.search && query.search.trim()) {
-    const parser = new QueryParser(
-      new Set(dataset.columns.keys()),
-      dataset.aggregates,
-      dataset.columnAliases
-    );
+    const schema = deriveSearchSchema(dataset);
+    const parser = new QueryParser(schema, dataset.aggregates);
     const ast = parser.parse(query.search);
     if (ast) {
       const searchParams: Record<string, string> = {};
@@ -205,6 +202,42 @@ export function buildQuery(query: OpticQuery): BuiltQuery {
   }
 
   return { sql, params };
+}
+
+/**
+ * Parse a search string into SQL conditions using the dataset's schema.
+ *
+ * This is a convenience helper for routes that use rawQuery but still need
+ * schema-based search parsing with Map column fallback.
+ *
+ * @param datasetName  Dataset name (e.g. 'spans', 'logs', 'errors')
+ * @param search       Raw AQL search string from the client
+ * @param params       Mutable params map — will be populated with search parameters
+ * @returns            SQL WHERE fragment to inject, or empty string if no search
+ *
+ * @example
+ * ```typescript
+ * const params = { projectId, fillStart, fillEnd };
+ * const searchCond = parseSearchToSQL('spans', search, params);
+ * const sql = `SELECT ... WHERE project_id = ... ${searchCond ? `AND (${searchCond})` : ''}`;
+ * const result = await optic.rawQuery({ query: sql, params });
+ * ```
+ */
+export function parseSearchToSQL(
+  datasetName: string,
+  search: string | undefined,
+  params: Record<string, any>
+): { where: string; having: string } {
+  if (!search || !search.trim()) return { where: '', having: '' };
+  const dataset = getDataset(datasetName);
+  const schema = deriveSearchSchema(dataset);
+  const parser = new QueryParser(schema, dataset.aggregates);
+  const ast = parser.parse(search);
+  if (!ast) return { where: '', having: '' };
+  const searchParams: Record<string, string> = {};
+  const generated = parser.generateSQL(ast, searchParams);
+  Object.assign(params, searchParams);
+  return { where: generated.where || '', having: generated.having || '' };
 }
 
 /**
@@ -408,4 +441,43 @@ function buildCondition(
 
   // String comparison (=, !=, ILIKE, NOT ILIKE)
   return `${field} ${cond.op} {${p}:String}`;
+}
+
+/**
+ * Derive a SearchSchema from a DatasetConfig.
+ *
+ * This auto-converts the DatasetConfig's column Map into the format QueryParser
+ * needs. Map(String,T) type columns are automatically registered as mapColumns,
+ * enabling unknown search keys (e.g. 'server.region') to fall back to map access.
+ */
+function deriveSearchSchema(dataset: DatasetConfig): SearchSchema {
+  const columns: Record<string, 'string' | 'number'> = {};
+  const mapCols: MapColumnDef[] = [];
+
+  for (const [name, colDef] of dataset.columns) {
+    // Map columns → register for fallback
+    if (colDef.type === 'Map(String,String)') {
+      mapCols.push({ name, valueType: 'String' });
+    } else if (colDef.type === 'Map(String,Float64)') {
+      mapCols.push({ name, valueType: 'Float64' });
+    } else {
+      // Regular columns
+      const isNumeric = [
+        'UInt8', 'UInt16', 'UInt32', 'UInt64', 'Float64',
+        'Nullable(UInt64)', 'Nullable(UInt32)', 'Nullable(UInt16)',
+      ].includes(colDef.type);
+      columns[name] = isNumeric ? 'number' : 'string';
+    }
+  }
+
+  // String Map columns first (e.g. tags) — QueryParser uses mapColumns[0] as
+  // the default fallback for unknown keys, and string tags are the most common
+  // target. Float64 Maps (e.g. measurements) should come after.
+  mapCols.sort((a, b) => (a.valueType === 'String' ? -1 : 1) - (b.valueType === 'String' ? -1 : 1));
+
+  return {
+    columns,
+    mapColumns: mapCols,
+    aliases: dataset.columnAliases,
+  };
 }

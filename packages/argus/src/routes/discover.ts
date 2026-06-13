@@ -1,15 +1,18 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { optic } from '@gatrix/argus-optic';
+import { optic, parseSearchToSQL, getDataset } from '@gatrix/argus-optic';
 import db from '../config/knex';
 import { createLogger } from '../utils/logger';
-import { QueryParser } from '../utils/queryParser';
 import { getBucketingConfig, buildTimeFilter } from '../utils/timeBucket';
-import { ERRORS_SCHEMA } from '../utils/tableSchemas';
 
 const logger = createLogger('argus-discover');
 
-// Allowed columns for field validation (derived from centralised schema)
-const ALLOWED_COLUMNS = new Set(Object.keys(ERRORS_SCHEMA.columns));
+// Allowed columns for field validation (derived from dataset schema, excluding Map columns)
+const errorsDataset = getDataset('errors');
+const ALLOWED_COLUMNS = new Set(
+  [...errorsDataset.columns.entries()]
+    .filter(([, def]) => !def.type.startsWith('Map('))
+    .map(([name]) => name)
+);
 
 const ALLOWED_AGGREGATES = new Set([
   'count',
@@ -171,15 +174,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         let havingClause = '';
 
-        // Advanced conditions using QueryParser
+        // Advanced conditions using parseSearchToSQL
         if (conditions && conditions.trim()) {
-          const parser = new QueryParser(ERRORS_SCHEMA, ALLOWED_AGGREGATES);
-          const ast = parser.parse(conditions);
-          if (ast) {
-            const { where, having } = parser.generateSQL(ast, queryParams);
-            if (where) query += ` AND (${where})`;
-            if (having) havingClause = `HAVING ${having}`;
-          }
+          const { where, having } = parseSearchToSQL('errors', conditions, queryParams);
+          if (where) query += ` AND (${where})`;
+          if (having) havingClause = `HAVING ${having}`;
         }
 
         // Group by ??auto-include non-aggregate fields
@@ -418,14 +417,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         const queryParams: Record<string, string> = { projectId };
 
-        // Parse conditions from search param using QueryParser
+        // Parse conditions from search param using parseSearchToSQL
         if (search && typeof search === 'string' && search.trim()) {
-          const parser = new QueryParser(ERRORS_SCHEMA, ALLOWED_AGGREGATES);
-          const ast = parser.parse(search);
-          if (ast) {
-            const { where } = parser.generateSQL(ast, queryParams);
-            if (where) query += ` AND (${where})`;
-          }
+          const { where: searchWhere } = parseSearchToSQL('errors', search, queryParams);
+          if (searchWhere) query += ` AND (${searchWhere})`;
         }
 
         query += `
