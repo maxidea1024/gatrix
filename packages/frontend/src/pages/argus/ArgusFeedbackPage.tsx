@@ -210,9 +210,23 @@ const ArgusFeedbackPage: React.FC = () => {
   );
 
   useEffect(() => {
+    const period = urlState.period;
+    // Chart brush zoom produces "ISO|ISO" format for custom date ranges
+    if (period.includes('|')) {
+      const [startStr, endStr] = period.split('|');
+      const start = new Date(startStr);
+      const end = new Date(endStr);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        setFilters((prev) => ({
+          ...prev,
+          dateRange: { type: 'custom', start, end },
+        }));
+        return;
+      }
+    }
     setFilters((prev) => ({
       ...prev,
-      dateRange: { type: 'preset', preset: urlState.period },
+      dateRange: { type: 'preset', preset: period },
     }));
   }, [urlState.period]);
 
