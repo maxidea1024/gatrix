@@ -515,7 +515,13 @@ const ArgusFeedbackPage: React.FC = () => {
   const handleFilterChange = (newFilters: ArgusFilterState) => {
     setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      setUrlState({ period: newFilters.dateRange.preset, start: '', end: '', page: '1', fb: '' });
+      setUrlState({
+        period: newFilters.dateRange.preset,
+        start: '',
+        end: '',
+        page: '1',
+        fb: '',
+      });
     } else if (
       newFilters.dateRange.type === 'custom' &&
       newFilters.dateRange.start &&
