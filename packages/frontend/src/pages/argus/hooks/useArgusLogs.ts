@@ -324,11 +324,14 @@ export function useArgusLogs() {
   useEffect(() => {
     if (urlState.queryId && savedQueries.length > 0) {
       const qId = parseInt(urlState.queryId, 10);
-      if (currentQueryId !== qId) {
-        const matched = savedQueries.find((q) => q.id === qId);
-        if (matched) {
-          handleLoadSavedQuery(matched);
-        }
+      // Already on this query
+      if (currentQueryId === qId) return;
+      // handleDialogSave already set currentQueryId to a NEW id and is waiting
+      // for URL to catch up — don't re-load the old query from the stale URL
+      if (currentQueryId !== null && lastProcessedUrlQueryIdRef.current !== urlState.queryId) return;
+      const matched = savedQueries.find((q) => q.id === qId);
+      if (matched) {
+        handleLoadSavedQuery(matched);
       }
     } else if (!urlState.queryId && currentQueryId !== null) {
       setCurrentQueryId(null);
