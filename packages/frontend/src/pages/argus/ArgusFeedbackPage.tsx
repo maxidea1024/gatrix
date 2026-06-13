@@ -133,6 +133,8 @@ const ArgusFeedbackPage: React.FC = () => {
         default: '14d',
         storageKey: 'argus-feedback-period',
       },
+      start: { key: 'start', default: '' },
+      end: { key: 'end', default: '' },
       status: { key: 'status', default: 'unresolved' },
       page: { key: 'page', default: '1' },
       sort: { key: 'sort', default: 'newest' },
@@ -210,25 +212,35 @@ const ArgusFeedbackPage: React.FC = () => {
   );
 
   useEffect(() => {
-    const period = urlState.period;
-    // Chart brush zoom produces "ISO|ISO" format for custom date ranges
-    if (period.includes('|')) {
-      const [startStr, endStr] = period.split('|');
-      const start = new Date(startStr);
-      const end = new Date(endStr);
-      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-        setFilters((prev) => ({
+    setFilters((prev) => {
+      if (urlState.period === 'custom') {
+        if (urlState.start && urlState.end) {
+          return {
+            ...prev,
+            dateRange: {
+              type: 'custom',
+              start: new Date(urlState.start),
+              end: new Date(urlState.end),
+            },
+          };
+        }
+        return {
           ...prev,
-          dateRange: { type: 'custom', start, end },
-        }));
-        return;
+          dateRange: { type: 'preset', preset: '14d' },
+        };
       }
+      return {
+        ...prev,
+        dateRange: { type: 'preset', preset: urlState.period },
+      };
+    });
+  }, [urlState.period, urlState.start, urlState.end]);
+
+  useEffect(() => {
+    if (urlState.period === 'custom' && (!urlState.start || !urlState.end)) {
+      setUrlState({ period: '14d' });
     }
-    setFilters((prev) => ({
-      ...prev,
-      dateRange: { type: 'preset', preset: period },
-    }));
-  }, [urlState.period]);
+  }, [urlState.period, urlState.start, urlState.end, setUrlState]);
 
   // Lazy-loading callback for QueryAQLEditor
   const fetchFieldValues = useCallback(
@@ -503,7 +515,19 @@ const ArgusFeedbackPage: React.FC = () => {
   const handleFilterChange = (newFilters: ArgusFilterState) => {
     setFilters(newFilters);
     if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
-      setUrlState({ period: newFilters.dateRange.preset, page: '1', fb: '' });
+      setUrlState({ period: newFilters.dateRange.preset, start: '', end: '', page: '1', fb: '' });
+    } else if (
+      newFilters.dateRange.type === 'custom' &&
+      newFilters.dateRange.start &&
+      newFilters.dateRange.end
+    ) {
+      setUrlState({
+        period: 'custom',
+        start: newFilters.dateRange.start.toISOString(),
+        end: newFilters.dateRange.end.toISOString(),
+        page: '1',
+        fb: '',
+      });
     }
   };
 
@@ -803,7 +827,9 @@ const ArgusFeedbackPage: React.FC = () => {
           end.setHours(23, 59, 59, 999);
           if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
             setUrlState({
-              period: `${start.toISOString()}|${end.toISOString()}`,
+              period: 'custom',
+              start: start.toISOString(),
+              end: end.toISOString(),
               page: '1',
               fb: '',
             });
