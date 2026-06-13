@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   useState,
   useCallback,
   useEffect,
@@ -23,7 +23,6 @@ import {
   MenuItem,
   IconButton,
   Tooltip,
-  CircularProgress,
 } from '@mui/material';
 import {
   Explore as DiscoverIcon,
@@ -396,7 +395,15 @@ const ArgusDiscoverPage: React.FC = () => {
     (query: string) => {
       setConditions(query);
       setUrlState({ q: query });
-      setTimeout(runQuery, 10);
+    },
+    [setUrlState]
+  );
+
+  const handleSearchSubmit = useCallback(
+    (query: string) => {
+      setConditions(query);
+      setUrlState({ q: query });
+      runQuery();
     },
     [setUrlState, runQuery]
   );
@@ -411,9 +418,9 @@ const ArgusDiscoverPage: React.FC = () => {
         appendStr = `${tag}:"${value}"`;
       }
       const finalStr = (conditions.trim() + ' ' + appendStr).trim();
-      handleSearchChange(finalStr);
+      handleSearchSubmit(finalStr);
     },
-    [conditions, handleSearchChange]
+    [conditions, handleSearchSubmit]
   );
 
   const handleColumnSort = useCallback(
@@ -577,50 +584,37 @@ const ArgusDiscoverPage: React.FC = () => {
         loading={loading}
         hideFilters={['browser', 'os']}
         extraControls={
-          <GroupBySelector
-            groupBy={groupBy}
-            columns={groupableColumns}
-            onToggle={toggleGroupBy}
-            isDark={isDark}
-          />
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            <GroupBySelector
+              groupBy={groupBy}
+              columns={groupableColumns}
+              onToggle={toggleGroupBy}
+              isDark={isDark}
+            />
+            <QueryAQLEditor
+              ref={dslEditorRef}
+              config={DISCOVER_CONFIG}
+              initialQuery={conditions}
+              onSearch={handleSearchSubmit}
+              onChange={handleSearchChange}
+              fetchFieldValues={fetchFieldValues}
+              initialFacets={facets}
+              placeholder={t(
+                'argus.discover.searchPlaceholder',
+                'Search by event, user, or tag...'
+              )}
+            />
+          </Box>
         }
       />
-
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <QueryAQLEditor
-          ref={dslEditorRef}
-          config={DISCOVER_CONFIG}
-          initialQuery={conditions}
-          onSearch={handleSearchChange}
-          onChange={handleSearchChange}
-          fetchFieldValues={fetchFieldValues}
-          initialFacets={facets}
-          placeholder={t(
-            'argus.discover.searchPlaceholder',
-            'Search by event, user, or tag...'
-          )}
-        />
-        <Button
-          variant="contained"
-          size="small"
-          onClick={runQuery}
-          disabled={loading || fields.length === 0}
-          sx={{
-            textTransform: 'none',
-            fontWeight: 700,
-            px: 2.5,
-            height: 36,
-            borderRadius: '6px',
-            fontSize: '0.78rem',
-          }}
-        >
-          {loading ? (
-            <CircularProgress size={16} color="inherit" />
-          ) : (
-            t('argus.discover.run', 'Search')
-          )}
-        </Button>
-      </Box>
 
       {/* Tag Summary (Facet Map) */}
       <DiscoverFacetMap
