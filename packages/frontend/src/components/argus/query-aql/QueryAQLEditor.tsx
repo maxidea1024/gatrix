@@ -336,9 +336,7 @@ export const QueryAQLEditor = forwardRef<
                     ...c,
                     value: values[0],
                     values,
-                    operator:
-                      operator ??
-                      (values.length > 1 ? 'IN' : '='),
+                    operator: operator ?? (values.length > 1 ? 'IN' : '='),
                   }
                 : c
             );
