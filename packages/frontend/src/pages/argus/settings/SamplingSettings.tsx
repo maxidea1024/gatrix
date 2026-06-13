@@ -121,20 +121,23 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
       </FieldBlock>
       <FieldBlock
         label={t('argus.settings.metricsGroupLimit', 'Metrics Group Limit')}
-        desc={t('argus.settings.metricsGroupDesc', 'Maximum number of series shown in metrics explorer multi-group charts.')}
+        desc={t(
+          'argus.settings.metricsGroupDesc',
+          'Maximum number of series shown in metrics explorer multi-group charts.'
+        )}
         last
       >
         <TextField
           type="number"
           value={metricsGroupLimit}
-          onChange={(e) => setMetricsGroupLimit(Math.max(1, Number(e.target.value)))}
+          onChange={(e) =>
+            setMetricsGroupLimit(Math.max(1, Number(e.target.value)))
+          }
           size="small"
           sx={{ ...inpSx, width: 120 }}
           InputProps={{
             endAdornment: (
-              <InputAdornment position="end">
-                series
-              </InputAdornment>
+              <InputAdornment position="end">series</InputAdornment>
             ),
           }}
         />

@@ -26,7 +26,16 @@ export type EquationQuery = {
 };
 
 export type ChartConfig = {
-  type: 'line' | 'bar' | 'area' | 'stacked-bar' | 'stacked-area' | 'stacked-line' | 'pie' | 'doughnut' | 'scatter';
+  type:
+    | 'line'
+    | 'bar'
+    | 'area'
+    | 'stacked-bar'
+    | 'stacked-area'
+    | 'stacked-line'
+    | 'pie'
+    | 'doughnut'
+    | 'scatter';
   yAxisType: 'linear' | 'logarithmic';
   showLegend: boolean;
 };
@@ -159,8 +168,7 @@ export const MetricChart: React.FC<MetricChartProps> = ({
       let endDate = parseChDate(end);
       if (buckets.length > 1) {
         const gap =
-          parseChDate(buckets[1]).getTime() -
-          parseChDate(buckets[0]).getTime();
+          parseChDate(buckets[1]).getTime() - parseChDate(buckets[0]).getTime();
         endDate = new Date(endDate.getTime() + gap);
       } else {
         endDate = new Date(endDate.getTime() + 3600000);

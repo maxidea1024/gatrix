@@ -77,7 +77,9 @@ const ArgusExplorePage: React.FC = () => {
   const [duplicateTarget, setDuplicateTarget] =
     useState<ArgusSavedQuery | null>(null);
   const [duplicateName, setDuplicateName] = useState('');
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
+    null
+  );
 
   // Fetch
   const fetchQueries = useCallback(async () => {

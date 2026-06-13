@@ -748,7 +748,12 @@ class ArgusService {
       groupLimit?: number;
       interval?: string;
     }
-  ): Promise<{ timeSeries: any[]; summary: any; metricType?: string; unit?: string }> {
+  ): Promise<{
+    timeSeries: any[];
+    summary: any;
+    metricType?: string;
+    unit?: string;
+  }> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/metrics/${projectId}/query`,
       { params }
@@ -2010,7 +2015,10 @@ class ArgusService {
       : { data: [], meta: { fields: [] } };
   }
 
-  async discoverTags(projectId: number | string, dataset?: string): Promise<{
+  async discoverTags(
+    projectId: number | string,
+    dataset?: string
+  ): Promise<{
     columns: string[];
     aggregates: string[];
     stats: Record<string, any>;
@@ -2032,7 +2040,13 @@ class ArgusService {
 
   async getDiscoverVolume(
     projectId: number | string,
-    params: { period?: string; start?: string; end?: string; search?: string; dataset?: string }
+    params: {
+      period?: string;
+      start?: string;
+      end?: string;
+      search?: string;
+      dataset?: string;
+    }
   ): Promise<{ bucket: string; level: string; count: number }[]> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/discover/volume`,

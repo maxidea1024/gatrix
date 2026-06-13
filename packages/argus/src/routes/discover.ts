@@ -7,7 +7,13 @@ import { getBucketingConfig, buildTimeFilter } from '../utils/timeBucket';
 const logger = createLogger('argus-discover');
 
 // Supported datasets for Discover
-const DISCOVER_DATASETS = new Set(['errors', 'spans', 'logs', 'transactions', 'sessions']);
+const DISCOVER_DATASETS = new Set([
+  'errors',
+  'spans',
+  'logs',
+  'transactions',
+  'sessions',
+]);
 
 /**
  * Resolve dataset config, columns and aggregates dynamically.
@@ -24,8 +30,16 @@ function getDiscoverDataset(name?: string) {
   const allowedAggregates = new Set([
     ...ds.aggregates,
     // Always include these common ones
-    'count', 'uniq', 'min', 'max', 'avg', 'sum',
-    'p50', 'p75', 'p95', 'p99',
+    'count',
+    'uniq',
+    'min',
+    'max',
+    'avg',
+    'sum',
+    'p50',
+    'p75',
+    'p95',
+    'p99',
   ]);
   return { ds, allowedColumns, allowedAggregates, table: ds.table };
 }
@@ -167,20 +181,31 @@ export default async function discoverRoutes(app: FastifyInstance) {
           dataset: datasetName,
         } = body;
 
-        const { allowedColumns: ALLOWED_COLUMNS, allowedAggregates: ALLOWED_AGGREGATES, table } = getDiscoverDataset(datasetName);
-        const dsName = datasetName && DISCOVER_DATASETS.has(datasetName) ? datasetName : 'errors';
+        const {
+          allowedColumns: ALLOWED_COLUMNS,
+          allowedAggregates: ALLOWED_AGGREGATES,
+          table,
+        } = getDiscoverDataset(datasetName);
+        const dsName =
+          datasetName && DISCOVER_DATASETS.has(datasetName)
+            ? datasetName
+            : 'errors';
 
         // Parse fields — filter out plain columns not in this dataset
         const parsedFields = fields
           .filter((f) => {
-            const trimmed = f.trim().replace(/\s+AS\s+\w+$/i, '').trim();
+            const trimmed = f
+              .trim()
+              .replace(/\s+AS\s+\w+$/i, '')
+              .trim();
             // Keep aggregates and equations
-            if (trimmed.includes('(') || trimmed.startsWith('equation|')) return true;
+            if (trimmed.includes('(') || trimmed.startsWith('equation|'))
+              return true;
             // Keep plain columns only if in dataset
             return ALLOWED_COLUMNS.has(trimmed);
           })
           .map((f) => parseField(f, ALLOWED_COLUMNS, ALLOWED_AGGREGATES));
-        
+
         if (parsedFields.length === 0) {
           parsedFields.push({ sql: 'count()', alias: 'count' });
         }
@@ -296,21 +321,34 @@ export default async function discoverRoutes(app: FastifyInstance) {
         start,
         end,
         dataset: datasetName,
-      } = request.query as { period?: string; start?: string; end?: string; dataset?: string };
-      const { allowedColumns: ALLOWED_COLUMNS, allowedAggregates: ALLOWED_AGGREGATES, table } = getDiscoverDataset(datasetName as string);
+      } = request.query as {
+        period?: string;
+        start?: string;
+        end?: string;
+        dataset?: string;
+      };
+      const {
+        allowedColumns: ALLOWED_COLUMNS,
+        allowedAggregates: ALLOWED_AGGREGATES,
+        table,
+      } = getDiscoverDataset(datasetName as string);
       const timeFilter = buildTimeFilter(period, start, end, '30d');
 
       try {
         // Build dynamic stats from dataset columns
-        const dsObj = getDataset(datasetName as string || 'errors');
+        const dsObj = getDataset((datasetName as string) || 'errors');
         const statsCols = [...dsObj.columns.entries()]
-          .filter(([, def]) => def.lowCardinality && !def.type.startsWith('Map('))
+          .filter(
+            ([, def]) => def.lowCardinality && !def.type.startsWith('Map(')
+          )
           .slice(0, 5)
           .map(([name]) => name);
-        
+
         let stats: Record<string, any> = {};
         if (statsCols.length > 0) {
-          const statsSelect = statsCols.map(c => `uniq(${c}) as ${c}_count`).join(', ');
+          const statsSelect = statsCols
+            .map((c) => `uniq(${c}) as ${c}_count`)
+            .join(', ');
           const result = await optic.rawQuery({
             query: `
               SELECT ${statsSelect}
@@ -325,12 +363,15 @@ export default async function discoverRoutes(app: FastifyInstance) {
 
         // Dynamically build tag queries from lowCardinality columns
         const lowCardCols = [...dsObj.columns.entries()]
-          .filter(([, def]) => def.lowCardinality && !def.type.startsWith('Map('))
+          .filter(
+            ([, def]) => def.lowCardinality && !def.type.startsWith('Map(')
+          )
           .map(([name]) => name)
           .slice(0, 10);
 
-        const tagUnionParts = lowCardCols.map(col =>
-          `SELECT '${col}' AS tag, ${col} AS value, count() AS cnt FROM ${table} WHERE project_id = {projectId:String} AND ${timeFilter} AND ${col} != '' GROUP BY ${col} ORDER BY cnt DESC LIMIT 20`
+        const tagUnionParts = lowCardCols.map(
+          (col) =>
+            `SELECT '${col}' AS tag, ${col} AS value, count() AS cnt FROM ${table} WHERE project_id = {projectId:String} AND ${timeFilter} AND ${col} != '' GROUP BY ${col} ORDER BY cnt DESC LIMIT 20`
         );
 
         let tagMap: Record<string, { value: string; count: number }[]> = {};
@@ -369,11 +410,20 @@ export default async function discoverRoutes(app: FastifyInstance) {
     '/:projectId/discover/volume',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, search, dataset: datasetName } = request.query as any;
+      const {
+        period,
+        start,
+        end,
+        search,
+        dataset: datasetName,
+      } = request.query as any;
 
       try {
         const { table } = getDiscoverDataset(datasetName as string);
-        const dsName = datasetName && DISCOVER_DATASETS.has(datasetName) ? datasetName : 'errors';
+        const dsName =
+          datasetName && DISCOVER_DATASETS.has(datasetName)
+            ? datasetName
+            : 'errors';
         const bucket = getBucketingConfig(period, start, end);
         const timestampCol = getDataset(dsName).timestampColumn;
         const timeFilter =

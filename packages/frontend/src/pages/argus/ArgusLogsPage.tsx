@@ -366,7 +366,8 @@ const ArgusLogsPage: React.FC = () => {
                   handleSave();
                 } else if (queryName !== defaultQueryName && queryName.trim()) {
                   const duplicate = savedQueries.find(
-                    (q) => q.name.toLowerCase() === queryName.trim().toLowerCase()
+                    (q) =>
+                      q.name.toLowerCase() === queryName.trim().toLowerCase()
                   );
                   if (duplicate) {
                     setSaveName(queryName.trim());

@@ -287,9 +287,18 @@ export const PaginationControls: React.FC<{
 
 // ─── Dataset Switcher ───
 
-export type DiscoverDataset = 'errors' | 'spans' | 'logs' | 'transactions' | 'sessions';
+export type DiscoverDataset =
+  | 'errors'
+  | 'spans'
+  | 'logs'
+  | 'transactions'
+  | 'sessions';
 
-export const DATASET_OPTIONS: { value: DiscoverDataset; label: string; color: string }[] = [
+export const DATASET_OPTIONS: {
+  value: DiscoverDataset;
+  label: string;
+  color: string;
+}[] = [
   { value: 'errors', label: 'Errors', color: '#f44336' },
   { value: 'spans', label: 'Spans', color: '#7c4dff' },
   { value: 'logs', label: 'Logs', color: '#4caf50' },
@@ -329,9 +338,7 @@ export const DatasetSwitcher: React.FC<{
                   : 'rgba(0,0,0,0.04)',
               border: `1px solid ${selected ? opt.color : 'transparent'}`,
               '&:hover': {
-                backgroundColor: selected
-                  ? opt.color
-                  : alpha(opt.color, 0.1),
+                backgroundColor: selected ? opt.color : alpha(opt.color, 0.1),
                 borderColor: alpha(opt.color, 0.3),
               },
             }}
@@ -348,24 +355,40 @@ export const DatasetSwitcher: React.FC<{
 
 export const DATASET_FALLBACK_COLUMNS: Record<DiscoverDataset, string[]> = {
   errors: [
-    'event_id', 'timestamp', 'level', 'platform',
-    'environment', 'release', 'transaction',
+    'event_id',
+    'timestamp',
+    'level',
+    'platform',
+    'environment',
+    'release',
+    'transaction',
   ],
   spans: [
-    'span_id', 'trace_id', 'timestamp', 'op',
-    'description', 'status', 'duration',
+    'span_id',
+    'trace_id',
+    'timestamp',
+    'op',
+    'description',
+    'status',
+    'duration',
   ],
-  logs: [
-    'log_id', 'timestamp', 'level', 'service',
-    'message', 'environment',
-  ],
+  logs: ['log_id', 'timestamp', 'level', 'service', 'message', 'environment'],
   transactions: [
-    'transaction_id', 'trace_id', 'timestamp', 'name',
-    'duration', 'status', 'op',
+    'transaction_id',
+    'trace_id',
+    'timestamp',
+    'name',
+    'duration',
+    'status',
+    'op',
   ],
   sessions: [
-    'session_id', 'timestamp', 'status', 'duration',
-    'environment', 'release',
+    'session_id',
+    'timestamp',
+    'status',
+    'duration',
+    'environment',
+    'release',
   ],
 };
 
@@ -462,28 +485,33 @@ export const VolumeChart: React.FC<{
 
     const sortedLevels = [...levels].sort((a, b) => {
       const order = ['fatal', 'error', 'warning', 'info', 'debug', 'all'];
-      return (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) -
-             (order.indexOf(b) === -1 ? 99 : order.indexOf(b));
+      return (
+        (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) -
+        (order.indexOf(b) === -1 ? 99 : order.indexOf(b))
+      );
     });
 
-    const datasets = sortedLevels.length <= 1
-      ? [{
-          label: t('argus.discover.volumeTitle', 'count(events)'),
-          data: sortedKeys.map((k) => {
-            const m = bucketLevelMap.get(k)!;
-            let total = 0;
-            m.forEach((v) => (total += v));
-            return total;
-          }),
-          type: 'bar' as const,
-          color: '#7c4dff',
-        }]
-      : sortedLevels.map((level) => ({
-          label: level,
-          data: sortedKeys.map((k) => bucketLevelMap.get(k)?.get(level) || 0),
-          type: 'bar' as const,
-          color: LEVEL_COLORS[level] || '#7c4dff',
-        }));
+    const datasets =
+      sortedLevels.length <= 1
+        ? [
+            {
+              label: t('argus.discover.volumeTitle', 'count(events)'),
+              data: sortedKeys.map((k) => {
+                const m = bucketLevelMap.get(k)!;
+                let total = 0;
+                m.forEach((v) => (total += v));
+                return total;
+              }),
+              type: 'bar' as const,
+              color: '#7c4dff',
+            },
+          ]
+        : sortedLevels.map((level) => ({
+            label: level,
+            data: sortedKeys.map((k) => bucketLevelMap.get(k)?.get(level) || 0),
+            type: 'bar' as const,
+            color: LEVEL_COLORS[level] || '#7c4dff',
+          }));
 
     return {
       sortedBuckets: sortedKeys,

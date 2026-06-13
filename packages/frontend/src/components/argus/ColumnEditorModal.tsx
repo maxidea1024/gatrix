@@ -160,9 +160,7 @@ const SortableColumnRow: React.FC<{
         <TextField
           size="small"
           value={entry.expression.replace('equation|', '')}
-          onChange={(e) =>
-            onChangeExpr(entry.id, `equation|${e.target.value}`)
-          }
+          onChange={(e) => onChangeExpr(entry.id, `equation|${e.target.value}`)}
           placeholder="e.g. count() / uniq(user_id)"
           sx={{
             flex: 2,
@@ -170,13 +168,23 @@ const SortableColumnRow: React.FC<{
             '& .MuiOutlinedInput-root': {
               fontSize: '0.82rem',
               fontFamily: 'monospace',
-              backgroundColor: isDark ? 'rgba(255,152,0,0.04)' : 'rgba(255,152,0,0.03)',
+              backgroundColor: isDark
+                ? 'rgba(255,152,0,0.04)'
+                : 'rgba(255,152,0,0.03)',
             },
             '& .MuiOutlinedInput-input': { py: 0.75 },
           }}
           InputProps={{
             startAdornment: (
-              <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#ff9800', mr: 1, whiteSpace: 'nowrap' }}>
+              <Typography
+                sx={{
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: '#ff9800',
+                  mr: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 ƒ(x)
               </Typography>
             ),
@@ -184,100 +192,100 @@ const SortableColumnRow: React.FC<{
         />
       ) : (
         <>
-      {/* Field / Function Selector */}
-      <Select
-        size="small"
-        value={baseValue}
-        onChange={(e) => {
-          const val = e.target.value;
-          if (aggregates.includes(val)) {
-            onChangeExpr(
-              entry.id,
-              val === 'count' ? 'count()' : `${val}(${columns[0] || '*'})`
-            );
-          } else {
-            onChangeExpr(entry.id, val);
-          }
-        }}
-        sx={{
-          flex: 1,
-          minWidth: 140,
-          '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem' },
-        }}
-        MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
-      >
-        <MenuItem
-          disabled
-          sx={{
-            fontSize: '0.75rem',
-            fontWeight: 'bold',
-            color: 'text.secondary',
-          }}
-        >
-          Functions
-        </MenuItem>
-        {aggregates.map((agg) => (
-          <MenuItem
-            key={`agg-${agg}`}
-            value={agg}
-            sx={{ fontSize: '0.82rem', pl: 3 }}
+          {/* Field / Function Selector */}
+          <Select
+            size="small"
+            value={baseValue}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (aggregates.includes(val)) {
+                onChangeExpr(
+                  entry.id,
+                  val === 'count' ? 'count()' : `${val}(${columns[0] || '*'})`
+                );
+              } else {
+                onChangeExpr(entry.id, val);
+              }
+            }}
+            sx={{
+              flex: 1,
+              minWidth: 140,
+              '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem' },
+            }}
+            MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
           >
-            {agg}
-          </MenuItem>
-        ))}
-        <MenuItem
-          disabled
-          sx={{
-            fontSize: '0.75rem',
-            fontWeight: 'bold',
-            color: 'text.secondary',
-            mt: 1,
-          }}
-        >
-          Columns
-        </MenuItem>
-        {columns.map((col) => (
-          <MenuItem
-            key={`col-${col}`}
-            value={col}
-            sx={{ fontSize: '0.82rem', pl: 3 }}
-          >
-            {col}
-          </MenuItem>
-        ))}
-      </Select>
-
-      {/* Parameter Selector (if function) */}
-      {isFunc && baseValue !== 'count' && (
-        <Select
-          size="small"
-          value={paramValue || columns[0] || ''}
-          onChange={(e) => {
-            onChangeExpr(entry.id, `${baseValue}(${e.target.value})`);
-          }}
-          sx={{
-            flex: 1,
-            minWidth: 140,
-            '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem' },
-          }}
-          MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
-        >
-          {columns.map((col) => (
             <MenuItem
-              key={`param-${col}`}
-              value={col}
-              sx={{ fontSize: '0.82rem' }}
+              disabled
+              sx={{
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                color: 'text.secondary',
+              }}
             >
-              {col}
+              Functions
             </MenuItem>
-          ))}
-        </Select>
-      )}
-      {(!isFunc || baseValue === 'count') && (
-        <Box
-          sx={{ flex: 1, minWidth: 140 }}
-        /> /* Spacer to align alias input */
-      )}
+            {aggregates.map((agg) => (
+              <MenuItem
+                key={`agg-${agg}`}
+                value={agg}
+                sx={{ fontSize: '0.82rem', pl: 3 }}
+              >
+                {agg}
+              </MenuItem>
+            ))}
+            <MenuItem
+              disabled
+              sx={{
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                color: 'text.secondary',
+                mt: 1,
+              }}
+            >
+              Columns
+            </MenuItem>
+            {columns.map((col) => (
+              <MenuItem
+                key={`col-${col}`}
+                value={col}
+                sx={{ fontSize: '0.82rem', pl: 3 }}
+              >
+                {col}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {/* Parameter Selector (if function) */}
+          {isFunc && baseValue !== 'count' && (
+            <Select
+              size="small"
+              value={paramValue || columns[0] || ''}
+              onChange={(e) => {
+                onChangeExpr(entry.id, `${baseValue}(${e.target.value})`);
+              }}
+              sx={{
+                flex: 1,
+                minWidth: 140,
+                '& .MuiSelect-select': { py: 0.75, fontSize: '0.82rem' },
+              }}
+              MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
+            >
+              {columns.map((col) => (
+                <MenuItem
+                  key={`param-${col}`}
+                  value={col}
+                  sx={{ fontSize: '0.82rem' }}
+                >
+                  {col}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+          {(!isFunc || baseValue === 'count') && (
+            <Box
+              sx={{ flex: 1, minWidth: 140 }}
+            /> /* Spacer to align alias input */
+          )}
         </>
       )}
 
@@ -375,7 +383,11 @@ const ColumnEditorModal: React.FC<ColumnEditorModalProps> = ({
   const handleAddEquation = () => {
     setEntries((prev) => [
       ...prev,
-      { id: nextId(), expression: 'equation|count() / uniq(user_id)', alias: '' },
+      {
+        id: nextId(),
+        expression: 'equation|count() / uniq(user_id)',
+        alias: '',
+      },
     ]);
   };
 

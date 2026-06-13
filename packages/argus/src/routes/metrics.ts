@@ -19,18 +19,13 @@ const KNOWN_GROUPBY_COLUMNS = new Set([
 /** Default top-N limit for multi-group-by series */
 const DEFAULT_GROUP_LIMIT = 10;
 
-
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
  * Look up the metric_type for a given metric name.
  * Returns 'counter' | 'gauge' | 'distribution' or 'counter' as fallback.
  */
-async function getMetricType(
-  projectId: string,
-  name: string
-): Promise<string> {
+async function getMetricType(projectId: string, name: string): Promise<string> {
   try {
     const result = await optic.query<{ metric_type: string }>({
       dataset: 'metrics',
@@ -439,7 +434,7 @@ export default async function metricsRoutes(app: FastifyInstance) {
             SELECT DISTINCT arrayJoin(mapKeys(tags)) AS tag_key
             FROM argus.metrics
             WHERE project_id = {projectId:String}
-              ${name ? "AND name = {name:String}" : ""}
+              ${name ? 'AND name = {name:String}' : ''}
               AND timestamp >= now() - INTERVAL 1 DAY
             ORDER BY tag_key
             LIMIT 50
@@ -459,9 +454,7 @@ export default async function metricsRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({ error: 'Failed to get groupBy options' });
+        return reply.code(500).send({ error: 'Failed to get groupBy options' });
       }
     }
   );
@@ -551,9 +544,7 @@ export default async function metricsRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({ error: 'Failed to get metric samples' });
+        return reply.code(500).send({ error: 'Failed to get metric samples' });
       }
     }
   );
@@ -593,9 +584,7 @@ export default async function metricsRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({ error: 'Failed to get metric volume' });
+        return reply.code(500).send({ error: 'Failed to get metric volume' });
       }
     }
   );

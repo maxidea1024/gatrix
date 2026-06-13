@@ -39,13 +39,31 @@ export interface ChartDataset {
   label: string;
   data: number[];
   color?: string;
-  type?: 'bar' | 'line' | 'area' | 'scatter' | 'stacked-bar' | 'stacked-area' | 'stacked-line' | 'pie' | 'doughnut';
+  type?:
+    | 'bar'
+    | 'line'
+    | 'area'
+    | 'scatter'
+    | 'stacked-bar'
+    | 'stacked-area'
+    | 'stacked-line'
+    | 'pie'
+    | 'doughnut';
 }
 
 interface InteractiveTimeSeriesChartProps {
   // Legacy single-series support
   data?: { label: string; count: number }[];
-  type?: 'bar' | 'line' | 'area' | 'scatter' | 'stacked-bar' | 'stacked-area' | 'stacked-line' | 'pie' | 'doughnut';
+  type?:
+    | 'bar'
+    | 'line'
+    | 'area'
+    | 'scatter'
+    | 'stacked-bar'
+    | 'stacked-area'
+    | 'stacked-line'
+    | 'pie'
+    | 'doughnut';
 
   // Multi-series support
   labels?: string[];
@@ -80,16 +98,16 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
     onZoomRef.current = onZoom;
   }, [onZoom]);
 
-const PIE_COLORS = [
-  '#3b82f6',
-  '#10b981',
-  '#8b5cf6',
-  '#f59e0b',
-  '#ec4899',
-  '#14b8a6',
-  '#ef4444',
-  '#06b6d4',
-];
+  const PIE_COLORS = [
+    '#3b82f6',
+    '#10b981',
+    '#8b5cf6',
+    '#f59e0b',
+    '#ec4899',
+    '#14b8a6',
+    '#ef4444',
+    '#06b6d4',
+  ];
 
   const isPieOrDoughnut = type === 'pie' || type === 'doughnut';
 
@@ -120,7 +138,9 @@ const PIE_COLORS = [
       const dataList = finalDatasets.map((ds) => {
         return ds.data.reduce((acc, val) => acc + (val || 0), 0);
       });
-      const colorsList = finalDatasets.map((ds, idx) => ds.color || PIE_COLORS[idx % PIE_COLORS.length]);
+      const colorsList = finalDatasets.map(
+        (ds, idx) => ds.color || PIE_COLORS[idx % PIE_COLORS.length]
+      );
       return {
         labels: labelsList,
         datasets: [
@@ -143,7 +163,10 @@ const PIE_COLORS = [
         const resolvedType =
           dsType === 'stacked-bar'
             ? 'bar'
-            : dsType === 'area' || dsType === 'stacked-area' || dsType === 'scatter' || dsType === 'stacked-line'
+            : dsType === 'area' ||
+                dsType === 'stacked-area' ||
+                dsType === 'scatter' ||
+                dsType === 'stacked-line'
               ? 'line'
               : dsType;
         return {
@@ -187,7 +210,13 @@ const PIE_COLORS = [
         };
       }),
     };
-  }, [finalLabels, finalDatasets, type, theme.palette.primary.main, isPieOrDoughnut]);
+  }, [
+    finalLabels,
+    finalDatasets,
+    type,
+    theme.palette.primary.main,
+    isPieOrDoughnut,
+  ]);
 
   const options = useMemo(
     () => ({
@@ -222,8 +251,10 @@ const PIE_COLORS = [
 
             chart.data.datasets.forEach((dataset: any, index: number) => {
               if (index === hoveredDatasetIndex) {
-                dataset.borderColor = dataset.originalBorderColor || dataset.borderColor;
-                dataset.backgroundColor = dataset.originalBackgroundColor || dataset.backgroundColor;
+                dataset.borderColor =
+                  dataset.originalBorderColor || dataset.borderColor;
+                dataset.backgroundColor =
+                  dataset.originalBackgroundColor || dataset.backgroundColor;
               } else {
                 if (!dataset.originalBorderColor) {
                   dataset.originalBorderColor = dataset.borderColor;
@@ -233,9 +264,15 @@ const PIE_COLORS = [
                 }
                 dataset.borderColor = alpha(dataset.originalBorderColor, 0.15);
                 if (typeof dataset.originalBackgroundColor === 'string') {
-                  dataset.backgroundColor = alpha(dataset.originalBackgroundColor, 0.05);
+                  dataset.backgroundColor = alpha(
+                    dataset.originalBackgroundColor,
+                    0.05
+                  );
                 } else {
-                  dataset.backgroundColor = alpha(dataset.originalBorderColor, 0.03);
+                  dataset.backgroundColor = alpha(
+                    dataset.originalBorderColor,
+                    0.03
+                  );
                 }
               }
             });
@@ -278,7 +315,10 @@ const PIE_COLORS = [
               x: {
                 grid: { display: false },
                 border: { display: false },
-                stacked: type === 'stacked-bar' || type === 'stacked-area' || type === 'stacked-line',
+                stacked:
+                  type === 'stacked-bar' ||
+                  type === 'stacked-area' ||
+                  type === 'stacked-line',
                 ticks: {
                   maxRotation: 0,
                   autoSkip: true,
@@ -291,7 +331,10 @@ const PIE_COLORS = [
                 type: yAxisType,
                 beginAtZero: true,
                 border: { display: false },
-                stacked: type === 'stacked-bar' || type === 'stacked-area' || type === 'stacked-line',
+                stacked:
+                  type === 'stacked-bar' ||
+                  type === 'stacked-area' ||
+                  type === 'stacked-line',
                 grid: {
                   color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                   drawBorder: false,
@@ -311,7 +354,16 @@ const PIE_COLORS = [
           }
         : {}),
     }),
-    [isDark, showLegend, legendPosition, yAxisType, type, isPieOrDoughnut, onPointClick, chartData]
+    [
+      isDark,
+      showLegend,
+      legendPosition,
+      yAxisType,
+      type,
+      isPieOrDoughnut,
+      onPointClick,
+      chartData,
+    ]
   );
 
   const plugins = useMemo(() => {

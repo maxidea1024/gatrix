@@ -63,7 +63,10 @@ import ArgusFilterBar, {
   argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
 import SingleSelectFilterChip from '@/components/common/SingleSelectFilterChip';
-import argusService, { ArgusSavedQuery, ArgusProject } from '@/services/argusService';
+import argusService, {
+  ArgusSavedQuery,
+  ArgusProject,
+} from '@/services/argusService';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useLocation } from 'react-router-dom';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
@@ -177,8 +180,14 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         '30d': 30 * 86400,
       };
       deltaSeconds = presetMap[filters.dateRange.preset] || 14 * 86400;
-    } else if (filters.dateRange.type === 'custom' && filters.dateRange.start && filters.dateRange.end) {
-      deltaSeconds = (filters.dateRange.end.getTime() - filters.dateRange.start.getTime()) / 1000;
+    } else if (
+      filters.dateRange.type === 'custom' &&
+      filters.dateRange.start &&
+      filters.dateRange.end
+    ) {
+      deltaSeconds =
+        (filters.dateRange.end.getTime() - filters.dateRange.start.getTime()) /
+        1000;
     }
 
     const options = [
@@ -205,7 +214,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   }, [filters.dateRange, t]);
 
   useEffect(() => {
-    const isAllowed = allowedIntervals.some((opt) => opt.value === urlState.interval);
+    const isAllowed = allowedIntervals.some(
+      (opt) => opt.value === urlState.interval
+    );
     if (!isAllowed) {
       setUrlState({ interval: 'auto' });
     }
@@ -233,7 +244,16 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         };
       });
     }
-    return [{ id: 'a', metric: '', agg: 'avg', groupBy: '', filter: '', isHidden: false }];
+    return [
+      {
+        id: 'a',
+        metric: '',
+        agg: 'avg',
+        groupBy: '',
+        filter: '',
+        isHidden: false,
+      },
+    ];
   });
 
   const [equations, setEquations] = useState<EquationQuery[]>(() => {
@@ -255,7 +275,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   });
 
   // ─── Samples View state ───
-  const [viewMode, setViewMode] = useState<'aggregates' | 'samples'>('aggregates');
+  const [viewMode, setViewMode] = useState<'aggregates' | 'samples'>(
+    'aggregates'
+  );
   const [samplesData, setSamplesData] = useState<any[]>([]);
   const [samplesLoading, setSamplesLoading] = useState(false);
   const [groupByOptions, setGroupByOptions] = useState<GroupByOption[]>([]);
@@ -264,7 +286,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   const [project, setProject] = useState<ArgusProject | null>(null);
 
   useEffect(() => {
-    argusService.getProject(projectId).then(setProject).catch(() => {});
+    argusService
+      .getProject(projectId)
+      .then(setProject)
+      .catch(() => {});
   }, [projectId]);
 
   // ─── Sync queries/equations/chart config → URL ───
@@ -289,7 +314,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       legend: chartConfig.showLegend ? '1' : '0',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queriesUrlKey, equationsUrlKey, chartConfig.type, chartConfig.yAxisType, chartConfig.showLegend]);
+  }, [
+    queriesUrlKey,
+    equationsUrlKey,
+    chartConfig.type,
+    chartConfig.yAxisType,
+    chartConfig.showLegend,
+  ]);
 
   const [metricNames, setMetricNames] = useState<any[]>([]);
   const [queryResults, setQueryResults] = useState<
@@ -314,7 +345,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
+    null
+  );
 
   const lastProcessedUrlQueryIdRef = useRef<string | undefined>(undefined);
 
@@ -340,7 +373,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     equations: string;
     chartConfig: string;
   };
-  const [savedSnapshot, setSavedSnapshot] = useState<MetricsSnapshot | null>(null);
+  const [savedSnapshot, setSavedSnapshot] = useState<MetricsSnapshot | null>(
+    null
+  );
 
   const takeSnapshot = useCallback(() => {
     setSavedSnapshot({
@@ -385,12 +420,19 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       const [options, tagData] = await Promise.all([
         argusService.getMetricGroupByOptions(projectId, firstMetric),
         firstMetric
-          ? argusService.getMetricTags(projectId, { name: firstMetric, period: currentPeriod })
+          ? argusService.getMetricTags(projectId, {
+              name: firstMetric,
+              period: currentPeriod,
+            })
           : Promise.resolve({ environment: [], release: [], metric_type: [] }),
       ]);
       setGroupByOptions(options as GroupByOption[]);
-      setCommonEnvironments((tagData.environment || []).map((e: any) => e.value).filter(Boolean));
-      setCommonReleases((tagData.release || []).map((r: any) => r.value).filter(Boolean));
+      setCommonEnvironments(
+        (tagData.environment || []).map((e: any) => e.value).filter(Boolean)
+      );
+      setCommonReleases(
+        (tagData.release || []).map((r: any) => r.value).filter(Boolean)
+      );
     } catch {
       // fallback
       setGroupByOptions([
@@ -402,36 +444,39 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     }
   }, [projectId, queries.map((q) => q.metric).join(','), currentPeriod]);
 
-  const getFilterSuggestions = useCallback((inputValue: string) => {
-    if (!inputValue) {
-      return groupByOptions.map((opt) => `${opt.key}=`);
-    }
-
-    const parts = inputValue.split(',');
-    const currentPart = parts[parts.length - 1];
-    const prefix = parts.slice(0, parts.length - 1).join(',');
-
-    const eqIndex = currentPart.indexOf('=');
-    if (eqIndex === -1) {
-      // Suggest keys
-      return groupByOptions.map((opt) => {
-        const pfx = prefix ? `${prefix.trim()}, ` : '';
-        return `${pfx}${opt.key}=`;
-      });
-    } else {
-      // Suggest values for the key
-      const key = currentPart.substring(0, eqIndex).trim();
-      let commonVals: string[] = [];
-      if (key === 'environment') {
-        commonVals = commonEnvironments;
-      } else if (key === 'release') {
-        commonVals = commonReleases;
+  const getFilterSuggestions = useCallback(
+    (inputValue: string) => {
+      if (!inputValue) {
+        return groupByOptions.map((opt) => `${opt.key}=`);
       }
 
-      const pfx = prefix ? `${prefix.trim()}, ` : '';
-      return commonVals.map((val) => `${pfx}${key}=${val}`);
-    }
-  }, [groupByOptions, commonEnvironments, commonReleases]);
+      const parts = inputValue.split(',');
+      const currentPart = parts[parts.length - 1];
+      const prefix = parts.slice(0, parts.length - 1).join(',');
+
+      const eqIndex = currentPart.indexOf('=');
+      if (eqIndex === -1) {
+        // Suggest keys
+        return groupByOptions.map((opt) => {
+          const pfx = prefix ? `${prefix.trim()}, ` : '';
+          return `${pfx}${opt.key}=`;
+        });
+      } else {
+        // Suggest values for the key
+        const key = currentPart.substring(0, eqIndex).trim();
+        let commonVals: string[] = [];
+        if (key === 'environment') {
+          commonVals = commonEnvironments;
+        } else if (key === 'release') {
+          commonVals = commonReleases;
+        }
+
+        const pfx = prefix ? `${prefix.trim()}, ` : '';
+        return commonVals.map((val) => `${pfx}${key}=${val}`);
+      }
+    },
+    [groupByOptions, commonEnvironments, commonReleases]
+  );
 
   const fetchMetricQueries = useCallback(async () => {
     const activeQueries = queries.filter((q) => q.metric);
@@ -460,7 +505,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           results[q.id] = data;
           // Track metric type and unit from response
           if (data.metricType) {
-            setMetricTypes((prev) => ({ ...prev, [q.metric]: data.metricType! }));
+            setMetricTypes((prev) => ({
+              ...prev,
+              [q.metric]: data.metricType!,
+            }));
           }
           if (data.unit) {
             setMetricUnits((prev) => ({ ...prev, [q.metric]: data.unit! }));
@@ -473,7 +521,14 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     } finally {
       setQueryLoading(false);
     }
-  }, [projectId, filters, currentPeriod, queries, project?.metrics_group_limit, urlState.interval]);
+  }, [
+    projectId,
+    filters,
+    currentPeriod,
+    queries,
+    project?.metrics_group_limit,
+    urlState.interval,
+  ]);
 
   // Fetch samples for Samples view
   const fetchSamples = useCallback(async () => {
@@ -513,7 +568,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   }, [
     fetchMetricQueries,
     fetchGroupByOptions,
-    queries.map((q) => `${q.id}-${q.metric}-${q.agg}-${q.groupBy}-${q.filter || ''}`).join('|'),
+    queries
+      .map((q) => `${q.id}-${q.metric}-${q.agg}-${q.groupBy}-${q.filter || ''}`)
+      .join('|'),
   ]);
 
   // Fetch samples when view switches to samples mode
@@ -552,7 +609,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       if (isNaN(date.getTime())) return;
 
       // Parse query ID from label, e.g., "[A] my.metric (group_val)"
-      const match = label.match(/^\[([a-zA-Z0-9]+)\]\s*(.*?)(?:\s*\((.*?)\))?$/);
+      const match = label.match(
+        /^\[([a-zA-Z0-9]+)\]\s*(.*?)(?:\s*\((.*?)\))?$/
+      );
       if (!match) return;
 
       const qId = match[1].toLowerCase();
@@ -589,9 +648,12 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         if (filterPairs.length > 0) {
           // Parse existing filters
           const existing = updatedFilter
-            ? updatedFilter.split(',').map((s) => s.trim()).filter(Boolean)
+            ? updatedFilter
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)
             : [];
-          
+
           // Merge filters (avoid duplicates)
           const merged = [...existing];
           filterPairs.forEach((pair) => {
@@ -619,7 +681,14 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     const nextId = String.fromCharCode(97 + queries.length); // 'a', 'b', 'c'
     setQueries([
       ...queries,
-      { id: nextId, metric: '', agg: 'avg', groupBy: '', filter: '', isHidden: false },
+      {
+        id: nextId,
+        metric: '',
+        agg: 'avg',
+        groupBy: '',
+        filter: '',
+        isHidden: false,
+      },
     ]);
   };
 
@@ -645,12 +714,15 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     setEquations(equations.filter((eq) => eq.id !== id));
   };
 
-  const buildQueryConfig = useCallback(() => ({
-    queries,
-    equations,
-    chartConfig,
-    period: currentPeriod,
-  }), [queries, equations, chartConfig, currentPeriod]);
+  const buildQueryConfig = useCallback(
+    () => ({
+      queries,
+      equations,
+      chartConfig,
+      period: currentPeriod,
+    }),
+    [queries, equations, chartConfig, currentPeriod]
+  );
 
   // Save: update existing or prompt name for new
   const handleSave = useCallback(async () => {
@@ -690,7 +762,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
             setCurrentQueryId(res.id);
             setUrlState({ queryId: String(res.id) });
           }
-          const updated = await argusService.listSavedQueries(projectId, 'metrics' as any);
+          const updated = await argusService.listSavedQueries(
+            projectId,
+            'metrics' as any
+          );
           setSavedQueries(updated);
           takeSnapshot();
           lastProcessedUrlQueryIdRef.current = String(res.id);
@@ -704,7 +779,16 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       setSaveDialogMode('new');
       setSaveDialogOpen(true);
     }
-  }, [currentQueryId, projectId, queryName, defaultQueryName, buildQueryConfig, takeSnapshot, setUrlState, savedQueries]);
+  }, [
+    currentQueryId,
+    projectId,
+    queryName,
+    defaultQueryName,
+    buildQueryConfig,
+    takeSnapshot,
+    setUrlState,
+    savedQueries,
+  ]);
 
   // Save As: always open name dialog
   const handleSaveAs = useCallback(() => {
@@ -714,45 +798,48 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   }, [queryName, defaultQueryName]);
 
   // Dialog save callback
-  const handleDialogSave = useCallback(async (name: string, existingQueryId: number | null) => {
-    try {
-      if (existingQueryId) {
-        // Overwrite existing query with same name
-        await argusService.updateSavedQuery(projectId, existingQueryId, {
-          name,
-          query_config: buildQueryConfig(),
-          display_type: 'chart',
-        });
-        setCurrentQueryId(existingQueryId);
-        setQueryName(name);
-        setUrlState({ queryId: String(existingQueryId) });
-      } else {
-        // Create new
-        const res = await argusService.createSavedQuery(projectId, {
-          name,
-          query_config: buildQueryConfig(),
-          display_type: 'chart',
-          query_type: 'metrics' as any,
-        });
-        if (res.id) {
-          setCurrentQueryId(res.id);
+  const handleDialogSave = useCallback(
+    async (name: string, existingQueryId: number | null) => {
+      try {
+        if (existingQueryId) {
+          // Overwrite existing query with same name
+          await argusService.updateSavedQuery(projectId, existingQueryId, {
+            name,
+            query_config: buildQueryConfig(),
+            display_type: 'chart',
+          });
+          setCurrentQueryId(existingQueryId);
           setQueryName(name);
-          setUrlState({ queryId: String(res.id) });
+          setUrlState({ queryId: String(existingQueryId) });
+        } else {
+          // Create new
+          const res = await argusService.createSavedQuery(projectId, {
+            name,
+            query_config: buildQueryConfig(),
+            display_type: 'chart',
+            query_type: 'metrics' as any,
+          });
+          if (res.id) {
+            setCurrentQueryId(res.id);
+            setQueryName(name);
+            setUrlState({ queryId: String(res.id) });
+          }
         }
-      }
-      const updated = await argusService.listSavedQueries(
-        projectId,
-        'metrics' as any
-      );
-      setSavedQueries(updated);
+        const updated = await argusService.listSavedQueries(
+          projectId,
+          'metrics' as any
+        );
+        setSavedQueries(updated);
 
-      takeSnapshot();
-      setSaveDialogOpen(false);
-      setSaveName('');
-    } catch (err) {
-      console.error('Failed to save metrics query:', err);
-    }
-  }, [projectId, buildQueryConfig, setUrlState, takeSnapshot]);
+        takeSnapshot();
+        setSaveDialogOpen(false);
+        setSaveName('');
+      } catch (err) {
+        console.error('Failed to save metrics query:', err);
+      }
+    },
+    [projectId, buildQueryConfig, setUrlState, takeSnapshot]
+  );
 
   const handleRename = useCallback(
     async (newName: string) => {
@@ -778,26 +865,29 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     [currentQueryId, projectId, urlState.queryId]
   );
 
-  const handleLoadSavedQuery = useCallback((sq: ArgusSavedQuery) => {
-    const cfg =
-      typeof sq.query_config === 'string'
-        ? JSON.parse(sq.query_config)
-        : sq.query_config;
-    if (cfg.queries) setQueries(cfg.queries);
-    if (cfg.equations) setEquations(cfg.equations);
-    if (cfg.chartConfig) setChartConfig(cfg.chartConfig);
-    if (cfg.period) setUrlState({ period: cfg.period });
-    setQueryName(sq.name);
-    setCurrentQueryId(sq.id);
-    setUrlState({ queryId: String(sq.id) });
-    setSavedPanelOpen(false);
-    // Set snapshot so isDirty starts as false
-    setSavedSnapshot({
-      queries: JSON.stringify(cfg.queries || []),
-      equations: JSON.stringify(cfg.equations || []),
-      chartConfig: JSON.stringify(cfg.chartConfig || {}),
-    });
-  }, [setUrlState]);
+  const handleLoadSavedQuery = useCallback(
+    (sq: ArgusSavedQuery) => {
+      const cfg =
+        typeof sq.query_config === 'string'
+          ? JSON.parse(sq.query_config)
+          : sq.query_config;
+      if (cfg.queries) setQueries(cfg.queries);
+      if (cfg.equations) setEquations(cfg.equations);
+      if (cfg.chartConfig) setChartConfig(cfg.chartConfig);
+      if (cfg.period) setUrlState({ period: cfg.period });
+      setQueryName(sq.name);
+      setCurrentQueryId(sq.id);
+      setUrlState({ queryId: String(sq.id) });
+      setSavedPanelOpen(false);
+      // Set snapshot so isDirty starts as false
+      setSavedSnapshot({
+        queries: JSON.stringify(cfg.queries || []),
+        equations: JSON.stringify(cfg.equations || []),
+        chartConfig: JSON.stringify(cfg.chartConfig || {}),
+      });
+    },
+    [setUrlState]
+  );
 
   const handleDeleteSavedQuery = useCallback(
     (id: number) => {
@@ -863,20 +953,28 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       } else {
         const groupSeriesMap = new Map<string, Map<string, number>>();
         res.timeSeries.forEach((ts: any) => {
-          const groupVals = groupByKeys.map(key => ts[`group_${key}`] || 'none');
+          const groupVals = groupByKeys.map(
+            (key) => ts[`group_${key}`] || 'none'
+          );
           const groupKeyStr = groupVals.join('/');
           if (!groupSeriesMap.has(groupKeyStr)) {
             groupSeriesMap.set(groupKeyStr, new Map());
           }
-          groupSeriesMap.get(groupKeyStr)!.set(String(ts.bucket), Number(ts.value));
+          groupSeriesMap
+            .get(groupKeyStr)!
+            .set(String(ts.bucket), Number(ts.value));
         });
 
         // Sort groups by total/average sum to find the top N groups
-        const groupSums = Array.from(groupSeriesMap.entries()).map(([gKey, bucketMap]) => {
-          let sum = 0;
-          bucketMap.forEach((val) => { sum += val; });
-          return { gKey, sum };
-        });
+        const groupSums = Array.from(groupSeriesMap.entries()).map(
+          ([gKey, bucketMap]) => {
+            let sum = 0;
+            bucketMap.forEach((val) => {
+              sum += val;
+            });
+            return { gKey, sum };
+          }
+        );
 
         // Sort descending
         groupSums.sort((a, b) => b.sum - a.sum);
@@ -908,8 +1006,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           const res = queryResults[q.id];
           if (res) {
             // Find sum of all matching buckets if grouped, or single value
-            const matchedBuckets = res.timeSeries.filter((ts: any) => ts.bucket === b);
-            const sum = matchedBuckets.reduce((acc: number, curr: any) => acc + Number(curr.value || 0), 0);
+            const matchedBuckets = res.timeSeries.filter(
+              (ts: any) => ts.bucket === b
+            );
+            const sum = matchedBuckets.reduce(
+              (acc: number, curr: any) => acc + Number(curr.value || 0),
+              0
+            );
             context[q.id] = sum;
           } else {
             context[q.id] = 0;
@@ -944,7 +1047,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       chartDatasets: datasets,
       buckets: sortedBuckets,
     };
-  }, [queryResults, queries, equations, chartConfig.type, project?.metrics_group_limit]);
+  }, [
+    queryResults,
+    queries,
+    equations,
+    chartConfig.type,
+    project?.metrics_group_limit,
+  ]);
 
   const [displayedData, setDisplayedData] = useState<{
     chartLabels: string[];
@@ -977,7 +1086,16 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         totalSamples,
       });
     }
-  }, [queryLoading, chartLabels, chartDatasets, buckets, queries, metricUnits, metricTypes, totalSamples]);
+  }, [
+    queryLoading,
+    chartLabels,
+    chartDatasets,
+    buckets,
+    queries,
+    metricUnits,
+    metricTypes,
+    totalSamples,
+  ]);
 
   const [displayedSamplesData, setDisplayedSamplesData] = useState<any[]>([]);
 
@@ -1178,8 +1296,13 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                 onChange={(_, newVal) => {
                   if (newVal) {
                     // Auto-set default aggregation based on metric_type
-                    const metaMatch = metricNames.find((m) => m.name === newVal);
-                    const mType = metaMatch?.metric_type || metricTypes[newVal] || 'counter';
+                    const metaMatch = metricNames.find(
+                      (m) => m.name === newVal
+                    );
+                    const mType =
+                      metaMatch?.metric_type ||
+                      metricTypes[newVal] ||
+                      'counter';
                     const defaultAgg = DEFAULT_AGG_BY_TYPE[mType] || 'avg';
                     updateQuery(q.id, { metric: newVal, agg: defaultAgg });
                   }
@@ -1254,7 +1377,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    placeholder={t('argus.metrics.filter', 'Filter: key=val,...')}
+                    placeholder={t(
+                      'argus.metrics.filter',
+                      'Filter: key=val,...'
+                    )}
                     sx={{
                       '& .MuiInputBase-root': {
                         fontSize: '0.8rem',
@@ -1456,14 +1582,29 @@ const ArgusMetricsExplorerPage: React.FC = () => {
             }
             options={[
               { value: 'line', label: t('argus.metrics.line', 'Line') },
-              { value: 'stacked-line', label: t('argus.metrics.stackedLine', 'Stacked Line') },
+              {
+                value: 'stacked-line',
+                label: t('argus.metrics.stackedLine', 'Stacked Line'),
+              },
               { value: 'area', label: t('argus.metrics.area', 'Area') },
-              { value: 'stacked-area', label: t('argus.metrics.stackedArea', 'Stacked Area') },
+              {
+                value: 'stacked-area',
+                label: t('argus.metrics.stackedArea', 'Stacked Area'),
+              },
               { value: 'bar', label: t('argus.metrics.bar', 'Bar') },
-              { value: 'stacked-bar', label: t('argus.metrics.stackedBar', 'Stacked Bar') },
+              {
+                value: 'stacked-bar',
+                label: t('argus.metrics.stackedBar', 'Stacked Bar'),
+              },
               { value: 'pie', label: t('argus.metrics.pie', 'Pie') },
-              { value: 'doughnut', label: t('argus.metrics.doughnut', 'Doughnut') },
-              { value: 'scatter', label: t('argus.metrics.scatter', 'Scatter') },
+              {
+                value: 'doughnut',
+                label: t('argus.metrics.doughnut', 'Doughnut'),
+              },
+              {
+                value: 'scatter',
+                label: t('argus.metrics.scatter', 'Scatter'),
+              },
             ]}
           />
           <SingleSelectFilterChip
@@ -1483,9 +1624,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           <SingleSelectFilterChip
             label={t('argus.metrics.interval', 'Interval:')}
             value={urlState.interval || 'auto'}
-            onChange={(val) =>
-              setUrlState({ interval: val })
-            }
+            onChange={(val) => setUrlState({ interval: val })}
             options={allowedIntervals}
           />
           <PillSwitch
@@ -1503,13 +1642,22 @@ const ArgusMetricsExplorerPage: React.FC = () => {
       </Paper>
 
       {/* ═══ View Mode Toggle ═══ */}
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box
+        sx={{
+          mb: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <Tabs
           value={viewMode}
           onChange={(_, val) => setViewMode(val)}
           sx={{
             minHeight: 0,
-            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+            backgroundColor: isDark
+              ? 'rgba(255,255,255,0.03)'
+              : 'rgba(0,0,0,0.03)',
             borderRadius: '8px',
             p: 0.5,
             '& .MuiTabs-indicator': {
@@ -1533,23 +1681,38 @@ const ArgusMetricsExplorerPage: React.FC = () => {
             },
           }}
         >
-          <Tab value="aggregates" label={t('argus.metrics.aggregates', 'Aggregates')} />
+          <Tab
+            value="aggregates"
+            label={t('argus.metrics.aggregates', 'Aggregates')}
+          />
           <Tab value="samples" label={t('argus.metrics.samples', 'Samples')} />
         </Tabs>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+          <Typography
+            sx={{
+              fontSize: '0.78rem',
+              color: 'text.secondary',
+              fontWeight: 500,
+            }}
+          >
             {viewMode === 'aggregates' ? (
               <>
                 {t('argus.metrics.aggregatedSamplesCount', '집계된 샘플 수:')}{' '}
-                <Box component="span" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                <Box
+                  component="span"
+                  sx={{ fontWeight: 600, color: 'text.primary' }}
+                >
                   {formatCompactNumber(displayedData.totalSamples)}
                 </Box>
               </>
             ) : (
               <>
                 {t('argus.metrics.showingSamplesCount', '표시 중인 샘플 수:')}{' '}
-                <Box component="span" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                <Box
+                  component="span"
+                  sx={{ fontWeight: 600, color: 'text.primary' }}
+                >
                   {formatCompactNumber(displayedSamplesData.length)}
                 </Box>
               </>
@@ -1643,21 +1806,38 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                       <TableRow key={idx} hover>
                         <TableCell sx={{ py: 0.6 }}>
                           <Typography
-                            sx={{ fontSize: '0.73rem', color: 'text.secondary' }}
+                            sx={{
+                              fontSize: '0.73rem',
+                              color: 'text.secondary',
+                            }}
                           >
-                            {formatDateTimeUI(parseChDate(displayedData.buckets[idx]))}
+                            {formatDateTimeUI(
+                              parseChDate(displayedData.buckets[idx])
+                            )}
                           </Typography>
                         </TableCell>
                         {displayedData.chartDatasets.map((ds) => {
                           const qId = ds.id.split('_')[0];
-                          const queryObj = displayedData.queries.find((q) => q.id === qId);
+                          const queryObj = displayedData.queries.find(
+                            (q) => q.id === qId
+                          );
                           const metricName = queryObj?.metric;
-                          const unit = metricName ? displayedData.metricUnits[metricName] : undefined;
-                          const metricType = metricName ? displayedData.metricTypes[metricName] : undefined;
+                          const unit = metricName
+                            ? displayedData.metricUnits[metricName]
+                            : undefined;
+                          const metricType = metricName
+                            ? displayedData.metricTypes[metricName]
+                            : undefined;
                           return (
                             <TableCell key={ds.id} sx={{ py: 0.6 }}>
-                              <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
-                                {formatMetricValue(Number(ds.data[idx]), unit, metricType)}
+                              <Typography
+                                sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                              >
+                                {formatMetricValue(
+                                  Number(ds.data[idx]),
+                                  unit,
+                                  metricType
+                                )}
                               </Typography>
                             </TableCell>
                           );
@@ -1686,7 +1866,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           >
             {displayedSamplesData.length === 0 ? (
               <EmptyPlaceholder
-                message={t('argus.metrics.noSamples', 'No metric samples found. Select a metric to view individual events.')}
+                message={t(
+                  'argus.metrics.noSamples',
+                  'No metric samples found. Select a metric to view individual events.'
+                )}
                 minHeight={200}
               />
             ) : (
@@ -1710,7 +1893,15 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                 >
                   <TableHead>
                     <TableRow>
-                      {['Timestamp', 'Name', 'Type', 'Value', 'Unit', 'Environment', 'Release'].map((h) => (
+                      {[
+                        'Timestamp',
+                        'Name',
+                        'Type',
+                        'Value',
+                        'Unit',
+                        'Environment',
+                        'Release',
+                      ].map((h) => (
                         <TableCell
                           key={h}
                           sx={{
@@ -1728,18 +1919,26 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                   <TableBody>
                     {displayedSamplesData.map((row, idx) => {
                       const ts = parseChDate(String(row.timestamp));
-                      const valRaw = typeof row.value === 'object'
-                        ? JSON.stringify(row.value)
-                        : row.value;
+                      const valRaw =
+                        typeof row.value === 'object'
+                          ? JSON.stringify(row.value)
+                          : row.value;
                       return (
                         <TableRow key={idx} hover>
                           <TableCell sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary' }}>
+                            <Typography
+                              sx={{
+                                fontSize: '0.73rem',
+                                color: 'text.secondary',
+                              }}
+                            >
                               {formatDateTimeUI(row.timestamp)}
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
+                            <Typography
+                              sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                            >
                               {row.name}
                             </Typography>
                           </TableCell>
@@ -1750,7 +1949,10 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                                 px: 0.8,
                                 py: 0.2,
                                 borderRadius: 1,
-                                backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                                backgroundColor: alpha(
+                                  theme.palette.primary.main,
+                                  0.08
+                                ),
                                 display: 'inline-block',
                               }}
                             >
@@ -1758,12 +1960,23 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
-                              {formatMetricValue(Number(valRaw), row.unit, row.metric_type)}
+                            <Typography
+                              sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                            >
+                              {formatMetricValue(
+                                Number(valRaw),
+                                row.unit,
+                                row.metric_type
+                              )}
                             </Typography>
                           </TableCell>
                           <TableCell sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary' }}>
+                            <Typography
+                              sx={{
+                                fontSize: '0.73rem',
+                                color: 'text.secondary',
+                              }}
+                            >
                               {row.unit || '—'}
                             </Typography>
                           </TableCell>
@@ -1868,8 +2081,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
                   {sq.name}
                 </Typography>
                 <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
-                  {sq.created_by} ·{' '}
-                  {formatDate(sq.created_at)}
+                  {sq.created_by} · {formatDate(sq.created_at)}
                 </Typography>
               </Box>
               <IconButton

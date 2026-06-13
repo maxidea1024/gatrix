@@ -365,7 +365,9 @@ export function useArgusLogs() {
     );
   }, [search, columns, urlState.groupBy, savedSnapshot, urlState.queryId]);
 
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
+    null
+  );
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
@@ -756,14 +758,17 @@ export function useArgusLogs() {
   );
 
   // ─── Saved Query Handlers ───
-  const buildQueryConfig = useCallback(() => ({
-    search: search.trim(),
-    columns,
-    columnNames,
-    period: currentPeriod,
-    groupBy: aggGroupBys.length > 0 ? aggGroupBys.join(',') : 'level',
-    activeTab,
-  }), [search, columns, columnNames, currentPeriod, aggGroupBys, activeTab]);
+  const buildQueryConfig = useCallback(
+    () => ({
+      search: search.trim(),
+      columns,
+      columnNames,
+      period: currentPeriod,
+      groupBy: aggGroupBys.length > 0 ? aggGroupBys.join(',') : 'level',
+      activeTab,
+    }),
+    [search, columns, columnNames, currentPeriod, aggGroupBys, activeTab]
+  );
 
   // Save: update existing or prompt name for new
   const handleSave = async () => {
@@ -840,7 +845,9 @@ export function useArgusLogs() {
 
   const handleRename = async (newName: string) => {
     setQueryName(newName);
-    const effectiveId = currentQueryId || (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
+    const effectiveId =
+      currentQueryId ||
+      (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
     if (effectiveId) {
       setSaving(true);
       try {
@@ -874,48 +881,51 @@ export function useArgusLogs() {
     setDeleteTarget(null);
   };
 
-  const handleLoadSavedQuery = useCallback((
-    sq: ArgusSavedQuery,
-    onExtrasLoaded?: (extras: Record<string, any>) => void
-  ) => {
-    try {
-      const cfg =
-        typeof sq.query_config === 'string'
-          ? JSON.parse(sq.query_config)
-          : sq.query_config;
-      if (cfg.search !== undefined) {
-        setSearch(cfg.search);
-        setUrlState({ q: cfg.search });
-      }
-      if (cfg.columns) setColumns(cfg.columns);
-      if (cfg.columnNames) setColumnNames(cfg.columnNames);
-      if (cfg.period) setUrlState({ period: cfg.period });
-      if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
-      if (cfg.activeTab !== undefined)
-        setUrlState({ tab: String(cfg.activeTab) });
-      setUrlState({ queryId: String(sq.id) });
-      setQueryName(sq.name);
-      setCurrentQueryId(sq.id);
-      lastProcessedUrlQueryIdRef.current = String(sq.id);
+  const handleLoadSavedQuery = useCallback(
+    (
+      sq: ArgusSavedQuery,
+      onExtrasLoaded?: (extras: Record<string, any>) => void
+    ) => {
+      try {
+        const cfg =
+          typeof sq.query_config === 'string'
+            ? JSON.parse(sq.query_config)
+            : sq.query_config;
+        if (cfg.search !== undefined) {
+          setSearch(cfg.search);
+          setUrlState({ q: cfg.search });
+        }
+        if (cfg.columns) setColumns(cfg.columns);
+        if (cfg.columnNames) setColumnNames(cfg.columnNames);
+        if (cfg.period) setUrlState({ period: cfg.period });
+        if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
+        if (cfg.activeTab !== undefined)
+          setUrlState({ tab: String(cfg.activeTab) });
+        setUrlState({ queryId: String(sq.id) });
+        setQueryName(sq.name);
+        setCurrentQueryId(sq.id);
+        lastProcessedUrlQueryIdRef.current = String(sq.id);
 
-      // Set snapshot after load so isDirty starts as false
-      setSavedSnapshot({
-        search: cfg.search || '',
-        columns: cfg.columns || [...DEFAULT_COLUMNS],
-        groupBy: cfg.groupBy || 'level',
-      });
+        // Set snapshot after load so isDirty starts as false
+        setSavedSnapshot({
+          search: cfg.search || '',
+          columns: cfg.columns || [...DEFAULT_COLUMNS],
+          groupBy: cfg.groupBy || 'level',
+        });
 
-      // Pass extra fields (displayDensity, wrapLines) to the caller
-      if (onExtrasLoaded) {
-        onExtrasLoaded(cfg);
+        // Pass extra fields (displayDensity, wrapLines) to the caller
+        if (onExtrasLoaded) {
+          onExtrasLoaded(cfg);
+        }
+      } catch (err) {
+        console.error('Failed to load saved query config:', err);
+        setQueryName(sq.name);
+        setCurrentQueryId(sq.id);
       }
-    } catch (err) {
-      console.error('Failed to load saved query config:', err);
-      setQueryName(sq.name);
-      setCurrentQueryId(sq.id);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setUrlState, setColumns, setColumnNames]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [setUrlState, setColumns, setColumnNames]
+  );
 
   const totalLogCount =
     facets.levels?.reduce((s, l) => s + Number(l.count), 0) || 0;

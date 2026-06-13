@@ -76,7 +76,6 @@ import { DiscoverSavedPanel } from './components/DiscoverDialogs';
 import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
 import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 
-
 const ArgusDiscoverPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -173,7 +172,9 @@ const ArgusDiscoverPage: React.FC = () => {
   const [editorOpen, setEditorOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
+    null
+  );
   const lastProcessedUrlQueryIdRef = useRef<string | undefined>(undefined);
 
   const defaultQueryName = t('argus.discover.newQuery', 'New Discover Query');
@@ -208,7 +209,9 @@ const ArgusDiscoverPage: React.FC = () => {
     yAxis: string;
     dataset: string;
   };
-  const [savedSnapshot, setSavedSnapshot] = useState<DiscoverSnapshot | null>(null);
+  const [savedSnapshot, setSavedSnapshot] = useState<DiscoverSnapshot | null>(
+    null
+  );
 
   const takeSnapshot = useCallback(() => {
     setSavedSnapshot({
@@ -235,7 +238,17 @@ const ArgusDiscoverPage: React.FC = () => {
       yAxis !== savedSnapshot.yAxis ||
       dataset !== savedSnapshot.dataset
     );
-  }, [fields, conditions, groupBy, orderBy, displayMode, yAxis, dataset, hasQueried, savedSnapshot]);
+  }, [
+    fields,
+    conditions,
+    groupBy,
+    orderBy,
+    displayMode,
+    yAxis,
+    dataset,
+    hasQueried,
+    savedSnapshot,
+  ]);
 
   // ─── Tag/schema data ───
   const [facets, setFacets] = useState<Record<string, any[]>>({});
@@ -257,18 +270,15 @@ const ArgusDiscoverPage: React.FC = () => {
     return '24h';
   }, [filters.dateRange]);
 
-  const handleChartZoom = useCallback(
-    (start: string, end: string) => {
-      const startDate = new Date(start);
-      const endDate = new Date(end);
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
-      setFilters((prev) => ({
-        ...prev,
-        dateRange: { type: 'custom', start: startDate, end: endDate },
-      }));
-    },
-    []
-  );
+  const handleChartZoom = useCallback((start: string, end: string) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return;
+    setFilters((prev) => ({
+      ...prev,
+      dateRange: { type: 'custom', start: startDate, end: endDate },
+    }));
+  }, []);
 
   // ─── API calls ───
   const buildConditions = useCallback(() => {
@@ -345,7 +355,9 @@ const ArgusDiscoverPage: React.FC = () => {
       .then((data) => {
         setFacets(data.tags || {});
         setAvailableColumns(
-          data.columns?.length ? data.columns : DATASET_FALLBACK_COLUMNS[dataset] || FALLBACK_COLUMNS
+          data.columns?.length
+            ? data.columns
+            : DATASET_FALLBACK_COLUMNS[dataset] || FALLBACK_COLUMNS
         );
         setAvailableAggregates(
           data.aggregates?.length
@@ -354,7 +366,9 @@ const ArgusDiscoverPage: React.FC = () => {
         );
       })
       .catch(() => {
-        setAvailableColumns(DATASET_FALLBACK_COLUMNS[dataset] || FALLBACK_COLUMNS);
+        setAvailableColumns(
+          DATASET_FALLBACK_COLUMNS[dataset] || FALLBACK_COLUMNS
+        );
         setAvailableAggregates(['count', 'uniq', 'avg', 'sum', 'p95']);
       });
     fetchVolume();
@@ -374,13 +388,16 @@ const ArgusDiscoverPage: React.FC = () => {
   }, [yAxis, hasQueried, runQuery]);
 
   // ─── Handlers ───
-  const buildQueryConfig = useCallback(() => ({
-    fields,
-    conditions,
-    groupBy,
-    orderBy,
-    period: currentPeriod,
-  }), [fields, conditions, groupBy, orderBy, currentPeriod]);
+  const buildQueryConfig = useCallback(
+    () => ({
+      fields,
+      conditions,
+      groupBy,
+      orderBy,
+      period: currentPeriod,
+    }),
+    [fields, conditions, groupBy, orderBy, currentPeriod]
+  );
 
   // Save: update existing or prompt name for new
   const handleSave = useCallback(async () => {
@@ -440,7 +457,17 @@ const ArgusDiscoverPage: React.FC = () => {
       setSaveDialogMode('new');
       setSaveDialogOpen(true);
     }
-  }, [currentQueryId, projectId, queryName, defaultQueryName, buildQueryConfig, displayMode, takeSnapshot, setUrlState, savedQueries]);
+  }, [
+    currentQueryId,
+    projectId,
+    queryName,
+    defaultQueryName,
+    buildQueryConfig,
+    displayMode,
+    takeSnapshot,
+    setUrlState,
+    savedQueries,
+  ]);
 
   // Save As: always open name dialog
   const handleSaveAs = useCallback(() => {
@@ -450,51 +477,56 @@ const ArgusDiscoverPage: React.FC = () => {
   }, [queryName, defaultQueryName]);
 
   // Dialog save callback
-  const handleDialogSave = useCallback(async (name: string, existingQueryId: number | null) => {
-    setSaving(true);
-    try {
-      if (existingQueryId) {
-        // Overwrite existing query with same name
-        await argusService.updateSavedQuery(projectId, existingQueryId, {
-          name,
-          query_config: buildQueryConfig(),
-          display_type: displayMode,
-        });
-        setCurrentQueryId(existingQueryId);
-        setQueryName(name);
-        setUrlState({ queryId: String(existingQueryId) });
-        lastProcessedUrlQueryIdRef.current = String(existingQueryId);
-      } else {
-        // Create new
-        const res = await argusService.createSavedQuery(projectId, {
-          name,
-          query_config: buildQueryConfig(),
-          display_type: displayMode,
-        });
-        if (res.id) {
-          setCurrentQueryId(res.id);
+  const handleDialogSave = useCallback(
+    async (name: string, existingQueryId: number | null) => {
+      setSaving(true);
+      try {
+        if (existingQueryId) {
+          // Overwrite existing query with same name
+          await argusService.updateSavedQuery(projectId, existingQueryId, {
+            name,
+            query_config: buildQueryConfig(),
+            display_type: displayMode,
+          });
+          setCurrentQueryId(existingQueryId);
           setQueryName(name);
-          setUrlState({ queryId: String(res.id) });
-          lastProcessedUrlQueryIdRef.current = String(res.id);
+          setUrlState({ queryId: String(existingQueryId) });
+          lastProcessedUrlQueryIdRef.current = String(existingQueryId);
+        } else {
+          // Create new
+          const res = await argusService.createSavedQuery(projectId, {
+            name,
+            query_config: buildQueryConfig(),
+            display_type: displayMode,
+          });
+          if (res.id) {
+            setCurrentQueryId(res.id);
+            setQueryName(name);
+            setUrlState({ queryId: String(res.id) });
+            lastProcessedUrlQueryIdRef.current = String(res.id);
+          }
         }
-      }
-      const updated = await argusService.listSavedQueries(projectId);
-      setSavedQueries(updated);
+        const updated = await argusService.listSavedQueries(projectId);
+        setSavedQueries(updated);
 
-      takeSnapshot();
-      setSaveDialogOpen(false);
-      setSaveName('');
-    } catch (err) {
-      console.error('Failed to save query:', err);
-    } finally {
-      setSaving(false);
-    }
-  }, [projectId, buildQueryConfig, displayMode, setUrlState, takeSnapshot]);
+        takeSnapshot();
+        setSaveDialogOpen(false);
+        setSaveName('');
+      } catch (err) {
+        console.error('Failed to save query:', err);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [projectId, buildQueryConfig, displayMode, setUrlState, takeSnapshot]
+  );
 
   const handleRename = useCallback(
     async (newName: string) => {
       setQueryName(newName);
-      const effectiveId = currentQueryId || (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
+      const effectiveId =
+        currentQueryId ||
+        (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
       if (effectiveId) {
         setSaving(true);
         try {
@@ -920,8 +952,12 @@ const ArgusDiscoverPage: React.FC = () => {
       />
 
       {/* Volume Chart */}
-      <VolumeChart data={volume} isDark={isDark} period={currentPeriod} onZoom={handleChartZoom} />
-
+      <VolumeChart
+        data={volume}
+        isDark={isDark}
+        period={currentPeriod}
+        onZoom={handleChartZoom}
+      />
 
       {/* Results Table */}
       {hasQueried && (
@@ -1024,177 +1060,182 @@ const ArgusDiscoverPage: React.FC = () => {
           >
             {results.length > 0 ? (
               <>
-              <Box sx={{ overflowX: 'auto' }}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      {Object.keys(results[0]).map((key) => (
-                        <TableCell
-                          key={key}
-                          onClick={() => handleColumnSort(key)}
-                          sx={{
-                            fontWeight: 700,
-                            fontSize: '0.72rem',
-                            cursor: 'pointer',
-                            backgroundColor: isDark
-                              ? 'rgba(255,255,255,0.02)'
-                              : 'rgba(0,0,0,0.01)',
-                            borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                            whiteSpace: 'nowrap',
-                            userSelect: 'none',
-                            '&:hover': { color: theme.palette.primary.main },
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                            }}
-                          >
-                            {key}
-                            {currentOrderCol === key &&
-                              (orderDir === 'desc' ? (
-                                <SortDescIcon
-                                  sx={{
-                                    fontSize: 14,
-                                    color: theme.palette.primary.main,
-                                  }}
-                                />
-                              ) : (
-                                <SortAscIcon
-                                  sx={{
-                                    fontSize: 14,
-                                    color: theme.palette.primary.main,
-                                  }}
-                                />
-                              ))}
-                          </Box>
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {results.map((row, idx) => (
-                      <TableRow
-                        key={idx}
-                        hover
-                        onClick={() => handleRowClick(row)}
-                        sx={{
-                          cursor: row.issue_id ? 'pointer' : 'default',
-                          '&:hover': {
-                            backgroundColor: isDark
-                              ? 'rgba(255,255,255,0.015)'
-                              : 'rgba(0,0,0,0.008)',
-                          },
-                        }}
-                      >
-                        {Object.entries(row).map(([colKey, val], cidx) => (
+                <Box sx={{ overflowX: 'auto' }}>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        {Object.keys(results[0]).map((key) => (
                           <TableCell
-                            key={cidx}
+                            key={key}
+                            onClick={() => handleColumnSort(key)}
                             sx={{
-                              fontSize: '0.78rem',
-                              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                              position: 'relative',
+                              fontWeight: 700,
+                              fontSize: '0.72rem',
+                              cursor: 'pointer',
+                              backgroundColor: isDark
+                                ? 'rgba(255,255,255,0.02)'
+                                : 'rgba(0,0,0,0.01)',
+                              borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                               whiteSpace: 'nowrap',
-                              '&:hover .cell-actions': { opacity: 1 },
+                              userSelect: 'none',
+                              '&:hover': { color: theme.palette.primary.main },
                             }}
                           >
                             <Box
                               sx={{
-                                display: 'inline-flex',
+                                display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.5,
                               }}
                             >
-                              <span
-                                style={{
-                                  ...(((colKey === 'event_id' && row.issue_id) || colKey === 'issue_id') ? {
-                                    color: theme.palette.primary.main,
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline',
-                                    textDecorationStyle: 'dotted' as const,
-                                  } : {}),
-                                }}
-                              >
-                                {typeof val === 'number'
-                                  ? val.toLocaleString()
-                                  : String(val)}
-                              </span>
-                              <Box
-                                className="cell-actions"
-                                sx={{
-                                  opacity: 0,
-                                  transition: 'opacity 0.15s',
-                                  display: 'inline-flex',
-                                  gap: 0.25,
-                                  ml: 0.5,
-                                }}
-                              >
-                                <Tooltip
-                                  title={t(
-                                    'argus.discover.facet.addToFilter',
-                                    'Add to filter'
-                                  )}
-                                >
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      handleSelectFacet(
-                                        colKey,
-                                        String(val),
-                                        false
-                                      )
-                                    }
+                              {key}
+                              {currentOrderCol === key &&
+                                (orderDir === 'desc' ? (
+                                  <SortDescIcon
                                     sx={{
-                                      p: 0.25,
+                                      fontSize: 14,
                                       color: theme.palette.primary.main,
                                     }}
-                                  >
-                                    <FilterIcon sx={{ fontSize: 13 }} />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip
-                                  title={t(
-                                    'argus.discover.facet.exclude',
-                                    'Exclude'
-                                  )}
-                                >
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      handleSelectFacet(
-                                        colKey,
-                                        String(val),
-                                        true
-                                      )
-                                    }
+                                  />
+                                ) : (
+                                  <SortAscIcon
                                     sx={{
-                                      p: 0.25,
-                                      color: theme.palette.error.main,
+                                      fontSize: 14,
+                                      color: theme.palette.primary.main,
                                     }}
-                                  >
-                                    <ExcludeIcon sx={{ fontSize: 13 }} />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
+                                  />
+                                ))}
                             </Box>
                           </TableCell>
                         ))}
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Box>
-              {/* Pagination */}
-              <PaginationControls
-                offset={queryOffset}
-                limit={QUERY_LIMIT}
-                resultCount={results.length}
-                onPrev={handlePagePrev}
-                onNext={handlePageNext}
-                isDark={isDark}
-              />
+                    </TableHead>
+                    <TableBody>
+                      {results.map((row, idx) => (
+                        <TableRow
+                          key={idx}
+                          hover
+                          onClick={() => handleRowClick(row)}
+                          sx={{
+                            cursor: row.issue_id ? 'pointer' : 'default',
+                            '&:hover': {
+                              backgroundColor: isDark
+                                ? 'rgba(255,255,255,0.015)'
+                                : 'rgba(0,0,0,0.008)',
+                            },
+                          }}
+                        >
+                          {Object.entries(row).map(([colKey, val], cidx) => (
+                            <TableCell
+                              key={cidx}
+                              sx={{
+                                fontSize: '0.78rem',
+                                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                                position: 'relative',
+                                whiteSpace: 'nowrap',
+                                '&:hover .cell-actions': { opacity: 1 },
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    ...((colKey === 'event_id' &&
+                                      row.issue_id) ||
+                                    colKey === 'issue_id'
+                                      ? {
+                                          color: theme.palette.primary.main,
+                                          cursor: 'pointer',
+                                          textDecoration: 'underline',
+                                          textDecorationStyle:
+                                            'dotted' as const,
+                                        }
+                                      : {}),
+                                  }}
+                                >
+                                  {typeof val === 'number'
+                                    ? val.toLocaleString()
+                                    : String(val)}
+                                </span>
+                                <Box
+                                  className="cell-actions"
+                                  sx={{
+                                    opacity: 0,
+                                    transition: 'opacity 0.15s',
+                                    display: 'inline-flex',
+                                    gap: 0.25,
+                                    ml: 0.5,
+                                  }}
+                                >
+                                  <Tooltip
+                                    title={t(
+                                      'argus.discover.facet.addToFilter',
+                                      'Add to filter'
+                                    )}
+                                  >
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        handleSelectFacet(
+                                          colKey,
+                                          String(val),
+                                          false
+                                        )
+                                      }
+                                      sx={{
+                                        p: 0.25,
+                                        color: theme.palette.primary.main,
+                                      }}
+                                    >
+                                      <FilterIcon sx={{ fontSize: 13 }} />
+                                    </IconButton>
+                                  </Tooltip>
+                                  <Tooltip
+                                    title={t(
+                                      'argus.discover.facet.exclude',
+                                      'Exclude'
+                                    )}
+                                  >
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        handleSelectFacet(
+                                          colKey,
+                                          String(val),
+                                          true
+                                        )
+                                      }
+                                      sx={{
+                                        p: 0.25,
+                                        color: theme.palette.error.main,
+                                      }}
+                                    >
+                                      <ExcludeIcon sx={{ fontSize: 13 }} />
+                                    </IconButton>
+                                  </Tooltip>
+                                </Box>
+                              </Box>
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+                {/* Pagination */}
+                <PaginationControls
+                  offset={queryOffset}
+                  limit={QUERY_LIMIT}
+                  resultCount={results.length}
+                  onPrev={handlePagePrev}
+                  onNext={handlePageNext}
+                  isDark={isDark}
+                />
               </>
             ) : !loading && !error ? (
               <Box sx={{ py: 8, textAlign: 'center' }}>
@@ -1215,10 +1256,7 @@ const ArgusDiscoverPage: React.FC = () => {
 
       {/* Empty initial state — Pre-built Query Cards */}
       {!hasQueried && (
-        <PrebuiltQueryCards
-          onSelect={handleSelectPrebuilt}
-          isDark={isDark}
-        />
+        <PrebuiltQueryCards onSelect={handleSelectPrebuilt} isDark={isDark} />
       )}
 
       {/* Save / Save As Dialog */}
