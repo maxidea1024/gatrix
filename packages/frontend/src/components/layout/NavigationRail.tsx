@@ -127,7 +127,7 @@ const NavigationRail: React.FC<NavigationRailProps> = ({
 
   // When sub-panel is closed, clicking anywhere on the rail reopens it
   const handleRailBackgroundClick = () => {
-    if (!subPanelOpen && !aboutOpen) {
+    if (!subPanelOpen && !aboutOpen && !settingsMenuOpen) {
       onRailClick();
     }
   };
