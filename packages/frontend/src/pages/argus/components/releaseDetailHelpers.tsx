@@ -114,7 +114,8 @@ export const ReleaseHealthChart: React.FC<{
   // the release's active period and would flatten the chart to the bottom.
   let startIdx = 0;
   let endIdx = data.length - 1;
-  while (startIdx < data.length && data[startIdx].crash_free_rate <= 0) startIdx++;
+  while (startIdx < data.length && data[startIdx].crash_free_rate <= 0)
+    startIdx++;
   while (endIdx > startIdx && data[endIdx].crash_free_rate <= 0) endIdx--;
   // Keep one zero-entry on each side as a visual anchor if available
   if (startIdx > 0) startIdx--;
