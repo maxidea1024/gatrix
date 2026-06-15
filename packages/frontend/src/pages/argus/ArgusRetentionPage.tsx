@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -7,12 +7,17 @@ import {
   alpha,
   Divider,
   IconButton,
+  CircularProgress,
+  Collapse,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import {
   PlayArrow as RunIcon,
   Close as CloseIcon,
   DragIndicator as DragIcon,
   KeyboardArrowDown as ArrowDownIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -57,6 +62,8 @@ import {
   type RetentionEventEntry,
   type EventCondition,
 } from '@/hooks/useAnalyticsStore';
+import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
@@ -65,28 +72,20 @@ import ChartTypeSelector, {
   ChartType,
 } from './components/analytics/ChartTypeSelector';
 import PropertyPicker from './components/analytics/PropertyPicker';
+import PropertyValueInput from './components/analytics/PropertyValueInput';
 import CsvExportButton from './components/analytics/CsvExportButton';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { splitBreakdownValue } from './components/analytics/breakdownUtils';
+import { ArgusAnalyticsDrilldownDrawer } from './components/analytics/ArgusAnalyticsDrilldownDrawer';
 
 /* ─── Types ─── */
 
 type RetentionViewMode = 'curve' | 'line' | 'bar' | 'table' | 'metric';
 type RetentionEvent = RetentionEventEntry;
 
-/* ─── Constants ─── */
-
-const OPERATORS = [
-  { value: 'is', label: 'is' },
-  { value: 'is_not', label: 'is not' },
-  { value: 'contains', label: 'contains' },
-  { value: 'not_contains', label: 'does not contain' },
-  { value: 'gt', label: '>' },
-  { value: 'lt', label: '<' },
-  { value: 'set', label: 'is set' },
-  { value: 'not_set', label: 'is not set' },
-];
+/* ─── Component ─── */
 
 const SERIES_COLORS = [
   '#6366f1',
@@ -108,6 +107,17 @@ const ArgusRetentionPage: React.FC = () => {
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
 
+  const OPERATORS = [
+    { value: 'is', label: t('argus.analytics.op.is', 'is') },
+    { value: 'is_not', label: t('argus.analytics.op.isNot', 'is not') },
+    { value: 'contains', label: t('argus.analytics.op.contains', 'contains') },
+    { value: 'not_contains', label: t('argus.analytics.op.notContains', 'does not contain') },
+    { value: 'gt', label: '>' },
+    { value: 'lt', label: '<' },
+    { value: 'set', label: t('argus.analytics.op.isSet', 'is set') },
+    { value: 'not_set', label: t('argus.analytics.op.isNotSet', 'is not set') },
+  ];
+
   // ── Persisted State (survives refresh) ──
   const dateRange = useRetentionStore((s) => s.dateRange);
   const setDateRange = useRetentionStore((s) => s.setDateRange);
@@ -127,16 +137,48 @@ const ArgusRetentionPage: React.FC = () => {
   );
   const minFrequency = useRetentionStore((s) => s.minFrequency);
   const setMinFrequency = useRetentionStore((s) => s.setMinFrequency);
-  const breakdownProperty = useRetentionStore((s) => s.breakdownProperty);
-  const setBreakdownProperty = useRetentionStore((s) => s.setBreakdownProperty);
+  const breakdownProperties = useRetentionStore((s) => s.breakdownProperties);
+  const setBreakdownProperties = useRetentionStore((s) => s.setBreakdownProperties);
   const viewMode = useRetentionStore((s) => s.viewMode);
   const setViewMode = useRetentionStore((s) => s.setViewMode);
+  const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State ──
   const [availableEvents, setAvailableEvents] = useState<string[]>([]);
   const [cohorts, setCohorts] = useState<any[]>([]);
+  const [breakdownCohorts, setBreakdownCohorts] = useState<Record<string, any[]> | undefined>(undefined);
   const [queryLoading, setQueryLoading] = useState(false);
   const [hasQueried, setHasQueried] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useLocalStorage<boolean>(
+    'argus_retention_settings_expanded',
+    false
+  );
+  const [menuAnchor, setMenuAnchor] = useState<{ el: HTMLElement; target: 'cohort' | 'return' } | null>(null);
+
+  const handleOpenMenu = useCallback((e: React.MouseEvent<HTMLElement>, target: 'cohort' | 'return') => {
+    setMenuAnchor({ el: e.currentTarget, target });
+  }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    setMenuAnchor(null);
+  }, []);
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const isInitialMount = useRef(true);
+  const lastExecutedKeyRef = useRef<string>('');
+
+  // Drilldown state
+  const [drilldownOpen, setDrilldownOpen] = useState(false);
+  const [drilldownParams, setDrilldownParams] = useState<{
+    eventName: string;
+    dateRange: { start: Date; end: Date };
+    breakdownProperty?: string;
+    breakdownValue?: string;
+  } | null>(null);
+
+  // Reset hidden keys when cohorts change
+  useEffect(() => {
+    setHiddenSeriesKeys(new Set());
+  }, [cohorts]);
 
   // ── Fetch event names ──
   useEffect(() => {
@@ -203,6 +245,21 @@ const ArgusRetentionPage: React.FC = () => {
   // ── Run Query ──
   const handleRun = useCallback(async () => {
     if (!cohortEvent.name || !returnEvent.name) return;
+
+    const queryKey = JSON.stringify({
+      projectId,
+      cohortEvent,
+      returnEvent,
+      retentionType,
+      criteria,
+      measurement,
+      measurementProperty,
+      breakdownProperties,
+      minFrequency,
+      globalFilters,
+    });
+    lastExecutedKeyRef.current = queryKey;
+
     setQueryLoading(true);
     setHasQueried(true);
     try {
@@ -224,17 +281,20 @@ const ArgusRetentionPage: React.FC = () => {
         )
           ? measurementProperty
           : undefined,
-        breakdown: breakdownProperty
-          ? { property: breakdownProperty }
+        breakdown: breakdownProperties.length > 0
+          ? { properties: breakdownProperties }
           : undefined,
         min_frequency: minFrequency > 1 ? minFrequency : undefined,
+        global_filters: globalFilters.length > 0 ? globalFilters : undefined,
         period: apiParams.period,
         start: apiParams.start,
         end: apiParams.end,
       });
       setCohorts(data.cohorts || []);
+      setBreakdownCohorts(data.breakdowns);
     } catch {
       setCohorts([]);
+      setBreakdownCohorts(undefined);
     } finally {
       setQueryLoading(false);
     }
@@ -247,9 +307,149 @@ const ArgusRetentionPage: React.FC = () => {
     criteria,
     measurement,
     measurementProperty,
-    breakdownProperty,
+    breakdownProperties,
     minFrequency,
+    globalFilters,
   ]);
+
+  // Debounced auto-query running on settings change
+  useEffect(() => {
+    if (!cohortEvent.name || !returnEvent.name) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const queryKey = JSON.stringify({
+      projectId,
+      cohortEvent,
+      returnEvent,
+      retentionType,
+      criteria,
+      measurement,
+      measurementProperty,
+      breakdownProperties,
+      minFrequency,
+      globalFilters,
+    });
+
+    if (queryKey === lastExecutedKeyRef.current) {
+      return;
+    }
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      lastExecutedKeyRef.current = queryKey;
+      handleRun();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      lastExecutedKeyRef.current = queryKey;
+      handleRun();
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [
+    cohortEvent,
+    returnEvent,
+    dateRange,
+    retentionType,
+    criteria,
+    measurement,
+    measurementProperty,
+    breakdownProperties,
+    minFrequency,
+    globalFilters,
+    projectId,
+    handleRun
+  ]);
+
+  const handleCellClick = useCallback((cohortDateStr: string, periodIndex: number) => {
+    if (!returnEvent.name) return;
+
+    const baseDate = new Date(cohortDateStr);
+    const targetDate = new Date(baseDate);
+    
+    if (retentionType === 'day') {
+      targetDate.setDate(targetDate.getDate() + periodIndex);
+    } else if (retentionType === 'week') {
+      targetDate.setDate(targetDate.getDate() + periodIndex * 7);
+    } else {
+      targetDate.setMonth(targetDate.getMonth() + periodIndex);
+    }
+
+    const start = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
+    const end = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+
+    setDrilldownParams({
+      eventName: periodIndex === 0 ? cohortEvent.name : returnEvent.name,
+      dateRange: { start, end },
+    });
+    setDrilldownOpen(true);
+  }, [cohortEvent.name, returnEvent.name, retentionType]);
+
+  const handleBreakdownCellClick = useCallback((breakdownValue: string, periodIndex: number) => {
+    if (!returnEvent.name) return;
+
+    const apiParams = dateRangeToApiParams(dateRange);
+    let start = new Date();
+    let end = new Date();
+
+    if (apiParams.start && apiParams.end) {
+      start = new Date(apiParams.start);
+      end = new Date(apiParams.end);
+    } else {
+      const days = parseInt(apiParams.period || '14d', 10) || 14;
+      start.setDate(start.getDate() - days);
+    }
+
+    const startShifted = new Date(start);
+    const endShifted = new Date(end);
+    if (retentionType === 'day') {
+      startShifted.setDate(startShifted.getDate() + periodIndex);
+      endShifted.setDate(endShifted.getDate() + periodIndex);
+    } else if (retentionType === 'week') {
+      startShifted.setDate(startShifted.getDate() + periodIndex * 7);
+      endShifted.setDate(endShifted.getDate() + periodIndex * 7);
+    } else {
+      startShifted.setMonth(startShifted.getMonth() + periodIndex);
+      endShifted.setMonth(endShifted.getMonth() + periodIndex);
+    }
+
+    setDrilldownParams({
+      eventName: periodIndex === 0 ? cohortEvent.name : returnEvent.name,
+      dateRange: { start: startShifted, end: endShifted },
+      breakdownProperty: breakdownProperties[0],
+      breakdownValue: breakdownValue,
+    });
+    setDrilldownOpen(true);
+  }, [cohortEvent.name, returnEvent.name, retentionType, dateRange, breakdownProperties]);
+
+  const handleLegendClick = useCallback((e: any) => {
+    const { dataKey } = e;
+    setHiddenSeriesKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(dataKey)) {
+        next.delete(dataKey);
+      } else {
+        next.add(dataKey);
+      }
+      return next;
+    });
+  }, []);
+
+  const renderLegendText = useCallback((value: string, entry: any) => {
+    const isHidden = hiddenSeriesKeys.has(entry.dataKey || value);
+    return (
+      <span style={{
+        color: isHidden ? theme.palette.text.disabled : 'inherit',
+        textDecoration: isHidden ? 'line-through' : 'none',
+        cursor: 'pointer',
+      }}>
+        {value}
+      </span>
+    );
+  }, [hiddenSeriesKeys, theme]);
 
   const eventOptions = useMemo(
     () => availableEvents.map((name) => ({ value: name, label: name })),
@@ -287,6 +487,49 @@ const ArgusRetentionPage: React.FC = () => {
     }));
   }, [cohorts, retentionType]);
 
+  // ── Breakdown curve data (one line per breakdown value, averaged) ──
+  const breakdownCurveData = useMemo(() => {
+    if (!breakdownCohorts || Object.keys(breakdownCohorts).length === 0) return null;
+
+    // Find max periods across all breakdown values
+    let maxPeriods = 0;
+    for (const bvCohorts of Object.values(breakdownCohorts)) {
+      for (const c of bvCohorts) {
+        maxPeriods = Math.max(maxPeriods, c.retention?.length || 0);
+      }
+    }
+    if (maxPeriods === 0) return null;
+
+    let breakdownKeys = Object.keys(breakdownCohorts);
+
+    // Limit to top N breakdown values by total cohort size
+    const BREAKDOWN_LIMIT = 10;
+    if (breakdownKeys.length > BREAKDOWN_LIMIT) {
+      breakdownKeys.sort((a, b) => {
+        const sumA = breakdownCohorts[a].reduce((s: number, c: any) => s + (c.cohort_size || 0), 0);
+        const sumB = breakdownCohorts[b].reduce((s: number, c: any) => s + (c.cohort_size || 0), 0);
+        return sumB - sumA;
+      });
+      breakdownKeys = breakdownKeys.slice(0, BREAKDOWN_LIMIT);
+    }
+
+    return Array.from({ length: maxPeriods }, (_, i) => {
+      const point: Record<string, any> = {
+        period: `${retentionType === 'day' ? 'Day' : retentionType === 'week' ? 'Wk' : 'Mo'} ${i}`,
+      };
+      for (const bv of breakdownKeys) {
+        const bvArr = breakdownCohorts[bv];
+        let sum = 0, count = 0;
+        for (const c of bvArr) {
+          const val = c.retention?.[i] ?? 0;
+          if (val > 0) { sum += val; count++; }
+        }
+        point[bv] = count > 0 ? Math.round((sum / count) * 10) / 10 : 0;
+      }
+      return point;
+    });
+  }, [breakdownCohorts, retentionType]);
+
   // ── CSV data ──
   const csvData = useMemo(() => {
     return cohorts.map((c) => ({
@@ -304,86 +547,83 @@ const ArgusRetentionPage: React.FC = () => {
   // ── Render condition block ──
   const renderConditions = (
     target: 'cohort' | 'return',
-    event: RetentionEvent,
-    setEvent: React.Dispatch<React.SetStateAction<RetentionEvent>>
-  ) => (
-    <>
-      {event.conditions?.map((cond, cIdx) => (
-        <Box
-          key={cIdx}
+    event: RetentionEvent
+  ) => {
+    if (!event.conditions || event.conditions.length === 0) return null;
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {event.conditions.map((cond, cIdx) => (
+          <Box
+            key={cIdx}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              pl: 0.5,
+            }}
+          >
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+              {t('argus.analytics.where', 'where')}
+            </Typography>
+            <PropertyPicker
+              projectId={projectId}
+              eventName={event.name}
+              value={cond.property ? [cond.property] : []}
+              onChange={(val) =>
+                handleConditionChange(target, cIdx, 'property', val[0] || '')
+              }
+              emptyLabel={t('argus.analytics.property', 'Property')}
+              highlightEmpty
+              maxItems={1}
+              variant="text"
+            />
+            <InlineSelect
+              value={cond.operator}
+              onChange={(val) =>
+                handleConditionChange(target, cIdx, 'operator', val)
+              }
+              options={OPERATORS}
+            />
+            {!['set', 'not_set'].includes(cond.operator) && (
+              <Box sx={{ flex: 1, minWidth: 60 }}>
+                <PropertyValueInput
+                  projectId={projectId}
+                  property={cond.property}
+                  value={cond.value}
+                  onChange={(val) =>
+                    handleConditionChange(target, cIdx, 'value', val)
+                  }
+                />
+              </Box>
+            )}
+            <IconButton
+              size="small"
+              onClick={() => handleRemoveCondition(target, cIdx)}
+              sx={{ p: 0.25, ml: 0.5, opacity: 0.6, '&:hover': { opacity: 1 } }}
+            >
+              <CloseIcon sx={{ fontSize: 14 }} />
+            </IconButton>
+          </Box>
+        ))}
+        <Button
+          size="small"
+          onClick={() => handleAddCondition(target)}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 0.5,
+            alignSelf: 'flex-start',
+            textTransform: 'none',
+            opacity: 0.7,
             pl: 0.5,
+            py: 0,
+            minWidth: 0,
+            fontSize: '0.75rem',
           }}
         >
-          <Typography variant="caption" color="text.secondary">
-            {t('argus.analytics.where', 'where')}
-          </Typography>
-          <PropertyPicker
-            projectId={projectId}
-            eventName={event.name}
-            value={cond.property}
-            onChange={(val) =>
-              handleConditionChange(target, cIdx, 'property', val)
-            }
-            emptyLabel={t('argus.analytics.property', 'Property')}
-            highlightEmpty
-          />
-          <InlineSelect
-            value={cond.operator}
-            onChange={(val) =>
-              handleConditionChange(target, cIdx, 'operator', val)
-            }
-            options={OPERATORS}
-          />
-          {!['set', 'not_set'].includes(cond.operator) && (
-            <input
-              value={cond.value}
-              onChange={(e) =>
-                handleConditionChange(target, cIdx, 'value', e.target.value)
-              }
-              placeholder={t('argus.analytics.valuePlaceholder', 'value')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
-                color: 'inherit',
-                outline: 'none',
-                width: 80,
-                fontSize: '0.8rem',
-                fontFamily: 'inherit',
-              }}
-            />
-          )}
-          <IconButton
-            size="small"
-            onClick={() => handleRemoveCondition(target, cIdx)}
-            sx={{ p: 0.25, ml: 0.5, opacity: 0.6, '&:hover': { opacity: 1 } }}
-          >
-            <CloseIcon sx={{ fontSize: 14 }} />
-          </IconButton>
-        </Box>
-      ))}
-      <Button
-        size="small"
-        onClick={() => handleAddCondition(target)}
-        sx={{
-          alignSelf: 'flex-start',
-          textTransform: 'none',
-          opacity: 0.7,
-          pl: 0.5,
-          py: 0,
-          minWidth: 0,
-          fontSize: '0.75rem',
-        }}
-      >
-        {t('argus.analytics.addFilter', '+ Filter')}
-      </Button>
-    </>
-  );
+          {t('argus.analytics.filter', '+ Filter')}
+        </Button>
+      </Box>
+    );
+  };
 
   // ── UI: Left Panel ──
   const leftPanel = (
@@ -399,25 +639,44 @@ const ArgusRetentionPage: React.FC = () => {
         <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
           {/* Cohort Event */}
           <EventBlock indexLabel="A" color="#6366f1">
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ minWidth: 48 }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ minWidth: 48 }}
+                >
+                  {t('argus.analytics.first', 'First')}
+                </Typography>
+                <InlineSelect
+                  value={cohortEvent.name}
+                  onChange={(val) =>
+                    setCohortEvent({ ...cohortEvent, name: val })
+                  }
+                  options={eventOptions}
+                  emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
+                  highlightEmpty
+                />
+              </Box>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenMenu(e, 'cohort');
+                }}
+                sx={{ opacity: 0.6, '&:hover': { opacity: 1 }, p: 0.25 }}
               >
-                {t('argus.analytics.first', 'First')}
-              </Typography>
-              <InlineSelect
-                value={cohortEvent.name}
-                onChange={(val) =>
-                  setCohortEvent({ ...cohortEvent, name: val })
-                }
-                options={eventOptions}
-                emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
-                highlightEmpty
-              />
+                <MoreVertIcon sx={{ fontSize: 16 }} />
+              </IconButton>
             </Box>
-            {renderConditions('cohort', cohortEvent, setCohortEvent)}
+            {renderConditions('cohort', cohortEvent)}
           </EventBlock>
 
           <Box
@@ -425,16 +684,15 @@ const ArgusRetentionPage: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              my: 0.5,
-              py: 0.25,
+              my: -1, // Negate parent flex gap to pull the connection box flush with event blocks
             }}
           >
             {/* Dotted line top */}
             <Box
               sx={{
                 width: 0,
-                height: 10,
-                borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.25)'}`,
+                height: 14,
+                borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
               }}
             />
             {/* Arrow circle */}
@@ -443,13 +701,12 @@ const ArgusRetentionPage: React.FC = () => {
                 width: 20,
                 height: 20,
                 borderRadius: '50%',
-                border: `2px solid ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
+                border: `2px solid ${isDark ? 'rgba(99,102,241,0.45)' : 'rgba(99,102,241,0.35)'}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: isDark
-                  ? 'rgba(99,102,241,0.08)'
-                  : 'rgba(99,102,241,0.05)',
+                bgcolor: 'background.paper', // Prevents dashed line showing behind it
+                zIndex: 2,
               }}
             >
               <ArrowDownIcon
@@ -465,33 +722,52 @@ const ArgusRetentionPage: React.FC = () => {
             <Box
               sx={{
                 width: 0,
-                height: 10,
-                borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.25)'}`,
+                height: 14,
+                borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
               }}
             />
           </Box>
 
           {/* Return Event */}
           <EventBlock indexLabel="B" color="#10b981">
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ minWidth: 48 }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ minWidth: 48 }}
+                >
+                  {t('argus.analytics.return', 'Return')}
+                </Typography>
+                <InlineSelect
+                  value={returnEvent.name}
+                  onChange={(val) =>
+                    setReturnEvent({ ...returnEvent, name: val })
+                  }
+                  options={eventOptions}
+                  emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
+                  highlightEmpty
+                />
+              </Box>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenMenu(e, 'return');
+                }}
+                sx={{ opacity: 0.6, '&:hover': { opacity: 1 }, p: 0.25 }}
               >
-                {t('argus.analytics.return', 'Return')}
-              </Typography>
-              <InlineSelect
-                value={returnEvent.name}
-                onChange={(val) =>
-                  setReturnEvent({ ...returnEvent, name: val })
-                }
-                options={eventOptions}
-                emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
-                highlightEmpty
-              />
+                <MoreVertIcon sx={{ fontSize: 16 }} />
+              </IconButton>
             </Box>
-            {renderConditions('return', returnEvent, setReturnEvent)}
+            {renderConditions('return', returnEvent)}
           </EventBlock>
         </Box>
       </Box>
@@ -500,12 +776,36 @@ const ArgusRetentionPage: React.FC = () => {
 
       {/* Settings */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-        <Typography
-          variant="overline"
-          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+        <Box
+          onClick={() => setSettingsExpanded(!settingsExpanded)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            userSelect: 'none',
+            '&:hover': { opacity: 0.8 },
+            ml: 0.5,
+          }}
         >
-          {t('argus.analytics.settings', 'Settings')}
-        </Typography>
+          <Typography
+            variant="overline"
+            sx={{ fontWeight: 700, color: 'text.secondary', mb: 0 }}
+          >
+            {t('argus.analytics.settings', 'Settings')}
+          </Typography>
+          <ArrowDownIcon
+            sx={{
+              fontSize: 16,
+              color: 'text.secondary',
+              transition: 'transform 0.2s',
+              transform: settingsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+            }}
+          />
+        </Box>
+
+        <Collapse in={settingsExpanded} timeout={200}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, pt: 0.5, pl: 1.5 }}>
 
         {/* Retention Type */}
         <Box
@@ -619,13 +919,14 @@ const ArgusRetentionPage: React.FC = () => {
             <PropertyPicker
               projectId={projectId}
               eventName={returnEvent.name}
-              value={measurementProperty}
-              onChange={setMeasurementProperty}
+              value={measurementProperty ? [measurementProperty] : []}
+              onChange={(val) => setMeasurementProperty(val[0] || '')}
               emptyLabel={t(
                 'argus.analytics.selectProperty',
                 'Select Property'
               )}
               highlightEmpty
+              maxItems={1}
             />
           </Box>
         )}
@@ -664,34 +965,52 @@ const ArgusRetentionPage: React.FC = () => {
             {t('argus.analytics.times', 'times')}
           </Typography>
         </Box>
+          </Box>
+        </Collapse>
       </Box>
 
       <Divider sx={{ opacity: isDark ? 0.05 : 0.5 }} />
 
       {/* Breakdown */}
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
-        >
-          {t('argus.analytics.breakdownBy', 'Breakdown By')}
-        </Typography>
-        <Box
-          sx={{
-            mt: 1,
-            p: 1.5,
-            borderRadius: 2,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          }}
-        >
-          <PropertyPicker
-            projectId={projectId}
-            eventName={cohortEvent.name}
-            value={breakdownProperty}
-            onChange={setBreakdownProperty}
-            emptyLabel={t('argus.analytics.noBreakdown', 'None')}
-          />
-        </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {breakdownProperties.length > 0 ? (
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}>
+                {t('argus.analytics.breakdownBy', 'Breakdown By')}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setBreakdownProperties([])}
+                sx={{ p: 0.25, opacity: 0.6, '&:hover': { opacity: 1 } }}
+              >
+                <CloseIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            </Box>
+            <Box sx={{ pl: 1.5 }}>
+              <Box sx={{ mt: 0.5, p: 1.5, borderRadius: 2, border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
+                <PropertyPicker
+                  projectId={projectId}
+                  eventName={cohortEvent.name}
+                  value={breakdownProperties}
+                  onChange={setBreakdownProperties}
+                  emptyLabel={t('argus.analytics.noBreakdown', 'None')}
+                />
+              </Box>
+            </Box>
+          </Box>
+        ) : (
+          <Box sx={{ pl: 1.5 }}>
+            <PropertyPicker
+              projectId={projectId}
+              eventName={cohortEvent.name}
+              value={breakdownProperties}
+              onChange={setBreakdownProperties}
+              emptyLabel={t('argus.analytics.addBreakdown', 'Breakdown')}
+              variant="text"
+            />
+          </Box>
+        )}
       </Box>
 
       <Box sx={{ mt: 'auto', pt: 2 }}>
@@ -699,7 +1018,7 @@ const ArgusRetentionPage: React.FC = () => {
           fullWidth
           variant="contained"
           size="small"
-          startIcon={<RunIcon />}
+          startIcon={queryLoading ? <CircularProgress size={16} color="inherit" /> : <RunIcon />}
           onClick={handleRun}
           disabled={queryLoading || !cohortEvent.name || !returnEvent.name}
           sx={{ borderRadius: 1.5, textTransform: 'none', px: 2 }}
@@ -729,13 +1048,78 @@ const ArgusRetentionPage: React.FC = () => {
 
   // ── Render: Retention Curve ──
   const renderCurveView = () => {
+    // Breakdown mode: one line per breakdown value
+    if (breakdownCurveData && breakdownCurveData.length > 0 && breakdownCohorts) {
+      const breakdownKeys = Object.keys(breakdownCohorts);
+      return (
+        <Box sx={{ height: { xs: 360, md: '50vh' }, minHeight: 360, maxHeight: 600, width: '100%', pr: 2 }}>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
+            <LineChart
+              data={breakdownCurveData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
+              />
+              <XAxis
+                dataKey="period"
+                tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+                tickLine={false}
+                axisLine={false}
+                width={40}
+                unit="%"
+              />
+              <RechartsTooltip
+                wrapperStyle={{ zIndex: 1000 }}
+                contentStyle={{
+                  background: isDark ? '#1e1e2e' : '#fff',
+                  color: isDark ? '#e4e4e7' : '#1a1a2e',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+                  borderRadius: 8,
+                  fontSize: 12,
+                }}
+                itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
+                labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+              />
+              <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 11 }} />
+              {breakdownKeys.map((key, idx) => (
+                <Line
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  hide={hiddenSeriesKeys.has(key)}
+                  stroke={SERIES_COLORS[idx % SERIES_COLORS.length]}
+                  strokeWidth={2}
+                  dot={{ r: 2 }}
+                  name={key}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </Box>
+      );
+    }
+
+    // Default: overall cohort curve
     if (curveData.length === 0) return null;
     const cohortKeys = cohorts.map((c) =>
       String(c.cohort_date).substring(0, 10)
     );
 
     return (
-      <Box sx={{ height: 360, width: '100%', pr: 2 }}>
+      <Box sx={{ height: { xs: 360, md: '50vh' }, minHeight: 360, maxHeight: 600, width: '100%', pr: 2 }}>
         <ResponsiveContainer
           width="100%"
           height="100%"
@@ -765,18 +1149,23 @@ const ArgusRetentionPage: React.FC = () => {
               unit="%"
             />
             <RechartsTooltip
+              wrapperStyle={{ zIndex: 1000 }}
               contentStyle={{
                 background: isDark ? '#1e1e2e' : '#fff',
+                color: isDark ? '#e4e4e7' : '#1a1a2e',
                 border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                 borderRadius: 8,
                 fontSize: 12,
               }}
+              itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
+              labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
             />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 11 }} />
             {/* Average line (bold) */}
             <Line
               type="monotone"
               dataKey="average"
+              hide={hiddenSeriesKeys.has('average')}
               stroke="#6366f1"
               strokeWidth={3}
               dot={{ r: 3 }}
@@ -788,6 +1177,7 @@ const ArgusRetentionPage: React.FC = () => {
                 key={key}
                 type="monotone"
                 dataKey={key}
+                hide={hiddenSeriesKeys.has(key)}
                 stroke={SERIES_COLORS[idx % SERIES_COLORS.length]}
                 strokeWidth={1}
                 strokeOpacity={0.4}
@@ -802,52 +1192,48 @@ const ArgusRetentionPage: React.FC = () => {
 
   // ── Render: Bar Chart ──
   const renderBarView = () => {
-    if (curveData.length === 0) return null;
+    // Breakdown mode: grouped bars
+    if (breakdownCurveData && breakdownCurveData.length > 0 && breakdownCohorts) {
+      const breakdownKeys = Object.keys(breakdownCohorts).slice(0, 10);
+      return (
+        <Box sx={{ height: { xs: 360, md: '50vh' }, minHeight: 360, maxHeight: 600, width: '100%', pr: 2 }}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+            <BarChart data={breakdownCurveData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} />
+              <XAxis dataKey="period" tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} width={40} unit="%" />
+              <RechartsTooltip
+                wrapperStyle={{ zIndex: 1000 }}
+                contentStyle={{ background: isDark ? '#1e1e2e' : '#fff', color: isDark ? '#e4e4e7' : '#1a1a2e', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, borderRadius: 8, fontSize: 12 }}
+                itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
+                labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+              />
+              <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 11 }} />
+              {breakdownKeys.map((key, idx) => (
+                <Bar key={key} dataKey={key} hide={hiddenSeriesKeys.has(key)} fill={SERIES_COLORS[idx % SERIES_COLORS.length]} radius={[4, 4, 0, 0]} name={key} />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        </Box>
+      );
+    }
 
+    // Default: overall average bar
+    if (curveData.length === 0) return null;
     return (
-      <Box sx={{ height: 360, width: '100%', pr: 2 }}>
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-          minWidth={0}
-          minHeight={0}
-        >
-          <BarChart
-            data={curveData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
-            />
-            <XAxis
-              dataKey="period"
-              tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
-              tickLine={false}
-              axisLine={false}
-              width={40}
-              unit="%"
-            />
+      <Box sx={{ height: { xs: 360, md: '50vh' }, minHeight: 360, maxHeight: 600, width: '100%', pr: 2 }}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+          <BarChart data={curveData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} />
+            <XAxis dataKey="period" tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} width={40} unit="%" />
             <RechartsTooltip
-              contentStyle={{
-                background: isDark ? '#1e1e2e' : '#fff',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                borderRadius: 8,
-                fontSize: 12,
-              }}
+              wrapperStyle={{ zIndex: 1000 }}
+              contentStyle={{ background: isDark ? '#1e1e2e' : '#fff', color: isDark ? '#e4e4e7' : '#1a1a2e', border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`, borderRadius: 8, fontSize: 12 }}
+              itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
+              labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
             />
-            <Bar
-              dataKey="average"
-              fill="#6366f1"
-              radius={[4, 4, 0, 0]}
-              name={t('argus.analytics.average', 'Average')}
-            />
+            <Bar dataKey="average" fill="#6366f1" radius={[4, 4, 0, 0]} name={t('argus.analytics.average', 'Average')} />
           </BarChart>
         </ResponsiveContainer>
       </Box>
@@ -897,134 +1283,209 @@ const ArgusRetentionPage: React.FC = () => {
   const renderHeatmapTable = () => {
     if (cohorts.length === 0) return null;
 
+    const hasBreakdown = breakdownCohorts && Object.keys(breakdownCohorts).length > 0;
+    const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+    const periodPrefix = retentionType === 'day' ? 'D' : retentionType === 'week' ? 'W' : 'M';
+
+    // Compute max periods from overall cohorts
+    const maxPeriods = cohorts[0]?.retention?.length || 0;
+
+    // ── Breakdown summary table (Mixpanel-style: all values at once) ──
+    const renderBreakdownSummary = () => {
+      if (!hasBreakdown || maxPeriods === 0) return null;
+
+      const bdKeys = Object.keys(breakdownCohorts!);
+
+      // Calculate weighted average retention per breakdown value
+      const summaryRows = bdKeys.map((bv, idx) => {
+        const bvCohorts = breakdownCohorts![bv];
+        const totalSize = bvCohorts.reduce((s: number, c: any) => s + (c.cohort_size || 0), 0);
+
+        const avgRetention: number[] = [];
+        for (let p = 0; p < maxPeriods; p++) {
+          let weightedSum = 0, totalWeight = 0;
+          for (const c of bvCohorts) {
+            const pct = c.retention?.[p] ?? 0;
+            const size = c.cohort_size || 0;
+            if (pct > 0 && size > 0) {
+              weightedSum += pct * size;
+              totalWeight += size;
+            }
+          }
+          avgRetention.push(totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : 0);
+        }
+
+        return {
+          label: bv,
+          parts: splitBreakdownValue(bv),
+          color: SERIES_COLORS[idx % SERIES_COLORS.length],
+          size: totalSize,
+          retention: avgRetention,
+        };
+      });
+
+      // Sort by D1 retention desc (or overall)
+      summaryRows.sort((a, b) => (b.retention[1] ?? b.retention[0] ?? 0) - (a.retention[1] ?? a.retention[0] ?? 0));
+
+      return (
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, px: 0.5, color: 'text.secondary', fontSize: '0.78rem' }}>
+            {t('argus.analytics.breakdownComparison', 'Breakdown Comparison')}
+            <Typography component="span" variant="caption" sx={{ ml: 1, opacity: 0.6 }}>
+              ({breakdownProperties.join(' · ')})
+            </Typography>
+          </Typography>
+          <Box sx={{ overflowX: 'auto', border: `1px solid ${borderColor}`, borderRadius: 1 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+              <thead>
+                <tr>
+                {breakdownProperties.length > 1 ? (
+                  breakdownProperties.map((prop) => (
+                    <th key={prop} style={{ textAlign: 'left', padding: '10px 12px', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600, position: 'sticky', left: 0, background: theme.palette.background.paper, zIndex: 2, minWidth: 90 }}>
+                      {prop}
+                    </th>
+                  ))
+                ) : (
+                  <th style={{ textAlign: 'left', padding: '10px 12px', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600, position: 'sticky', left: 0, background: theme.palette.background.paper, zIndex: 2, minWidth: 120 }}>
+                    {t('argus.analytics.breakdownValue', 'Segment')}
+                  </th>
+                )}
+                  <th style={{ textAlign: 'right', padding: '10px 12px', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600, minWidth: 60 }}>
+                    {t('argus.analytics.cohortSize', 'Size')}
+                  </th>
+                  {Array.from({ length: maxPeriods }, (_, i) => (
+                    <th key={i} style={{ padding: '8px 6px', textAlign: 'center', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600, minWidth: 50 }}>
+                      {`${periodPrefix}${i}`}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {summaryRows.map((row, rowIdx) => (
+                  <tr
+                    key={rowIdx}
+                    style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
+                  >
+                    {breakdownProperties.length > 1 ? (
+                      row.parts.map((part: string, pIdx: number) => (
+                        <td key={pIdx} style={{ padding: '8px 12px', fontWeight: 600, ...(pIdx === 0 ? { position: 'sticky' as const, left: 0, background: theme.palette.background.paper, zIndex: 1 } : {}) }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {pIdx === 0 && <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: row.color, flexShrink: 0 }} />}
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+                              {part || '(empty)'}
+                            </span>
+                          </Box>
+                        </td>
+                      ))
+                    ) : (
+                      <td style={{ padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, position: 'sticky', left: 0, background: theme.palette.background.paper, zIndex: 1 }}>
+                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: row.color, flexShrink: 0 }} />
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+                          {row.label}
+                        </span>
+                      </td>
+                    )}
+                    <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                      {formatCompactNumber(row.size)}
+                    </td>
+                    {row.retention.map((pct, colIdx) => (
+                      <td key={colIdx} style={{ padding: '6px 4px' }}>
+                        <Box
+                          onClick={() => pct > 0 && handleBreakdownCellClick(row.label, colIdx)}
+                          sx={{
+                            width: '100%', height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            borderRadius: 0.5,
+                            background: pct > 0 ? alpha(row.color, Math.min(0.15 + (pct / 100) * 0.55, 0.7)) : 'transparent',
+                            color: pct > 60 ? '#fff' : pct > 0 ? theme.palette.text.primary : theme.palette.text.disabled,
+                            fontWeight: pct > 0 ? 600 : 400,
+                            fontSize: '0.72rem',
+                            cursor: pct > 0 ? 'pointer' : 'default',
+                            '&:hover': pct > 0 ? {
+                              filter: 'brightness(1.15)',
+                              transform: 'scale(1.02)',
+                            } : {},
+                            transition: 'all 0.1s ease',
+                          }}
+                        >
+                          {pct > 0 ? `${pct}%` : '—'}
+                        </Box>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Box>
+        </Box>
+      );
+    };
+
     return (
-      <Box
-        sx={{
-          overflowX: 'auto',
-          mt: 2,
-          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        }}
-      >
-        <table
-          style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            fontSize: '0.8rem',
+      <Box sx={{ mt: 2 }}>
+        {/* Breakdown summary (all values at once) */}
+        {renderBreakdownSummary()}
+
+        {/* Cohort-level heatmap (always shown) */}
+        <Box
+          sx={{
+            overflowX: 'auto',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           }}
         >
-          <thead>
-            <tr>
-              <th
-                style={{
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                  color: theme.palette.text.secondary,
-                  fontWeight: 600,
-                  position: 'sticky',
-                  left: 0,
-                  background: theme.palette.background.paper,
-                  zIndex: 2,
-                }}
-              >
-                {t('argus.analytics.cohortDate', 'Cohort Date')}
-              </th>
-              <th
-                style={{
-                  textAlign: 'center',
-                  padding: '12px 16px',
-                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                  color: theme.palette.text.secondary,
-                  fontWeight: 600,
-                }}
-              >
-                {t('argus.analytics.cohortSize', 'Size')}
-              </th>
-              {cohorts[0]?.retention?.map((_: any, i: number) => (
-                <th
-                  key={i}
-                  style={{
-                    padding: '8px 8px',
-                    textAlign: 'center',
-                    borderBottom: `2px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                    color: theme.palette.text.secondary,
-                    fontWeight: 600,
-                    minWidth: 42,
-                  }}
-                >
-                  {retentionType === 'day'
-                    ? `D${i}`
-                    : retentionType === 'week'
-                      ? `W${i}`
-                      : `M${i}`}
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600, position: 'sticky', left: 0, background: theme.palette.background.paper, zIndex: 2 }}>
+                  {t('argus.analytics.cohortDate', 'Cohort Date')}
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {cohorts.map((cohort, rowIdx) => (
-              <tr key={rowIdx}>
-                <td
-                  style={{
-                    padding: '6px 12px',
-                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                    whiteSpace: 'nowrap',
-                    fontWeight: 500,
-                    position: 'sticky',
-                    left: 0,
-                    background: theme.palette.background.paper,
-                    zIndex: 1,
-                  }}
-                >
-                  {String(cohort.cohort_date).substring(0, 10)}
-                </td>
-                <td
-                  style={{
-                    padding: '6px 12px',
-                    textAlign: 'right',
-                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                    fontWeight: 700,
-                  }}
-                >
-                  {formatCompactNumber(cohort.cohort_size)}
-                </td>
-                {cohort.retention?.map((pct: number, colIdx: number) => (
-                  <td
-                    key={colIdx}
-                    style={{
-                      padding: '6px 4px',
-                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: '100%',
-                        height: 28,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: 1,
-                        background:
-                          pct > 0
-                            ? alpha(getHeatColor(pct), isDark ? 0.6 : 0.85)
-                            : 'transparent',
-                        color:
-                          pct > 50
-                            ? '#fff'
-                            : pct > 0
-                              ? theme.palette.text.primary
-                              : theme.palette.text.disabled,
-                        fontWeight: pct > 0 ? 600 : 400,
-                      }}
-                    >
-                      {pct > 0 ? `${pct}%` : '—'}
-                    </Box>
-                  </td>
+                <th style={{ textAlign: 'right', padding: '12px 16px', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+                  {t('argus.analytics.cohortSize', 'Size')}
+                </th>
+                {cohorts[0]?.retention?.map((_: any, i: number) => (
+                  <th key={i} style={{ padding: '8px 8px', textAlign: 'center', borderBottom: `1px solid ${borderColor}`, color: theme.palette.text.secondary, fontWeight: 600, minWidth: 42 }}>
+                    {`${periodPrefix}${i}`}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {cohorts.map((cohort, rowIdx) => (
+                <tr key={rowIdx}>
+                  <td style={{ padding: '6px 12px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`, whiteSpace: 'nowrap', fontWeight: 500, position: 'sticky', left: 0, background: theme.palette.background.paper, zIndex: 1 }}>
+                    {String(cohort.cohort_date).substring(0, 10)}
+                  </td>
+                  <td style={{ padding: '6px 12px', textAlign: 'right', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`, fontWeight: 700 }}>
+                    {formatCompactNumber(cohort.cohort_size)}
+                  </td>
+                  {cohort.retention?.map((pct: number, colIdx: number) => (
+                    <td key={colIdx} style={{ padding: '6px 4px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
+                      <Box
+                        onClick={() => pct > 0 && handleCellClick(String(cohort.cohort_date), colIdx)}
+                        sx={{
+                          width: '100%', height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          borderRadius: 1,
+                          background: pct > 0 ? alpha(getHeatColor(pct), isDark ? 0.6 : 0.85) : 'transparent',
+                          color: pct > 50 ? '#fff' : pct > 0 ? theme.palette.text.primary : theme.palette.text.disabled,
+                          fontWeight: pct > 0 ? 600 : 400,
+                          cursor: pct > 0 ? 'pointer' : 'default',
+                          '&:hover': pct > 0 ? {
+                            filter: 'brightness(1.15)',
+                            transform: 'scale(1.02)',
+                          } : {},
+                          transition: 'all 0.1s ease',
+                        }}
+                      >
+                        {pct > 0 ? `${pct}%` : '—'}
+                      </Box>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Box>
       </Box>
     );
   };
@@ -1037,6 +1498,7 @@ const ArgusRetentionPage: React.FC = () => {
         flexDirection: 'column',
         height: 'calc(100vh - 64px)',
         overflow: 'hidden',
+        m: -2,
       }}
     >
       <PageHeader
@@ -1060,13 +1522,11 @@ const ArgusRetentionPage: React.FC = () => {
           flex: 1,
           overflow: 'hidden',
           minHeight: 0,
-          px: 2,
-          pb: 2,
         }}
       >
-        <AnalyticsLayout leftPanel={leftPanel} toolbar={toolbar}>
+        <AnalyticsLayout leftPanel={leftPanel} toolbar={toolbar} projectId={projectId}>
           <PageContentLoader
-            loading={queryLoading}
+            loading={queryLoading || (!!cohortEvent.name && !!returnEvent.name && !hasQueried)}
             skeleton={<ArgusChartSkeleton type="line" height={300} />}
           >
             {!hasQueried ? (
@@ -1106,6 +1566,42 @@ const ArgusRetentionPage: React.FC = () => {
           </PageContentLoader>
         </AnalyticsLayout>
       </Box>
+      {drilldownParams && (
+        <ArgusAnalyticsDrilldownDrawer
+          open={drilldownOpen}
+          onClose={() => setDrilldownOpen(false)}
+          projectId={projectId}
+          eventName={drilldownParams.eventName}
+          dateRange={drilldownParams.dateRange}
+          globalFilters={globalFilters}
+          breakdownProperty={drilldownParams.breakdownProperty}
+          breakdownValue={drilldownParams.breakdownValue}
+        />
+      )}
+
+      {menuAnchor && (
+        <Menu
+          anchorEl={menuAnchor.el}
+          open={Boolean(menuAnchor)}
+          onClose={handleCloseMenu}
+          PaperProps={{
+            sx: {
+              maxHeight: 320,
+              width: '24ch',
+            }
+          }}
+        >
+          <MenuItem
+            onClick={() => {
+              handleAddCondition(menuAnchor.target);
+              handleCloseMenu();
+            }}
+            sx={{ fontSize: '0.8rem', py: 0.75 }}
+          >
+            {t('argus.analytics.addFilter', 'Add Filter')}
+          </MenuItem>
+        </Menu>
+      )}
     </Box>
   );
 };

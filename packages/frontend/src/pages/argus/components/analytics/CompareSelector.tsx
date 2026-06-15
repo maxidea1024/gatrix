@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Box, Popover, Typography, useTheme, alpha } from '@mui/material';
 import { CompareArrows as CompareIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 export type ComparePeriod =
   | ''
@@ -14,22 +15,23 @@ interface CompareSelectorProps {
   onChange: (value: ComparePeriod) => void;
 }
 
-const OPTIONS: { value: ComparePeriod; label: string }[] = [
-  { value: '', label: 'None' },
-  { value: 'previous_period', label: 'Previous Period' },
-  { value: 'previous_week', label: 'Previous Week' },
-  { value: 'previous_month', label: 'Previous Month' },
-  { value: 'previous_year', label: 'Previous Year' },
-];
-
 const CompareSelector: React.FC<CompareSelectorProps> = ({
   value,
   onChange,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { t } = useTranslation();
   const anchorRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+
+  const OPTIONS: { value: ComparePeriod; label: string }[] = [
+    { value: '', label: t('common.none', 'None') },
+    { value: 'previous_period', label: t('argus.analytics.comparePreviousPeriod', 'Previous Period') },
+    { value: 'previous_week', label: t('argus.analytics.comparePreviousWeek', 'Previous Week') },
+    { value: 'previous_month', label: t('argus.analytics.comparePreviousMonth', 'Previous Month') },
+    { value: 'previous_year', label: t('argus.analytics.comparePreviousYear', 'Previous Year') },
+  ];
 
   const activeOption = OPTIONS.find((o) => o.value === value);
   const isActive = !!value;
@@ -69,7 +71,7 @@ const CompareSelector: React.FC<CompareSelectorProps> = ({
         }}
       >
         <CompareIcon sx={{ fontSize: 16 }} />
-        {isActive ? activeOption?.label : 'Compare'}
+        {isActive ? activeOption?.label : t('argus.analytics.compare', 'Compare')}
       </Box>
 
       <Popover
@@ -107,7 +109,7 @@ const CompareSelector: React.FC<CompareSelectorProps> = ({
             letterSpacing: 0.5,
           }}
         >
-          Compare to
+          {t('argus.analytics.compareTo', 'Compare to')}
         </Typography>
         {OPTIONS.map((opt) => (
           <Box

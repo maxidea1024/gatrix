@@ -2608,6 +2608,23 @@ class ArgusService {
     );
   }
 
+  async getAnalyticsPropertyValues(
+    projectId: number | string,
+    property: string,
+    params?: { period?: string; start?: string; end?: string; search?: string },
+    signal?: AbortSignal
+  ): Promise<{ value: string; count: number }[]> {
+    try {
+      const response = await argusApi.get(
+        `${ARGUS_BASE}/projects/${projectId}/analytics/property-values`,
+        { params: { property, ...params }, signal }
+      );
+      return response.data?.data || response.data || [];
+    } catch {
+      return [];
+    }
+  }
+
   async getAnalyticsInsights(
     projectId: number | string,
     body: {
@@ -2621,12 +2638,13 @@ class ArgusService {
           value: string | number;
         }[];
       }[];
-      breakdown?: { property: string; type?: string };
+      breakdown?: { properties: string[] };
       interval?: string;
       period?: string;
       start?: string;
       end?: string;
       compare_period?: string;
+      global_filters?: { property: string; operator: string; value: string }[];
     }
   ): Promise<{
     series: {
@@ -2661,11 +2679,22 @@ class ArgusService {
       ordering?: 'specific' | 'any';
       hold_constant?: string[];
       counting?: 'uniques' | 'totals';
-      breakdown?: { property: string };
+      breakdown?: { properties: string[] };
+      exclusion_steps?: {
+        event_name: string;
+        between: [number, number];
+      }[];
       mode?: 'steps' | 'trending' | 'time_to_convert';
       period?: string;
       start?: string;
       end?: string;
+      global_filters?: { property: string; operator: string; value: string }[];
+      segments?: {
+        id: string;
+        name: string;
+        filters: { property: string; operator: string; value: string }[];
+        color: string;
+      }[];
     }
   ): Promise<{
     steps: { name: string; count: number; conversion_rate: number }[];
@@ -2689,6 +2718,13 @@ class ArgusService {
       p25_seconds: number;
       p75_seconds: number;
     };
+    segments?: {
+      id: string;
+      name: string;
+      color: string;
+      steps: { name: string; count: number; conversion_rate: number }[];
+      overall_conversion: number;
+    }[];
   }> {
     const response = await argusApi.post(
       `${ARGUS_BASE}/projects/${projectId}/analytics/funnels`,
@@ -2725,11 +2761,12 @@ class ArgusService {
         | 'property_sum'
         | 'property_avg';
       measurement_property?: string;
-      breakdown?: { property: string };
+      breakdown?: { properties: string[] };
       min_frequency?: number;
       period?: string;
       start?: string;
       end?: string;
+      global_filters?: { property: string; operator: string; value: string }[];
     }
   ): Promise<{
     cohorts: {
@@ -2737,6 +2774,11 @@ class ArgusService {
       cohort_size: number;
       retention: number[];
     }[];
+    breakdowns?: Record<string, {
+      cohort_date: string;
+      cohort_size: number;
+      retention: number[];
+    }[]>;
   }> {
     const response = await argusApi.post(
       `${ARGUS_BASE}/projects/${projectId}/analytics/retention`,
@@ -2755,12 +2797,13 @@ class ArgusService {
       steps_after?: number;
       depth?: number;
       view?: 'sankey' | 'top_paths';
-      breakdown?: { property: string };
+      breakdown?: { properties: string[] };
       exclude_events?: string[];
       period?: string;
       start?: string;
       end?: string;
       min_frequency?: number;
+      global_filters?: { property: string; operator: string; value: string }[];
     }
   ): Promise<{
     nodes: { id: string; count: number }[];

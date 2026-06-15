@@ -164,10 +164,24 @@ export const StepConnector = styled(Box, {
 /** Recharts tooltip content style */
 export const tooltipStyle = (isDark: boolean) => ({
   background: isDark ? '#1e1e2e' : '#fff',
+  color: isDark ? '#e4e4e7' : '#1a1a2e',
   border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
   borderRadius: 8,
   boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
   fontSize: 12,
+});
+
+/** Recharts tooltip item (series label + value) style */
+export const tooltipItemStyle = (isDark: boolean) => ({
+  color: isDark ? '#e4e4e7' : '#1a1a2e',
+  fontSize: 12,
+});
+
+/** Recharts tooltip label (x-axis category) style */
+export const tooltipLabelStyle = (isDark: boolean) => ({
+  color: isDark ? '#a1a1aa' : '#52525b',
+  fontSize: 11,
+  fontWeight: 600 as const,
 });
 
 /** Recharts grid stroke */

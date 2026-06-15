@@ -23,6 +23,31 @@ export interface EventCondition {
   value: string;
 }
 
+/** Persist migration: breakdownProperty (string) → breakdownProperties (string[]) */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function migrateBreakdown(persisted: any): any {
+  if (persisted && typeof persisted.breakdownProperty === 'string') {
+    persisted.breakdownProperties = persisted.breakdownProperty
+      ? [persisted.breakdownProperty]
+      : [];
+    delete persisted.breakdownProperty;
+  }
+  return persisted;
+}
+
+/** Persist migration: breakdownProperty (string) → breakdownProperties (string[]) and formula (string) → formulas (string[]) */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function migrateInsights(persisted: any): any {
+  if (persisted) {
+    persisted = migrateBreakdown(persisted);
+    if (typeof persisted.formula === 'string') {
+      persisted.formulas = persisted.formula ? [persisted.formula] : [];
+      delete persisted.formula;
+    }
+  }
+  return persisted;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    Insights Store
    ═══════════════════════════════════════════════════════════════════════ */
@@ -37,27 +62,27 @@ export interface InsightsEventEntry {
 interface InsightsState {
   dateRange: DateRangeValue;
   events: InsightsEventEntry[];
-  breakdownProperty: string;
+  breakdownProperties: string[];
   chartType: ChartType;
   comparePeriod: ComparePeriod;
-  formula: string;
+  formulas: string[];
 
   setDateRange: (v: DateRangeValue) => void;
   setEvents: (v: InsightsEventEntry[]) => void;
-  setBreakdownProperty: (v: string) => void;
+  setBreakdownProperties: (v: string[]) => void;
   setChartType: (v: ChartType) => void;
   setComparePeriod: (v: ComparePeriod) => void;
-  setFormula: (v: string) => void;
+  setFormulas: (v: string[]) => void;
   resetStore: () => void;
 }
 
 const INSIGHTS_DEFAULTS = {
   dateRange: { type: 'preset' as const, preset: '14d' },
   events: [{ name: '', aggregation: 'total' }] as InsightsEventEntry[],
-  breakdownProperty: '',
+  breakdownProperties: [] as string[],
   chartType: 'line' as ChartType,
   comparePeriod: '' as ComparePeriod,
-  formula: '',
+  formulas: [] as string[],
 };
 
 export const useInsightsStore = create<InsightsState>()(
@@ -66,22 +91,23 @@ export const useInsightsStore = create<InsightsState>()(
       ...INSIGHTS_DEFAULTS,
       setDateRange: (dateRange) => set({ dateRange }),
       setEvents: (events) => set({ events }),
-      setBreakdownProperty: (breakdownProperty) => set({ breakdownProperty }),
+      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
       setChartType: (chartType) => set({ chartType }),
       setComparePeriod: (comparePeriod) => set({ comparePeriod }),
-      setFormula: (formula) => set({ formula }),
+      setFormulas: (formulas) => set({ formulas }),
       resetStore: () => set({ ...INSIGHTS_DEFAULTS }),
     }),
     {
       name: 'argus-analytics-insights',
-      // Only persist query config, not results
+      version: 2,
+      migrate: (persisted) => migrateInsights(persisted) as InsightsState,
       partialize: (state) => ({
         dateRange: state.dateRange,
         events: state.events,
-        breakdownProperty: state.breakdownProperty,
+        breakdownProperties: state.breakdownProperties,
         chartType: state.chartType,
         comparePeriod: state.comparePeriod,
-        formula: state.formula,
+        formulas: state.formulas,
       }),
     }
   )
@@ -96,9 +122,21 @@ export interface FunnelStepEntry {
   conditions?: EventCondition[];
 }
 
+export interface FunnelExclusionStep {
+  event_name: string;
+  between: [number, number]; // [afterStepIdx, beforeStepIdx] (0-indexed)
+}
+
 type FunnelViewMode = 'steps' | 'trending' | 'time_to_convert';
 
 type FunnelChartLayout = 'horizontal' | 'vertical';
+
+export interface FunnelSegment {
+  id: string;
+  name: string;
+  filters: { property: string; operator: string; value: string }[];
+  color: string;
+}
 
 interface FunnelsState {
   dateRange: DateRangeValue;
@@ -109,7 +147,10 @@ interface FunnelsState {
   ordering: 'specific' | 'any';
   counting: 'uniques' | 'totals';
   holdConstant: string[];
-  breakdownProperty: string;
+  breakdownProperties: string[];
+  exclusionSteps: FunnelExclusionStep[];
+  segments: FunnelSegment[];
+  compareMode: boolean;
 
   setDateRange: (v: DateRangeValue) => void;
   setSteps: (v: FunnelStepEntry[]) => void;
@@ -119,7 +160,10 @@ interface FunnelsState {
   setOrdering: (v: 'specific' | 'any') => void;
   setCounting: (v: 'uniques' | 'totals') => void;
   setHoldConstant: (v: string[]) => void;
-  setBreakdownProperty: (v: string) => void;
+  setBreakdownProperties: (v: string[]) => void;
+  setExclusionSteps: (v: FunnelExclusionStep[]) => void;
+  setSegments: (v: FunnelSegment[]) => void;
+  setCompareMode: (v: boolean) => void;
   resetStore: () => void;
 }
 
@@ -132,7 +176,10 @@ const FUNNELS_DEFAULTS = {
   ordering: 'specific' as const,
   counting: 'uniques' as const,
   holdConstant: [] as string[],
-  breakdownProperty: '',
+  breakdownProperties: [] as string[],
+  exclusionSteps: [] as FunnelExclusionStep[],
+  segments: [] as FunnelSegment[],
+  compareMode: false,
 };
 
 export const useFunnelsStore = create<FunnelsState>()(
@@ -147,11 +194,16 @@ export const useFunnelsStore = create<FunnelsState>()(
       setOrdering: (ordering) => set({ ordering }),
       setCounting: (counting) => set({ counting }),
       setHoldConstant: (holdConstant) => set({ holdConstant }),
-      setBreakdownProperty: (breakdownProperty) => set({ breakdownProperty }),
+      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
+      setExclusionSteps: (exclusionSteps) => set({ exclusionSteps }),
+      setSegments: (segments) => set({ segments }),
+      setCompareMode: (compareMode) => set({ compareMode }),
       resetStore: () => set({ ...FUNNELS_DEFAULTS }),
     }),
     {
       name: 'argus-analytics-funnels',
+      version: 2,
+      migrate: (persisted) => migrateBreakdown(persisted) as FunnelsState,
       partialize: (state) => ({
         dateRange: state.dateRange,
         steps: state.steps,
@@ -161,7 +213,10 @@ export const useFunnelsStore = create<FunnelsState>()(
         ordering: state.ordering,
         counting: state.counting,
         holdConstant: state.holdConstant,
-        breakdownProperty: state.breakdownProperty,
+        breakdownProperties: state.breakdownProperties,
+        exclusionSteps: state.exclusionSteps,
+        segments: state.segments,
+        compareMode: state.compareMode,
       }),
     }
   )
@@ -191,7 +246,7 @@ interface RetentionState {
     | 'property_avg';
   measurementProperty: string;
   minFrequency: number;
-  breakdownProperty: string;
+  breakdownProperties: string[];
   viewMode: RetentionViewMode;
 
   setDateRange: (v: DateRangeValue) => void;
@@ -202,7 +257,7 @@ interface RetentionState {
   setMeasurement: (v: RetentionState['measurement']) => void;
   setMeasurementProperty: (v: string) => void;
   setMinFrequency: (v: number) => void;
-  setBreakdownProperty: (v: string) => void;
+  setBreakdownProperties: (v: string[]) => void;
   setViewMode: (v: RetentionViewMode) => void;
   resetStore: () => void;
 }
@@ -216,7 +271,7 @@ const RETENTION_DEFAULTS = {
   measurement: 'retention_rate' as const,
   measurementProperty: '',
   minFrequency: 1,
-  breakdownProperty: '',
+  breakdownProperties: [] as string[],
   viewMode: 'curve' as RetentionViewMode,
 };
 
@@ -233,12 +288,14 @@ export const useRetentionStore = create<RetentionState>()(
       setMeasurementProperty: (measurementProperty) =>
         set({ measurementProperty }),
       setMinFrequency: (minFrequency) => set({ minFrequency }),
-      setBreakdownProperty: (breakdownProperty) => set({ breakdownProperty }),
+      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
       setViewMode: (viewMode) => set({ viewMode }),
       resetStore: () => set({ ...RETENTION_DEFAULTS }),
     }),
     {
       name: 'argus-analytics-retention',
+      version: 2,
+      migrate: (persisted) => migrateBreakdown(persisted) as RetentionState,
       partialize: (state) => ({
         dateRange: state.dateRange,
         cohortEvent: state.cohortEvent,
@@ -248,7 +305,7 @@ export const useRetentionStore = create<RetentionState>()(
         measurement: state.measurement,
         measurementProperty: state.measurementProperty,
         minFrequency: state.minFrequency,
-        breakdownProperty: state.breakdownProperty,
+        breakdownProperties: state.breakdownProperties,
         viewMode: state.viewMode,
       }),
     }
@@ -272,7 +329,7 @@ interface FlowsState {
   depth: number;
   viewMode: FlowViewMode;
   excludeEvents: string[];
-  breakdownProperty: string;
+  breakdownProperties: string[];
 
   setDateRange: (v: DateRangeValue) => void;
   setAnchorEventA: (v: string) => void;
@@ -284,7 +341,7 @@ interface FlowsState {
   setDepth: (v: number) => void;
   setViewMode: (v: FlowViewMode) => void;
   setExcludeEvents: (v: string[]) => void;
-  setBreakdownProperty: (v: string) => void;
+  setBreakdownProperties: (v: string[]) => void;
   resetStore: () => void;
 }
 
@@ -299,7 +356,7 @@ const FLOWS_DEFAULTS = {
   depth: 4,
   viewMode: 'sankey' as FlowViewMode,
   excludeEvents: [] as string[],
-  breakdownProperty: '',
+  breakdownProperties: [] as string[],
 };
 
 export const useFlowsStore = create<FlowsState>()(
@@ -316,11 +373,13 @@ export const useFlowsStore = create<FlowsState>()(
       setDepth: (depth) => set({ depth }),
       setViewMode: (viewMode) => set({ viewMode }),
       setExcludeEvents: (excludeEvents) => set({ excludeEvents }),
-      setBreakdownProperty: (breakdownProperty) => set({ breakdownProperty }),
+      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
       resetStore: () => set({ ...FLOWS_DEFAULTS }),
     }),
     {
       name: 'argus-analytics-flows',
+      version: 2,
+      migrate: (persisted) => migrateBreakdown(persisted) as FlowsState,
       partialize: (state) => ({
         dateRange: state.dateRange,
         anchorEventA: state.anchorEventA,
@@ -332,7 +391,7 @@ export const useFlowsStore = create<FlowsState>()(
         depth: state.depth,
         viewMode: state.viewMode,
         excludeEvents: state.excludeEvents,
-        breakdownProperty: state.breakdownProperty,
+        breakdownProperties: state.breakdownProperties,
       }),
     }
   )

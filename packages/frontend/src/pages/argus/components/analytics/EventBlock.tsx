@@ -11,6 +11,7 @@ import {
   Close as CloseIcon,
   DragIndicator as DragIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 export interface EventBlockProps {
   /** The letter index, e.g., 'A', 'B' */
@@ -40,12 +41,15 @@ const EventBlock: React.FC<EventBlockProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { t } = useTranslation();
 
   return (
     <Box
       sx={{
         display: 'flex',
         alignItems: 'flex-start',
+        position: 'relative',
+        zIndex: 2,
         gap: 1,
         p: 1.5,
         borderRadius: 2,
@@ -128,7 +132,7 @@ const EventBlock: React.FC<EventBlockProps> = ({
 
       {/* Remove Button */}
       {onRemove && (
-        <Tooltip title="Remove">
+        <Tooltip title={t('common.remove', 'Remove')}>
           <IconButton
             size="small"
             onClick={onRemove}

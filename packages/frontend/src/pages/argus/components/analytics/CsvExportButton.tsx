@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface CsvColumn {
   key: string;
@@ -36,6 +37,7 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { t } = useTranslation();
 
   const handleExport = useCallback(() => {
     if (!data || data.length === 0) return;
@@ -66,7 +68,7 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({
   }, [data, filename, columns]);
 
   return (
-    <Tooltip title="Export CSV" arrow>
+    <Tooltip title={t('argus.analytics.exportCsv', 'Export CSV')} arrow>
       <span>
         <IconButton
           size="small"

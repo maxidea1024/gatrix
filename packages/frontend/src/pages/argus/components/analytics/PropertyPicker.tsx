@@ -15,8 +15,11 @@ import {
   alpha,
   Chip,
   CircularProgress,
+  Checkbox,
+  Button,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+import { Search as SearchIcon, Close as CloseIcon, Add as AddIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import argusService from '@/services/argusService';
 
 interface PropertyOption {
@@ -28,15 +31,29 @@ interface PropertyOption {
 interface PropertyPickerProps {
   projectId: string | number;
   eventName?: string;
-  value: string;
-  onChange: (value: string) => void;
+  value: string[];
+  onChange: (value: string[]) => void;
   /** Placeholder label when no value selected */
   emptyLabel?: string;
   /** If true, show highlight when empty */
   highlightEmpty?: boolean;
+  /** Maximum number of properties allowed (default: 3) */
+  maxItems?: number;
+  /** Styling variant */
+  variant?: 'button' | 'text';
 }
 
-const BUILTIN_LABELS: Record<string, string> = {
+const BUILTIN_KEYS: Record<string, string> = {
+  platform: 'argus.analytics.prop.platform',
+  environment: 'argus.analytics.prop.environment',
+  release: 'argus.analytics.prop.release',
+  country: 'argus.analytics.prop.country',
+  city: 'argus.analytics.prop.city',
+  os: 'argus.analytics.prop.os',
+  app_version: 'argus.analytics.prop.appVersion',
+};
+
+const BUILTIN_DEFAULTS: Record<string, string> = {
   platform: 'Platform',
   environment: 'Environment',
   release: 'Release',
@@ -51,12 +68,26 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
   eventName,
   value,
   onChange,
-  emptyLabel = 'Select Property',
+  emptyLabel: emptyLabelProp,
   highlightEmpty = false,
+  maxItems = 3,
+  variant = 'button',
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const anchorRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+  const anchorRef = useRef<any>(null);
+
+  const emptyLabel = emptyLabelProp ?? t('argus.analytics.selectProperty', 'Select Property');
+
+  /** Translate a builtin property key at render time */
+  const getBuiltinLabel = useCallback(
+    (key: string) => {
+      const i18nKey = BUILTIN_KEYS[key];
+      return i18nKey ? t(i18nKey, BUILTIN_DEFAULTS[key] || key) : key;
+    },
+    [t]
+  );
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -68,8 +99,8 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
     setLoading(true);
     try {
       // Always include builtin columns
-      const builtinProps: PropertyOption[] = Object.entries(BUILTIN_LABELS).map(
-        ([key, label]) => ({ key, type: 'builtin' as const, label })
+      const builtinProps: PropertyOption[] = Object.keys(BUILTIN_KEYS).map(
+        (key) => ({ key, type: 'builtin' as const, label: BUILTIN_DEFAULTS[key] })
       );
 
       // Always call API - when eventName is undefined, backend returns all project properties
@@ -93,10 +124,10 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
     } catch {
       // Fallback to builtin only
       setProperties(
-        Object.entries(BUILTIN_LABELS).map(([key, label]) => ({
+        Object.keys(BUILTIN_KEYS).map((key) => ({
           key,
           type: 'builtin' as const,
-          label,
+          label: BUILTIN_DEFAULTS[key],
         }))
       );
     } finally {
@@ -132,47 +163,123 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
     return groups;
   }, [filtered]);
 
-  const displayLabel = value ? BUILTIN_LABELS[value] || value : emptyLabel;
+  const isSelected = useCallback(
+    (key: string) => value.includes(key),
+    [value]
+  );
 
-  const isEmpty = !value;
+  const toggleProperty = useCallback(
+    (key: string) => {
+      if (value.includes(key)) {
+        onChange(value.filter((v) => v !== key));
+      } else if (value.length < maxItems) {
+        onChange([...value, key]);
+      }
+    },
+    [value, onChange, maxItems]
+  );
+
+  const removeProperty = useCallback(
+    (key: string) => {
+      onChange(value.filter((v) => v !== key));
+    },
+    [value, onChange]
+  );
+
+  const clearAll = useCallback(() => {
+    onChange([]);
+  }, [onChange]);
+
+  const isEmpty = value.length === 0;
+  const isMaxed = value.length >= maxItems;
 
   return (
     <>
-      <Box
-        ref={anchorRef}
-        onClick={() => setOpen(true)}
-        sx={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          cursor: 'pointer',
-          px: 1,
-          py: 0.25,
-          borderRadius: 1,
-          fontSize: '0.8rem',
-          fontWeight: 500,
-          color:
-            isEmpty && highlightEmpty ? theme.palette.primary.main : 'inherit',
-          border: `1px solid ${
-            isEmpty && highlightEmpty
-              ? alpha(theme.palette.primary.main, 0.3)
-              : isDark
-                ? 'rgba(255,255,255,0.08)'
-                : 'rgba(0,0,0,0.08)'
-          }`,
-          background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-          '&:hover': {
-            background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-            borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
-          },
-          transition: 'all 0.15s ease',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          maxWidth: 200,
-        }}
-      >
-        {displayLabel}
-      </Box>
+      {variant === 'text' && isEmpty ? (
+        <Button
+          ref={anchorRef}
+          size="small"
+          startIcon={<AddIcon sx={{ fontSize: 14 }} />}
+          onClick={() => setOpen(true)}
+          sx={{
+            justifyContent: 'flex-start',
+            color: 'text.secondary',
+            textTransform: 'none',
+            borderRadius: 2,
+            pl: 0.5,
+            fontSize: '0.8rem',
+            width: 'fit-content',
+            minWidth: 0,
+            '&:hover': {
+              background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+            },
+          }}
+        >
+          {emptyLabel}
+        </Button>
+      ) : (
+        <Box
+          ref={anchorRef}
+          onClick={() => setOpen(true)}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.5,
+            cursor: 'pointer',
+            px: 1,
+            py: 0.25,
+            borderRadius: 1,
+            fontSize: '0.8rem',
+            fontWeight: 500,
+            color:
+              isEmpty && highlightEmpty ? theme.palette.primary.main : 'inherit',
+            border: `1px solid ${
+              isEmpty && highlightEmpty
+                ? alpha(theme.palette.primary.main, 0.3)
+                : isDark
+                  ? 'rgba(255,255,255,0.08)'
+                  : 'rgba(0,0,0,0.08)'
+            }`,
+            background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+            '&:hover': {
+              background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+              borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+            },
+            transition: 'all 0.15s ease',
+            flexWrap: 'wrap',
+            maxWidth: 400,
+          }}
+        >
+          {isEmpty ? (
+            <span>{emptyLabel}</span>
+          ) : (
+            value.map((key) => (
+              <Chip
+                key={key}
+                label={getBuiltinLabel(key)}
+                size="small"
+                onDelete={(e) => {
+                  e.stopPropagation();
+                  removeProperty(key);
+                }}
+                deleteIcon={<CloseIcon sx={{ fontSize: '14px !important' }} />}
+                sx={{
+                  height: 20,
+                  fontSize: '0.72rem',
+                  fontWeight: 500,
+                  bgcolor: alpha(theme.palette.primary.main, isDark ? 0.15 : 0.08),
+                  color: theme.palette.primary.main,
+                  '& .MuiChip-deleteIcon': {
+                    fontSize: 14,
+                    color: alpha(theme.palette.primary.main, 0.6),
+                    '&:hover': { color: theme.palette.primary.main },
+                  },
+                }}
+              />
+            ))
+          )}
+        </Box>
+      )}
 
       <Popover
         open={open}
@@ -186,8 +293,8 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
         slotProps={{
           paper: {
             sx: {
-              width: 280,
-              maxHeight: 400,
+              width: 300,
+              maxHeight: 440,
               mt: 0.5,
               borderRadius: 2,
               border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
@@ -208,7 +315,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
           <TextField
             size="small"
             fullWidth
-            placeholder="Search properties..."
+            placeholder={t('argus.analytics.searchProperties', 'Search properties...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             autoFocus
@@ -222,6 +329,61 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
             }}
           />
         </Box>
+
+        {/* Selected chips + clear */}
+        {!isEmpty && (
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.75,
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              alignItems: 'center',
+              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            }}
+          >
+            {value.map((key) => (
+              <Chip
+                key={key}
+                label={getBuiltinLabel(key)}
+                size="small"
+                onDelete={() => removeProperty(key)}
+                deleteIcon={<CloseIcon sx={{ fontSize: '14px !important' }} />}
+                sx={{
+                  height: 20,
+                  fontSize: '0.7rem',
+                  bgcolor: alpha(theme.palette.primary.main, isDark ? 0.15 : 0.08),
+                  color: theme.palette.primary.main,
+                  '& .MuiChip-deleteIcon': {
+                    fontSize: 14,
+                    color: alpha(theme.palette.primary.main, 0.5),
+                  },
+                }}
+              />
+            ))}
+            <Typography
+              variant="caption"
+              onClick={clearAll}
+              sx={{
+                cursor: 'pointer',
+                color: 'error.main',
+                fontSize: '0.65rem',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              {t('common.remove', 'Clear')}
+            </Typography>
+            {isMaxed && (
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.disabled', fontSize: '0.65rem', ml: 'auto' }}
+              >
+                {t('argus.analytics.maxBreakdowns', 'Max {{max}}', { max: maxItems })}
+              </Typography>
+            )}
+          </Box>
+        )}
 
         {/* Options */}
         <Box sx={{ overflowY: 'auto', maxHeight: 320, py: 0.5 }}>
@@ -239,14 +401,14 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                 opacity: 0.5,
               }}
             >
-              No properties found
+              {t('argus.analytics.noPropertiesFound', 'No properties found')}
             </Typography>
           ) : (
             <>
-              {/* None option */}
+              {/* None option — clear all */}
               <Box
                 onClick={() => {
-                  onChange('');
+                  clearAll();
                   setOpen(false);
                   setSearch('');
                 }}
@@ -264,7 +426,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                   },
                 }}
               >
-                None
+                {t('common.none', 'None')}
               </Box>
 
               {(['builtin', 'string', 'numeric'] as const).map((groupType) => {
@@ -272,10 +434,10 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                 if (!items || items.length === 0) return null;
                 const groupLabel =
                   groupType === 'builtin'
-                    ? 'Built-in'
+                    ? t('argus.analytics.groupBuiltin', 'Built-in')
                     : groupType === 'string'
-                      ? 'Custom (String)'
-                      : 'Custom (Numeric)';
+                      ? t('argus.analytics.groupCustomString', 'Custom (String)')
+                      : t('argus.analytics.groupCustomNumeric', 'Custom (Numeric)');
 
                 return (
                   <React.Fragment key={groupType}>
@@ -295,61 +457,75 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                     >
                       {groupLabel}
                     </Typography>
-                    {items.map((prop) => (
-                      <Box
-                        key={prop.key}
-                        onClick={() => {
-                          onChange(prop.key);
-                          setOpen(false);
-                          setSearch('');
-                        }}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          px: 1.5,
-                          py: 0.75,
-                          cursor: 'pointer',
-                          fontSize: '0.8rem',
-                          fontWeight: value === prop.key ? 600 : 400,
-                          color:
-                            value === prop.key
-                              ? 'primary.main'
-                              : 'text.primary',
-                          bgcolor:
-                            value === prop.key
+                    {items.map((prop) => {
+                      const selected = isSelected(prop.key);
+                      const disabled = !selected && isMaxed;
+                      return (
+                        <Box
+                          key={prop.key}
+                          onClick={() => {
+                            if (!disabled) toggleProperty(prop.key);
+                          }}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            px: 1,
+                            py: 0.5,
+                            cursor: disabled ? 'not-allowed' : 'pointer',
+                            fontSize: '0.8rem',
+                            fontWeight: selected ? 600 : 400,
+                            opacity: disabled ? 0.4 : 1,
+                            color: selected ? 'primary.main' : 'text.primary',
+                            bgcolor: selected
                               ? alpha(
                                   theme.palette.primary.main,
                                   isDark ? 0.1 : 0.05
                                 )
                               : 'transparent',
-                          '&:hover': {
-                            bgcolor: isDark
-                              ? 'rgba(255,255,255,0.04)'
-                              : 'rgba(0,0,0,0.04)',
-                          },
-                        }}
-                      >
-                        <span>{prop.label || prop.key}</span>
-                        {groupType !== 'builtin' && (
-                          <Chip
-                            label={groupType === 'string' ? 'Str' : 'Num'}
+                            '&:hover': {
+                              bgcolor: disabled
+                                ? 'transparent'
+                                : isDark
+                                  ? 'rgba(255,255,255,0.04)'
+                                  : 'rgba(0,0,0,0.04)',
+                            },
+                          }}
+                        >
+                          <Checkbox
+                            checked={selected}
+                            disabled={disabled}
                             size="small"
                             sx={{
-                              height: 16,
-                              fontSize: '0.6rem',
-                              fontWeight: 600,
-                              bgcolor: alpha(
-                                groupType === 'string' ? '#3b82f6' : '#f59e0b',
-                                isDark ? 0.15 : 0.1
-                              ),
-                              color:
-                                groupType === 'string' ? '#3b82f6' : '#f59e0b',
+                              p: 0.25,
+                              mr: 0.75,
+                              '& .MuiSvgIcon-root': { fontSize: 16 },
                             }}
                           />
-                        )}
-                      </Box>
-                    ))}
+                          <span style={{ flex: 1 }}>
+                            {prop.type === 'builtin'
+                              ? getBuiltinLabel(prop.key)
+                              : (prop.label || prop.key)}
+                          </span>
+                          {groupType !== 'builtin' && (
+                            <Chip
+                              label={groupType === 'string' ? 'Str' : 'Num'}
+                              size="small"
+                              sx={{
+                                height: 16,
+                                fontSize: '0.6rem',
+                                fontWeight: 600,
+                                bgcolor: alpha(
+                                  groupType === 'string' ? '#3b82f6' : '#f59e0b',
+                                  isDark ? 0.15 : 0.1
+                                ),
+                                color:
+                                  groupType === 'string' ? '#3b82f6' : '#f59e0b',
+                              }}
+                            />
+                          )}
+                        </Box>
+                      );
+                    })}
                   </React.Fragment>
                 );
               })}

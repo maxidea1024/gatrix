@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import { Box, TextField, Typography, useTheme, alpha } from '@mui/material';
+import { Box, TextField, Typography, useTheme, alpha, InputAdornment } from '@mui/material';
 import { Functions as FxIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 interface FormulaInputProps {
   value: string;
@@ -26,26 +27,32 @@ export function validateFormula(
   for (const ch of formula) {
     if (ch === '(') depth++;
     if (ch === ')') depth--;
-    if (depth < 0) return 'Unmatched closing parenthesis';
+    if (depth < 0) return 'formula_unmatched_close';
   }
-  if (depth !== 0) return 'Unmatched opening parenthesis';
+  if (depth !== 0) return 'formula_unmatched_open';
 
   // Check for valid tokens: labels, numbers, operators, parentheses, whitespace
   const tokenPattern = /^[\s]*([A-Z]|[0-9]+\.?[0-9]*|[+\-*/()]|[\s])+[\s]*$/;
   if (!tokenPattern.test(formula)) {
-    return 'Invalid characters in formula';
+    return 'formula_invalid_chars';
   }
 
   // Check that all letter references exist in availableLabels
   const referencedLabels = formula.match(/[A-Z]/g) || [];
   for (const label of referencedLabels) {
     if (!availableLabels.includes(label)) {
-      return `Unknown metric "${label}". Available: ${availableLabels.join(', ')}`;
+      return `formula_unknown_metric:${label}:${availableLabels.join(',')}`;
     }
   }
 
   return '';
 }
+
+const FORMULA_ERROR_MAP: Record<string, string> = {
+  formula_unmatched_close: 'argus.analytics.formulaUnmatchedClose',
+  formula_unmatched_open: 'argus.analytics.formulaUnmatchedOpen',
+  formula_invalid_chars: 'argus.analytics.formulaInvalidChars',
+};
 
 const FormulaInput: React.FC<FormulaInputProps> = ({
   value,
@@ -55,11 +62,27 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { t } = useTranslation();
 
-  const validationError = useMemo(
+  const rawError = useMemo(
     () => externalError || validateFormula(value, availableLabels),
     [value, availableLabels, externalError]
   );
+
+  // Translate validation error keys
+  const validationError = useMemo(() => {
+    if (!rawError) return '';
+    if (rawError.startsWith('formula_unknown_metric:')) {
+      const parts = rawError.split(':');
+      return t('argus.analytics.formulaUnknownMetric', 'Unknown metric "{{label}}". Available: {{available}}', {
+        label: parts[1],
+        available: parts[2]?.replace(/,/g, ', ') || '',
+      });
+    }
+    const key = FORMULA_ERROR_MAP[rawError];
+    if (key) return t(key, rawError);
+    return rawError;
+  }, [rawError, t]);
 
   const hasError = !!validationError && value.trim().length > 0;
 
@@ -71,15 +94,6 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
         gap: 0.5,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <FxIcon sx={{ fontSize: 16, color: '#8b5cf6', opacity: 0.8 }} />
-        <Typography
-          variant="caption"
-          sx={{ fontWeight: 600, color: '#8b5cf6', fontSize: '0.7rem' }}
-        >
-          Formula
-        </Typography>
-      </Box>
       <TextField
         size="small"
         fullWidth
@@ -89,6 +103,11 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
         error={hasError}
         helperText={hasError ? validationError : undefined}
         InputProps={{
+          startAdornment: (
+            <InputAdornment position="start" sx={{ mr: 0.5 }}>
+              <FxIcon sx={{ fontSize: 16, color: '#8b5cf6', opacity: 0.8 }} />
+            </InputAdornment>
+          ),
           sx: {
             fontSize: '0.85rem',
             fontWeight: 500,
@@ -102,6 +121,7 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
                 : alpha('#8b5cf6', isDark ? 0.2 : 0.15)
             }`,
             borderRadius: 1.5,
+            pl: 1,
             '& fieldset': { border: 'none' },
             '&:hover': {
               borderColor: hasError

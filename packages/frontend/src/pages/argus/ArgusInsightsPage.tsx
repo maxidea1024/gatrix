@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -8,11 +8,16 @@ import {
   alpha,
   Divider,
   IconButton,
+  CircularProgress,
+  Menu,
+  MenuItem,
+  ListSubheader,
 } from '@mui/material';
 import {
   Add as AddIcon,
   PlayArrow as RunIcon,
   Close as CloseIcon,
+  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -44,9 +49,11 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   Legend,
+  ReferenceArea,
 } from 'recharts';
 import PageHeader from '@/components/common/PageHeader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
+import { ArgusAnalyticsDrilldownDrawer } from './components/analytics/ArgusAnalyticsDrilldownDrawer';
 import DateRangeSelector, {
   DateRangeValue,
   dateRangeToApiParams,
@@ -54,12 +61,13 @@ import DateRangeSelector, {
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import argusService from '@/services/argusService';
-import { useFormulaEngine } from '@/pages/argus/hooks/useFormulaEngine';
+import { useFormulaEngine, evaluateFormula } from '@/pages/argus/hooks/useFormulaEngine';
 import {
   useInsightsStore,
   type InsightsEventEntry,
   type EventCondition,
 } from '@/hooks/useAnalyticsStore';
+import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
 
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
@@ -68,6 +76,7 @@ import ChartTypeSelector, {
   ChartType,
 } from './components/analytics/ChartTypeSelector';
 import PropertyPicker from './components/analytics/PropertyPicker';
+import PropertyValueInput from './components/analytics/PropertyValueInput';
 import CsvExportButton from './components/analytics/CsvExportButton';
 import CompareSelector, {
   ComparePeriod,
@@ -80,6 +89,7 @@ import {
 } from './components/analytics/useBreakdownLimit';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { formatBreakdownLabel } from './components/analytics/breakdownUtils';
 
 /* ─── Types ─── */
 
@@ -118,18 +128,6 @@ const SortableEventWrapper: React.FC<{
 
 /* ─── Constants ─── */
 
-const AGGREGATIONS = [
-  { value: 'total', label: 'Total Count' },
-  { value: 'unique', label: 'Unique Users' },
-  { value: 'frequency', label: 'Frequency per User' },
-  { value: 'avg', label: 'Average' },
-  { value: 'median', label: 'Median' },
-  { value: 'sum', label: 'Sum' },
-  { value: 'p25', label: 'P25 (25th percentile)' },
-  { value: 'p75', label: 'P75 (75th percentile)' },
-  { value: 'p90', label: 'P90 (90th percentile)' },
-];
-
 const PROPERTY_AGGREGATIONS = new Set([
   'avg',
   'median',
@@ -138,19 +136,6 @@ const PROPERTY_AGGREGATIONS = new Set([
   'p75',
   'p90',
 ]);
-
-const OPERATORS = [
-  { value: 'is', label: 'is' },
-  { value: 'is_not', label: 'is not' },
-  { value: 'contains', label: 'contains' },
-  { value: 'not_contains', label: 'does not contain' },
-  { value: 'gt', label: '>' },
-  { value: 'lt', label: '<' },
-  { value: 'gte', label: '≥' },
-  { value: 'lte', label: '≤' },
-  { value: 'set', label: 'is set' },
-  { value: 'not_set', label: 'is not set' },
-];
 
 const SERIES_COLORS = [
   '#6366f1',
@@ -165,6 +150,14 @@ const SERIES_COLORS = [
 
 const COMPARE_DASH = '6 4';
 
+const FORMULA_COLORS = [
+  '#8b5cf6',
+  '#d946ef',
+  '#ec4899',
+  '#f43f5e',
+  '#a855f7',
+];
+
 /* ─── Component ─── */
 
 const ArgusInsightsPage: React.FC = () => {
@@ -175,19 +168,45 @@ const ArgusInsightsPage: React.FC = () => {
   const projectId = currentProject?.id || '1';
   const breakdownLimit = useBreakdownLimit(projectId);
 
+  const AGGREGATIONS = [
+    { value: 'total', label: t('argus.analytics.aggTotalCount', 'Total Count') },
+    { value: 'unique', label: t('argus.analytics.aggUniqueUsers', 'Unique Users') },
+    { value: 'frequency', label: t('argus.analytics.aggFrequency', 'Frequency per User') },
+    { value: 'avg', label: t('argus.analytics.aggAverage', 'Average') },
+    { value: 'median', label: t('argus.analytics.aggMedian', 'Median') },
+    { value: 'sum', label: t('argus.analytics.aggSum', 'Sum') },
+    { value: 'p25', label: t('argus.analytics.aggP25', 'P25 (25th percentile)') },
+    { value: 'p75', label: t('argus.analytics.aggP75', 'P75 (75th percentile)') },
+    { value: 'p90', label: t('argus.analytics.aggP90', 'P90 (90th percentile)') },
+  ];
+
+  const OPERATORS = [
+    { value: 'is', label: t('argus.analytics.op.is', 'is') },
+    { value: 'is_not', label: t('argus.analytics.op.isNot', 'is not') },
+    { value: 'contains', label: t('argus.analytics.op.contains', 'contains') },
+    { value: 'not_contains', label: t('argus.analytics.op.notContains', 'does not contain') },
+    { value: 'gt', label: '>' },
+    { value: 'lt', label: '<' },
+    { value: 'gte', label: '≥' },
+    { value: 'lte', label: '≤' },
+    { value: 'set', label: t('argus.analytics.op.isSet', 'is set') },
+    { value: 'not_set', label: t('argus.analytics.op.isNotSet', 'is not set') },
+  ];
+
   // ── Persisted State (survives refresh) ──
   const dateRange = useInsightsStore((s) => s.dateRange);
   const setDateRange = useInsightsStore((s) => s.setDateRange);
   const events = useInsightsStore((s) => s.events);
   const setEvents = useInsightsStore((s) => s.setEvents);
-  const breakdownProperty = useInsightsStore((s) => s.breakdownProperty);
-  const setBreakdownProperty = useInsightsStore((s) => s.setBreakdownProperty);
+  const breakdownProperties = useInsightsStore((s) => s.breakdownProperties);
+  const setBreakdownProperties = useInsightsStore((s) => s.setBreakdownProperties);
   const chartType = useInsightsStore((s) => s.chartType);
   const setChartType = useInsightsStore((s) => s.setChartType);
   const comparePeriod = useInsightsStore((s) => s.comparePeriod);
   const setComparePeriod = useInsightsStore((s) => s.setComparePeriod);
-  const formula = useInsightsStore((s) => s.formula);
-  const setFormula = useInsightsStore((s) => s.setFormula);
+  const formulas = useInsightsStore((s) => s.formulas);
+  const setFormulas = useInsightsStore((s) => s.setFormulas);
+  const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State (reset on refresh) ──
   const [availableEvents, setAvailableEvents] = useState<string[]>([]);
@@ -197,6 +216,58 @@ const ArgusInsightsPage: React.FC = () => {
   const [compareSeries, setCompareSeries] = useState<any[] | undefined>();
   const [queryLoading, setQueryLoading] = useState(false);
   const [hasQueried, setHasQueried] = useState(false);
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const [menuAnchor, setMenuAnchor] = useState<{ el: HTMLElement; idx: number } | null>(null);
+  const isInitialMount = useRef(true);
+  const lastExecutedKeyRef = useRef<string>('');
+
+  // Drilldown & Zoom state
+  const [drilldownOpen, setDrilldownOpen] = useState(false);
+  const [drilldownParams, setDrilldownParams] = useState<{
+    eventName: string;
+    dateRange: { start: Date; end: Date };
+    breakdownProperty?: string;
+    breakdownValue?: string;
+  } | null>(null);
+
+  const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null);
+  const [refAreaRight, setRefAreaRight] = useState<string | null>(null);
+
+  const handleZoom = useCallback(() => {
+    if (refAreaLeft === refAreaRight || !refAreaLeft || !refAreaRight) {
+      setRefAreaLeft(null);
+      setRefAreaRight(null);
+      return;
+    }
+
+    let left = refAreaLeft;
+    let right = refAreaRight;
+
+    if (new Date(left) > new Date(right)) {
+      left = refAreaRight;
+      right = refAreaLeft;
+    }
+
+    const start = new Date(left);
+    const end = new Date(right);
+    end.setHours(23, 59, 59, 999);
+
+    setDateRange({
+      type: 'custom',
+      start,
+      end,
+    });
+
+    setRefAreaLeft(null);
+    setRefAreaRight(null);
+  }, [refAreaLeft, refAreaRight, setDateRange]);
+
+
+
+  // Reset hidden keys when series changes
+  useEffect(() => {
+    setHiddenSeriesKeys(new Set());
+  }, [series]);
 
   // ── Fetch event names ──
   const fetchEventNames = useCallback(async () => {
@@ -253,6 +324,14 @@ const ArgusInsightsPage: React.FC = () => {
     },
     [events, eventIds, setEvents]
   );
+
+  const handleOpenMenu = useCallback((e: React.MouseEvent<HTMLElement>, idx: number) => {
+    setMenuAnchor({ el: e.currentTarget, idx });
+  }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    setMenuAnchor(null);
+  }, []);
 
   const handleAddCondition = useCallback(
     (eventIndex: number) => {
@@ -318,6 +397,17 @@ const ArgusInsightsPage: React.FC = () => {
     const validEvents = events.filter((e) => e.name);
     if (validEvents.length === 0) return;
 
+    const queryKey = JSON.stringify({
+      projectId,
+      events: validEvents,
+      breakdownProperties,
+      dateRange,
+      comparePeriod,
+      formulas,
+      globalFilters,
+    });
+    lastExecutedKeyRef.current = queryKey;
+
     setQueryLoading(true);
     setHasQueried(true);
     try {
@@ -329,13 +419,14 @@ const ArgusInsightsPage: React.FC = () => {
           property: e.property,
           conditions: e.conditions?.filter((c) => c.property),
         })),
-        breakdown: breakdownProperty
-          ? { property: breakdownProperty }
+        breakdown: breakdownProperties.length > 0
+          ? { properties: breakdownProperties }
           : undefined,
         period: apiParams.period,
         start: apiParams.start,
         end: apiParams.end,
         compare_period: comparePeriod || undefined,
+        global_filters: globalFilters.length > 0 ? globalFilters : undefined,
       });
       setSeries(limitBreakdownSeries(result.series || [], breakdownLimit));
       setCompareSeries(result.compare_series);
@@ -345,7 +436,44 @@ const ArgusInsightsPage: React.FC = () => {
     } finally {
       setQueryLoading(false);
     }
-  }, [events, dateRange, projectId, breakdownProperty, comparePeriod]);
+  }, [events, dateRange, projectId, breakdownProperties, comparePeriod, globalFilters, breakdownLimit]);
+
+  // Debounced auto-query running on settings change
+  useEffect(() => {
+    const validEvents = events.filter((e) => e.name);
+    if (validEvents.length === 0) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    const queryKey = JSON.stringify({
+      projectId,
+      events: validEvents,
+      breakdownProperties,
+      dateRange,
+      comparePeriod,
+      formulas,
+      globalFilters,
+    });
+
+    if (queryKey === lastExecutedKeyRef.current) {
+      return;
+    }
+
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      lastExecutedKeyRef.current = queryKey;
+      handleRunQuery();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      lastExecutedKeyRef.current = queryKey;
+      handleRunQuery();
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [events, breakdownProperties, dateRange, comparePeriod, formulas, globalFilters, projectId, handleRunQuery]);
 
   // ── Chart data ──
   const chartData = useMemo(() => {
@@ -353,7 +481,7 @@ const ArgusInsightsPage: React.FC = () => {
     const timeMap = new Map<string, Record<string, number>>();
     series.forEach((s) => {
       const key = s.breakdown_value
-        ? `${s.event}:${s.breakdown_value}`
+        ? `${s.event}:${formatBreakdownLabel(s.breakdown_value, breakdownProperties)}`
         : s.event;
       for (const point of s.data) {
         if (!timeMap.has(point.bucket)) timeMap.set(point.bucket, {});
@@ -370,15 +498,33 @@ const ArgusInsightsPage: React.FC = () => {
         }
       });
     }
+    // Collect all series keys to fill missing values with 0
+    const allKeys = new Set<string>();
+    series.forEach((s) => {
+      allKeys.add(s.breakdown_value
+        ? `${s.event}:${formatBreakdownLabel(s.breakdown_value, breakdownProperties)}`
+        : s.event);
+    });
+    if (compareSeries) {
+      compareSeries.forEach((s) => allKeys.add(`${s.event} (prev)`));
+    }
+
+    // Fill missing bucket values with 0 to prevent line gaps
     return Array.from(timeMap.entries())
       .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([bucket, values]) => ({ bucket: formatBucket(bucket), ...values }));
+      .map(([bucket, values]) => {
+        const filled: Record<string, any> = { bucket: formatBucket(bucket) };
+        for (const k of allKeys) {
+          filled[k] = values[k] ?? 0;
+        }
+        return filled;
+      });
   }, [series, compareSeries]);
 
   const seriesKeys = useMemo(() => {
     const keys = new Set<string>();
     series.forEach((s) => {
-      keys.add(s.breakdown_value ? `${s.event}:${s.breakdown_value}` : s.event);
+      keys.add(s.breakdown_value ? `${s.event}:${formatBreakdownLabel(s.breakdown_value, breakdownProperties)}` : s.event);
     });
     return Array.from(keys);
   }, [series]);
@@ -397,50 +543,130 @@ const ArgusInsightsPage: React.FC = () => {
 
   const formulaSeriesMap = useMemo(() => {
     const map: Record<string, { bucket: string; value: number }[]> = {};
-    series.forEach((s, idx) => {
+    series.forEach((s) => {
       if (!s.breakdown_value) {
-        const label = String.fromCharCode(65 + idx);
-        map[label] = s.data;
+        const idx = events.findIndex((e) => e.name === s.event);
+        if (idx !== -1) {
+          const label = String.fromCharCode(65 + idx);
+          map[label] = s.data;
+        }
       }
     });
     return map;
-  }, [series]);
+  }, [series, events]);
 
-  const formulaResult = useFormulaEngine(formula, formulaSeriesMap);
+  const formulaResults = useMemo(() => {
+    return formulas.map((f, index) => {
+      const res = evaluateFormula(f, formulaSeriesMap);
+      return {
+        formula: f,
+        key: f || `Formula ${index + 1}`,
+        result: res,
+      };
+    });
+  }, [formulas, formulaSeriesMap]);
+
+  const validFormulaResults = useMemo(() => {
+    return formulaResults.filter(
+      (r) => r.formula && !r.result.error && r.result.data.length > 0
+    );
+  }, [formulaResults]);
 
   // Add formula data to chartData
   const chartDataWithFormula = useMemo(() => {
-    if (!formula || formulaResult.error || formulaResult.data.length === 0)
-      return chartData;
-    const formulaMap = new Map<string, number>();
-    formulaResult.data.forEach((d) =>
-      formulaMap.set(formatBucket(d.bucket), d.value)
-    );
-    return chartData.map((row) => ({
-      ...row,
-      Formula: formulaMap.get(row.bucket) ?? 0,
-    }));
-  }, [chartData, formula, formulaResult]);
+    if (validFormulaResults.length === 0) return chartData;
 
-  // Use formula expression as the display key
-  const formulaDisplayKey = formula || 'Formula';
+    return chartData.map((row) => {
+      const updatedRow = { ...row };
+      validFormulaResults.forEach((r) => {
+        const point = r.result.data.find(
+          (d) => formatBucket(d.bucket) === row.bucket
+        );
+        updatedRow[r.key] = point ? point.value : 0;
+      });
+      return updatedRow;
+    });
+  }, [chartData, validFormulaResults]);
 
   const allSeriesKeys = useMemo(() => {
     const keys = [...seriesKeys, ...compareKeys];
-    if (formula && !formulaResult.error && formulaResult.data.length > 0) {
-      keys.push(formulaDisplayKey);
-    }
+    validFormulaResults.forEach((r) => {
+      keys.push(r.key);
+    });
     return keys;
-  }, [seriesKeys, compareKeys, formula, formulaResult, formulaDisplayKey]);
+  }, [seriesKeys, compareKeys, validFormulaResults]);
 
   // ── CSV data ──
   const csvData = useMemo(() => chartDataWithFormula, [chartDataWithFormula]);
+
+  const handleChartClick = useCallback((chartState: any) => {
+    if (!chartState || !chartState.activeLabel || !chartState.activePayload) return;
+    if (refAreaLeft && refAreaRight && refAreaLeft !== refAreaRight) {
+      return;
+    }
+
+    const bucket = chartState.activeLabel;
+    const activeItem = chartState.activePayload[0];
+    if (!activeItem) return;
+
+    const dataKey = String(activeItem.dataKey);
+    if (validFormulaResults.some((r) => r.key === dataKey) || dataKey.endsWith(' (prev)')) {
+      return;
+    }
+
+    let eventName = dataKey;
+    let bValue: string | undefined;
+
+    if (dataKey.includes(':')) {
+      const parts = dataKey.split(':');
+      eventName = parts[0];
+      bValue = parts[1];
+    }
+
+    const clickedDate = new Date(bucket);
+    const start = new Date(clickedDate.getFullYear(), clickedDate.getMonth(), clickedDate.getDate(), 0, 0, 0);
+    const end = new Date(clickedDate.getFullYear(), clickedDate.getMonth(), clickedDate.getDate(), 23, 59, 59);
+
+    setDrilldownParams({
+      eventName,
+      dateRange: { start, end },
+      breakdownProperty: breakdownProperties[0],
+      breakdownValue: bValue,
+    });
+    setDrilldownOpen(true);
+  }, [breakdownProperties, validFormulaResults, refAreaLeft, refAreaRight]);
 
   // Options
   const eventOptions = useMemo(
     () => availableEvents.map((name) => ({ value: name, label: name })),
     [availableEvents]
   );
+
+  const handleLegendClick = useCallback((e: any) => {
+    const { dataKey } = e;
+    setHiddenSeriesKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(dataKey)) {
+        next.delete(dataKey);
+      } else {
+        next.add(dataKey);
+      }
+      return next;
+    });
+  }, []);
+
+  const renderLegendText = useCallback((value: string, entry: any) => {
+    const isHidden = hiddenSeriesKeys.has(entry.dataKey || value);
+    return (
+      <span style={{
+        color: isHidden ? theme.palette.text.disabled : 'inherit',
+        textDecoration: isHidden ? 'line-through' : 'none',
+        cursor: 'pointer',
+      }}>
+        {value}
+      </span>
+    );
+  }, [hiddenSeriesKeys, theme]);
 
   // ── UI: Left Panel (Query Builder) ──
   const leftPanel = (
@@ -470,21 +696,16 @@ const ArgusInsightsPage: React.FC = () => {
                     <EventBlock
                       indexLabel={String.fromCharCode(65 + idx)}
                       color={SERIES_COLORS[idx % SERIES_COLORS.length]}
-                      onRemove={
-                        events.length > 1
-                          ? () => handleRemoveEvent(idx)
-                          : undefined
-                      }
                       dragHandleProps={dragHandleProps}
                       isDragging={isDragging}
                     >
-                      {/* Event name */}
+                      {/* Event name & Menu */}
                       <Box
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
-                          flexWrap: 'wrap',
-                          gap: 0.5,
+                          justifyContent: 'space-between',
+                          width: '100%',
                         }}
                       >
                         <InlineSelect
@@ -499,144 +720,136 @@ const ArgusInsightsPage: React.FC = () => {
                           )}
                           highlightEmpty
                         />
-                      </Box>
-
-                      {/* Measurement */}
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          pl: 0.5,
-                        }}
-                      >
-                        <Typography variant="caption" color="text.secondary">
-                          {t('argus.analytics.show', 'show')}
-                        </Typography>
-                        <InlineSelect
-                          value={ev.aggregation}
-                          onChange={(val) =>
-                            handleEventChange(idx, 'aggregation', val)
-                          }
-                          options={AGGREGATIONS}
-                        />
-                      </Box>
-
-                      {/* Property selector for aggregate measurements */}
-                      {PROPERTY_AGGREGATIONS.has(ev.aggregation) && (
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 0.5,
-                            pl: 0.5,
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenMenu(e, idx);
                           }}
+                          sx={{ opacity: 0.6, '&:hover': { opacity: 1 }, p: 0.25 }}
                         >
-                          <Typography variant="caption" color="text.secondary">
-                            of
+                          <MoreVertIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </Box>
+
+                      {/* Measurement summary text or property selector */}
+                      {ev.aggregation !== 'total' && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, pl: 0.5 }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                            {t('argus.analytics.show', 'show')}:
                           </Typography>
-                          <PropertyPicker
-                            projectId={projectId}
-                            eventName={ev.name}
-                            value={ev.property || ''}
-                            onChange={(val) =>
-                              handleEventChange(idx, 'property', val)
-                            }
-                            emptyLabel="Select Property"
-                            highlightEmpty
-                          />
+                          <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.7rem' }}>
+                            {AGGREGATIONS.find((a) => a.value === ev.aggregation)?.label || ev.aggregation}
+                          </Typography>
+                          {PROPERTY_AGGREGATIONS.has(ev.aggregation) && (
+                            <>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                {t('argus.analytics.of', 'of')}
+                              </Typography>
+                              <PropertyPicker
+                                projectId={projectId}
+                                eventName={ev.name}
+                                value={ev.property ? [ev.property] : []}
+                                onChange={(val) =>
+                                  handleEventChange(idx, 'property', val[0] || '')
+                                }
+                                emptyLabel={t('argus.analytics.selectProperty', 'Select Property')}
+                                highlightEmpty
+                                maxItems={1}
+                                variant="text"
+                              />
+                            </>
+                          )}
                         </Box>
                       )}
 
-                      {/* Conditions */}
-                      {ev.conditions?.map((cond, cIdx) => (
-                        <Box
-                          key={cIdx}
-                          sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            gap: 0.5,
-                            pl: 0.5,
-                          }}
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            {t('argus.analytics.where', 'where')}
-                          </Typography>
-                          <PropertyPicker
-                            projectId={projectId}
-                            eventName={ev.name}
-                            value={cond.property}
-                            onChange={(val) =>
-                              handleConditionChange(idx, cIdx, 'property', val)
-                            }
-                            emptyLabel={t(
-                              'argus.analytics.property',
-                              'Property'
-                            )}
-                            highlightEmpty
-                          />
-                          <InlineSelect
-                            value={cond.operator}
-                            onChange={(val) =>
-                              handleConditionChange(idx, cIdx, 'operator', val)
-                            }
-                            options={OPERATORS}
-                          />
-                          {!['set', 'not_set'].includes(cond.operator) && (
-                            <input
-                              value={cond.value}
-                              onChange={(e) =>
-                                handleConditionChange(
-                                  idx,
-                                  cIdx,
-                                  'value',
-                                  e.target.value
-                                )
-                              }
-                              placeholder="value"
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}`,
-                                color: 'inherit',
-                                outline: 'none',
-                                width: 80,
-                                fontSize: '0.8rem',
-                                fontFamily: 'inherit',
+                      {/* Conditions (Filters) */}
+                      {ev.conditions && ev.conditions.length > 0 && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          {ev.conditions.map((cond, cIdx) => (
+                            <Box
+                              key={cIdx}
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                gap: 0.5,
+                                pl: 0.5,
                               }}
-                            />
-                          )}
-                          <IconButton
+                            >
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                                {t('argus.analytics.where', 'where')}
+                              </Typography>
+                              <PropertyPicker
+                                projectId={projectId}
+                                eventName={ev.name}
+                                value={cond.property ? [cond.property] : []}
+                                onChange={(val) =>
+                                  handleConditionChange(idx, cIdx, 'property', val[0] || '')
+                                }
+                                emptyLabel={t(
+                                  'argus.analytics.property',
+                                  'Property'
+                                )}
+                                highlightEmpty
+                                maxItems={1}
+                                variant="text"
+                              />
+                              <InlineSelect
+                                value={cond.operator}
+                                onChange={(val) =>
+                                  handleConditionChange(idx, cIdx, 'operator', val)
+                                }
+                                options={OPERATORS}
+                              />
+                              {!['set', 'not_set'].includes(cond.operator) && (
+                                <Box sx={{ flex: 1, minWidth: 60 }}>
+                                  <PropertyValueInput
+                                    projectId={projectId}
+                                    property={cond.property}
+                                    value={cond.value}
+                                    onChange={(val) =>
+                                      handleConditionChange(
+                                        idx,
+                                        cIdx,
+                                        'value',
+                                        val
+                                      )
+                                    }
+                                  />
+                                </Box>
+                              )}
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRemoveCondition(idx, cIdx)}
+                                sx={{
+                                  p: 0.25,
+                                  ml: 0.5,
+                                  opacity: 0.6,
+                                  '&:hover': { opacity: 1 },
+                                }}
+                              >
+                                <CloseIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Box>
+                          ))}
+                          <Button
                             size="small"
-                            onClick={() => handleRemoveCondition(idx, cIdx)}
+                            onClick={() => handleAddCondition(idx)}
                             sx={{
-                              p: 0.25,
-                              ml: 0.5,
-                              opacity: 0.6,
-                              '&:hover': { opacity: 1 },
+                              alignSelf: 'flex-start',
+                              textTransform: 'none',
+                              opacity: 0.7,
+                              pl: 0.5,
+                              minWidth: 0,
+                              fontSize: '0.75rem',
+                              py: 0,
                             }}
                           >
-                            <CloseIcon sx={{ fontSize: 14 }} />
-                          </IconButton>
+                            {t('argus.analytics.filter', '+ Filter')}
+                          </Button>
                         </Box>
-                      ))}
-
-                      <Button
-                        size="small"
-                        onClick={() => handleAddCondition(idx)}
-                        sx={{
-                          alignSelf: 'flex-start',
-                          textTransform: 'none',
-                          opacity: 0.7,
-                          pl: 0.5,
-                          minWidth: 0,
-                          fontSize: '0.75rem',
-                          py: 0,
-                        }}
-                      >
-                        {t('argus.analytics.filter', '+ Filter')}
-                      </Button>
+                      )}
                     </EventBlock>
                   )}
                 </SortableEventWrapper>
@@ -664,48 +877,122 @@ const ArgusInsightsPage: React.FC = () => {
       <Divider sx={{ opacity: isDark ? 0.05 : 0.5 }} />
 
       {/* Formula Section */}
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
-        >
-          Formula
-        </Typography>
-        <Box sx={{ mt: 1 }}>
-          <FormulaInput
-            value={formula}
-            onChange={setFormula}
-            availableLabels={formulaLabels}
-          />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {formulas.length > 0 && (
+          <Typography
+            variant="overline"
+            sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+          >
+            {t('argus.analytics.formulas', 'Formulas')}
+          </Typography>
+        )}
+
+        <Box sx={{ pl: 1.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {formulas.map((form, idx) => (
+              <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
+                <Box sx={{ flex: 1 }}>
+                  <FormulaInput
+                    value={form}
+                    onChange={(val) => {
+                      const next = [...formulas];
+                      next[idx] = val;
+                      setFormulas(next);
+                    }}
+                    availableLabels={formulaLabels}
+                  />
+                </Box>
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    setFormulas(formulas.filter((_, i) => i !== idx));
+                  }}
+                  sx={{
+                    p: 0.25,
+                    opacity: 0.6,
+                    '&:hover': { opacity: 1 },
+                    mt: '6px', // Align with the center of the 36px high input field
+                  }}
+                >
+                  <CloseIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </Box>
+            ))}
+          </Box>
+
+          {formulas.length < 5 && (
+            <Button
+              size="small"
+              startIcon={<AddIcon sx={{ fontSize: 14 }} />}
+              onClick={() => setFormulas([...formulas, ''])}
+              sx={{
+                justifyContent: 'flex-start',
+                color: 'text.secondary',
+                textTransform: 'none',
+                borderRadius: 2,
+                pl: 0.5,
+                fontSize: '0.8rem',
+                width: 'fit-content',
+              }}
+            >
+              {t('argus.analytics.addFormula', 'Formula')}
+            </Button>
+          )}
         </Box>
       </Box>
 
       <Divider sx={{ opacity: isDark ? 0.05 : 0.5 }} />
 
       {/* Breakdown Section */}
-      <Box>
-        <Typography
-          variant="overline"
-          sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
-        >
-          {t('argus.analytics.breakdownBy', 'Breakdown By')}
-        </Typography>
-        <Box
-          sx={{
-            mt: 1,
-            p: 1.5,
-            borderRadius: 2,
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          }}
-        >
-          <PropertyPicker
-            projectId={projectId}
-            eventName={events[0]?.name}
-            value={breakdownProperty}
-            onChange={setBreakdownProperty}
-            emptyLabel={t('argus.analytics.noBreakdown', 'None')}
-          />
-        </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {breakdownProperties.length > 0 ? (
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Typography
+                variant="overline"
+                sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
+              >
+                {t('argus.analytics.breakdownBy', 'Breakdown By')}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setBreakdownProperties([])}
+                sx={{ p: 0.25, opacity: 0.6, '&:hover': { opacity: 1 } }}
+              >
+                <CloseIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            </Box>
+            <Box sx={{ pl: 1.5 }}>
+              <Box
+                sx={{
+                  mt: 0.5,
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                }}
+              >
+                <PropertyPicker
+                  projectId={projectId}
+                  eventName={events[0]?.name}
+                  value={breakdownProperties}
+                  onChange={setBreakdownProperties}
+                  emptyLabel={t('argus.analytics.noBreakdown', 'None')}
+                />
+              </Box>
+            </Box>
+          </Box>
+        ) : (
+          <Box sx={{ pl: 1.5 }}>
+            <PropertyPicker
+              projectId={projectId}
+              eventName={events[0]?.name}
+              value={breakdownProperties}
+              onChange={setBreakdownProperties}
+              emptyLabel={t('argus.analytics.addBreakdown', 'Breakdown')}
+              variant="text"
+            />
+          </Box>
+        )}
       </Box>
 
       <Box sx={{ mt: 'auto', pt: 2 }}>
@@ -713,7 +1000,7 @@ const ArgusInsightsPage: React.FC = () => {
           fullWidth
           variant="contained"
           size="small"
-          startIcon={<RunIcon />}
+          startIcon={queryLoading ? <CircularProgress size={16} color="inherit" /> : <RunIcon />}
           onClick={handleRunQuery}
           disabled={queryLoading || events.filter((e) => e.name).length === 0}
           sx={{ borderRadius: 1.5, textTransform: 'none', px: 2 }}
@@ -739,16 +1026,6 @@ const ArgusInsightsPage: React.FC = () => {
         filename="insights"
         disabled={chartDataWithFormula.length === 0}
       />
-      <Button
-        variant="contained"
-        size="small"
-        startIcon={<RunIcon />}
-        onClick={handleRunQuery}
-        disabled={queryLoading || events.every((e) => !e.name)}
-        sx={{ borderRadius: 1.5, textTransform: 'none', px: 2 }}
-      >
-        {t('argus.analytics.runQuery', 'Run Query')}
-      </Button>
     </>
   );
 
@@ -759,11 +1036,14 @@ const ArgusInsightsPage: React.FC = () => {
 
     const commonTooltipStyle = {
       background: isDark ? '#1e1e2e' : '#fff',
+      color: isDark ? '#e4e4e7' : '#1a1a2e',
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
       borderRadius: 8,
       boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
       fontSize: 12,
     };
+    const commonTooltipItemStyle = { color: isDark ? '#e4e4e7' : '#1a1a2e' };
+    const commonTooltipLabelStyle = { color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 };
 
     const gridStroke = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
     const tickStyle = { fontSize: 11, fill: theme.palette.text.secondary };
@@ -773,23 +1053,37 @@ const ArgusInsightsPage: React.FC = () => {
     }
 
     return (
-      <Box sx={{ height: 360, width: '100%', pr: 2 }}>
+      <Box sx={{ height: { xs: 360, md: '50vh' }, minHeight: 360, maxHeight: 600, width: '100%', pr: 2 }}>
         <ResponsiveContainer
           width="100%"
           height="100%"
           minWidth={0}
           minHeight={0}
+          debounce={100}
         >
           {chartType === 'line' ? (
             <LineChart
               data={data}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              onMouseDown={(e) => e && setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)}
+              onMouseMove={(e) => e && refAreaLeft && setRefAreaRight(e.activeLabel ? String(e.activeLabel) : null)}
+              onMouseUp={handleZoom}
+              onClick={handleChartClick}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
                 stroke={gridStroke}
               />
+              {refAreaLeft && refAreaRight && (
+                <ReferenceArea
+                  x1={refAreaLeft}
+                  x2={refAreaRight}
+                  strokeOpacity={0.3}
+                  fill={theme.palette.primary.main}
+                  fillOpacity={0.15}
+                />
+              )}
               <XAxis
                 dataKey="bucket"
                 tick={tickStyle}
@@ -803,56 +1097,75 @@ const ArgusInsightsPage: React.FC = () => {
                 axisLine={false}
                 width={50}
               />
-              <RechartsTooltip contentStyle={commonTooltipStyle} />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
+              <RechartsTooltip wrapperStyle={{ zIndex: 1000 }} contentStyle={commonTooltipStyle} itemStyle={commonTooltipItemStyle} labelStyle={commonTooltipLabelStyle} />
+              <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
               {seriesKeys.map((key, idx) => (
                 <Line
                   key={key}
                   type="monotone"
                   dataKey={key}
+                  hide={hiddenSeriesKeys.has(key)}
                   stroke={SERIES_COLORS[idx % SERIES_COLORS.length]}
                   strokeWidth={2}
-                  dot={{ r: 0 }}
-                  activeDot={{ r: 5, strokeWidth: 0 }}
+                  dot={false}
+                  activeDot={{ r: 4, strokeWidth: 0 }}
+                  isAnimationActive={false}
                 />
               ))}
-              {/* Compare series as dashed lines */}
               {compareKeys.map((key, idx) => (
                 <Line
                   key={key}
                   type="monotone"
                   dataKey={key}
+                  hide={hiddenSeriesKeys.has(key)}
                   stroke={SERIES_COLORS[idx % SERIES_COLORS.length]}
                   strokeWidth={1.5}
                   strokeDasharray={COMPARE_DASH}
                   strokeOpacity={0.5}
                   dot={false}
+                  isAnimationActive={false}
                 />
               ))}
-              {/* Formula as special line */}
-              {allSeriesKeys.includes(formulaDisplayKey) && (
+              {/* Formulas as special lines */}
+              {validFormulaResults.map((r, idx) => (
                 <Line
+                  key={r.key}
                   type="monotone"
-                  dataKey={formulaDisplayKey}
-                  name={formula}
-                  stroke="#8b5cf6"
+                  dataKey={r.key}
+                  name={r.formula}
+                  hide={hiddenSeriesKeys.has(r.key)}
+                  stroke={FORMULA_COLORS[idx % FORMULA_COLORS.length]}
                   strokeWidth={2.5}
                   strokeDasharray="8 4"
                   dot={false}
-                  activeDot={{ r: 5, strokeWidth: 0, fill: '#8b5cf6' }}
+                  activeDot={{ r: 4, strokeWidth: 0, fill: FORMULA_COLORS[idx % FORMULA_COLORS.length] }}
+                  isAnimationActive={false}
                 />
-              )}
+              ))}
             </LineChart>
           ) : (
             <BarChart
               data={data}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              onMouseDown={(e) => e && setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)}
+              onMouseMove={(e) => e && refAreaLeft && setRefAreaRight(e.activeLabel ? String(e.activeLabel) : null)}
+              onMouseUp={handleZoom}
+              onClick={handleChartClick}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
                 vertical={false}
                 stroke={gridStroke}
               />
+              {refAreaLeft && refAreaRight && (
+                <ReferenceArea
+                  x1={refAreaLeft}
+                  x2={refAreaRight}
+                  strokeOpacity={0.3}
+                  fill={theme.palette.primary.main}
+                  fillOpacity={0.15}
+                />
+              )}
               <XAxis
                 dataKey="bucket"
                 tick={tickStyle}
@@ -866,15 +1179,29 @@ const ArgusInsightsPage: React.FC = () => {
                 axisLine={false}
                 width={50}
               />
-              <RechartsTooltip contentStyle={commonTooltipStyle} />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
+              <RechartsTooltip wrapperStyle={{ zIndex: 1000 }} contentStyle={commonTooltipStyle} itemStyle={commonTooltipItemStyle} labelStyle={commonTooltipLabelStyle} />
+              <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 12, paddingTop: 16 }} />
               {seriesKeys.map((key, idx) => (
                 <Bar
                   key={key}
                   dataKey={key}
+                  hide={hiddenSeriesKeys.has(key)}
                   fill={SERIES_COLORS[idx % SERIES_COLORS.length]}
                   radius={[4, 4, 0, 0]}
                   stackId={chartType === 'stacked-bar' ? 'stack' : undefined}
+                  isAnimationActive={false}
+                />
+              ))}
+              {validFormulaResults.map((r, idx) => (
+                <Bar
+                  key={r.key}
+                  dataKey={r.key}
+                  name={r.formula}
+                  hide={hiddenSeriesKeys.has(r.key)}
+                  fill={FORMULA_COLORS[idx % FORMULA_COLORS.length]}
+                  radius={[4, 4, 0, 0]}
+                  stackId={chartType === 'stacked-bar' ? 'stack' : undefined}
+                  isAnimationActive={false}
                 />
               ))}
             </BarChart>
@@ -1055,7 +1382,7 @@ const ArgusInsightsPage: React.FC = () => {
           <tbody>
             {series.map((s, idx) => {
               const label = s.breakdown_value
-                ? `${s.event} - ${s.breakdown_value}`
+                ? `${s.event} - ${formatBreakdownLabel(s.breakdown_value, breakdownProperties)}`
                 : s.event;
               const values = s.data.map((d: any) => d.value);
               const total = values.reduce(
@@ -1066,7 +1393,7 @@ const ArgusInsightsPage: React.FC = () => {
               const min = values.length > 0 ? Math.min(...values) : 0;
               const max = values.length > 0 ? Math.max(...values) : 0;
               const keyForColor = s.breakdown_value
-                ? `${s.event}:${s.breakdown_value}`
+                ? `${s.event}:${formatBreakdownLabel(s.breakdown_value, breakdownProperties)}`
                 : s.event;
               const color =
                 SERIES_COLORS[
@@ -1075,6 +1402,80 @@ const ArgusInsightsPage: React.FC = () => {
               return (
                 <tr
                   key={idx}
+                  style={{
+                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                  }}
+                >
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: '50%',
+                        bgcolor: color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    {label}
+                  </td>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontWeight: 600,
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {formatCompactNumber(total)}
+                  </td>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {formatCompactNumber(Math.round(avg))}
+                  </td>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {formatCompactNumber(min)}
+                  </td>
+                  <td
+                    style={{
+                      padding: '10px 16px',
+                      textAlign: 'right',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {formatCompactNumber(max)}
+                  </td>
+                </tr>
+              );
+            })}
+            {validFormulaResults.map((r, idx) => {
+              const label = r.formula;
+              const values = r.result.data.map((d: any) => d.value);
+              const total = values.reduce((acc: number, v: number) => acc + v, 0);
+              const avg = values.length > 0 ? total / values.length : 0;
+              const min = values.length > 0 ? Math.min(...values) : 0;
+              const max = values.length > 0 ? Math.max(...values) : 0;
+              const color = FORMULA_COLORS[idx % FORMULA_COLORS.length];
+              return (
+                <tr
+                  key={`formula-${idx}`}
                   style={{
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
                   }}
@@ -1152,6 +1553,7 @@ const ArgusInsightsPage: React.FC = () => {
         flexDirection: 'column',
         height: 'calc(100vh - 64px)',
         overflow: 'hidden',
+        m: -2,
       }}
     >
       <PageHeader
@@ -1175,13 +1577,11 @@ const ArgusInsightsPage: React.FC = () => {
           flex: 1,
           overflow: 'hidden',
           minHeight: 0,
-          px: 2,
-          pb: 2,
         }}
       >
-        <AnalyticsLayout leftPanel={leftPanel} toolbar={toolbar}>
+        <AnalyticsLayout leftPanel={leftPanel} toolbar={toolbar} projectId={projectId}>
           <PageContentLoader
-            loading={queryLoading}
+            loading={queryLoading || (events.some((e) => e.name) && !hasQueried)}
             skeleton={<ArgusChartSkeleton height={300} />}
           >
             {!hasQueried ? (
@@ -1216,6 +1616,73 @@ const ArgusInsightsPage: React.FC = () => {
           </PageContentLoader>
         </AnalyticsLayout>
       </Box>
+      {drilldownParams && (
+        <ArgusAnalyticsDrilldownDrawer
+          open={drilldownOpen}
+          onClose={() => setDrilldownOpen(false)}
+          projectId={projectId}
+          eventName={drilldownParams.eventName}
+          dateRange={drilldownParams.dateRange}
+          globalFilters={globalFilters}
+          breakdownProperty={drilldownParams.breakdownProperty}
+          breakdownValue={drilldownParams.breakdownValue}
+        />
+      )}
+
+      {menuAnchor && (
+        <Menu
+          anchorEl={menuAnchor.el}
+          open={Boolean(menuAnchor)}
+          onClose={handleCloseMenu}
+          PaperProps={{
+            sx: {
+              maxHeight: 320,
+              width: '24ch',
+            }
+          }}
+        >
+          <MenuItem
+            onClick={() => {
+              handleAddCondition(menuAnchor.idx);
+              handleCloseMenu();
+            }}
+            sx={{ fontSize: '0.8rem', py: 0.75 }}
+          >
+            {t('argus.analytics.addFilter', 'Add Filter')}
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              handleRemoveEvent(menuAnchor.idx);
+              handleCloseMenu();
+            }}
+            disabled={events.length <= 1}
+            sx={{
+              fontSize: '0.8rem',
+              py: 0.75,
+              color: events.length > 1 ? 'error.main' : 'text.disabled',
+            }}
+          >
+            {t('argus.analytics.removeEvent', 'Delete Event')}
+          </MenuItem>
+          <Divider />
+          <ListSubheader sx={{ py: 0.5, height: 'auto', lineHeight: 'normal', fontSize: '0.65rem', fontWeight: 700 }}>
+            {t('argus.analytics.show', 'Show')}
+          </ListSubheader>
+          {AGGREGATIONS.map((agg) => (
+            <MenuItem
+              key={agg.value}
+              selected={events[menuAnchor.idx]?.aggregation === agg.value}
+              onClick={() => {
+                handleEventChange(menuAnchor.idx, 'aggregation', agg.value);
+                handleCloseMenu();
+              }}
+              sx={{ fontSize: '0.75rem', py: 0.5 }}
+            >
+              {agg.label}
+            </MenuItem>
+          ))}
+        </Menu>
+      )}
     </Box>
   );
 };

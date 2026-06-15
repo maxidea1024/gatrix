@@ -17,11 +17,12 @@ import {
   Event as EventIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '@/components/common/PageHeader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import argusService from '@/services/argusService';
+import { formatCompactNumber } from '@/utils/numberFormat';
 import {
   PageContainer,
   FeatureCard,
@@ -82,7 +83,6 @@ const ArgusAnalyticsPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
@@ -110,7 +110,7 @@ const ArgusAnalyticsPage: React.FC = () => {
   }, [fetchEventNames]);
 
   const totalEvents = useMemo(
-    () => eventNames.reduce((sum, e) => sum + e.count, 0),
+    () => eventNames.reduce((sum, e) => sum + Number(e.count), 0),
     [eventNames]
   );
 
@@ -190,7 +190,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                 <Skeleton width={80} height={32} />
               ) : (
                 <Typography variant="h5" fontWeight={700}>
-                  {totalEvents.toLocaleString()}
+                  {formatCompactNumber(totalEvents)}
                 </Typography>
               )}
             </StatCard>
@@ -213,7 +213,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                     letterSpacing: 0.5,
                   }}
                 >
-                  Top Event
+                  {t('argus.analytics.topEvent', 'Top Event')}
                 </Typography>
               </Box>
               {loading ? (
@@ -248,7 +248,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                 fontSize: '0.7rem',
               }}
             >
-              Features
+              {t('argus.analytics.features', 'Features')}
             </Typography>
           </SectionHeader>
           <Grid container spacing={2}>
@@ -306,10 +306,14 @@ const ArgusAnalyticsPage: React.FC = () => {
               }}
             >
               {eventNames.slice(0, 15).map((ev, i) => {
-                const pct =
-                  totalEvents > 0
-                    ? Math.round((ev.count / totalEvents) * 100)
-                    : 0;
+                const pctValue =
+                  totalEvents > 0 ? (ev.count / totalEvents) * 100 : 0;
+                const pctLabel =
+                  pctValue === 0
+                    ? '0%'
+                    : pctValue < 1
+                      ? '<1%'
+                      : `${Math.round(pctValue)}%`;
                 return (
                   <Box
                     key={ev.name}
@@ -327,8 +331,8 @@ const ArgusAnalyticsPage: React.FC = () => {
                       overflow: 'hidden',
                       '&:hover': {
                         background: isDark
-                          ? 'rgba(255,255,255,0.02)'
-                          : 'rgba(0,0,0,0.01)',
+                           ? 'rgba(255,255,255,0.02)'
+                           : 'rgba(0,0,0,0.01)',
                       },
                     }}
                   >
@@ -339,7 +343,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                         left: 0,
                         top: 0,
                         bottom: 0,
-                        width: `${pct}%`,
+                        width: `${pctValue}%`,
                         background: alpha(isDark ? '#818cf8' : '#6366f1', 0.06),
                         transition: 'width 0.3s ease',
                       }}
@@ -366,7 +370,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                         textAlign: 'right',
                       }}
                     >
-                      {ev.count.toLocaleString()}
+                      {formatCompactNumber(ev.count)}
                     </Typography>
                     <Typography
                       variant="caption"
@@ -379,7 +383,7 @@ const ArgusAnalyticsPage: React.FC = () => {
                         opacity: 0.7,
                       }}
                     >
-                      {pct}%
+                      {pctLabel}
                     </Typography>
                   </Box>
                 );

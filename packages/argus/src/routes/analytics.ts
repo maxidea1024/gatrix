@@ -123,6 +123,82 @@ export default async function analyticsRoutes(app: FastifyInstance) {
     }
   );
 
+  // GET /:projectId/analytics/property-values
+  app.get(
+    '/projects/:projectId/analytics/property-values',
+    async (
+      request: FastifyRequest<{
+        Params: { projectId: string };
+        Querystring: {
+          property: string;
+          period?: string;
+          start?: string;
+          end?: string;
+          search?: string;
+        };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const { projectId } = request.params;
+      const { property, period, start, end, search } = request.query;
+
+      if (!property) {
+        return reply
+          .code(400)
+          .send({ success: false, message: 'property is required' });
+      }
+
+      const { conditions, params } = buildTimeRangeConditions(
+        period || '30d',
+        start,
+        end
+      );
+      conditions.push('project_id = {projectId:String}');
+      params.projectId = projectId;
+
+      // Resolve column: builtin or custom property
+      const builtinColumns = [
+        'platform',
+        'environment',
+        'release',
+        'country',
+        'city',
+        'os',
+        'app_version',
+      ];
+      let valueExpr: string;
+      if (builtinColumns.includes(property)) {
+        valueExpr = property;
+      } else {
+        // Try string properties first (most common)
+        valueExpr = `properties[{propKey:String}]`;
+        params.propKey = property;
+      }
+
+      if (search) {
+        conditions.push(
+          `${valueExpr} ILIKE {searchPattern:String}`
+        );
+        params.searchPattern = `%${search}%`;
+      }
+
+      const sql = `
+        SELECT
+          ${valueExpr} AS value,
+          count() AS count
+        FROM ${TABLE}
+        WHERE ${conditions.join(' AND ')}
+          AND ${valueExpr} != ''
+        GROUP BY value
+        ORDER BY count DESC
+        LIMIT 50
+      `;
+
+      const result = await optic.rawQuery({ query: sql, params });
+      return reply.send({ success: true, data: result.data });
+    }
+  );
+
   // POST /:projectId/analytics/insights
   app.post(
     '/projects/:projectId/analytics/insights',
@@ -152,7 +228,8 @@ export default async function analyticsRoutes(app: FastifyInstance) {
 
       const series: any[] = [];
 
-      for (const event of body.events) {
+      for (let eventIdx = 0; eventIdx < body.events.length; eventIdx++) {
+        const event = body.events[eventIdx];
         const params: Record<string, any> = {
           ...timeParams,
           ...bucketing.queryParams,
@@ -163,13 +240,19 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         const propConditions = buildPropertyConditions(
           event.conditions,
           params,
-          `ev_${event.name.replace(/[^a-zA-Z0-9]/g, '')}`
+          `ev_e${eventIdx}_`
+        );
+        const globalConditions = buildGlobalFilterConditions(
+          body.global_filters,
+          params,
+          `gf_e${eventIdx}_`
         );
         const conditions = [
           ...timeConditions,
           'project_id = {projectId:String}',
           'event_name = {eventName:String}',
           ...propConditions,
+          ...globalConditions,
         ];
 
         // Aggregation expression
@@ -235,9 +318,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             aggExpr = 'count()';
         }
 
-        if (body.breakdown) {
-          // Breakdown query
-          const breakdownCol = resolveBreakdownColumn(body.breakdown.property);
+        const bdProps = getBreakdownProperties(body.breakdown);
+        if (bdProps.length > 0) {
+          // Breakdown query (supports multiple properties)
+          const breakdownCol = buildBreakdownExpression(bdProps);
           const sql = `
             SELECT
               ${bucketing.selectExpr} AS bucket,
@@ -400,6 +484,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         data: {
           series,
           ...(compareSeries ? { compare_series: compareSeries } : {}),
+          ...(getBreakdownProperties(body.breakdown).length > 0 ? { breakdown_properties: getBreakdownProperties(body.breakdown) } : {}),
         },
       });
     }
@@ -462,15 +547,69 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         })
         .join(', ');
 
-      // Only include events that are in the funnel
-      conditions.push(
-        `event_name IN (${eventNames.map((_, i) => `{funnelEvent${i}:String}`).join(', ')})`
+      // Only include events that are in the funnel (+ exclusion events)
+      const exclusionEventNames = (body.exclusion_steps || []).map(
+        (es, i) => {
+          const pKey = `exclusionEvent${i}`;
+          params[pKey] = es.event_name;
+          return es.event_name;
+        }
       );
+      const allRelevantEvents = [
+        ...eventNames.map((_, i) => `{funnelEvent${i}:String}`),
+        ...exclusionEventNames.map((_, i) => `{exclusionEvent${i}:String}`),
+      ];
+      conditions.push(`event_name IN (${allRelevantEvents.join(', ')})`);
 
       // Exclude events without user_id (funnel is user-based)
       conditions.push("user_id != ''");
 
+      // Apply global filters
+      const globalConditions = buildGlobalFilterConditions(
+        body.global_filters,
+        params,
+        'gf_funnel'
+      );
+      conditions.push(...globalConditions);
+
       const whereClause = conditions.join(' AND ');
+
+      // ── Build exclusion subquery if needed ──
+      let exclusionFilter = '';
+      if (body.exclusion_steps && body.exclusion_steps.length > 0) {
+        // Validate indices and filter out invalid exclusion steps
+        const validExclusions = body.exclusion_steps.filter(
+          (es) =>
+            es.event_name &&
+            es.between[0] >= 0 &&
+            es.between[1] > es.between[0] &&
+            es.between[0] < totalSteps &&
+            es.between[1] < totalSteps
+        );
+        if (validExclusions.length > 0) {
+          const exclusionSubqueries = validExclusions.map((es, i) => {
+            const afterStep = es.between[0];
+            const beforeStep = es.between[1];
+            return `
+              SELECT DISTINCT excl.user_id
+              FROM ${TABLE} AS excl
+              INNER JOIN (
+                SELECT user_id,
+                  min(if(event_name = {funnelEvent${afterStep}:String}, timestamp, toDateTime64('2099-01-01', 3))) AS step_after_ts,
+                  min(if(event_name = {funnelEvent${beforeStep}:String}, timestamp, toDateTime64('2099-01-01', 3))) AS step_before_ts
+                FROM ${TABLE}
+                WHERE ${whereClause}
+                GROUP BY user_id
+              ) AS funnel_ts ON excl.user_id = funnel_ts.user_id
+              WHERE excl.event_name = {exclusionEvent${i}:String}
+                AND excl.project_id = {projectId:String}
+                AND excl.timestamp > funnel_ts.step_after_ts
+                AND excl.timestamp < funnel_ts.step_before_ts
+            `;
+          });
+          exclusionFilter = `AND user_id NOT IN (${exclusionSubqueries.join(' UNION ALL ')})`;
+        }
+      }
 
       // ── Always compute steps result ──
       const stepsSql = `
@@ -483,6 +622,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
           FROM ${TABLE}
           WHERE ${whereClause}
+          ${exclusionFilter}
           GROUP BY user_id
         )
         WHERE level > 0
@@ -548,6 +688,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
               FROM ${TABLE}
               WHERE ${whereClause}
+              ${exclusionFilter}
               GROUP BY user_id
             )
             WHERE level > 0
@@ -703,6 +844,169 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         }
       }
 
+      // ── Segment comparison: run separate funnel per segment ──
+      if (body.segments && body.segments.length > 0) {
+        const segmentResults: any[] = [];
+        for (const seg of body.segments) {
+          // Clone params and add segment filter conditions
+          const segParams = { ...params };
+          const segFilterConds = buildGlobalFilterConditions(
+            seg.filters,
+            segParams,
+            `seg_${seg.id.replace(/[^a-zA-Z0-9]/g, '')}`
+          );
+          const segWhereClause = segFilterConds.length > 0
+            ? `${whereClause} AND ${segFilterConds.join(' AND ')}`
+            : whereClause;
+
+          const segSql = `
+            SELECT
+              level,
+              count() AS cnt
+            FROM (
+              SELECT
+                user_id,
+                windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
+              FROM ${TABLE}
+              WHERE ${segWhereClause}
+              ${exclusionFilter}
+              GROUP BY user_id
+            )
+            WHERE level > 0
+            GROUP BY level
+            ORDER BY level ASC
+          `;
+
+          const { data: segRows } = (await optic.rawQuery({
+            query: segSql,
+            params: segParams,
+          })) as { data: any[] };
+
+          const segLevelCounts = new Array(totalSteps + 1).fill(0);
+          for (const row of segRows) {
+            segLevelCounts[Number(row.level)] = Number(row.cnt);
+          }
+          const segStepCounts = new Array(totalSteps).fill(0);
+          for (let step = totalSteps; step >= 1; step--) {
+            segStepCounts[step - 1] = segLevelCounts[step];
+            if (step < totalSteps) {
+              segStepCounts[step - 1] += segStepCounts[step];
+            }
+          }
+          const segFirstCount = segStepCounts[0] || 1;
+          segmentResults.push({
+            id: seg.id,
+            name: seg.name,
+            color: seg.color,
+            steps: eventNames.map((name, i) => ({
+              name,
+              count: segStepCounts[i],
+              conversion_rate:
+                Math.round((segStepCounts[i] / segFirstCount) * 1000) / 10,
+            })),
+            overall_conversion:
+              segFirstCount > 0
+                ? Math.round(
+                    (segStepCounts[totalSteps - 1] / segFirstCount) * 1000
+                  ) / 10
+                : 0,
+          });
+        }
+        baseResult.segments = segmentResults;
+      }
+
+      // ── Breakdown: run separate funnel per breakdown value ──
+      const funnelBdProps = getBreakdownProperties(body.breakdown);
+      if (funnelBdProps.length > 0) {
+        try {
+          const bdCol = buildBreakdownExpression(funnelBdProps);
+
+          // Get top 10 breakdown values
+          const topValuesSql = `
+            SELECT ${bdCol} AS bd, count() AS cnt
+            FROM ${TABLE}
+            WHERE ${whereClause} AND ${bdCol} != ''
+            GROUP BY bd
+            ORDER BY cnt DESC
+            LIMIT 10
+          `;
+          const { data: topRows } = (await optic.rawQuery({
+            query: topValuesSql,
+            params,
+          })) as { data: any[] };
+
+          const breakdownResults: Record<string, any> = {};
+
+          for (const tvRow of topRows) {
+            const bv = String(tvRow.bd);
+            const bdParams = { ...params };
+            const bdParamKey = `bdVal_${Object.keys(breakdownResults).length}`;
+            bdParams[bdParamKey] = bv;
+
+            const bdWhereClause = `${whereClause} AND ${bdCol} = {${bdParamKey}:String}`;
+
+            const bdSql = `
+              SELECT
+                level,
+                count() AS cnt
+              FROM (
+                SELECT
+                  user_id,
+                  windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
+                FROM ${TABLE}
+                WHERE ${bdWhereClause}
+                ${exclusionFilter}
+                GROUP BY user_id
+              )
+              WHERE level > 0
+              GROUP BY level
+              ORDER BY level ASC
+            `;
+
+            const { data: bdRows } = (await optic.rawQuery({
+              query: bdSql,
+              params: bdParams,
+            })) as { data: any[] };
+
+            const bdLevelCounts = new Array(totalSteps + 1).fill(0);
+            for (const row of bdRows) {
+              bdLevelCounts[Number(row.level)] = Number(row.cnt);
+            }
+            const bdStepCounts = new Array(totalSteps).fill(0);
+            for (let step = totalSteps; step >= 1; step--) {
+              bdStepCounts[step - 1] = bdLevelCounts[step];
+              if (step < totalSteps) {
+                bdStepCounts[step - 1] += bdStepCounts[step];
+              }
+            }
+            const bdFirstCount = bdStepCounts[0] || 1;
+            breakdownResults[bv] = {
+              steps: eventNames.map((name, i) => ({
+                name,
+                count: bdStepCounts[i],
+                conversion_rate:
+                  Math.round((bdStepCounts[i] / bdFirstCount) * 1000) / 10,
+              })),
+              overall_conversion:
+                bdFirstCount > 0
+                  ? Math.round(
+                      (bdStepCounts[totalSteps - 1] / bdFirstCount) * 1000
+                    ) / 10
+                  : 0,
+            };
+          }
+
+          baseResult.breakdowns = breakdownResults;
+        } catch (err: any) {
+          // Breakdown is supplementary — don't fail the whole request
+          baseResult.breakdowns = {};
+        }
+      }
+
+      if (funnelBdProps.length > 0) {
+        baseResult.breakdown_properties = funnelBdProps;
+      }
+
       return reply.send({
         success: true,
         data: baseResult,
@@ -788,6 +1092,17 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           ? `AND ${returnEventConds.join(' AND ')}`
           : '';
 
+      // Global filters for retention
+      const globalRetentionConds = buildGlobalFilterConditions(
+        body.global_filters,
+        params,
+        'gf_ret'
+      );
+      const globalRetentionWhere =
+        globalRetentionConds.length > 0
+          ? `AND ${globalRetentionConds.join(' AND ')}`
+          : '';
+
       const sql = `
         SELECT
           cohort_date,
@@ -805,6 +1120,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               AND project_id = {projectId:String}
               AND user_id != ''
               ${firstEventWhere}
+              ${globalRetentionWhere}
               AND ${timeConditions.join(' AND ')}
             GROUP BY user_id
           ) f
@@ -813,6 +1129,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             AND r.event_name = {returnEvent:String}
             AND r.project_id = {projectId:String}
             ${returnEventWhere}
+            ${globalRetentionWhere}
             AND r.timestamp >= f.first_ts
             AND r.timestamp <= f.first_ts + INTERVAL {numPeriods:UInt32} ${intervalUnit}
         )
@@ -839,7 +1156,71 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         };
       });
 
-      return reply.send({ success: true, data: { cohorts } });
+      // ── Breakdown query: per-breakdown-value cohorts ──
+      let breakdowns: Record<string, typeof cohorts> | undefined;
+      const retBdProps = getBreakdownProperties(body.breakdown);
+      if (retBdProps.length > 0) {
+        const bdCol = buildBreakdownExpression(retBdProps);
+        const bdSql = `
+          SELECT
+            bd AS breakdown_value,
+            cohort_date,
+            count(DISTINCT user_id) AS cohort_size,
+            ${periodSelects.join(',\n            ')}
+          FROM (
+            SELECT
+              f.user_id,
+              ${bdCol} AS bd,
+              ${truncFunc}(f.first_ts) AS cohort_date,
+              dateDiff('${dateDiffUnit}', ${truncFunc}(f.first_ts), ${truncFunc}(r.timestamp)) AS return_period
+            FROM (
+              SELECT user_id, min(timestamp) AS first_ts
+              FROM ${TABLE}
+              WHERE event_name = {firstEvent:String}
+                AND project_id = {projectId:String}
+                AND user_id != ''
+                ${firstEventWhere}
+                ${globalRetentionWhere}
+                AND ${timeConditions.join(' AND ')}
+              GROUP BY user_id
+            ) f
+            INNER JOIN ${TABLE} r
+              ON r.user_id = f.user_id
+              AND r.event_name = {returnEvent:String}
+              AND r.project_id = {projectId:String}
+              ${returnEventWhere}
+              ${globalRetentionWhere}
+              AND r.timestamp >= f.first_ts
+              AND r.timestamp <= f.first_ts + INTERVAL {numPeriods:UInt32} ${intervalUnit}
+          )
+          WHERE return_period >= 0 AND return_period <= {numPeriods:UInt32}
+          GROUP BY breakdown_value, cohort_date
+          ORDER BY breakdown_value, cohort_date ASC
+        `;
+
+        const { data: bdRows } = (await optic.rawQuery({ query: bdSql, params })) as {
+          data: any[];
+        };
+
+        breakdowns = {};
+        for (const row of bdRows) {
+          const bv = String(row.breakdown_value || '(none)');
+          if (!breakdowns[bv]) breakdowns[bv] = [];
+          const cohortSize = Number(row.cohort_size) || 1;
+          const retention: number[] = [];
+          for (let i = 0; i <= numPeriods; i++) {
+            const periodCount = Number(row[`p${i}`]) || 0;
+            retention.push(Math.round((periodCount / cohortSize) * 1000) / 10);
+          }
+          breakdowns[bv].push({
+            cohort_date: row.cohort_date,
+            cohort_size: Number(row.cohort_size),
+            retention,
+          });
+        }
+      }
+
+      return reply.send({ success: true, data: { cohorts, breakdowns, ...(retBdProps.length > 0 ? { breakdown_properties: retBdProps } : {}) } });
     }
   );
 
@@ -877,6 +1258,14 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       params.projectId = projectId;
       params.anchorEvent = body.anchor_event.name;
       params.seqLimit = depth + 1;
+
+      // Apply global filters
+      const globalFlowsConds = buildGlobalFilterConditions(
+        body.global_filters,
+        params,
+        'gf_flows'
+      );
+      conditions.push(...globalFlowsConds);
 
       // Get event sequences per user
       const orderDir = direction === 'before' ? 'DESC' : 'ASC';
@@ -947,7 +1336,151 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         count,
       }));
 
-      return reply.send({ success: true, data: { nodes, links } });
+      // Compute Top Paths (frequent user journey sequences)
+      const topPathsSql = `
+        SELECT
+          seq,
+          count() AS cnt
+        FROM (
+          SELECT
+            user_id,
+            groupArray(${depth + 1})(event_name) AS seq
+          FROM (
+            SELECT
+              user_id,
+              event_name,
+              timestamp,
+              row_number() OVER (
+                PARTITION BY user_id
+                ORDER BY timestamp ${orderDir}
+              ) AS rn
+            FROM ${TABLE}
+            WHERE ${conditions.join(' AND ')}
+          )
+          WHERE rn <= {seqLimit:UInt32}
+          GROUP BY user_id
+          HAVING has(seq, {anchorEvent:String})
+          LIMIT 10000
+        )
+        GROUP BY seq
+        ORDER BY cnt DESC
+        LIMIT 30
+      `;
+
+      let top_paths: { path: string[]; count: number; percentage: number }[] = [];
+      try {
+        const { data: topPathsRows } = (await optic.rawQuery({
+          query: topPathsSql,
+          params,
+        })) as { data: any[] };
+
+        const totalPathsCount = topPathsRows.reduce((sum: number, r: any) => sum + Number(r.cnt), 0) || 1;
+        top_paths = topPathsRows.map((r: any) => ({
+          path: r.seq || [],
+          count: Number(r.cnt),
+          percentage: Math.round((Number(r.cnt) / totalPathsCount) * 1000) / 10
+        }));
+      } catch (err) {
+        // Fallback to empty top paths
+        top_paths = [];
+      }
+
+      // ── Breakdown: separate flow per breakdown value ──
+      let breakdowns: Record<string, { nodes: any[]; links: any[] }> | undefined;
+      const flowBdProps = getBreakdownProperties(body.breakdown);
+      if (flowBdProps.length > 0) {
+        try {
+          const bdCol = buildBreakdownExpression(flowBdProps);
+
+          // Get top 5 breakdown values
+          const topBdSql = `
+            SELECT ${bdCol} AS bd, count() AS cnt
+            FROM ${TABLE}
+            WHERE ${conditions.join(' AND ')} AND ${bdCol} != ''
+            GROUP BY bd
+            ORDER BY cnt DESC
+            LIMIT 5
+          `;
+          const { data: topBdRows } = (await optic.rawQuery({
+            query: topBdSql,
+            params,
+          })) as { data: any[] };
+
+          breakdowns = {};
+
+          for (const tvRow of topBdRows) {
+            const bv = String(tvRow.bd);
+            const bdParams = { ...params };
+            const bdParamKey = `bdFlowVal_${Object.keys(breakdowns).length}`;
+            bdParams[bdParamKey] = bv;
+
+            const bdConditions = [...conditions, `${bdCol} = {${bdParamKey}:String}`];
+
+            const bdSql = `
+              SELECT
+                source_event,
+                target_event,
+                count() AS value
+              FROM (
+                SELECT
+                  user_id,
+                  groupArray(${depth + 1})(event_name) AS seq
+                FROM (
+                  SELECT
+                    user_id,
+                    event_name,
+                    timestamp,
+                    row_number() OVER (
+                      PARTITION BY user_id
+                      ORDER BY timestamp ${orderDir}
+                    ) AS rn
+                  FROM ${TABLE}
+                  WHERE ${bdConditions.join(' AND ')}
+                )
+                WHERE rn <= {seqLimit:UInt32}
+                GROUP BY user_id
+                HAVING has(seq, {anchorEvent:String})
+                LIMIT 5000
+              )
+              ARRAY JOIN
+                arraySlice(seq, 1, length(seq) - 1) AS source_event,
+                arraySlice(seq, 2) AS target_event
+              GROUP BY source_event, target_event
+              ORDER BY value DESC
+              LIMIT 200
+            `;
+
+            const { data: bdRows } = (await optic.rawQuery({
+              query: bdSql,
+              params: bdParams,
+            })) as { data: any[] };
+
+            const bdNodeMap = new Map<string, number>();
+            const bdLinks: { source: string; target: string; value: number }[] = [];
+            const bdTotal = bdRows.reduce((s: number, r: any) => s + Number(r.value), 0);
+            const bdThreshold = bdTotal * minFrequency;
+
+            for (const row of bdRows) {
+              const v = Number(row.value);
+              if (v < bdThreshold) continue;
+              const src = String(row.source_event);
+              const tgt = String(row.target_event);
+              bdNodeMap.set(src, (bdNodeMap.get(src) || 0) + v);
+              bdNodeMap.set(tgt, (bdNodeMap.get(tgt) || 0) + v);
+              bdLinks.push({ source: src, target: tgt, value: v });
+            }
+
+            breakdowns[bv] = {
+              nodes: Array.from(bdNodeMap.entries()).map(([id, count]) => ({ id, count })),
+              links: bdLinks,
+            };
+          }
+        } catch {
+          breakdowns = {};
+        }
+      }
+
+      return reply.send({ success: true, data: { nodes, links, breakdowns, top_paths, ...(flowBdProps.length > 0 ? { breakdown_properties: flowBdProps } : {}) } });
     }
   );
 }
@@ -1014,6 +1547,20 @@ function resolveBreakdownColumn(property: string): string {
   }
   // Map property access: properties['key']
   return `properties['${property.replace(/'/g, "\\'")}']`;
+}
+
+/** Build a composite breakdown expression from multiple properties */
+function buildBreakdownExpression(properties: string[]): string {
+  if (properties.length === 0) return "''";
+  if (properties.length === 1) return resolveBreakdownColumn(properties[0]);
+  return `concat(${properties.map(p => resolveBreakdownColumn(p)).join(", '|||', ")})`;
+}
+
+/** Extract breakdown properties array from request body */
+function getBreakdownProperties(
+  breakdown?: { properties?: string[] }
+): string[] {
+  return breakdown?.properties?.filter(Boolean) ?? [];
 }
 
 /** Build SQL conditions for an array of Property Conditions */
@@ -1094,6 +1641,50 @@ interface Condition {
   value: string | number;
 }
 
+interface GlobalFilterEntry {
+  property: string;
+  operator: string;    // 'is' | 'is_not' | 'contains' | 'not_contains'
+  value: string;
+}
+
+/**
+ * Build SQL conditions from global filters.
+ * Global filters apply to built-in columns (platform, country, os, etc.)
+ * and custom properties (properties map).
+ */
+function buildGlobalFilterConditions(
+  globalFilters: GlobalFilterEntry[] | undefined,
+  params: Record<string, any>,
+  prefix: string = 'gf'
+): string[] {
+  if (!globalFilters || globalFilters.length === 0) return [];
+
+  return globalFilters
+    .filter((f) => f.property && (f.value || f.operator === 'set' || f.operator === 'not_set'))
+    .map((f, i) => {
+      const pKey = `${prefix}${i}`;
+      params[pKey] = f.value;
+      const col = resolveBreakdownColumn(f.property);
+
+      switch (f.operator) {
+        case 'is':
+          return `${col} = {${pKey}:String}`;
+        case 'is_not':
+          return `${col} != {${pKey}:String}`;
+        case 'contains':
+          return `${col} LIKE concat('%', {${pKey}:String}, '%')`;
+        case 'not_contains':
+          return `${col} NOT LIKE concat('%', {${pKey}:String}, '%')`;
+        case 'set':
+          return `${col} != ''`;
+        case 'not_set':
+          return `${col} = ''`;
+        default:
+          return `${col} = {${pKey}:String}`;
+      }
+    });
+}
+
 interface InsightsRequest {
   events: {
     name: string;
@@ -1110,7 +1701,7 @@ interface InsightsRequest {
     property?: string;
     conditions?: Condition[];
   }[];
-  breakdown?: { property: string; type?: 'string' | 'numeric' };
+  breakdown?: { properties: string[] };
   interval?: '1h' | '1d' | '1w';
   period?: string;
   start?: string;
@@ -1120,6 +1711,7 @@ interface InsightsRequest {
     | 'previous_week'
     | 'previous_month'
     | 'previous_year';
+  global_filters?: GlobalFilterEntry[];
 }
 
 interface FunnelsRequest {
@@ -1128,11 +1720,22 @@ interface FunnelsRequest {
   ordering?: 'specific' | 'any';
   hold_constant?: string[];
   counting?: 'uniques' | 'totals';
-  breakdown?: { property: string };
+  breakdown?: { properties: string[] };
+  exclusion_steps?: {
+    event_name: string;
+    between: [number, number]; // [afterStepIdx, beforeStepIdx] 0-indexed
+  }[];
   mode?: 'steps' | 'trending' | 'time_to_convert';
   period?: string;
   start?: string;
   end?: string;
+  global_filters?: GlobalFilterEntry[];
+  segments?: {
+    id: string;
+    name: string;
+    filters: GlobalFilterEntry[];
+    color: string;
+  }[];
 }
 
 interface RetentionRequest {
@@ -1147,11 +1750,12 @@ interface RetentionRequest {
     | 'property_sum'
     | 'property_avg';
   measurement_property?: string;
-  breakdown?: { property: string };
+  breakdown?: { properties: string[] };
   min_frequency?: number;
   period?: string;
   start?: string;
   end?: string;
+  global_filters?: GlobalFilterEntry[];
 }
 
 interface FlowsRequest {
@@ -1163,10 +1767,11 @@ interface FlowsRequest {
   steps_after?: number;
   depth?: number;
   view?: 'sankey' | 'top_paths';
-  breakdown?: { property: string };
+  breakdown?: { properties: string[] };
   exclude_events?: string[];
   period?: string;
   start?: string;
   end?: string;
   min_frequency?: number;
+  global_filters?: GlobalFilterEntry[];
 }

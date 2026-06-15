@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Paper, useTheme, Typography, Divider } from '@mui/material';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
+import GlobalFilterBar from './GlobalFilterBar';
 
 export interface AnalyticsLayoutProps {
   /** The content of the left sidebar (Query Builder) */
@@ -11,6 +12,8 @@ export interface AnalyticsLayoutProps {
   children: React.ReactNode;
   /** Optional title for the right section */
   title?: string;
+  /** Project ID for global filter property picker */
+  projectId?: string;
 }
 
 const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
@@ -18,6 +21,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
   toolbar,
   children,
   title,
+  projectId,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -39,10 +43,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
         display: 'flex',
         flex: 1,
         height: '100%',
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        borderRadius: 2,
         overflow: 'hidden',
-        backgroundColor: 'background.paper',
       }}
     >
       {/* Left Sidebar: Query Builder */}
@@ -137,6 +138,22 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               {toolbar}
             </Box>
+          </Box>
+        )}
+
+        {/* Global Filter Bar */}
+        {projectId && (
+          <Box
+            sx={{
+              px: 3,
+              py: 1,
+              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+              minHeight: 32,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <GlobalFilterBar projectId={projectId} />
           </Box>
         )}
 

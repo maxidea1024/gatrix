@@ -15,6 +15,7 @@ import {
   Search as SearchIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 export interface InlineSelectOption {
   value: string;
@@ -37,13 +38,16 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
   value,
   onChange,
   options,
-  placeholder = 'Search...',
+  placeholder: placeholderProp,
   disabled = false,
-  emptyLabel = 'Select...',
+  emptyLabel: emptyLabelProp,
   highlightEmpty = false,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { t } = useTranslation();
+  const placeholder = placeholderProp ?? t('common.search', 'Search...');
+  const emptyLabel = emptyLabelProp ?? t('common.select', 'Select...');
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [search, setSearch] = useState('');
@@ -144,6 +148,7 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
           },
         }}
       >
+        {options.length > 6 && (
         <Box
           sx={{
             p: 1,
@@ -172,11 +177,12 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
             }}
           />
         </Box>
+        )}
         <List sx={{ p: 0, maxHeight: 300, overflowY: 'auto' }}>
           {filteredOptions.length === 0 ? (
             <Box sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
-                No results found
+                {t('common.noResultsFound', 'No results found')}
               </Typography>
             </Box>
           ) : (
