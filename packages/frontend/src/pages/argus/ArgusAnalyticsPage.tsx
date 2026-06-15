@@ -331,8 +331,8 @@ const ArgusAnalyticsPage: React.FC = () => {
                       overflow: 'hidden',
                       '&:hover': {
                         background: isDark
-                           ? 'rgba(255,255,255,0.02)'
-                           : 'rgba(0,0,0,0.01)',
+                          ? 'rgba(255,255,255,0.02)'
+                          : 'rgba(0,0,0,0.01)',
                       },
                     }}
                   >

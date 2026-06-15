@@ -42,7 +42,10 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
     { value: 'is', label: t('argus.analytics.op.is', 'is') },
     { value: 'is_not', label: t('argus.analytics.op.isNot', 'is not') },
     { value: 'contains', label: t('argus.analytics.op.contains', 'contains') },
-    { value: 'not_contains', label: t('argus.analytics.op.notContains', 'does not contain') },
+    {
+      value: 'not_contains',
+      label: t('argus.analytics.op.notContains', 'does not contain'),
+    },
   ];
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -76,7 +79,8 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
   };
 
   const formatLabel = (f: GlobalFilter) => {
-    const op = OPERATORS.find((o) => o.value === f.operator)?.label || f.operator;
+    const op =
+      OPERATORS.find((o) => o.value === f.operator)?.label || f.operator;
     return `${f.property} ${op} ${f.value}`;
   };
 
@@ -109,7 +113,10 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
       <Popover
         open={Boolean(anchorEl)}
         anchorEl={anchorEl}
-        onClose={(e) => { if (e) (e as any).stopPropagation?.(); setAnchorEl(null); }}
+        onClose={(e) => {
+          if (e) (e as any).stopPropagation?.();
+          setAnchorEl(null);
+        }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         slotProps={{
@@ -123,7 +130,11 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
           },
         }}
       >
-        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5, fontSize: '0.82rem' }}>
+        <Typography
+          variant="subtitle2"
+          fontWeight={700}
+          sx={{ mb: 1.5, fontSize: '0.82rem' }}
+        >
           {editingIdx !== null
             ? t('argus.analytics.editFilter', 'Edit Filter')
             : t('argus.analytics.addFilter', 'Add Filter')}
@@ -155,10 +166,20 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
             }}
           />
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: 1,
+              mt: 0.5,
+            }}
+          >
             <Button
               size="small"
-              onClick={(e) => { e.stopPropagation(); setAnchorEl(null); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setAnchorEl(null);
+              }}
               sx={{ textTransform: 'none', fontSize: '0.78rem' }}
             >
               {t('common.cancel', 'Cancel')}
@@ -166,11 +187,20 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
             <Button
               size="small"
               variant="contained"
-              onClick={(e) => { e.stopPropagation(); handleSave(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSave();
+              }}
               disabled={!draft.property}
-              sx={{ textTransform: 'none', fontSize: '0.78rem', fontWeight: 700 }}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+              }}
             >
-              {editingIdx !== null ? t('common.save', 'Save') : t('common.add', 'Add')}
+              {editingIdx !== null
+                ? t('common.save', 'Save')
+                : t('common.add', 'Add')}
             </Button>
           </Box>
         </Box>
@@ -199,7 +229,10 @@ const GlobalFilterBar: React.FC<GlobalFilterBarProps> = ({ projectId }) => {
             height: 24,
             fontSize: '0.72rem',
             fontWeight: 500,
-            backgroundColor: alpha(theme.palette.primary.main, isDark ? 0.12 : 0.08),
+            backgroundColor: alpha(
+              theme.palette.primary.main,
+              isDark ? 0.12 : 0.08
+            ),
             color: theme.palette.primary.main,
             borderRadius: 1.5,
             '& .MuiChip-deleteIcon': {

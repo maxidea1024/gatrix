@@ -176,9 +176,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       }
 
       if (search) {
-        conditions.push(
-          `${valueExpr} ILIKE {searchPattern:String}`
-        );
+        conditions.push(`${valueExpr} ILIKE {searchPattern:String}`);
         params.searchPattern = `%${search}%`;
       }
 
@@ -484,7 +482,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         data: {
           series,
           ...(compareSeries ? { compare_series: compareSeries } : {}),
-          ...(getBreakdownProperties(body.breakdown).length > 0 ? { breakdown_properties: getBreakdownProperties(body.breakdown) } : {}),
+          ...(getBreakdownProperties(body.breakdown).length > 0
+            ? { breakdown_properties: getBreakdownProperties(body.breakdown) }
+            : {}),
         },
       });
     }
@@ -548,13 +548,11 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         .join(', ');
 
       // Only include events that are in the funnel (+ exclusion events)
-      const exclusionEventNames = (body.exclusion_steps || []).map(
-        (es, i) => {
-          const pKey = `exclusionEvent${i}`;
-          params[pKey] = es.event_name;
-          return es.event_name;
-        }
-      );
+      const exclusionEventNames = (body.exclusion_steps || []).map((es, i) => {
+        const pKey = `exclusionEvent${i}`;
+        params[pKey] = es.event_name;
+        return es.event_name;
+      });
       const allRelevantEvents = [
         ...eventNames.map((_, i) => `{funnelEvent${i}:String}`),
         ...exclusionEventNames.map((_, i) => `{exclusionEvent${i}:String}`),
@@ -855,9 +853,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             segParams,
             `seg_${seg.id.replace(/[^a-zA-Z0-9]/g, '')}`
           );
-          const segWhereClause = segFilterConds.length > 0
-            ? `${whereClause} AND ${segFilterConds.join(' AND ')}`
-            : whereClause;
+          const segWhereClause =
+            segFilterConds.length > 0
+              ? `${whereClause} AND ${segFilterConds.join(' AND ')}`
+              : whereClause;
 
           const segSql = `
             SELECT
@@ -1198,7 +1197,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           ORDER BY breakdown_value, cohort_date ASC
         `;
 
-        const { data: bdRows } = (await optic.rawQuery({ query: bdSql, params })) as {
+        const { data: bdRows } = (await optic.rawQuery({
+          query: bdSql,
+          params,
+        })) as {
           data: any[];
         };
 
@@ -1220,7 +1222,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         }
       }
 
-      return reply.send({ success: true, data: { cohorts, breakdowns, ...(retBdProps.length > 0 ? { breakdown_properties: retBdProps } : {}) } });
+      return reply.send({
+        success: true,
+        data: {
+          cohorts,
+          breakdowns,
+          ...(retBdProps.length > 0
+            ? { breakdown_properties: retBdProps }
+            : {}),
+        },
+      });
     }
   );
 
@@ -1367,18 +1378,23 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         LIMIT 30
       `;
 
-      let top_paths: { path: string[]; count: number; percentage: number }[] = [];
+      let top_paths: { path: string[]; count: number; percentage: number }[] =
+        [];
       try {
         const { data: topPathsRows } = (await optic.rawQuery({
           query: topPathsSql,
           params,
         })) as { data: any[] };
 
-        const totalPathsCount = topPathsRows.reduce((sum: number, r: any) => sum + Number(r.cnt), 0) || 1;
+        const totalPathsCount =
+          topPathsRows.reduce(
+            (sum: number, r: any) => sum + Number(r.cnt),
+            0
+          ) || 1;
         top_paths = topPathsRows.map((r: any) => ({
           path: r.seq || [],
           count: Number(r.cnt),
-          percentage: Math.round((Number(r.cnt) / totalPathsCount) * 1000) / 10
+          percentage: Math.round((Number(r.cnt) / totalPathsCount) * 1000) / 10,
         }));
       } catch (err) {
         // Fallback to empty top paths
@@ -1386,7 +1402,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       }
 
       // ── Breakdown: separate flow per breakdown value ──
-      let breakdowns: Record<string, { nodes: any[]; links: any[] }> | undefined;
+      let breakdowns:
+        | Record<string, { nodes: any[]; links: any[] }>
+        | undefined;
       const flowBdProps = getBreakdownProperties(body.breakdown);
       if (flowBdProps.length > 0) {
         try {
@@ -1414,7 +1432,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             const bdParamKey = `bdFlowVal_${Object.keys(breakdowns).length}`;
             bdParams[bdParamKey] = bv;
 
-            const bdConditions = [...conditions, `${bdCol} = {${bdParamKey}:String}`];
+            const bdConditions = [
+              ...conditions,
+              `${bdCol} = {${bdParamKey}:String}`,
+            ];
 
             const bdSql = `
               SELECT
@@ -1456,8 +1477,12 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             })) as { data: any[] };
 
             const bdNodeMap = new Map<string, number>();
-            const bdLinks: { source: string; target: string; value: number }[] = [];
-            const bdTotal = bdRows.reduce((s: number, r: any) => s + Number(r.value), 0);
+            const bdLinks: { source: string; target: string; value: number }[] =
+              [];
+            const bdTotal = bdRows.reduce(
+              (s: number, r: any) => s + Number(r.value),
+              0
+            );
             const bdThreshold = bdTotal * minFrequency;
 
             for (const row of bdRows) {
@@ -1471,7 +1496,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             }
 
             breakdowns[bv] = {
-              nodes: Array.from(bdNodeMap.entries()).map(([id, count]) => ({ id, count })),
+              nodes: Array.from(bdNodeMap.entries()).map(([id, count]) => ({
+                id,
+                count,
+              })),
               links: bdLinks,
             };
           }
@@ -1480,7 +1508,18 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         }
       }
 
-      return reply.send({ success: true, data: { nodes, links, breakdowns, top_paths, ...(flowBdProps.length > 0 ? { breakdown_properties: flowBdProps } : {}) } });
+      return reply.send({
+        success: true,
+        data: {
+          nodes,
+          links,
+          breakdowns,
+          top_paths,
+          ...(flowBdProps.length > 0
+            ? { breakdown_properties: flowBdProps }
+            : {}),
+        },
+      });
     }
   );
 }
@@ -1553,13 +1592,13 @@ function resolveBreakdownColumn(property: string): string {
 function buildBreakdownExpression(properties: string[]): string {
   if (properties.length === 0) return "''";
   if (properties.length === 1) return resolveBreakdownColumn(properties[0]);
-  return `concat(${properties.map(p => resolveBreakdownColumn(p)).join(", '|||', ")})`;
+  return `concat(${properties.map((p) => resolveBreakdownColumn(p)).join(", '|||', ")})`;
 }
 
 /** Extract breakdown properties array from request body */
-function getBreakdownProperties(
-  breakdown?: { properties?: string[] }
-): string[] {
+function getBreakdownProperties(breakdown?: {
+  properties?: string[];
+}): string[] {
   return breakdown?.properties?.filter(Boolean) ?? [];
 }
 
@@ -1643,7 +1682,7 @@ interface Condition {
 
 interface GlobalFilterEntry {
   property: string;
-  operator: string;    // 'is' | 'is_not' | 'contains' | 'not_contains'
+  operator: string; // 'is' | 'is_not' | 'contains' | 'not_contains'
   value: string;
 }
 
@@ -1660,7 +1699,11 @@ function buildGlobalFilterConditions(
   if (!globalFilters || globalFilters.length === 0) return [];
 
   return globalFilters
-    .filter((f) => f.property && (f.value || f.operator === 'set' || f.operator === 'not_set'))
+    .filter(
+      (f) =>
+        f.property &&
+        (f.value || f.operator === 'set' || f.operator === 'not_set')
+    )
     .map((f, i) => {
       const pKey = `${prefix}${i}`;
       params[pKey] = f.value;

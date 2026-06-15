@@ -91,7 +91,8 @@ export const useInsightsStore = create<InsightsState>()(
       ...INSIGHTS_DEFAULTS,
       setDateRange: (dateRange) => set({ dateRange }),
       setEvents: (events) => set({ events }),
-      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
+      setBreakdownProperties: (breakdownProperties) =>
+        set({ breakdownProperties }),
       setChartType: (chartType) => set({ chartType }),
       setComparePeriod: (comparePeriod) => set({ comparePeriod }),
       setFormulas: (formulas) => set({ formulas }),
@@ -194,7 +195,8 @@ export const useFunnelsStore = create<FunnelsState>()(
       setOrdering: (ordering) => set({ ordering }),
       setCounting: (counting) => set({ counting }),
       setHoldConstant: (holdConstant) => set({ holdConstant }),
-      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
+      setBreakdownProperties: (breakdownProperties) =>
+        set({ breakdownProperties }),
       setExclusionSteps: (exclusionSteps) => set({ exclusionSteps }),
       setSegments: (segments) => set({ segments }),
       setCompareMode: (compareMode) => set({ compareMode }),
@@ -288,7 +290,8 @@ export const useRetentionStore = create<RetentionState>()(
       setMeasurementProperty: (measurementProperty) =>
         set({ measurementProperty }),
       setMinFrequency: (minFrequency) => set({ minFrequency }),
-      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
+      setBreakdownProperties: (breakdownProperties) =>
+        set({ breakdownProperties }),
       setViewMode: (viewMode) => set({ viewMode }),
       resetStore: () => set({ ...RETENTION_DEFAULTS }),
     }),
@@ -373,7 +376,8 @@ export const useFlowsStore = create<FlowsState>()(
       setDepth: (depth) => set({ depth }),
       setViewMode: (viewMode) => set({ viewMode }),
       setExcludeEvents: (excludeEvents) => set({ excludeEvents }),
-      setBreakdownProperties: (breakdownProperties) => set({ breakdownProperties }),
+      setBreakdownProperties: (breakdownProperties) =>
+        set({ breakdownProperties }),
       resetStore: () => set({ ...FLOWS_DEFAULTS }),
     }),
     {

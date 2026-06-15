@@ -8,8 +8,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 export interface GlobalFilter {
-  property: string;       // 'platform' | 'country' | 'os' | 'app_version' | custom prop
-  operator: string;       // 'is' | 'is_not' | 'contains' | 'not_contains'
+  property: string; // 'platform' | 'country' | 'os' | 'app_version' | custom prop
+  operator: string; // 'is' | 'is_not' | 'contains' | 'not_contains'
   value: string;
 }
 
@@ -30,7 +30,9 @@ export const useGlobalAnalyticsFilter = create<GlobalAnalyticsFilterState>()(
       addFilter: (f) => set({ filters: [...get().filters, f] }),
       updateFilter: (idx, f) =>
         set({
-          filters: get().filters.map((existing, i) => (i === idx ? f : existing)),
+          filters: get().filters.map((existing, i) =>
+            i === idx ? f : existing
+          ),
         }),
       removeFilter: (idx) =>
         set({ filters: get().filters.filter((_, i) => i !== idx) }),

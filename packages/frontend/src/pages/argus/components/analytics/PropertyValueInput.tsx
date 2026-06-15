@@ -4,7 +4,13 @@
  * Uses AbortController for request cancellation and debounced search.
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Box, Typography, useTheme, alpha, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  useTheme,
+  alpha,
+  CircularProgress,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import argusService from '@/services/argusService';
 import { formatCompactNumber } from '@/utils/numberFormat';
@@ -30,7 +36,9 @@ const PropertyValueInput: React.FC<PropertyValueInputProps> = ({
   const isDark = theme.palette.mode === 'dark';
   const { t } = useTranslation();
 
-  const [suggestions, setSuggestions] = useState<{ value: string; count: number }[]>([]);
+  const [suggestions, setSuggestions] = useState<
+    { value: string; count: number }[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [highlightIdx, setHighlightIdx] = useState(-1);
@@ -118,7 +126,11 @@ const PropertyValueInput: React.FC<PropertyValueInputProps> = ({
       e.preventDefault();
       setHighlightIdx((prev) => Math.max(prev - 1, -1));
       return;
-    } else if (e.key === 'Enter' && highlightIdx >= 0 && filtered[highlightIdx]) {
+    } else if (
+      e.key === 'Enter' &&
+      highlightIdx >= 0 &&
+      filtered[highlightIdx]
+    ) {
       e.preventDefault();
       handleSelect(filtered[highlightIdx].value);
       return; // Don't propagate — user is selecting a suggestion, not submitting
@@ -131,7 +143,10 @@ const PropertyValueInput: React.FC<PropertyValueInputProps> = ({
   // Close on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -189,7 +204,9 @@ const PropertyValueInput: React.FC<PropertyValueInputProps> = ({
             py: 0.5,
             '&::-webkit-scrollbar': { width: '4px' },
             '&::-webkit-scrollbar-thumb': {
-              backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.1)'
+                : 'rgba(0,0,0,0.1)',
               borderRadius: '2px',
             },
           }}

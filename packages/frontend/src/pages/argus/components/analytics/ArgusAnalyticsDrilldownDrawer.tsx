@@ -32,7 +32,9 @@ interface ArgusAnalyticsDrilldownDrawerProps {
   breakdownValue?: string;
 }
 
-export const ArgusAnalyticsDrilldownDrawer: React.FC<ArgusAnalyticsDrilldownDrawerProps> = ({
+export const ArgusAnalyticsDrilldownDrawer: React.FC<
+  ArgusAnalyticsDrilldownDrawerProps
+> = ({
   open,
   onClose,
   projectId,
@@ -48,7 +50,9 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<ArgusAnalyticsDrilldownDraw
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<Record<string, any>[]>([]);
-  const [selectedRow, setSelectedRow] = useState<Record<string, any> | null>(null);
+  const [selectedRow, setSelectedRow] = useState<Record<string, any> | null>(
+    null
+  );
 
   const fetchDrilldownData = useCallback(async () => {
     if (!open || !eventName) return;
@@ -81,7 +85,16 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<ArgusAnalyticsDrilldownDraw
       const conditions = conditionsParts.join(' ');
 
       const result = await argusService.discoverQuery(projectId, {
-        fields: ['timestamp', 'user_id', 'event_name', 'level', 'service', 'span_id', 'trace_id', 'message'],
+        fields: [
+          'timestamp',
+          'user_id',
+          'event_name',
+          'level',
+          'service',
+          'span_id',
+          'trace_id',
+          'message',
+        ],
         conditions: conditions || undefined,
         period: 'custom',
         start: dateRange.start.toISOString(),
@@ -96,7 +109,15 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<ArgusAnalyticsDrilldownDraw
     } finally {
       setLoading(false);
     }
-  }, [open, projectId, eventName, dateRange, globalFilters, breakdownProperty, breakdownValue]);
+  }, [
+    open,
+    projectId,
+    eventName,
+    dateRange,
+    globalFilters,
+    breakdownProperty,
+    breakdownValue,
+  ]);
 
   useEffect(() => {
     fetchDrilldownData();
@@ -126,34 +147,80 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<ArgusAnalyticsDrilldownDraw
         storageKey="argus-analytics-drilldown-drawer"
         defaultWidth={650}
       >
-        <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <Box
+          sx={{
+            p: 2,
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+              }}
+            >
               <CircularProgress size={40} />
             </Box>
           ) : data.length === 0 ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+              }}
+            >
               <Typography color="text.secondary">
-                {t('argus.analytics.drilldown.noData', 'No raw events found for the selected timeframe.')}
+                {t(
+                  'argus.analytics.drilldown.noData',
+                  'No raw events found for the selected timeframe.'
+                )}
               </Typography>
             </Box>
           ) : (
-            <TableContainer component={Paper} elevation={0} sx={{ flex: 1, overflowY: 'auto', border: `1px solid ${theme.palette.divider}` }}>
+            <TableContainer
+              component={Paper}
+              elevation={0}
+              sx={{
+                flex: 1,
+                overflowY: 'auto',
+                border: `1px solid ${theme.palette.divider}`,
+              }}
+            >
               <Table size="small" stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('argus.analytics.drilldown.colTime', 'Time')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('argus.analytics.drilldown.colUser', 'User ID')}</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>{t('argus.analytics.drilldown.colLevel', 'Level')}</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600 }}>{t('argus.analytics.drilldown.colAction', 'Action')}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('argus.analytics.drilldown.colTime', 'Time')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('argus.analytics.drilldown.colUser', 'User ID')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {t('argus.analytics.drilldown.colLevel', 'Level')}
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600 }}>
+                      {t('argus.analytics.drilldown.colAction', 'Action')}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {data.map((row, idx) => (
                     <TableRow key={row.span_id || idx} hover>
-                      <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatTimestamp(row.timestamp)}</TableCell>
+                      <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                        {formatTimestamp(row.timestamp)}
+                      </TableCell>
                       <TableCell>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ fontFamily: 'monospace' }}
+                        >
                           {truncateString(row.user_id, 12)}
                         </Typography>
                       </TableCell>
@@ -209,7 +276,11 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<ArgusAnalyticsDrilldownDraw
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setSelectedRow(null)} variant="contained" size="small">
+          <Button
+            onClick={() => setSelectedRow(null)}
+            variant="contained"
+            size="small"
+          >
             {t('argus.analytics.drilldown.btnClose', 'Close')}
           </Button>
         </DialogActions>

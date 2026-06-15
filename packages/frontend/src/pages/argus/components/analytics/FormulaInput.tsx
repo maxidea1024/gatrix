@@ -1,5 +1,12 @@
 import React, { useMemo } from 'react';
-import { Box, TextField, Typography, useTheme, alpha, InputAdornment } from '@mui/material';
+import {
+  Box,
+  TextField,
+  Typography,
+  useTheme,
+  alpha,
+  InputAdornment,
+} from '@mui/material';
 import { Functions as FxIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
@@ -74,10 +81,14 @@ const FormulaInput: React.FC<FormulaInputProps> = ({
     if (!rawError) return '';
     if (rawError.startsWith('formula_unknown_metric:')) {
       const parts = rawError.split(':');
-      return t('argus.analytics.formulaUnknownMetric', 'Unknown metric "{{label}}". Available: {{available}}', {
-        label: parts[1],
-        available: parts[2]?.replace(/,/g, ', ') || '',
-      });
+      return t(
+        'argus.analytics.formulaUnknownMetric',
+        'Unknown metric "{{label}}". Available: {{available}}',
+        {
+          label: parts[1],
+          available: parts[2]?.replace(/,/g, ', ') || '',
+        }
+      );
     }
     const key = FORMULA_ERROR_MAP[rawError];
     if (key) return t(key, rawError);

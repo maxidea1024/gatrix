@@ -27,10 +27,22 @@ const CompareSelector: React.FC<CompareSelectorProps> = ({
 
   const OPTIONS: { value: ComparePeriod; label: string }[] = [
     { value: '', label: t('common.none', 'None') },
-    { value: 'previous_period', label: t('argus.analytics.comparePreviousPeriod', 'Previous Period') },
-    { value: 'previous_week', label: t('argus.analytics.comparePreviousWeek', 'Previous Week') },
-    { value: 'previous_month', label: t('argus.analytics.comparePreviousMonth', 'Previous Month') },
-    { value: 'previous_year', label: t('argus.analytics.comparePreviousYear', 'Previous Year') },
+    {
+      value: 'previous_period',
+      label: t('argus.analytics.comparePreviousPeriod', 'Previous Period'),
+    },
+    {
+      value: 'previous_week',
+      label: t('argus.analytics.comparePreviousWeek', 'Previous Week'),
+    },
+    {
+      value: 'previous_month',
+      label: t('argus.analytics.comparePreviousMonth', 'Previous Month'),
+    },
+    {
+      value: 'previous_year',
+      label: t('argus.analytics.comparePreviousYear', 'Previous Year'),
+    },
   ];
 
   const activeOption = OPTIONS.find((o) => o.value === value);
@@ -71,7 +83,9 @@ const CompareSelector: React.FC<CompareSelectorProps> = ({
         }}
       >
         <CompareIcon sx={{ fontSize: 16 }} />
-        {isActive ? activeOption?.label : t('argus.analytics.compare', 'Compare')}
+        {isActive
+          ? activeOption?.label
+          : t('argus.analytics.compare', 'Compare')}
       </Box>
 
       <Popover

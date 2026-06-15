@@ -149,34 +149,34 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
         }}
       >
         {options.length > 6 && (
-        <Box
-          sx={{
-            p: 1,
-            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-          }}
-        >
-          <TextField
-            autoFocus
-            fullWidth
-            size="small"
-            placeholder={placeholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 18 }} />
-                </InputAdornment>
-              ),
-              sx: { fontSize: '0.85rem' },
-            }}
+          <Box
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 1.5,
-              },
+              p: 1,
+              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
             }}
-          />
-        </Box>
+          >
+            <TextField
+              autoFocus
+              fullWidth
+              size="small"
+              placeholder={placeholder}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 18 }} />
+                  </InputAdornment>
+                ),
+                sx: { fontSize: '0.85rem' },
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 1.5,
+                },
+              }}
+            />
+          </Box>
         )}
         <List sx={{ p: 0, maxHeight: 300, overflowY: 'auto' }}>
           {filteredOptions.length === 0 ? (

@@ -18,7 +18,11 @@ import {
   Checkbox,
   Button,
 } from '@mui/material';
-import { Search as SearchIcon, Close as CloseIcon, Add as AddIcon } from '@mui/icons-material';
+import {
+  Search as SearchIcon,
+  Close as CloseIcon,
+  Add as AddIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import argusService from '@/services/argusService';
 
@@ -78,7 +82,8 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
   const { t } = useTranslation();
   const anchorRef = useRef<any>(null);
 
-  const emptyLabel = emptyLabelProp ?? t('argus.analytics.selectProperty', 'Select Property');
+  const emptyLabel =
+    emptyLabelProp ?? t('argus.analytics.selectProperty', 'Select Property');
 
   /** Translate a builtin property key at render time */
   const getBuiltinLabel = useCallback(
@@ -100,7 +105,11 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
     try {
       // Always include builtin columns
       const builtinProps: PropertyOption[] = Object.keys(BUILTIN_KEYS).map(
-        (key) => ({ key, type: 'builtin' as const, label: BUILTIN_DEFAULTS[key] })
+        (key) => ({
+          key,
+          type: 'builtin' as const,
+          label: BUILTIN_DEFAULTS[key],
+        })
       );
 
       // Always call API - when eventName is undefined, backend returns all project properties
@@ -163,10 +172,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
     return groups;
   }, [filtered]);
 
-  const isSelected = useCallback(
-    (key: string) => value.includes(key),
-    [value]
-  );
+  const isSelected = useCallback((key: string) => value.includes(key), [value]);
 
   const toggleProperty = useCallback(
     (key: string) => {
@@ -211,7 +217,9 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
             width: 'fit-content',
             minWidth: 0,
             '&:hover': {
-              background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+              background: isDark
+                ? 'rgba(255,255,255,0.04)'
+                : 'rgba(0,0,0,0.04)',
             },
           }}
         >
@@ -232,7 +240,9 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
             fontSize: '0.8rem',
             fontWeight: 500,
             color:
-              isEmpty && highlightEmpty ? theme.palette.primary.main : 'inherit',
+              isEmpty && highlightEmpty
+                ? theme.palette.primary.main
+                : 'inherit',
             border: `1px solid ${
               isEmpty && highlightEmpty
                 ? alpha(theme.palette.primary.main, 0.3)
@@ -242,8 +252,12 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
             }`,
             background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
             '&:hover': {
-              background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-              borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+              background: isDark
+                ? 'rgba(255,255,255,0.06)'
+                : 'rgba(0,0,0,0.04)',
+              borderColor: isDark
+                ? 'rgba(255,255,255,0.15)'
+                : 'rgba(0,0,0,0.15)',
             },
             transition: 'all 0.15s ease',
             flexWrap: 'wrap',
@@ -267,7 +281,10 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                   height: 20,
                   fontSize: '0.72rem',
                   fontWeight: 500,
-                  bgcolor: alpha(theme.palette.primary.main, isDark ? 0.15 : 0.08),
+                  bgcolor: alpha(
+                    theme.palette.primary.main,
+                    isDark ? 0.15 : 0.08
+                  ),
                   color: theme.palette.primary.main,
                   '& .MuiChip-deleteIcon': {
                     fontSize: 14,
@@ -315,7 +332,10 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
           <TextField
             size="small"
             fullWidth
-            placeholder={t('argus.analytics.searchProperties', 'Search properties...')}
+            placeholder={t(
+              'argus.analytics.searchProperties',
+              'Search properties...'
+            )}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             autoFocus
@@ -353,7 +373,10 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                 sx={{
                   height: 20,
                   fontSize: '0.7rem',
-                  bgcolor: alpha(theme.palette.primary.main, isDark ? 0.15 : 0.08),
+                  bgcolor: alpha(
+                    theme.palette.primary.main,
+                    isDark ? 0.15 : 0.08
+                  ),
                   color: theme.palette.primary.main,
                   '& .MuiChip-deleteIcon': {
                     fontSize: 14,
@@ -379,7 +402,9 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                 variant="caption"
                 sx={{ color: 'text.disabled', fontSize: '0.65rem', ml: 'auto' }}
               >
-                {t('argus.analytics.maxBreakdowns', 'Max {{max}}', { max: maxItems })}
+                {t('argus.analytics.maxBreakdowns', 'Max {{max}}', {
+                  max: maxItems,
+                })}
               </Typography>
             )}
           </Box>
@@ -436,8 +461,14 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                   groupType === 'builtin'
                     ? t('argus.analytics.groupBuiltin', 'Built-in')
                     : groupType === 'string'
-                      ? t('argus.analytics.groupCustomString', 'Custom (String)')
-                      : t('argus.analytics.groupCustomNumeric', 'Custom (Numeric)');
+                      ? t(
+                          'argus.analytics.groupCustomString',
+                          'Custom (String)'
+                        )
+                      : t(
+                          'argus.analytics.groupCustomNumeric',
+                          'Custom (Numeric)'
+                        );
 
                 return (
                   <React.Fragment key={groupType}>
@@ -504,7 +535,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                           <span style={{ flex: 1 }}>
                             {prop.type === 'builtin'
                               ? getBuiltinLabel(prop.key)
-                              : (prop.label || prop.key)}
+                              : prop.label || prop.key}
                           </span>
                           {groupType !== 'builtin' && (
                             <Chip
@@ -515,11 +546,15 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                                 fontSize: '0.6rem',
                                 fontWeight: 600,
                                 bgcolor: alpha(
-                                  groupType === 'string' ? '#3b82f6' : '#f59e0b',
+                                  groupType === 'string'
+                                    ? '#3b82f6'
+                                    : '#f59e0b',
                                   isDark ? 0.15 : 0.1
                                 ),
                                 color:
-                                  groupType === 'string' ? '#3b82f6' : '#f59e0b',
+                                  groupType === 'string'
+                                    ? '#3b82f6'
+                                    : '#f59e0b',
                               }}
                             />
                           )}

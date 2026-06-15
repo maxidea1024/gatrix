@@ -2774,11 +2774,14 @@ class ArgusService {
       cohort_size: number;
       retention: number[];
     }[];
-    breakdowns?: Record<string, {
-      cohort_date: string;
-      cohort_size: number;
-      retention: number[];
-    }[]>;
+    breakdowns?: Record<
+      string,
+      {
+        cohort_date: string;
+        cohort_size: number;
+        retention: number[];
+      }[]
+    >;
   }> {
     const response = await argusApi.post(
       `${ARGUS_BASE}/projects/${projectId}/analytics/retention`,
