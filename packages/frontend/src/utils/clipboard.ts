@@ -78,7 +78,6 @@ export const tryExecCommandCopy = (text: string): boolean => {
 export const copyToClipboard = async (text: string): Promise<boolean> => {
   if (!text) return false;
 
-
   // Try modern Clipboard API first (HTTPS/localhost only)
   if (navigator.clipboard && window.isSecureContext) {
     try {
