@@ -29,8 +29,18 @@ import { FlagImage } from '@/components/common/CountrySelect';
 import { getCountryByCode } from '@/utils/countries';
 
 // ─── Platform SVG brand icons ─────────────────────────────────────────────────
-const IconSvg: React.FC<{ d: string; color?: string; size?: number }> = ({ d, color = 'currentColor', size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0 }}>
+const IconSvg: React.FC<{ d: string; color?: string; size?: number }> = ({
+  d,
+  color = 'currentColor',
+  size = 16,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill={color}
+    style={{ flexShrink: 0 }}
+  >
     <path d={d} />
   </svg>
 );
@@ -94,7 +104,8 @@ function relativeTime(ts: string, t: any): string {
     const then = new Date(ts).getTime();
     const diffSec = Math.floor((now - then) / 1000);
 
-    if (diffSec < 60) return t('argus.analytics.drilldown.timeJustNow', 'just now');
+    if (diffSec < 60)
+      return t('argus.analytics.drilldown.timeJustNow', 'just now');
     if (diffSec < 3600) {
       const m = Math.floor(diffSec / 60);
       return t('argus.analytics.drilldown.timeMinAgo', '{{m}}m ago', { m });
@@ -138,8 +149,13 @@ const DetailPanel: React.FC<{ row: Record<string, any> }> = ({ row }) => {
   const detailFields = useMemo(() => {
     const skip = new Set(['event_id']);
     return Object.entries(row)
-      .filter(([k, v]) => !skip.has(k) && v !== null && v !== undefined && v !== '')
-      .map(([k, v]) => ({ key: k, value: typeof v === 'object' ? JSON.stringify(v) : String(v) }));
+      .filter(
+        ([k, v]) => !skip.has(k) && v !== null && v !== undefined && v !== ''
+      )
+      .map(([k, v]) => ({
+        key: k,
+        value: typeof v === 'object' ? JSON.stringify(v) : String(v),
+      }));
   }, [row]);
 
   return (
@@ -310,14 +326,7 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
     } finally {
       setLoading(false);
     }
-  }, [
-    open,
-    projectId,
-    eventName,
-    dateRange,
-    globalFilters,
-    breakdownFilters,
-  ]);
+  }, [open, projectId, eventName, dateRange, globalFilters, breakdownFilters]);
 
   useEffect(() => {
     fetchDrilldownData();
@@ -332,7 +341,9 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
       await navigator.clipboard.writeText(userId);
       setCopiedId(rowId);
       setTimeout(() => setCopiedId(null), 1500);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   };
 
   // ── Header cell style ───────────────────────────────────────────────────
@@ -396,8 +407,14 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
             {loading
               ? t('argus.analytics.drilldown.loading', 'Loading...')
               : data.length >= 100
-                ? t('argus.analytics.drilldown.countCapped', '{{count}}+ events', { count: data.length })
-                : t('argus.analytics.drilldown.count', '{{count}} events', { count: data.length })}
+                ? t(
+                    'argus.analytics.drilldown.countCapped',
+                    '{{count}}+ events',
+                    { count: data.length }
+                  )
+                : t('argus.analytics.drilldown.count', '{{count}} events', {
+                    count: data.length,
+                  })}
           </Typography>
         </Box>
 
@@ -416,7 +433,14 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ ...headerCellSx, width: 40, px: 1, textAlign: 'center' }} />
+                <TableCell
+                  sx={{
+                    ...headerCellSx,
+                    width: 40,
+                    px: 1,
+                    textAlign: 'center',
+                  }}
+                />
                 <TableCell sx={headerCellSx}>
                   {t('argus.analytics.drilldown.colTime', 'Time')}
                 </TableCell>
@@ -448,7 +472,11 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
                       }}
                     >
                       <EmptyIcon
-                        sx={{ fontSize: 48, color: 'text.disabled', opacity: 0.5 }}
+                        sx={{
+                          fontSize: 48,
+                          color: 'text.disabled',
+                          opacity: 0.5,
+                        }}
                       />
                       <Typography
                         variant="body2"
@@ -498,7 +526,14 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
                         }}
                       >
                         {/* Expand toggle */}
-                        <TableCell sx={{ width: 40, px: 1, py: 0.75, textAlign: 'center' }}>
+                        <TableCell
+                          sx={{
+                            width: 40,
+                            px: 1,
+                            py: 0.75,
+                            textAlign: 'center',
+                          }}
+                        >
                           {isExpanded ? (
                             <CollapseIcon
                               sx={{ fontSize: 18, color: 'text.secondary' }}
@@ -519,7 +554,10 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
                           >
                             <Typography
                               variant="body2"
-                              sx={{ fontSize: '0.8125rem', color: 'text.primary' }}
+                              sx={{
+                                fontSize: '0.8125rem',
+                                color: 'text.primary',
+                              }}
                             >
                               {relativeTime(row.timestamp, t)}
                             </Typography>
@@ -538,7 +576,10 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
                             <Tooltip
                               title={
                                 copiedId === rowId
-                                  ? t('argus.analytics.drilldown.copied', 'Copied!')
+                                  ? t(
+                                      'argus.analytics.drilldown.copied',
+                                      'Copied!'
+                                    )
                                   : row.user_id || ''
                               }
                               placement="top"
@@ -555,10 +596,13 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
                                 size="small"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (row.user_id) handleCopyUserId(row.user_id, rowId);
+                                  if (row.user_id)
+                                    handleCopyUserId(row.user_id, rowId);
                                 }}
                                 icon={
-                                  <CopyIcon sx={{ fontSize: '12px !important' }} />
+                                  <CopyIcon
+                                    sx={{ fontSize: '12px !important' }}
+                                  />
                                 }
                                 sx={{
                                   fontFamily: 'monospace',
@@ -585,9 +629,18 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
 
                         {/* Platform */}
                         <TableCell sx={{ py: 0.75 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.75,
+                            }}
+                          >
                             <PlatformIcon platform={row.platform} />
-                            <Typography variant="body2" sx={{ fontSize: '0.8125rem' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontSize: '0.8125rem' }}
+                            >
                               {row.platform || '—'}
                             </Typography>
                           </Box>
@@ -596,16 +649,41 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
                         {/* Country */}
                         <TableCell sx={{ py: 0.75 }}>
                           {row.country ? (
-                            <Tooltip title={getCountryByCode(row.country)?.name || row.country} placement="top" arrow>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                                <FlagImage code={row.country.toLowerCase()} size={16} />
-                                <Typography variant="body2" sx={{ fontSize: '0.8125rem' }}>
+                            <Tooltip
+                              title={
+                                getCountryByCode(row.country)?.name ||
+                                row.country
+                              }
+                              placement="top"
+                              arrow
+                            >
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.75,
+                                }}
+                              >
+                                <FlagImage
+                                  code={row.country.toLowerCase()}
+                                  size={16}
+                                />
+                                <Typography
+                                  variant="body2"
+                                  sx={{ fontSize: '0.8125rem' }}
+                                >
                                   {row.country}
                                 </Typography>
                               </Box>
                             </Tooltip>
                           ) : (
-                            <Typography variant="body2" sx={{ fontSize: '0.8125rem', color: 'text.disabled' }}>
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontSize: '0.8125rem',
+                                color: 'text.disabled',
+                              }}
+                            >
                               —
                             </Typography>
                           )}
@@ -614,11 +692,12 @@ export const ArgusAnalyticsDrilldownDrawer: React.FC<
 
                       {/* ── Expanded detail ─────────────────────── */}
                       <TableRow>
-                        <TableCell
-                          colSpan={5}
-                          sx={{ p: 0, border: 0 }}
-                        >
-                          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                        <TableCell colSpan={5} sx={{ p: 0, border: 0 }}>
+                          <Collapse
+                            in={isExpanded}
+                            timeout="auto"
+                            unmountOnExit
+                          >
                             <DetailPanel row={row} />
                           </Collapse>
                         </TableCell>

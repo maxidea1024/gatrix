@@ -102,7 +102,10 @@ import {
 } from './components/analytics/useBreakdownLimit';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { formatBreakdownLabel, splitBreakdownValue } from './components/analytics/breakdownUtils';
+import {
+  formatBreakdownLabel,
+  splitBreakdownValue,
+} from './components/analytics/breakdownUtils';
 import QuickLexiconEditor from './components/analytics/QuickLexiconEditor';
 
 /* ─── Types ─── */
@@ -261,17 +264,20 @@ const ArgusInsightsPage: React.FC = () => {
     return map;
   }, [availableEvents]);
 
-  const tooltipFormatter = useCallback((value: any, name: string) => {
-    let label = name;
-    if (name.includes(':')) {
-      const [eventName, breakdownVal] = name.split(':');
-      const display = lexiconMap.get(eventName) || eventName;
-      label = `${display}: ${breakdownVal}`;
-    } else {
-      label = lexiconMap.get(name) || name;
-    }
-    return [value, label];
-  }, [lexiconMap]);
+  const tooltipFormatter = useCallback(
+    (value: any, name: string) => {
+      let label = name;
+      if (name.includes(':')) {
+        const [eventName, breakdownVal] = name.split(':');
+        const display = lexiconMap.get(eventName) || eventName;
+        label = `${display}: ${breakdownVal}`;
+      } else {
+        label = lexiconMap.get(name) || name;
+      }
+      return [value, label];
+    },
+    [lexiconMap]
+  );
 
   const [series, setSeries] = useState<any[]>([]);
   const [compareSeries, setCompareSeries] = useState<any[] | undefined>();
@@ -300,7 +306,9 @@ const ArgusInsightsPage: React.FC = () => {
 
   // Quick lexicon editor state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   const handleZoom = useCallback(() => {
@@ -748,18 +756,24 @@ const ArgusInsightsPage: React.FC = () => {
         // original composite value from series data
         const matchingSeries = series.find((s) => {
           if (!s.breakdown_value) return false;
-          return formatBreakdownLabel(s.breakdown_value, breakdownProperties) === bValue
-            && s.event === eventName;
+          return (
+            formatBreakdownLabel(s.breakdown_value, breakdownProperties) ===
+              bValue && s.event === eventName
+          );
         });
         if (matchingSeries) {
           const parts = splitBreakdownValue(matchingSeries.breakdown_value);
-          breakdownFilters = breakdownProperties.map((prop: string, i: number) => ({
-            property: prop,
-            value: parts[i] || '',
-          })).filter((f: { property: string; value: string }) => f.value !== '');
+          breakdownFilters = breakdownProperties
+            .map((prop: string, i: number) => ({
+              property: prop,
+              value: parts[i] || '',
+            }))
+            .filter((f: { property: string; value: string }) => f.value !== '');
         } else {
           // Fallback: single property
-          breakdownFilters = [{ property: breakdownProperties[0], value: bValue }];
+          breakdownFilters = [
+            { property: breakdownProperties[0], value: bValue },
+          ];
         }
       }
 
@@ -777,18 +791,21 @@ const ArgusInsightsPage: React.FC = () => {
   const { localizeEventName, localizeEventDescription } = useLocalizedLexicon();
 
   const eventOptions = useMemo(
-    () => availableEvents.map((e) => ({
-      value: e.name,
-      label: localizeEventName(e.name, e.display_name, e.is_reserved),
-      icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
-      meta: {
-        eventKey: e.name,
-        description: localizeEventDescription(e.name, e.description, e.is_reserved) || undefined,
-        category: e.category || undefined,
-        count: e.count,
-        isReserved: e.is_reserved,
-      },
-    })),
+    () =>
+      availableEvents.map((e) => ({
+        value: e.name,
+        label: localizeEventName(e.name, e.display_name, e.is_reserved),
+        icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
+        meta: {
+          eventKey: e.name,
+          description:
+            localizeEventDescription(e.name, e.description, e.is_reserved) ||
+            undefined,
+          category: e.category || undefined,
+          count: e.count,
+          isReserved: e.is_reserved,
+        },
+      })),
     [availableEvents, localizeEventName, localizeEventDescription]
   );
 
@@ -1106,9 +1123,7 @@ const ArgusInsightsPage: React.FC = () => {
           </Typography>
         )}
 
-        <Box
-          sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}
-        >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {formulas.map((form, idx) => (
               <Box
@@ -1490,11 +1505,15 @@ const ArgusInsightsPage: React.FC = () => {
                   }}
                 >
                   {(() => {
-                    const eventName = key.includes(':') ? key.split(':')[0] : key;
+                    const eventName = key.includes(':')
+                      ? key.split(':')[0]
+                      : key;
                     return lexiconMap.get(eventName) || eventName;
                   })()}
                   {key.includes(':') && (
-                    <span style={{ opacity: 0.6 }}>:{key.split(':').slice(1).join(':')}</span>
+                    <span style={{ opacity: 0.6 }}>
+                      :{key.split(':').slice(1).join(':')}
+                    </span>
                   )}
                 </th>
               ))}
@@ -1665,7 +1684,14 @@ const ArgusInsightsPage: React.FC = () => {
                     {(() => {
                       const meta = eventMetaMap.get(s.event);
                       return (
-                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+                        <Box
+                          sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 0.75,
+                            minWidth: 0,
+                          }}
+                        >
                           <EventLabel
                             eventName={s.event}
                             displayName={meta?.display_name}
@@ -1676,8 +1702,16 @@ const ArgusInsightsPage: React.FC = () => {
                             showIcon={false}
                           />
                           {s.breakdown_value && (
-                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-                              — {formatBreakdownLabel(s.breakdown_value, breakdownProperties)}
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontSize: '0.75rem' }}
+                            >
+                              —{' '}
+                              {formatBreakdownLabel(
+                                s.breakdown_value,
+                                breakdownProperties
+                              )}
                             </Typography>
                           )}
                         </Box>

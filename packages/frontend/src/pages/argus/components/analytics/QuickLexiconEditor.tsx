@@ -10,10 +10,7 @@ import {
   useTheme,
   InputAdornment,
 } from '@mui/material';
-import {
-  Search as SearchIcon,
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import argusService from '@/services/argusService';
@@ -107,20 +104,31 @@ const QuickLexiconEditor: React.FC<QuickLexiconEditorProps> = ({
       onSaved();
       onClose();
     } catch {
-      enqueueSnackbar(
-        t('argus.analytics.lexiconSaveError', 'Failed to save'),
-        { variant: 'error' }
-      );
+      enqueueSnackbar(t('argus.analytics.lexiconSaveError', 'Failed to save'), {
+        variant: 'error',
+      });
     } finally {
       setSaving(false);
     }
-  }, [projectId, eventName, displayName, description, icon, iconColor, enqueueSnackbar, t, onSaved, onClose]);
+  }, [
+    projectId,
+    eventName,
+    displayName,
+    description,
+    icon,
+    iconColor,
+    enqueueSnackbar,
+    t,
+    onSaved,
+    onClose,
+  ]);
 
   const filteredIcons = useMemo(() => {
     if (!iconSearch) return ICON_CATALOG;
     const s = iconSearch.toLowerCase();
     return ICON_CATALOG.filter(
-      (ic) => ic.name.toLowerCase().includes(s) || ic.label.toLowerCase().includes(s)
+      (ic) =>
+        ic.name.toLowerCase().includes(s) || ic.label.toLowerCase().includes(s)
     );
   }, [iconSearch]);
 
@@ -161,7 +169,11 @@ const QuickLexiconEditor: React.FC<QuickLexiconEditorProps> = ({
         }}
       >
         <Box>
-          <Typography variant="subtitle2" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
+          <Typography
+            variant="subtitle2"
+            fontWeight={700}
+            sx={{ fontSize: '0.85rem' }}
+          >
             {t('argus.analytics.quickEdit', 'Quick Edit')}
           </Typography>
           <Typography
@@ -258,7 +270,10 @@ const QuickLexiconEditor: React.FC<QuickLexiconEditorProps> = ({
               </Box>
               <TextField
                 size="small"
-                placeholder={t('argus.analytics.searchIcons', 'Search icons...')}
+                placeholder={t(
+                  'argus.analytics.searchIcons',
+                  'Search icons...'
+                )}
                 value={iconSearch}
                 onChange={(e) => setIconSearch(e.target.value)}
                 fullWidth
@@ -368,12 +383,23 @@ const QuickLexiconEditor: React.FC<QuickLexiconEditorProps> = ({
           </Box>
 
           {/* Actions */}
-          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', pt: 0.5 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              justifyContent: 'flex-end',
+              pt: 0.5,
+            }}
+          >
             <Button
               size="small"
               variant="outlined"
               onClick={onClose}
-              sx={{ textTransform: 'none', borderRadius: 1.5, fontSize: '0.8rem' }}
+              sx={{
+                textTransform: 'none',
+                borderRadius: 1.5,
+                fontSize: '0.8rem',
+              }}
             >
               {t('common.cancel', 'Cancel')}
             </Button>
@@ -383,7 +409,11 @@ const QuickLexiconEditor: React.FC<QuickLexiconEditorProps> = ({
               onClick={handleSave}
               disabled={saving}
               startIcon={saving ? <CircularProgress size={14} /> : undefined}
-              sx={{ textTransform: 'none', borderRadius: 1.5, fontSize: '0.8rem' }}
+              sx={{
+                textTransform: 'none',
+                borderRadius: 1.5,
+                fontSize: '0.8rem',
+              }}
             >
               {t('common.save', 'Save')}
             </Button>

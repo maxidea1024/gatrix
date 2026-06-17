@@ -5125,7 +5125,7 @@ async function main() {
 }
 
 const ACTIVITY_EVENT_DEFS = {
-  '$session_start': {
+  $session_start: {
     weight: 10,
     props: () => ({
       properties: {
@@ -5133,14 +5133,14 @@ const ACTIVITY_EVENT_DEFS = {
       },
     }),
   },
-  '$session_end': {
+  $session_end: {
     weight: 5,
     props: () => ({
       properties: { reason: randomPick(['manual', 'timeout', 'maintenance']) },
       numeric_properties: { session_duration_minutes: randomInt(5, 180) },
     }),
   },
-  '$page_view': {
+  $page_view: {
     weight: 12,
     props: () => ({
       properties: {
@@ -5155,24 +5155,32 @@ const ACTIVITY_EVENT_DEFS = {
       },
     }),
   },
-  '$click': {
+  $click: {
     weight: 15,
     props: () => ({
       properties: {
-        target: randomPick(['button#play', 'button#shop', 'tab#inventory', 'button#settings']),
+        target: randomPick([
+          'button#play',
+          'button#shop',
+          'tab#inventory',
+          'button#settings',
+        ]),
       },
     }),
   },
-  '$error': {
+  $error: {
     weight: 2,
     props: () => ({
       properties: {
         error_type: randomPick(['TypeError', 'ReferenceError', 'NetworkError']),
-        message: randomPick(['Cannot read properties of undefined', 'Connection lost']),
+        message: randomPick([
+          'Cannot read properties of undefined',
+          'Connection lost',
+        ]),
       },
     }),
   },
-  '$feedback': {
+  $feedback: {
     weight: 1,
     props: () => ({
       properties: {
@@ -5275,7 +5283,9 @@ async function generateAndInsertActivities(ch: any) {
     const daysToPlay = new Set<number>();
     daysToPlay.add(joinDay);
     for (let d = 1; d < activeDays; d++) {
-      const day = joinDay + randomInt(1, Math.min(activeDays + 2, DAYS_BACK - joinDay - 1));
+      const day =
+        joinDay +
+        randomInt(1, Math.min(activeDays + 2, DAYS_BACK - joinDay - 1));
       if (day < DAYS_BACK) daysToPlay.add(day);
     }
 
@@ -5283,12 +5293,17 @@ async function generateAndInsertActivities(ch: any) {
     let isFirstSession = true;
 
     for (const day of sortedDays) {
-      const sessionsToday = retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
+      const sessionsToday =
+        retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
 
       for (let s = 0; s < sessionsToday; s++) {
         const sessionId = uuid();
         const dayStart = new Date(NOW.getTime() - (DAYS_BACK - day) * 86400000);
-        dayStart.setUTCHours(randomInt(9, 18), randomInt(0, 59), randomInt(0, 59));
+        dayStart.setUTCHours(
+          randomInt(9, 18),
+          randomInt(0, 59),
+          randomInt(0, 59)
+        );
         let ts = dayStart.getTime();
 
         const sessionEvents: ActivityEventName[] = [];
@@ -5302,7 +5317,8 @@ async function generateAndInsertActivities(ch: any) {
           isFirstSession = false;
         }
 
-        const numGameplay = retentionClass === 'core' ? randomInt(5, 12) : randomInt(2, 6);
+        const numGameplay =
+          retentionClass === 'core' ? randomInt(5, 12) : randomInt(2, 6);
         const gameplayPool: ActivityEventName[] = [
           '$page_view',
           '$click',
@@ -5312,7 +5328,9 @@ async function generateAndInsertActivities(ch: any) {
           'battle_won',
           'item_purchased',
         ];
-        const gameplayWeights = gameplayPool.map(n => ACTIVITY_EVENT_DEFS[n].weight);
+        const gameplayWeights = gameplayPool.map(
+          (n) => ACTIVITY_EVENT_DEFS[n].weight
+        );
 
         for (let g = 0; g < numGameplay; g++) {
           sessionEvents.push(weightedPick(gameplayPool, gameplayWeights));
@@ -5329,7 +5347,10 @@ async function generateAndInsertActivities(ch: any) {
           batchBuffer.push({
             event_id: uuid(),
             project_id: PROJECT_ID,
-            timestamp: new Date(ts).toISOString().replace('T', ' ').replace('Z', ''),
+            timestamp: new Date(ts)
+              .toISOString()
+              .replace('T', ' ')
+              .replace('Z', ''),
             event_name: eventName,
             user_id: user.id,
             device_id: `device_${user.id}`,

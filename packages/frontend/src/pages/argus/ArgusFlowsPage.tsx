@@ -41,7 +41,9 @@ import DateRangeSelector, {
 } from '@/components/common/DateRangeSelector';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import argusService, { type AnalyticsEventNameEntry } from '@/services/argusService';
+import argusService, {
+  type AnalyticsEventNameEntry,
+} from '@/services/argusService';
 import { renderLexiconIcon } from '@/utils/lexiconIcons';
 import EventLabel from '@/components/argus/EventLabel';
 import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
@@ -118,7 +120,9 @@ const ArgusFlowsPage: React.FC = () => {
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<AnalyticsEventNameEntry[]>([]);
+  const [availableEvents, setAvailableEvents] = useState<
+    AnalyticsEventNameEntry[]
+  >([]);
   const [flowData, setFlowData] = useState<{
     nodes: { id: string; count: number }[];
     links: { source: string; target: string; value: number }[];
@@ -145,10 +149,7 @@ const ArgusFlowsPage: React.FC = () => {
   // ── Fetch event names ──
   const fetchEventNames = useCallback(async () => {
     try {
-      const data = await argusService.getAnalyticsEventNames(
-        projectId,
-        '30d'
-      );
+      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
       setAvailableEvents(data);
     } catch {
       setAvailableEvents([]);
@@ -161,7 +162,9 @@ const ArgusFlowsPage: React.FC = () => {
 
   // Quick lexicon editor state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   // ── Derived direction ──
@@ -338,7 +341,9 @@ const ArgusFlowsPage: React.FC = () => {
 
     const nodeIdxMap = new Map<string, number>();
     activeData.nodes.forEach((n, i) => nodeIdxMap.set(n.id, i));
-    const nodes = activeData.nodes.map((n) => ({ name: lexiconMap.get(n.id) || n.id }));
+    const nodes = activeData.nodes.map((n) => ({
+      name: lexiconMap.get(n.id) || n.id,
+    }));
     let links = activeData.links
       .filter(
         (l) =>
@@ -398,10 +403,23 @@ const ArgusFlowsPage: React.FC = () => {
     return [];
   }, [flowData, viewMode]);
 
-  const { localizeEventName: lfn, localizeEventDescription: lfd } = useLocalizedLexicon();
+  const { localizeEventName: lfn, localizeEventDescription: lfd } =
+    useLocalizedLexicon();
 
   const eventOptions = useMemo(
-    () => availableEvents.map((e) => ({ value: e.name, label: lfn(e.name, e.display_name, e.is_reserved), icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined), meta: { eventKey: e.name, description: lfd(e.name, e.description, e.is_reserved) || undefined, category: e.category || undefined, count: e.count, isReserved: e.is_reserved } })),
+    () =>
+      availableEvents.map((e) => ({
+        value: e.name,
+        label: lfn(e.name, e.display_name, e.is_reserved),
+        icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
+        meta: {
+          eventKey: e.name,
+          description: lfd(e.name, e.description, e.is_reserved) || undefined,
+          category: e.category || undefined,
+          count: e.count,
+          isReserved: e.is_reserved,
+        },
+      })),
     [availableEvents, lfn, lfd]
   );
 

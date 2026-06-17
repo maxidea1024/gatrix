@@ -75,7 +75,9 @@ import DateRangeSelector, {
 } from '@/components/common/DateRangeSelector';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import argusService, { type AnalyticsEventNameEntry } from '@/services/argusService';
+import argusService, {
+  type AnalyticsEventNameEntry,
+} from '@/services/argusService';
 import { renderLexiconIcon } from '@/utils/lexiconIcons';
 import EventLabel from '@/components/argus/EventLabel';
 import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
@@ -228,7 +230,9 @@ const ArgusFunnelsPage: React.FC = () => {
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<AnalyticsEventNameEntry[]>([]);
+  const [availableEvents, setAvailableEvents] = useState<
+    AnalyticsEventNameEntry[]
+  >([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<{
     el: HTMLElement;
@@ -254,7 +258,9 @@ const ArgusFunnelsPage: React.FC = () => {
     new Set()
   );
   // 'funnel' = visual bar chart, 'metric' = table-only (both use viewMode='steps')
-  const [chartSubType, setChartSubType] = useState<'funnel' | 'metric'>('funnel');
+  const [chartSubType, setChartSubType] = useState<'funnel' | 'metric'>(
+    'funnel'
+  );
   const isInitialMount = useRef(true);
   const lastExecutedKeyRef = useRef<string>('');
 
@@ -291,10 +297,7 @@ const ArgusFunnelsPage: React.FC = () => {
   // ── Fetch event names ──
   const fetchEventNames = useCallback(async () => {
     try {
-      const data = await argusService.getAnalyticsEventNames(
-        projectId,
-        '30d'
-      );
+      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
       setAvailableEvents(data);
     } catch {
       setAvailableEvents([]);
@@ -307,7 +310,9 @@ const ArgusFunnelsPage: React.FC = () => {
 
   // Quick lexicon editor state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   // ── Event handlers ──
@@ -640,7 +645,8 @@ const ArgusFunnelsPage: React.FC = () => {
     [hiddenSeriesKeys, theme]
   );
 
-  const { localizeEventName: lfn, localizeEventDescription: lfd } = useLocalizedLexicon();
+  const { localizeEventName: lfn, localizeEventDescription: lfd } =
+    useLocalizedLexicon();
 
   // Lexicon Map for translating event keys → localized display name
   const lexiconMap = useMemo(() => {
@@ -694,7 +700,19 @@ const ArgusFunnelsPage: React.FC = () => {
   }, [viewMode, chartData, trendingData, timeToConvertData]);
 
   const eventOptions = useMemo(
-    () => availableEvents.map((e) => ({ value: e.name, label: lfn(e.name, e.display_name, e.is_reserved), icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined), meta: { eventKey: e.name, description: lfd(e.name, e.description, e.is_reserved) || undefined, category: e.category || undefined, count: e.count, isReserved: e.is_reserved } })),
+    () =>
+      availableEvents.map((e) => ({
+        value: e.name,
+        label: lfn(e.name, e.display_name, e.is_reserved),
+        icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
+        meta: {
+          eventKey: e.name,
+          description: lfd(e.name, e.description, e.is_reserved) || undefined,
+          category: e.category || undefined,
+          count: e.count,
+          isReserved: e.is_reserved,
+        },
+      })),
     [availableEvents, lfn, lfd]
   );
 
@@ -1133,8 +1151,20 @@ const ArgusFunnelsPage: React.FC = () => {
                     options={availableEvents.map((e) => ({
                       value: e.name,
                       label: lfn(e.name, e.display_name, e.is_reserved),
-                      icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
-                      meta: { eventKey: e.name, description: lfd(e.name, e.description, e.is_reserved) || undefined, category: e.category || undefined, count: e.count, isReserved: e.is_reserved },
+                      icon: renderLexiconIcon(
+                        e.icon,
+                        18,
+                        e.icon_color || undefined
+                      ),
+                      meta: {
+                        eventKey: e.name,
+                        description:
+                          lfd(e.name, e.description, e.is_reserved) ||
+                          undefined,
+                        category: e.category || undefined,
+                        count: e.count,
+                        isReserved: e.is_reserved,
+                      },
                     }))}
                     emptyLabel={t(
                       'argus.analytics.selectEvent',
@@ -1495,12 +1525,18 @@ const ArgusFunnelsPage: React.FC = () => {
           flexShrink: 0,
         }}
       >
-        {([
-          { label: 'Funnel Steps', apiMode: 'steps', sub: 'funnel' },
-          { label: 'Line',         apiMode: 'trending', sub: 'funnel' },
-          { label: 'Metric',       apiMode: 'steps',   sub: 'metric' },
-          { label: 'Time to Conv.', apiMode: 'time_to_convert', sub: 'funnel' },
-        ] as const).map(({ label, apiMode, sub }) => {
+        {(
+          [
+            { label: 'Funnel Steps', apiMode: 'steps', sub: 'funnel' },
+            { label: 'Line', apiMode: 'trending', sub: 'funnel' },
+            { label: 'Metric', apiMode: 'steps', sub: 'metric' },
+            {
+              label: 'Time to Conv.',
+              apiMode: 'time_to_convert',
+              sub: 'funnel',
+            },
+          ] as const
+        ).map(({ label, apiMode, sub }) => {
           const isActive =
             viewMode === apiMode &&
             (apiMode !== 'steps' || chartSubType === sub);
@@ -1597,9 +1633,16 @@ const ArgusFunnelsPage: React.FC = () => {
     const stepDefs = result!.steps as any[];
     const gridStroke = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
     const BDC = [
-      '#6366f1', '#f59e0b', '#10b981', '#ec4899',
-      '#3b82f6', '#ef4444', '#8b5cf6', '#14b8a6',
-      '#f97316', '#84cc16',
+      '#6366f1',
+      '#f59e0b',
+      '#10b981',
+      '#ec4899',
+      '#3b82f6',
+      '#ef4444',
+      '#8b5cf6',
+      '#14b8a6',
+      '#f97316',
+      '#84cc16',
     ];
     // Height reference: max count across ALL breakdown values at step 0
     const globalMax = Math.max(
@@ -1616,7 +1659,11 @@ const ArgusFunnelsPage: React.FC = () => {
           <Typography variant="h3" fontWeight={800} sx={{ color: '#6366f1' }}>
             {result?.overall_conversion ?? 0}%
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" fontWeight={500}>
+          <Typography
+            variant="subtitle1"
+            color="text.secondary"
+            fontWeight={500}
+          >
             {t('argus.analytics.overallConversion', 'Overall Conversion Rate')}
           </Typography>
         </Box>
@@ -1624,9 +1671,23 @@ const ArgusFunnelsPage: React.FC = () => {
         {/* Segment legend */}
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', px: 1 }}>
           {bdKeys.map((key, idx) => (
-            <Box key={key} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: BDC[idx % BDC.length], flexShrink: 0 }} />
-              <Typography variant="caption" sx={{ fontSize: '0.72rem', color: 'text.secondary' }}>
+            <Box
+              key={key}
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+            >
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  bgcolor: BDC[idx % BDC.length],
+                  flexShrink: 0,
+                }}
+              />
+              <Typography
+                variant="caption"
+                sx={{ fontSize: '0.72rem', color: 'text.secondary' }}
+              >
                 {splitBreakdownValue(key).join(' · ') || key || '(empty)'}
               </Typography>
             </Box>
@@ -1666,7 +1727,17 @@ const ArgusFunnelsPage: React.FC = () => {
 
           <Box sx={{ flex: 1, position: 'relative' }}>
             {/* Background Gridlines */}
-            <Box sx={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, pointerEvents: 'none', zIndex: 0 }}>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                pointerEvents: 'none',
+                zIndex: 0,
+              }}
+            >
               {[0, 25, 50, 75, 100].map((tick) => (
                 <Box
                   key={tick}
@@ -1682,121 +1753,215 @@ const ArgusFunnelsPage: React.FC = () => {
             </Box>
 
             {/* Step column groups — each group = 1 step, N bars inside */}
-            <Box sx={{ display: 'flex', height: 280, gap: '8px', position: 'relative', zIndex: 1 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                height: 280,
+                gap: '8px',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
               {stepDefs.map((step, stepIdx) => {
                 return (
-                <Box
-                  key={stepIdx}
-                  sx={{ flex: 1, height: '100%', display: 'flex', alignItems: 'flex-end', gap: '2px', minWidth: 0, position: 'relative' }}
-                >
-                  {bdKeys.map((bdKey, bdIdx) => {
-                    const bdSteps = (breakdowns[bdKey].steps || []) as any[];
-                    const bdStep = bdSteps[stepIdx];
-                    const prevBdStep = stepIdx > 0 ? bdSteps[stepIdx - 1] : null;
-                    const count = bdStep?.count ?? 0;
-                    const rate = bdStep?.conversion_rate ?? 0;
-                    const prevCount = prevBdStep?.count ?? 0;
-                    const color = BDC[bdIdx % BDC.length];
-                    const filledPct = globalMax > 0 ? (count / globalMax) * 100 : 0;
-                    const ghostPct = stepIdx > 0 && globalMax > 0 ? (prevCount / globalMax) * 100 : 0;
-                    const dropCount = prevBdStep && prevCount > count ? prevCount - count : 0;
+                  <Box
+                    key={stepIdx}
+                    sx={{
+                      flex: 1,
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      gap: '2px',
+                      minWidth: 0,
+                      position: 'relative',
+                    }}
+                  >
+                    {bdKeys.map((bdKey, bdIdx) => {
+                      const bdSteps = (breakdowns[bdKey].steps || []) as any[];
+                      const bdStep = bdSteps[stepIdx];
+                      const prevBdStep =
+                        stepIdx > 0 ? bdSteps[stepIdx - 1] : null;
+                      const count = bdStep?.count ?? 0;
+                      const rate = bdStep?.conversion_rate ?? 0;
+                      const prevCount = prevBdStep?.count ?? 0;
+                      const color = BDC[bdIdx % BDC.length];
+                      const filledPct =
+                        globalMax > 0 ? (count / globalMax) * 100 : 0;
+                      const ghostPct =
+                        stepIdx > 0 && globalMax > 0
+                          ? (prevCount / globalMax) * 100
+                          : 0;
+                      const dropCount =
+                        prevBdStep && prevCount > count ? prevCount - count : 0;
 
-                    return (
-                      <Box
-                        key={bdKey}
-                        sx={{ flex: 1, height: '100%', position: 'relative', minWidth: 0 }}
-                      >
-                        {/* Ghost bar (previous step silhouette) */}
-                        {stepIdx > 0 && ghostPct > 0 && (
-                          <Box
-                            sx={{
-                              position: 'absolute', bottom: 0, left: 0, right: 0,
-                              height: `${ghostPct}%`,
-                              bgcolor: 'background.paper',
-                              borderRadius: '4px 4px 0 0',
-                              transition: 'height 0.5s ease',
-                              zIndex: 1,
-                            }}
-                          >
+                      return (
+                        <Box
+                          key={bdKey}
+                          sx={{
+                            flex: 1,
+                            height: '100%',
+                            position: 'relative',
+                            minWidth: 0,
+                          }}
+                        >
+                          {/* Ghost bar (previous step silhouette) */}
+                          {stepIdx > 0 && ghostPct > 0 && (
                             <Box
                               sx={{
-                                position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
-                                bgcolor: `${color}1c`,
-                                borderRadius: 'inherit',
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: `${ghostPct}%`,
+                                bgcolor: 'background.paper',
+                                borderRadius: '4px 4px 0 0',
+                                transition: 'height 0.5s ease',
+                                zIndex: 1,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  bgcolor: `${color}1c`,
+                                  borderRadius: 'inherit',
+                                }}
+                              />
+                              {dropCount > 0 &&
+                                ghostPct - filledPct > 12 &&
+                                (() => {
+                                  const pct =
+                                    ((ghostPct - filledPct) / 2 / ghostPct) *
+                                    100;
+                                  return (
+                                    <Box
+                                      sx={{
+                                        position: 'absolute',
+                                        top: `${pct}%`,
+                                        transform: 'translateY(-50%)',
+                                        left: 0,
+                                        right: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        pointerEvents: 'none',
+                                      }}
+                                    >
+                                      <Typography
+                                        sx={{
+                                          fontSize: '0.5rem',
+                                          color: '#ef4444',
+                                          opacity: 0.7,
+                                          fontWeight: 700,
+                                        }}
+                                      >
+                                        −{formatCompactNumber(dropCount)}
+                                      </Typography>
+                                    </Box>
+                                  );
+                                })()}
+                            </Box>
+                          )}
+                          {/* Drop boundary dashed line */}
+                          {stepIdx > 0 &&
+                            ghostPct > filledPct &&
+                            filledPct > 1 && (
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: `${filledPct}%`,
+                                  left: 0,
+                                  right: 0,
+                                  borderTop: '1px dashed rgba(239,68,68,0.25)',
+                                  pointerEvents: 'none',
+                                  zIndex: 2,
+                                }}
+                              />
+                            )}
+                          {/* Filled bar */}
+                          <Tooltip
+                            title={`${splitBreakdownValue(bdKey).join(' · ') || bdKey}: ${formatCompactNumber(count)} (${rate}%)`}
+                            placement="top"
+                            arrow
+                          >
+                            <Box
+                              onClick={() => handleBarClick(step.name)}
+                              sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height:
+                                  count > 0
+                                    ? `${Math.max(filledPct, 0.5)}%`
+                                    : 0,
+                                minHeight: count > 0 ? 3 : 0,
+                                bgcolor: color,
+                                borderRadius: '4px 4px 0 0',
+                                cursor: 'pointer',
+                                transition:
+                                  'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
+                                '&:hover': {
+                                  filter: 'brightness(1.1)',
+                                  zIndex: 3,
+                                },
+                                zIndex: 2,
                               }}
                             />
-                            {dropCount > 0 && ghostPct - filledPct > 12 && (() => {
-                              const pct = ((ghostPct - filledPct) / 2 / ghostPct) * 100;
-                              return (
-                                <Box sx={{ position: 'absolute', top: `${pct}%`, transform: 'translateY(-50%)', left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-                                  <Typography sx={{ fontSize: '0.5rem', color: '#ef4444', opacity: 0.7, fontWeight: 700 }}>
-                                    −{formatCompactNumber(dropCount)}
-                                  </Typography>
-                                </Box>
-                              );
-                            })()}
-                          </Box>
-                        )}
-                        {/* Drop boundary dashed line */}
-                        {stepIdx > 0 && ghostPct > filledPct && filledPct > 1 && (
-                          <Box sx={{ position: 'absolute', bottom: `${filledPct}%`, left: 0, right: 0, borderTop: '1px dashed rgba(239,68,68,0.25)', pointerEvents: 'none', zIndex: 2 }} />
-                        )}
-                        {/* Filled bar */}
-                        <Tooltip
-                          title={`${splitBreakdownValue(bdKey).join(' · ') || bdKey}: ${formatCompactNumber(count)} (${rate}%)`}
-                          placement="top"
-                          arrow
-                        >
-                          <Box
-                            onClick={() => handleBarClick(step.name)}
-                            sx={{
-                              position: 'absolute', bottom: 0, left: 0, right: 0,
-                              height: count > 0 ? `${Math.max(filledPct, 0.5)}%` : 0,
-                              minHeight: count > 0 ? 3 : 0,
-                              bgcolor: color,
-                              borderRadius: '4px 4px 0 0',
-                              cursor: 'pointer',
-                              transition: 'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
-                              '&:hover': { filter: 'brightness(1.1)', zIndex: 3 },
-                              zIndex: 2,
-                            }}
-                          />
-                        </Tooltip>
-                        {/* Floating label chip above bar */}
-                        {count > 0 && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              bottom: `${Math.max(filledPct, 0.5)}%`,
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              mb: '2px',
-                              bgcolor: isDark ? 'rgba(18,18,30,0.92)' : 'rgba(255,255,255,0.97)',
-                              borderRadius: '3px',
-                              px: '3px',
-                              py: '1px',
-                              boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
-                              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`,
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              zIndex: 10,
-                              whiteSpace: 'nowrap',
-                              pointerEvents: 'none',
-                            }}
-                          >
-                            <Typography sx={{ fontSize: '0.6rem', fontWeight: 700, color: 'text.primary', lineHeight: 1.2 }}>
-                              {rate}%
-                            </Typography>
-                            <Typography sx={{ fontSize: '0.55rem', color: 'text.secondary', lineHeight: 1 }}>
-                              {formatCompactNumber(count)}
-                            </Typography>
-                          </Box>
-                        )}
-                      </Box>
-                    );
-                  })}
-                </Box>
+                          </Tooltip>
+                          {/* Floating label chip above bar */}
+                          {count > 0 && (
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                bottom: `${Math.max(filledPct, 0.5)}%`,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                mb: '2px',
+                                bgcolor: isDark
+                                  ? 'rgba(18,18,30,0.92)'
+                                  : 'rgba(255,255,255,0.97)',
+                                borderRadius: '3px',
+                                px: '3px',
+                                py: '1px',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
+                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                zIndex: 10,
+                                whiteSpace: 'nowrap',
+                                pointerEvents: 'none',
+                              }}
+                            >
+                              <Typography
+                                sx={{
+                                  fontSize: '0.6rem',
+                                  fontWeight: 700,
+                                  color: 'text.primary',
+                                  lineHeight: 1.2,
+                                }}
+                              >
+                                {rate}%
+                              </Typography>
+                              <Typography
+                                sx={{
+                                  fontSize: '0.55rem',
+                                  color: 'text.secondary',
+                                  lineHeight: 1,
+                                }}
+                              >
+                                {formatCompactNumber(count)}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      );
+                    })}
+                  </Box>
                 );
               })}
             </Box>
@@ -1804,11 +1969,28 @@ const ArgusFunnelsPage: React.FC = () => {
             {/* Step name labels row */}
             <Box sx={{ display: 'flex', gap: '8px', mt: 1, height: 44 }}>
               {stepDefs.map((step, stepIdx) => (
-                <Tooltip key={stepIdx} title={step.name} placement="bottom" arrow>
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', gap: 0.25, pt: 0.5, minWidth: 0 }}>
+                <Tooltip
+                  key={stepIdx}
+                  title={step.name}
+                  placement="bottom"
+                  arrow
+                >
+                  <Box
+                    sx={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                      gap: 0.25,
+                      pt: 0.5,
+                      minWidth: 0,
+                    }}
+                  >
                     <Box
                       sx={{
-                        width: 18, height: 18,
+                        width: 18,
+                        height: 18,
                         borderRadius: '4px',
                         bgcolor: FUNNEL_COLORS[stepIdx % FUNNEL_COLORS.length],
                         color: '#fff',
@@ -1870,40 +2052,108 @@ const ArgusFunnelsPage: React.FC = () => {
           <Typography variant="h3" fontWeight={800} sx={{ color: '#6366f1' }}>
             {result?.overall_conversion ?? 0}%
           </Typography>
-          <Typography variant="subtitle1" color="text.secondary" fontWeight={500}>
+          <Typography
+            variant="subtitle1"
+            color="text.secondary"
+            fontWeight={500}
+          >
             {t('argus.analytics.overallConversion', 'Overall Conversion Rate')}
           </Typography>
         </Box>
-        <Box sx={{ overflowX: 'auto', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+        <Box
+          sx={{
+            overflowX: 'auto',
+            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          }}
+        >
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '0.8rem',
+            }}
+          >
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', padding: '12px 16px', borderBottom: `1px solid ${bdLine}`, color: theme.palette.text.secondary, fontWeight: 600 }}>
+                <th
+                  style={{
+                    textAlign: 'left',
+                    padding: '12px 16px',
+                    borderBottom: `1px solid ${bdLine}`,
+                    color: theme.palette.text.secondary,
+                    fontWeight: 600,
+                  }}
+                >
                   {t('argus.analytics.step', 'Step')}
                 </th>
                 <th style={thStyle}>{t('argus.analytics.users', 'Users')}</th>
-                <th style={{ ...thStyle, textAlign: 'left', minWidth: 180 }}>{t('argus.analytics.conversion', 'Conversion')}</th>
-                <th style={thStyle}>{t('argus.analytics.dropOff', 'Drop-off')}</th>
-                <th style={thStyle}>{t('argus.analytics.stepToStep', 'Step-to-Step')}</th>
+                <th style={{ ...thStyle, textAlign: 'left', minWidth: 180 }}>
+                  {t('argus.analytics.conversion', 'Conversion')}
+                </th>
+                <th style={thStyle}>
+                  {t('argus.analytics.dropOff', 'Drop-off')}
+                </th>
+                <th style={thStyle}>
+                  {t('argus.analytics.stepToStep', 'Step-to-Step')}
+                </th>
               </tr>
             </thead>
             <tbody>
               {result?.steps.map((s: any, idx: number) => {
-                const prevCount = idx > 0 ? result.steps[idx - 1].count : s.count;
+                const prevCount =
+                  idx > 0 ? result.steps[idx - 1].count : s.count;
                 const dropOff = idx > 0 ? prevCount - s.count : 0;
-                const dropPct = idx > 0 && prevCount > 0 ? Math.round((1 - s.count / prevCount) * 1000) / 10 : 0;
-                const stepToStep = idx === 0 ? 100 : prevCount > 0 ? Math.round((s.count / prevCount) * 1000) / 10 : 0;
-                const convBarWidth = maxCount > 0 ? (s.count / maxCount) * 100 : 0;
+                const dropPct =
+                  idx > 0 && prevCount > 0
+                    ? Math.round((1 - s.count / prevCount) * 1000) / 10
+                    : 0;
+                const stepToStep =
+                  idx === 0
+                    ? 100
+                    : prevCount > 0
+                      ? Math.round((s.count / prevCount) * 1000) / 10
+                      : 0;
+                const convBarWidth =
+                  maxCount > 0 ? (s.count / maxCount) * 100 : 0;
                 return (
                   <tr
                     key={idx}
-                    style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`, cursor: 'pointer' }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
+                    style={{
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      cursor: 'pointer',
+                    }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLElement).style.backgroundColor =
+                        isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.backgroundColor =
+                        'transparent';
+                    }}
                     onClick={() => handleBarClick(s.name)}
                   >
-                    <td style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <Box sx={{ width: 20, height: 20, borderRadius: '4px', bgcolor: FUNNEL_COLORS[idx % FUNNEL_COLORS.length], color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.6rem', fontWeight: 800 }}>
+                    <td
+                      style={{
+                        padding: '10px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: '4px',
+                          bgcolor: FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
+                          color: '#fff',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.6rem',
+                          fontWeight: 800,
+                        }}
+                      >
                         {idx + 1}
                       </Box>
                       {(() => {
@@ -1920,19 +2170,83 @@ const ArgusFunnelsPage: React.FC = () => {
                         );
                       })()}
                     </td>
-                    <td style={{ padding: '10px 16px', textAlign: 'right', fontWeight: 600 }}>{formatCompactNumber(s.count)}</td>
+                    <td
+                      style={{
+                        padding: '10px 16px',
+                        textAlign: 'right',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {formatCompactNumber(s.count)}
+                    </td>
                     <td style={{ padding: '10px 16px' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ flex: 1, height: 6, borderRadius: 3, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                          <Box sx={{ height: '100%', width: `${convBarWidth}%`, bgcolor: FUNNEL_COLORS[idx % FUNNEL_COLORS.length], borderRadius: 3, transition: 'width 0.4s ease' }} />
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Box
+                          sx={{
+                            flex: 1,
+                            height: 6,
+                            borderRadius: 3,
+                            bgcolor: isDark
+                              ? 'rgba(255,255,255,0.06)'
+                              : 'rgba(0,0,0,0.06)',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              height: '100%',
+                              width: `${convBarWidth}%`,
+                              bgcolor:
+                                FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
+                              borderRadius: 3,
+                              transition: 'width 0.4s ease',
+                            }}
+                          />
                         </Box>
-                        <span style={{ minWidth: 44, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{s.conversion_rate}%</span>
+                        <span
+                          style={{
+                            minWidth: 44,
+                            textAlign: 'right',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
+                        >
+                          {s.conversion_rate}%
+                        </span>
                       </Box>
                     </td>
-                    <td style={{ padding: '10px 16px', textAlign: 'right', color: dropOff > 0 ? '#ef4444' : 'inherit' }}>
-                      {idx > 0 ? <><span>-{formatCompactNumber(dropOff)}</span><span style={{ opacity: 0.7, marginLeft: 4, fontSize: '0.75rem' }}>({dropPct}%)</span></> : '—'}
+                    <td
+                      style={{
+                        padding: '10px 16px',
+                        textAlign: 'right',
+                        color: dropOff > 0 ? '#ef4444' : 'inherit',
+                      }}
+                    >
+                      {idx > 0 ? (
+                        <>
+                          <span>-{formatCompactNumber(dropOff)}</span>
+                          <span
+                            style={{
+                              opacity: 0.7,
+                              marginLeft: 4,
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            ({dropPct}%)
+                          </span>
+                        </>
+                      ) : (
+                        '—'
+                      )}
                     </td>
-                    <td style={{ padding: '10px 16px', textAlign: 'right', fontWeight: 500 }}>
+                    <td
+                      style={{
+                        padding: '10px 16px',
+                        textAlign: 'right',
+                        fontWeight: 500,
+                      }}
+                    >
                       {idx > 0 ? `${stepToStep}%` : '—'}
                     </td>
                   </tr>
@@ -2021,7 +2335,17 @@ const ArgusFunnelsPage: React.FC = () => {
             {/* Chart area */}
             <Box sx={{ flex: 1, position: 'relative' }}>
               {/* Background Gridlines */}
-              <Box sx={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, pointerEvents: 'none', zIndex: 0 }}>
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                }}
+              >
                 {[0, 25, 50, 75, 100].map((tick) => (
                   <Box
                     key={tick}
@@ -2037,16 +2361,32 @@ const ArgusFunnelsPage: React.FC = () => {
               </Box>
 
               {/* Bars row */}
-              <Box sx={{ display: 'flex', height: 280, alignItems: 'flex-end', gap: '3px', position: 'relative', zIndex: 1 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  height: 280,
+                  alignItems: 'flex-end',
+                  gap: '3px',
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
                 {chartData.map((entry: any, idx: number) => {
                   const prevEntry = idx > 0 ? chartData[idx - 1] : null;
                   const prevCount = prevEntry ? prevEntry.count : entry.count;
-                  const filledPct = maxCount > 0 ? (entry.count / maxCount) * 100 : 0;
-                  const ghostPct = prevEntry && maxCount > 0
-                    ? (prevCount / maxCount) * 100 : 0;
-                  const dropCount = prevEntry ? prevEntry.count - entry.count : 0;
-                  const dropPct = prevEntry && prevEntry.count > 0
-                    ? Math.round((dropCount / prevEntry.count) * 1000) / 10 : 0;
+                  const filledPct =
+                    maxCount > 0 ? (entry.count / maxCount) * 100 : 0;
+                  const ghostPct =
+                    prevEntry && maxCount > 0
+                      ? (prevCount / maxCount) * 100
+                      : 0;
+                  const dropCount = prevEntry
+                    ? prevEntry.count - entry.count
+                    : 0;
+                  const dropPct =
+                    prevEntry && prevEntry.count > 0
+                      ? Math.round((dropCount / prevEntry.count) * 1000) / 10
+                      : 0;
 
                   return (
                     <Box
@@ -2076,41 +2416,59 @@ const ArgusFunnelsPage: React.FC = () => {
                           <Box
                             sx={{
                               position: 'absolute',
-                              top: 0, bottom: 0, left: 0, right: 0,
+                              top: 0,
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
                               bgcolor: `${entry.fill}1c`,
                               borderRadius: 'inherit',
                             }}
                           />
                           {/* Drop-off label — centered in the drop-off zone */}
-                          {dropCount > 0 && ghostPct - filledPct > 5 && (() => {
-                            // Position label in the vertical center of the ghost zone above the filled bar
-                            const dropZoneTopPct = ((ghostPct - filledPct) / 2 / ghostPct) * 100;
-                            return (
-                              <Box
-                                sx={{
-                                  position: 'absolute',
-                                  top: `${dropZoneTopPct}%`,
-                                  transform: 'translateY(-50%)',
-                                  left: 0, right: 0,
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'center',
-                                  pointerEvents: 'none',
-                                }}
-                              >
-                                <Typography
-                                  sx={{ fontSize: '0.6rem', color: '#ef4444', opacity: 0.8, fontWeight: 700, lineHeight: 1.2 }}
+                          {dropCount > 0 &&
+                            ghostPct - filledPct > 5 &&
+                            (() => {
+                              // Position label in the vertical center of the ghost zone above the filled bar
+                              const dropZoneTopPct =
+                                ((ghostPct - filledPct) / 2 / ghostPct) * 100;
+                              return (
+                                <Box
+                                  sx={{
+                                    position: 'absolute',
+                                    top: `${dropZoneTopPct}%`,
+                                    transform: 'translateY(-50%)',
+                                    left: 0,
+                                    right: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    pointerEvents: 'none',
+                                  }}
                                 >
-                                  −{formatCompactNumber(dropCount)}
-                                </Typography>
-                                <Typography
-                                  sx={{ fontSize: '0.55rem', color: '#ef4444', opacity: 0.55, lineHeight: 1 }}
-                                >
-                                  −{dropPct}%
-                                </Typography>
-                              </Box>
-                            );
-                          })()}
+                                  <Typography
+                                    sx={{
+                                      fontSize: '0.6rem',
+                                      color: '#ef4444',
+                                      opacity: 0.8,
+                                      fontWeight: 700,
+                                      lineHeight: 1.2,
+                                    }}
+                                  >
+                                    −{formatCompactNumber(dropCount)}
+                                  </Typography>
+                                  <Typography
+                                    sx={{
+                                      fontSize: '0.55rem',
+                                      color: '#ef4444',
+                                      opacity: 0.55,
+                                      lineHeight: 1,
+                                    }}
+                                  >
+                                    −{dropPct}%
+                                  </Typography>
+                                </Box>
+                              );
+                            })()}
                         </Box>
                       )}
 
@@ -2142,7 +2500,10 @@ const ArgusFunnelsPage: React.FC = () => {
                             bottom: 0,
                             left: 0,
                             right: 0,
-                            height: entry.count > 0 ? `${Math.max(filledPct, 1)}%` : 0,
+                            height:
+                              entry.count > 0
+                                ? `${Math.max(filledPct, 1)}%`
+                                : 0,
                             minHeight: entry.count > 0 ? 4 : 0,
                             bgcolor: entry.fill,
                             borderRadius: '6px 6px 0 0',
@@ -2152,7 +2513,8 @@ const ArgusFunnelsPage: React.FC = () => {
                             flexDirection: 'column',
                             alignItems: 'center',
                             pt: filledPct > 8 ? 1 : 0,
-                            transition: 'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
+                            transition:
+                              'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
                             '&:hover': { filter: 'brightness(1.1)', zIndex: 3 },
                             zIndex: 2,
                           }}
@@ -2192,7 +2554,8 @@ const ArgusFunnelsPage: React.FC = () => {
                           sx={{
                             position: 'absolute',
                             bottom: `${Math.max(filledPct, 1) + 1}%`,
-                            left: 0, right: 0,
+                            left: 0,
+                            right: 0,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -2229,7 +2592,12 @@ const ArgusFunnelsPage: React.FC = () => {
               {/* Step names row */}
               <Box sx={{ display: 'flex', gap: '3px', mt: 1, height: 44 }}>
                 {chartData.map((entry: any, idx: number) => (
-                  <Tooltip key={idx} title={entry.name} placement="bottom" arrow>
+                  <Tooltip
+                    key={idx}
+                    title={entry.name}
+                    placement="bottom"
+                    arrow
+                  >
                     <Box
                       sx={{
                         flex: 1,
@@ -2244,7 +2612,8 @@ const ArgusFunnelsPage: React.FC = () => {
                     >
                       <Box
                         sx={{
-                          width: 18, height: 18,
+                          width: 18,
+                          height: 18,
                           borderRadius: '4px',
                           bgcolor: entry.fill,
                           color: '#fff',
@@ -2287,9 +2656,8 @@ const ArgusFunnelsPage: React.FC = () => {
               const barWidth = (entry.count / maxCount) * 100;
               const prevCount =
                 idx > 0 ? chartData[idx - 1].count : entry.count;
-              const ghostWidth = idx > 0 && maxCount > 0
-                ? (prevCount / maxCount) * 100
-                : 0;
+              const ghostWidth =
+                idx > 0 && maxCount > 0 ? (prevCount / maxCount) * 100 : 0;
               const convRate =
                 idx === 0
                   ? 100
@@ -2302,7 +2670,11 @@ const ArgusFunnelsPage: React.FC = () => {
                   ? Math.round((dropCount / prevCount) * 1000) / 10
                   : 0;
               const convColor =
-                convRate >= 70 ? '#10b981' : convRate >= 30 ? '#f59e0b' : '#ef4444';
+                convRate >= 70
+                  ? '#10b981'
+                  : convRate >= 30
+                    ? '#f59e0b'
+                    : '#ef4444';
 
               return (
                 <React.Fragment key={idx}>
@@ -2319,13 +2691,24 @@ const ArgusFunnelsPage: React.FC = () => {
                         opacity: 0.75,
                       }}
                     >
-                      <ArrowDownIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
+                      <ArrowDownIcon
+                        sx={{ fontSize: 12, color: 'text.disabled' }}
+                      />
                       <Typography
-                        sx={{ fontWeight: 700, fontSize: '0.75rem', color: convColor }}
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.75rem',
+                          color: convColor,
+                        }}
                       >
                         {convRate}%
                       </Typography>
-                      <Typography variant="caption" sx={{ color: 'text.disabled' }}>·</Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: 'text.disabled' }}
+                      >
+                        ·
+                      </Typography>
                       <Typography
                         variant="caption"
                         sx={{ fontSize: '0.65rem', color: '#ef4444' }}
@@ -2425,7 +2808,13 @@ const ArgusFunnelsPage: React.FC = () => {
                         }}
                       >
                         {barWidth > 20 && (
-                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'flex-end',
+                            }}
+                          >
                             <Typography
                               variant="caption"
                               sx={{
@@ -2456,7 +2845,14 @@ const ArgusFunnelsPage: React.FC = () => {
                       </Box>
                     </Box>
                     {/* Count + Rate */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        flexShrink: 0,
+                      }}
+                    >
                       <Typography
                         variant="body2"
                         sx={{
@@ -2473,7 +2869,12 @@ const ArgusFunnelsPage: React.FC = () => {
                         sx={{
                           fontWeight: 600,
                           fontSize: '0.7rem',
-                          color: entry.rate >= 70 ? '#10b981' : entry.rate >= 30 ? '#f59e0b' : '#ef4444',
+                          color:
+                            entry.rate >= 70
+                              ? '#10b981'
+                              : entry.rate >= 30
+                                ? '#f59e0b'
+                                : '#ef4444',
                           minWidth: 35,
                           textAlign: 'right',
                         }}
@@ -2571,7 +2972,8 @@ const ArgusFunnelsPage: React.FC = () => {
                     : prevCount > 0
                       ? Math.round((s.count / prevCount) * 1000) / 10
                       : 0;
-                const convBarWidth = maxCount > 0 ? (s.count / maxCount) * 100 : 0;
+                const convBarWidth =
+                  maxCount > 0 ? (s.count / maxCount) * 100 : 0;
                 return (
                   <tr
                     key={idx}
@@ -2580,12 +2982,12 @@ const ArgusFunnelsPage: React.FC = () => {
                       cursor: 'pointer',
                     }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.backgroundColor = isDark
-                        ? 'rgba(255,255,255,0.03)'
-                        : 'rgba(0,0,0,0.02)';
+                      (e.currentTarget as HTMLElement).style.backgroundColor =
+                        isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                      (e.currentTarget as HTMLElement).style.backgroundColor =
+                        'transparent';
                     }}
                     onClick={() => handleBarClick(s.name)}
                   >
@@ -2641,13 +3043,22 @@ const ArgusFunnelsPage: React.FC = () => {
                       {formatCompactNumber(s.count)}
                     </td>
                     <td style={{ padding: '10px 16px' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'flex-end',
+                          gap: 1,
+                        }}
+                      >
                         <Box
                           sx={{
                             width: 60,
                             height: 6,
                             borderRadius: 3,
-                            bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                            bgcolor: isDark
+                              ? 'rgba(255,255,255,0.06)'
+                              : 'rgba(0,0,0,0.06)',
                             overflow: 'hidden',
                             flexShrink: 0,
                           }}
@@ -2656,13 +3067,16 @@ const ArgusFunnelsPage: React.FC = () => {
                             sx={{
                               height: '100%',
                               width: `${convBarWidth}%`,
-                              bgcolor: FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
+                              bgcolor:
+                                FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
                               borderRadius: 3,
                               transition: 'width 0.4s ease',
                             }}
                           />
                         </Box>
-                        <span style={{ minWidth: 36, textAlign: 'right' }}>{s.conversion_rate}%</span>
+                        <span style={{ minWidth: 36, textAlign: 'right' }}>
+                          {s.conversion_rate}%
+                        </span>
                       </Box>
                     </td>
                     <td
@@ -2675,11 +3089,19 @@ const ArgusFunnelsPage: React.FC = () => {
                       {idx > 0 ? (
                         <>
                           -{formatCompactNumber(dropOff)}
-                          <span style={{ opacity: 0.7, marginLeft: 4, fontSize: '0.75rem' }}>
+                          <span
+                            style={{
+                              opacity: 0.7,
+                              marginLeft: 4,
+                              fontSize: '0.75rem',
+                            }}
+                          >
                             ({dropPct}%)
                           </span>
                         </>
-                      ) : '—'}
+                      ) : (
+                        '—'
+                      )}
                     </td>
                     <td
                       style={{
@@ -2721,7 +3143,9 @@ const ArgusFunnelsPage: React.FC = () => {
 
     // Build grouped bar data: one entry per step, with each segment as a bar
     const segChartData = result!.steps.map((step, idx) => {
-      const point: Record<string, any> = { name: lexiconMap.get(step.name) || step.name };
+      const point: Record<string, any> = {
+        name: lexiconMap.get(step.name) || step.name,
+      };
       point['Overall'] = step.conversion_rate;
       for (let sIdx = 0; sIdx < segs.length; sIdx++) {
         point[uniqueKeys[sIdx]] = segs[sIdx].steps[idx]?.conversion_rate ?? 0;
@@ -3400,11 +3824,18 @@ const ArgusFunnelsPage: React.FC = () => {
                   gap: 3,
                 }}
               >
-                {viewMode === 'steps' && chartSubType === 'funnel' && renderStepsView()}
+                {viewMode === 'steps' &&
+                  chartSubType === 'funnel' &&
+                  renderStepsView()}
                 {/* renderSegmentComparison only when no breakdown active (breakdown handled inside renderStepsView → renderBreakdownFunnelChart) */}
-                {viewMode === 'steps' && chartSubType === 'funnel' && !result?.breakdowns && renderSegmentComparison()}
+                {viewMode === 'steps' &&
+                  chartSubType === 'funnel' &&
+                  !result?.breakdowns &&
+                  renderSegmentComparison()}
                 {/* renderBreakdownComparison is called from inside renderBreakdownFunnelChart; no top-level call needed */}
-                {viewMode === 'steps' && chartSubType === 'metric' && renderMetricOnlyView()}
+                {viewMode === 'steps' &&
+                  chartSubType === 'metric' &&
+                  renderMetricOnlyView()}
                 {viewMode === 'trending' && renderTrendingView()}
                 {viewMode === 'time_to_convert' && renderTimeToConvertView()}
               </Box>

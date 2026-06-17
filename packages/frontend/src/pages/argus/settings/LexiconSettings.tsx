@@ -43,13 +43,18 @@ import {
   Delete as DeleteIcon,
   AutoFixHigh as SeedIcon,
 } from '@mui/icons-material';
-import {
-  type IconProps,
-} from '@phosphor-icons/react';
+import { type IconProps } from '@phosphor-icons/react';
 import { useSnackbar } from 'notistack';
-import argusService, { ArgusLexiconEvent, ArgusLexiconProperty } from '@/services/argusService';
+import argusService, {
+  ArgusLexiconEvent,
+  ArgusLexiconProperty,
+} from '@/services/argusService';
 import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
-import { ICON_CATALOG, renderLexiconIcon, COLOR_PRESETS } from '@/utils/lexiconIcons';
+import {
+  ICON_CATALOG,
+  renderLexiconIcon,
+  COLOR_PRESETS,
+} from '@/utils/lexiconIcons';
 
 interface LexiconSettingsProps {
   projectId: string;
@@ -57,10 +62,19 @@ interface LexiconSettingsProps {
   t: (...args: any[]) => any;
 }
 
-const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t }) => {
+const LexiconSettings: React.FC<LexiconSettingsProps> = ({
+  projectId,
+  isDark,
+  t,
+}) => {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
-  const { localizeEventName, localizeEventDescription, localizePropertyName, localizePropertyDescription } = useLocalizedLexicon();
+  const {
+    localizeEventName,
+    localizeEventDescription,
+    localizePropertyName,
+    localizePropertyDescription,
+  } = useLocalizedLexicon();
 
   // State
   const [tabValue, setTabValue] = useState(0); // 0 = Events, 1 = Properties
@@ -73,8 +87,11 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
   // Drawer states
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
-  const [selectedEvent, setSelectedEvent] = useState<ArgusLexiconEvent | null>(null);
-  const [selectedProperty, setSelectedProperty] = useState<ArgusLexiconProperty | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<ArgusLexiconEvent | null>(
+    null
+  );
+  const [selectedProperty, setSelectedProperty] =
+    useState<ArgusLexiconProperty | null>(null);
 
   // Edit/Create form states
   const [editEventName, setEditEventName] = useState('');
@@ -82,16 +99,24 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
   const [editDisplayName, setEditDisplayName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editCategory, setEditCategory] = useState('');
-  const [editStatus, setEditStatus] = useState<'active' | 'deprecated' | 'hidden'>('active');
+  const [editStatus, setEditStatus] = useState<
+    'active' | 'deprecated' | 'hidden'
+  >('active');
   const [editOwner, setEditOwner] = useState('');
-  const [editDataType, setEditDataType] = useState<'string' | 'number' | 'boolean' | 'date'>('string');
+  const [editDataType, setEditDataType] = useState<
+    'string' | 'number' | 'boolean' | 'date'
+  >('string');
   const [editIcon, setEditIcon] = useState('');
   const [editIconColor, setEditIconColor] = useState('');
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Delete dialog states
-  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; type: 'event' | 'property'; name: string }>({
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    type: 'event' | 'property';
+    name: string;
+  }>({
     open: false,
     type: 'event',
     name: '',
@@ -110,7 +135,10 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
         setProperties(data);
       }
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.fetchError', 'Failed to load lexicon data'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.fetchError', 'Failed to load lexicon data'),
+        { variant: 'error' }
+      );
     } finally {
       setLoading(false);
     }
@@ -131,10 +159,18 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
     setSeeding(true);
     try {
       await argusService.seedLexicon(projectId);
-      enqueueSnackbar(t('argus.settings.lexicon.seedSuccess', 'Reserved events and properties seeded'), { variant: 'success' });
+      enqueueSnackbar(
+        t(
+          'argus.settings.lexicon.seedSuccess',
+          'Reserved events and properties seeded'
+        ),
+        { variant: 'success' }
+      );
       fetchData();
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.seedError', 'Failed to seed'), { variant: 'error' });
+      enqueueSnackbar(t('argus.settings.lexicon.seedError', 'Failed to seed'), {
+        variant: 'error',
+      });
     } finally {
       setSeeding(false);
     }
@@ -202,11 +238,17 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
         status: editStatus,
         owner: editOwner || undefined,
       });
-      enqueueSnackbar(t('argus.settings.lexicon.saveSuccess', 'Event created successfully'), { variant: 'success' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.saveSuccess', 'Event created successfully'),
+        { variant: 'success' }
+      );
       setDrawerOpen(false);
       fetchData();
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.saveError', 'Failed to create event'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.saveError', 'Failed to create event'),
+        { variant: 'error' }
+      );
     } finally {
       setSaving(false);
     }
@@ -224,11 +266,20 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
         data_type: editDataType,
         status: editStatus,
       });
-      enqueueSnackbar(t('argus.settings.lexicon.saveSuccess', 'Property created successfully'), { variant: 'success' });
+      enqueueSnackbar(
+        t(
+          'argus.settings.lexicon.saveSuccess',
+          'Property created successfully'
+        ),
+        { variant: 'success' }
+      );
       setDrawerOpen(false);
       fetchData();
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.saveError', 'Failed to create property'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.saveError', 'Failed to create property'),
+        { variant: 'error' }
+      );
     } finally {
       setSaving(false);
     }
@@ -239,20 +290,33 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
     if (!selectedEvent) return;
     setSaving(true);
     try {
-      await argusService.updateLexiconEvent(projectId, selectedEvent.event_name, {
-        display_name: editDisplayName || null,
-        icon: editIcon || null,
-        icon_color: editIconColor || null,
-        description: editDescription || null,
-        category: editCategory || null,
-        status: editStatus,
-        owner: editOwner || null,
-      });
-      enqueueSnackbar(t('argus.settings.lexicon.saveSuccess', 'Event metadata saved successfully'), { variant: 'success' });
+      await argusService.updateLexiconEvent(
+        projectId,
+        selectedEvent.event_name,
+        {
+          display_name: editDisplayName || null,
+          icon: editIcon || null,
+          icon_color: editIconColor || null,
+          description: editDescription || null,
+          category: editCategory || null,
+          status: editStatus,
+          owner: editOwner || null,
+        }
+      );
+      enqueueSnackbar(
+        t(
+          'argus.settings.lexicon.saveSuccess',
+          'Event metadata saved successfully'
+        ),
+        { variant: 'success' }
+      );
       setDrawerOpen(false);
       fetchData();
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.saveError', 'Failed to save event metadata'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.saveError', 'Failed to save event metadata'),
+        { variant: 'error' }
+      );
     } finally {
       setSaving(false);
     }
@@ -263,17 +327,33 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
     if (!selectedProperty) return;
     setSaving(true);
     try {
-      await argusService.updateLexiconProperty(projectId, selectedProperty.property_name, {
-        display_name: editDisplayName || null,
-        description: editDescription || null,
-        data_type: editDataType,
-        status: editStatus,
-      });
-      enqueueSnackbar(t('argus.settings.lexicon.saveSuccess', 'Property metadata saved successfully'), { variant: 'success' });
+      await argusService.updateLexiconProperty(
+        projectId,
+        selectedProperty.property_name,
+        {
+          display_name: editDisplayName || null,
+          description: editDescription || null,
+          data_type: editDataType,
+          status: editStatus,
+        }
+      );
+      enqueueSnackbar(
+        t(
+          'argus.settings.lexicon.saveSuccess',
+          'Property metadata saved successfully'
+        ),
+        { variant: 'success' }
+      );
       setDrawerOpen(false);
       fetchData();
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.saveError', 'Failed to save property metadata'), { variant: 'error' });
+      enqueueSnackbar(
+        t(
+          'argus.settings.lexicon.saveError',
+          'Failed to save property metadata'
+        ),
+        { variant: 'error' }
+      );
     } finally {
       setSaving(false);
     }
@@ -288,11 +368,17 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
       } else {
         await argusService.deleteLexiconProperty(projectId, deleteDialog.name);
       }
-      enqueueSnackbar(t('argus.settings.lexicon.deleteSuccess', 'Deleted successfully'), { variant: 'success' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.deleteSuccess', 'Deleted successfully'),
+        { variant: 'success' }
+      );
       setDeleteDialog({ open: false, type: 'event', name: '' });
       fetchData();
     } catch {
-      enqueueSnackbar(t('argus.settings.lexicon.deleteFailed', 'Failed to delete'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.settings.lexicon.deleteFailed', 'Failed to delete'),
+        { variant: 'error' }
+      );
     } finally {
       setDeleting(false);
     }
@@ -304,7 +390,9 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
     return events.filter(
       (e) =>
         e.event_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (e.display_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (e.display_name || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
         (e.category || '').toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [events, searchQuery, tabValue]);
@@ -323,7 +411,8 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
   const customColor = isDark ? '#2dd4bf' : '#0f766e';
 
   // Check if empty (for seed CTA)
-  const isEmpty = tabValue === 0 ? events.length === 0 : properties.length === 0;
+  const isEmpty =
+    tabValue === 0 ? events.length === 0 : properties.length === 0;
 
   // Determine drawer save handler
   const getDrawerSaveHandler = () => {
@@ -360,8 +449,22 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
       </Box>
 
       {/* Tabs, search, and action buttons */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="lexicon sections">
+      <Box
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="lexicon sections"
+        >
           <Tab label={t('argus.settings.lexicon.events', 'Events')} />
           <Tab label={t('argus.settings.lexicon.properties', 'Properties')} />
         </Tabs>
@@ -369,7 +472,10 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1 }}>
           <TextField
             size="small"
-            placeholder={t('argus.settings.lexicon.search', 'Search names, display names...')}
+            placeholder={t(
+              'argus.settings.lexicon.search',
+              'Search names, display names...'
+            )}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             sx={{ width: 240 }}
@@ -383,11 +489,18 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
               },
             }}
           />
-          <Tooltip title={t('argus.settings.lexicon.seedReserved', 'Seed system events & properties')}>
+          <Tooltip
+            title={t(
+              'argus.settings.lexicon.seedReserved',
+              'Seed system events & properties'
+            )}
+          >
             <Button
               size="small"
               variant="outlined"
-              startIcon={seeding ? <CircularProgress size={16} /> : <SeedIcon />}
+              startIcon={
+                seeding ? <CircularProgress size={16} /> : <SeedIcon />
+              }
               onClick={handleSeed}
               disabled={seeding}
               sx={{ textTransform: 'none', whiteSpace: 'nowrap' }}
@@ -432,15 +545,27 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
           <Typography variant="body1" color="text.secondary" fontWeight={500}>
             {tabValue === 0
               ? t('argus.settings.lexicon.emptyEvents', 'No events defined yet')
-              : t('argus.settings.lexicon.emptyProperties', 'No properties defined yet')}
+              : t(
+                  'argus.settings.lexicon.emptyProperties',
+                  'No properties defined yet'
+                )}
           </Typography>
-          <Typography variant="body2" color="text.disabled" sx={{ maxWidth: 400, textAlign: 'center' }}>
-            {t('argus.settings.lexicon.emptyHint', 'Click "Seed" to populate system-defined events & properties, or "Add" to create your own.')}
+          <Typography
+            variant="body2"
+            color="text.disabled"
+            sx={{ maxWidth: 400, textAlign: 'center' }}
+          >
+            {t(
+              'argus.settings.lexicon.emptyHint',
+              'Click "Seed" to populate system-defined events & properties, or "Add" to create your own.'
+            )}
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
             <Button
               variant="outlined"
-              startIcon={seeding ? <CircularProgress size={16} /> : <SeedIcon />}
+              startIcon={
+                seeding ? <CircularProgress size={16} /> : <SeedIcon />
+              }
               onClick={handleSeed}
               disabled={seeding}
               sx={{ textTransform: 'none' }}
@@ -460,17 +585,39 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
           </Box>
         </Box>
       ) : tabValue === 0 ? (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
+        >
           <Table aria-label="lexicon events table">
-            <TableHead sx={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' }}>
+            <TableHead
+              sx={{
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.02)'
+                  : 'rgba(0,0,0,0.01)',
+              }}
+            >
               <TableRow>
                 <TableCell style={{ fontWeight: 600, width: 56 }}></TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.eventName', 'Event Name')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.alias', 'Display Name')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.category', 'Category')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.status', 'Status')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.owner', 'Owner')}</TableCell>
-                <TableCell align="right" style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.action', 'Actions')}</TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.eventName', 'Event Name')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.alias', 'Display Name')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.category', 'Category')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.status', 'Status')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.owner', 'Owner')}
+                </TableCell>
+                <TableCell align="right" style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.action', 'Actions')}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -484,7 +631,11 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                 </TableRow>
               ) : (
                 filteredEvents.map((ev) => (
-                  <TableRow key={ev.event_name} hover sx={{ opacity: ev.status === 'deprecated' ? 0.6 : 1 }}>
+                  <TableRow
+                    key={ev.event_name}
+                    hover
+                    sx={{ opacity: ev.status === 'deprecated' ? 0.6 : 1 }}
+                  >
                     <TableCell sx={{ width: 56, px: 1.5 }}>
                       <Box
                         sx={{
@@ -496,22 +647,39 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                           justifyContent: 'center',
                           bgcolor: ev.icon_color
                             ? alpha(ev.icon_color, isDark ? 0.18 : 0.12)
-                            : (isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)'),
-                          color: ev.icon_color || (isDark ? '#a5b4fc' : '#4f46e5'),
+                            : isDark
+                              ? 'rgba(99, 102, 241, 0.15)'
+                              : 'rgba(99, 102, 241, 0.08)',
+                          color:
+                            ev.icon_color || (isDark ? '#a5b4fc' : '#4f46e5'),
                         }}
                       >
-                        {renderLexiconIcon(ev.icon, 20, ev.icon_color || undefined)}
+                        {renderLexiconIcon(
+                          ev.icon,
+                          20,
+                          ev.icon_color || undefined
+                        )}
                       </Box>
                     </TableCell>
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Typography
+                          variant="body2"
+                          fontFamily="monospace"
+                          fontWeight={500}
+                        >
                           {ev.event_name}
                         </Typography>
                         {ev.is_reserved ? (
                           <Chip
                             size="small"
-                            icon={<ShieldIcon style={{ fontSize: 12, color: isReservedColor }} />}
+                            icon={
+                              <ShieldIcon
+                                style={{ fontSize: 12, color: isReservedColor }}
+                              />
+                            }
                             label="System"
                             sx={{
                               height: 20,
@@ -537,13 +705,37 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                           />
                         )}
                       </Box>
-                      {localizeEventDescription(ev.event_name, ev.description, ev.is_reserved) && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                          {localizeEventDescription(ev.event_name, ev.description, ev.is_reserved)}
+                      {localizeEventDescription(
+                        ev.event_name,
+                        ev.description,
+                        ev.is_reserved
+                      ) && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block', mt: 0.5 }}
+                        >
+                          {localizeEventDescription(
+                            ev.event_name,
+                            ev.description,
+                            ev.is_reserved
+                          )}
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell>{localizeEventName(ev.event_name, ev.display_name, ev.is_reserved) !== ev.event_name ? localizeEventName(ev.event_name, ev.display_name, ev.is_reserved) : '—'}</TableCell>
+                    <TableCell>
+                      {localizeEventName(
+                        ev.event_name,
+                        ev.display_name,
+                        ev.is_reserved
+                      ) !== ev.event_name
+                        ? localizeEventName(
+                            ev.event_name,
+                            ev.display_name,
+                            ev.is_reserved
+                          )
+                        : '—'}
+                    </TableCell>
                     <TableCell>
                       {ev.category ? (
                         <Chip
@@ -558,7 +750,13 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                     </TableCell>
                     <TableCell>
                       {ev.status === 'deprecated' && (
-                        <Chip size="small" label="Deprecated" color="warning" variant="outlined" sx={{ height: 20 }} />
+                        <Chip
+                          size="small"
+                          label="Deprecated"
+                          color="warning"
+                          variant="outlined"
+                          sx={{ height: 20 }}
+                        />
                       )}
                       {ev.status === 'hidden' && (
                         <Chip
@@ -571,12 +769,24 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                         />
                       )}
                       {ev.status === 'active' && (
-                        <Chip size="small" label="Active" color="success" variant="outlined" sx={{ height: 20 }} />
+                        <Chip
+                          size="small"
+                          label="Active"
+                          color="success"
+                          variant="outlined"
+                          sx={{ height: 20 }}
+                        />
                       )}
                     </TableCell>
                     <TableCell>
                       {ev.owner ? (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                          }}
+                        >
                           <PersonIcon fontSize="inherit" color="action" />
                           <Typography variant="body2">{ev.owner}</Typography>
                         </Box>
@@ -585,15 +795,30 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                       )}
                     </TableCell>
                     <TableCell align="right">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-                        <IconButton size="small" onClick={() => handleEditEvent(ev)}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 0.5,
+                          justifyContent: 'flex-end',
+                        }}
+                      >
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditEvent(ev)}
+                        >
                           <EditIcon fontSize="small" />
                         </IconButton>
                         {!ev.is_reserved && (
                           <IconButton
                             size="small"
                             color="error"
-                            onClick={() => setDeleteDialog({ open: true, type: 'event', name: ev.event_name })}
+                            onClick={() =>
+                              setDeleteDialog({
+                                open: true,
+                                type: 'event',
+                                name: ev.event_name,
+                              })
+                            }
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
@@ -607,15 +832,35 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
           </Table>
         </TableContainer>
       ) : (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
+        <TableContainer
+          component={Paper}
+          elevation={0}
+          sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
+        >
           <Table aria-label="lexicon properties table">
-            <TableHead sx={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)' }}>
+            <TableHead
+              sx={{
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.02)'
+                  : 'rgba(0,0,0,0.01)',
+              }}
+            >
               <TableRow>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.propertyName', 'Property Name')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.alias', 'Display Name')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.dataType', 'Data Type')}</TableCell>
-                <TableCell style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.status', 'Status')}</TableCell>
-                <TableCell align="right" style={{ fontWeight: 600 }}>{t('argus.settings.lexicon.action', 'Actions')}</TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.propertyName', 'Property Name')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.alias', 'Display Name')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.dataType', 'Data Type')}
+                </TableCell>
+                <TableCell style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.status', 'Status')}
+                </TableCell>
+                <TableCell align="right" style={{ fontWeight: 600 }}>
+                  {t('argus.settings.lexicon.action', 'Actions')}
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -623,22 +868,39 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
                     <Typography variant="body2" color="text.secondary">
-                      {t('argus.settings.lexicon.noProperties', 'No properties found')}
+                      {t(
+                        'argus.settings.lexicon.noProperties',
+                        'No properties found'
+                      )}
                     </Typography>
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredProperties.map((prop) => (
-                  <TableRow key={prop.property_name} hover sx={{ opacity: prop.status === 'deprecated' ? 0.6 : 1 }}>
+                  <TableRow
+                    key={prop.property_name}
+                    hover
+                    sx={{ opacity: prop.status === 'deprecated' ? 0.6 : 1 }}
+                  >
                     <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Typography
+                          variant="body2"
+                          fontFamily="monospace"
+                          fontWeight={500}
+                        >
                           {prop.property_name}
                         </Typography>
                         {prop.is_reserved ? (
                           <Chip
                             size="small"
-                            icon={<ShieldIcon style={{ fontSize: 12, color: isReservedColor }} />}
+                            icon={
+                              <ShieldIcon
+                                style={{ fontSize: 12, color: isReservedColor }}
+                              />
+                            }
                             label="System"
                             sx={{
                               height: 20,
@@ -664,13 +926,37 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                           />
                         )}
                       </Box>
-                      {localizePropertyDescription(prop.property_name, prop.description, prop.is_reserved) && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                          {localizePropertyDescription(prop.property_name, prop.description, prop.is_reserved)}
+                      {localizePropertyDescription(
+                        prop.property_name,
+                        prop.description,
+                        prop.is_reserved
+                      ) && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block', mt: 0.5 }}
+                        >
+                          {localizePropertyDescription(
+                            prop.property_name,
+                            prop.description,
+                            prop.is_reserved
+                          )}
                         </Typography>
                       )}
                     </TableCell>
-                    <TableCell>{localizePropertyName(prop.property_name, prop.display_name, prop.is_reserved) !== prop.property_name ? localizePropertyName(prop.property_name, prop.display_name, prop.is_reserved) : '—'}</TableCell>
+                    <TableCell>
+                      {localizePropertyName(
+                        prop.property_name,
+                        prop.display_name,
+                        prop.is_reserved
+                      ) !== prop.property_name
+                        ? localizePropertyName(
+                            prop.property_name,
+                            prop.display_name,
+                            prop.is_reserved
+                          )
+                        : '—'}
+                    </TableCell>
                     <TableCell>
                       <Chip
                         size="small"
@@ -682,7 +968,13 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                     </TableCell>
                     <TableCell>
                       {prop.status === 'deprecated' && (
-                        <Chip size="small" label="Deprecated" color="warning" variant="outlined" sx={{ height: 20 }} />
+                        <Chip
+                          size="small"
+                          label="Deprecated"
+                          color="warning"
+                          variant="outlined"
+                          sx={{ height: 20 }}
+                        />
                       )}
                       {prop.status === 'hidden' && (
                         <Chip
@@ -695,19 +987,40 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                         />
                       )}
                       {prop.status === 'active' && (
-                        <Chip size="small" label="Active" color="success" variant="outlined" sx={{ height: 20 }} />
+                        <Chip
+                          size="small"
+                          label="Active"
+                          color="success"
+                          variant="outlined"
+                          sx={{ height: 20 }}
+                        />
                       )}
                     </TableCell>
                     <TableCell align="right">
-                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
-                        <IconButton size="small" onClick={() => handleEditProperty(prop)}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          gap: 0.5,
+                          justifyContent: 'flex-end',
+                        }}
+                      >
+                        <IconButton
+                          size="small"
+                          onClick={() => handleEditProperty(prop)}
+                        >
                           <EditIcon fontSize="small" />
                         </IconButton>
                         {!prop.is_reserved && (
                           <IconButton
                             size="small"
                             color="error"
-                            onClick={() => setDeleteDialog({ open: true, type: 'property', name: prop.property_name })}
+                            onClick={() =>
+                              setDeleteDialog({
+                                open: true,
+                                type: 'property',
+                                name: prop.property_name,
+                              })
+                            }
                           >
                             <DeleteIcon fontSize="small" />
                           </IconButton>
@@ -723,15 +1036,34 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
       )}
 
       {/* Create/Edit Drawer */}
-      <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        <Box sx={{ width: 400, p: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Box
+          sx={{
+            width: 400,
+            p: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+          }}
+        >
           <Box>
             <Typography variant="h6" fontWeight={700}>
               {getDrawerTitle()}
             </Typography>
             {drawerMode === 'edit' && (
-              <Typography variant="caption" color="text.secondary" fontFamily="monospace" sx={{ display: 'block', mt: 1 }}>
-                {selectedEvent ? selectedEvent.event_name : selectedProperty?.property_name}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontFamily="monospace"
+                sx={{ display: 'block', mt: 1 }}
+              >
+                {selectedEvent
+                  ? selectedEvent.event_name
+                  : selectedProperty?.property_name}
               </Typography>
             )}
           </Box>
@@ -744,8 +1076,14 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
               label={t('argus.settings.lexicon.eventNameLabel', 'Event Key')}
               value={editEventName}
               onChange={(e) => setEditEventName(e.target.value)}
-              placeholder={t('argus.settings.lexicon.eventNamePlaceholder', 'e.g. button_clicked')}
-              helperText={t('argus.settings.lexicon.eventNameHint', 'Unique event identifier (cannot be changed later)')}
+              placeholder={t(
+                'argus.settings.lexicon.eventNamePlaceholder',
+                'e.g. button_clicked'
+              )}
+              helperText={t(
+                'argus.settings.lexicon.eventNameHint',
+                'Unique event identifier (cannot be changed later)'
+              )}
               slotProps={{ htmlInput: { style: { fontFamily: 'monospace' } } }}
             />
           )}
@@ -753,11 +1091,17 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
             <TextField
               fullWidth
               required
-              label={t('argus.settings.lexicon.propertyNameLabel', 'Property Key')}
+              label={t(
+                'argus.settings.lexicon.propertyNameLabel',
+                'Property Key'
+              )}
               value={editPropertyName}
               onChange={(e) => setEditPropertyName(e.target.value)}
               placeholder="e.g. plan_type"
-              helperText={t('argus.settings.lexicon.propertyNameHint', 'Unique property identifier (cannot be changed later)')}
+              helperText={t(
+                'argus.settings.lexicon.propertyNameHint',
+                'Unique property identifier (cannot be changed later)'
+              )}
               slotProps={{ htmlInput: { style: { fontFamily: 'monospace' } } }}
             />
           )}
@@ -765,14 +1109,20 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
           {/* Icon picker (Events only) */}
           {(tabValue === 0 || selectedEvent) && (
             <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mb: 1, display: 'block' }}
+              >
                 {t('argus.settings.lexicon.iconLabel', 'Icon')}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Button
                   variant="outlined"
                   size="small"
-                  onClick={(e) => setEmojiPickerOpen(emojiPickerOpen ? false : true)}
+                  onClick={(e) =>
+                    setEmojiPickerOpen(emojiPickerOpen ? false : true)
+                  }
                   id="icon-picker-anchor"
                   sx={{
                     minWidth: 48,
@@ -789,12 +1139,17 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                     borderColor: editIconColor || undefined,
                   }}
                 >
-                  {editIcon ? renderLexiconIcon(editIcon, 24, editIconColor || undefined) : <AddIcon fontSize="small" />}
+                  {editIcon ? (
+                    renderLexiconIcon(editIcon, 24, editIconColor || undefined)
+                  ) : (
+                    <AddIcon fontSize="small" />
+                  )}
                 </Button>
                 {editIcon && (
                   <>
                     <Typography variant="body2" color="text.secondary">
-                      {ICON_CATALOG.find((ic) => ic.name === editIcon)?.label || editIcon}
+                      {ICON_CATALOG.find((ic) => ic.name === editIcon)?.label ||
+                        editIcon}
                     </Typography>
                     <IconButton size="small" onClick={() => setEditIcon('')}>
                       <CloseIcon fontSize="small" />
@@ -810,7 +1165,13 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                 slotProps={{
                   paper: {
-                    sx: { p: 2, maxWidth: 360, maxHeight: 400, overflow: 'auto', borderRadius: 2 },
+                    sx: {
+                      p: 2,
+                      maxWidth: 360,
+                      maxHeight: 400,
+                      overflow: 'auto',
+                      borderRadius: 2,
+                    },
                   },
                 }}
               >
@@ -836,13 +1197,21 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
                             width: 38,
                             height: 38,
                             borderRadius: 1.5,
-                            color: isSelected ? '#fff' : isDark ? '#a5b4fc' : '#4f46e5',
+                            color: isSelected
+                              ? '#fff'
+                              : isDark
+                                ? '#a5b4fc'
+                                : '#4f46e5',
                             backgroundColor: isSelected
-                              ? isDark ? '#4f46e5' : '#4338ca'
+                              ? isDark
+                                ? '#4f46e5'
+                                : '#4338ca'
                               : 'transparent',
                             '&:hover': {
                               backgroundColor: isSelected
-                                ? isDark ? '#4338ca' : '#3730a3'
+                                ? isDark
+                                  ? '#4338ca'
+                                  : '#3730a3'
                                 : alpha(isDark ? '#a5b4fc' : '#4f46e5', 0.08),
                             },
                           }}
@@ -857,28 +1226,48 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
 
               {/* Color picker */}
               <Box sx={{ mt: 1.5 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ mb: 0.75, display: 'block' }}>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ mb: 0.75, display: 'block' }}
+                >
                   {t('argus.settings.lexicon.iconColor', 'Icon Color')}
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, alignItems: 'center' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 0.75,
+                    alignItems: 'center',
+                  }}
+                >
                   {COLOR_PRESETS.map((c) => (
                     <Box
                       key={c}
-                      onClick={() => setEditIconColor(editIconColor === c ? '' : c)}
+                      onClick={() =>
+                        setEditIconColor(editIconColor === c ? '' : c)
+                      }
                       sx={{
                         width: 24,
                         height: 24,
                         borderRadius: '50%',
                         bgcolor: c,
                         cursor: 'pointer',
-                        border: editIconColor === c ? `2px solid ${isDark ? '#fff' : '#000'}` : '2px solid transparent',
+                        border:
+                          editIconColor === c
+                            ? `2px solid ${isDark ? '#fff' : '#000'}`
+                            : '2px solid transparent',
                         transition: 'all 0.15s',
                         '&:hover': { transform: 'scale(1.2)' },
                       }}
                     />
                   ))}
                   {editIconColor && (
-                    <IconButton size="small" onClick={() => setEditIconColor('')} sx={{ ml: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => setEditIconColor('')}
+                      sx={{ ml: 0.5 }}
+                    >
                       <CloseIcon sx={{ fontSize: 14 }} />
                     </IconButton>
                   )}
@@ -909,7 +1298,10 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
             label={t('argus.settings.lexicon.description', 'Description')}
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
-            placeholder={t('argus.settings.lexicon.descPlaceholder', 'What triggers this event/property?')}
+            placeholder={t(
+              'argus.settings.lexicon.descPlaceholder',
+              'What triggers this event/property?'
+            )}
           />
 
           {/* Event-specific fields */}
@@ -933,9 +1325,12 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
           )}
 
           {/* Property-specific fields */}
-          {(selectedProperty || (drawerMode === 'create' && tabValue === 1)) && (
+          {(selectedProperty ||
+            (drawerMode === 'create' && tabValue === 1)) && (
             <FormControl fullWidth>
-              <InputLabel id="data-type-select-label">{t('argus.settings.lexicon.dataType', 'Data Type')}</InputLabel>
+              <InputLabel id="data-type-select-label">
+                {t('argus.settings.lexicon.dataType', 'Data Type')}
+              </InputLabel>
               <Select
                 labelId="data-type-select-label"
                 value={editDataType}
@@ -951,7 +1346,9 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
           )}
 
           <FormControl fullWidth>
-            <InputLabel id="status-select-label">{t('argus.settings.lexicon.status', 'Status')}</InputLabel>
+            <InputLabel id="status-select-label">
+              {t('argus.settings.lexicon.status', 'Status')}
+            </InputLabel>
             <Select
               labelId="status-select-label"
               value={editStatus}
@@ -966,41 +1363,81 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({ projectId, isDark, t 
 
           {/* Drawer Actions */}
           <Box sx={{ display: 'flex', gap: 2, mt: 4 }}>
-            <Button variant="outlined" fullWidth onClick={() => setDrawerOpen(false)}>
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => setDrawerOpen(false)}
+            >
               {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               variant="contained"
               fullWidth
-              disabled={saving || (drawerMode === 'create' && tabValue === 0 && !editEventName.trim()) || (drawerMode === 'create' && tabValue === 1 && !editPropertyName.trim())}
+              disabled={
+                saving ||
+                (drawerMode === 'create' &&
+                  tabValue === 0 &&
+                  !editEventName.trim()) ||
+                (drawerMode === 'create' &&
+                  tabValue === 1 &&
+                  !editPropertyName.trim())
+              }
               onClick={getDrawerSaveHandler()}
             >
-              {saving ? <CircularProgress size={24} /> : t('common.save', 'Save')}
+              {saving ? (
+                <CircularProgress size={24} />
+              ) : (
+                t('common.save', 'Save')
+              )}
             </Button>
           </Box>
         </Box>
       </Drawer>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialog.open} onClose={() => setDeleteDialog({ open: false, type: 'event', name: '' })}>
+      <Dialog
+        open={deleteDialog.open}
+        onClose={() =>
+          setDeleteDialog({ open: false, type: 'event', name: '' })
+        }
+      >
         <DialogTitle>
           {t('argus.settings.lexicon.deleteConfirm', 'Delete Confirmation')}
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <Typography component="span" fontFamily="monospace" fontWeight={600}>
+            <Typography
+              component="span"
+              fontFamily="monospace"
+              fontWeight={600}
+            >
               {deleteDialog.name}
-            </Typography>
-            {' '}
-            {t('argus.settings.lexicon.deleteMessage', 'will be permanently removed from the lexicon. This action cannot be undone.')}
+            </Typography>{' '}
+            {t(
+              'argus.settings.lexicon.deleteMessage',
+              'will be permanently removed from the lexicon. This action cannot be undone.'
+            )}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialog({ open: false, type: 'event', name: '' })}>
+          <Button
+            onClick={() =>
+              setDeleteDialog({ open: false, type: 'event', name: '' })
+            }
+          >
             {t('common.cancel', 'Cancel')}
           </Button>
-          <Button color="error" variant="contained" onClick={handleDelete} disabled={deleting}>
-            {deleting ? <CircularProgress size={20} /> : t('common.delete', 'Delete')}
+          <Button
+            color="error"
+            variant="contained"
+            onClick={handleDelete}
+            disabled={deleting}
+          >
+            {deleting ? (
+              <CircularProgress size={20} />
+            ) : (
+              t('common.delete', 'Delete')
+            )}
           </Button>
         </DialogActions>
       </Dialog>

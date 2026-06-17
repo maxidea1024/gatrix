@@ -62,7 +62,9 @@ import DateRangeSelector, {
 } from '@/components/common/DateRangeSelector';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import argusService, { type AnalyticsEventNameEntry } from '@/services/argusService';
+import argusService, {
+  type AnalyticsEventNameEntry,
+} from '@/services/argusService';
 import { renderLexiconIcon } from '@/utils/lexiconIcons';
 import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
 import {
@@ -159,7 +161,9 @@ const ArgusRetentionPage: React.FC = () => {
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<AnalyticsEventNameEntry[]>([]);
+  const [availableEvents, setAvailableEvents] = useState<
+    AnalyticsEventNameEntry[]
+  >([]);
   const [cohorts, setCohorts] = useState<any[]>([]);
   const [breakdownCohorts, setBreakdownCohorts] = useState<
     Record<string, any[]> | undefined
@@ -207,10 +211,7 @@ const ArgusRetentionPage: React.FC = () => {
   // ── Fetch event names ──
   const fetchEventNames = useCallback(async () => {
     try {
-      const data = await argusService.getAnalyticsEventNames(
-        projectId,
-        '30d'
-      );
+      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
       setAvailableEvents(data);
     } catch {
       setAvailableEvents([]);
@@ -223,7 +224,9 @@ const ArgusRetentionPage: React.FC = () => {
 
   // Quick lexicon editor state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   // ── Condition handlers ──
@@ -467,10 +470,12 @@ const ArgusRetentionPage: React.FC = () => {
       }
 
       const parts = splitBreakdownValue(breakdownValue);
-      const breakdownFilters = breakdownProperties.map((prop, i) => ({
-        property: prop,
-        value: parts[i] || '',
-      })).filter((f) => f.value !== '');
+      const breakdownFilters = breakdownProperties
+        .map((prop, i) => ({
+          property: prop,
+          value: parts[i] || '',
+        }))
+        .filter((f) => f.value !== '');
 
       setDrilldownParams({
         eventName: periodIndex === 0 ? cohortEvent.name : returnEvent.name,
@@ -519,10 +524,23 @@ const ArgusRetentionPage: React.FC = () => {
     [hiddenSeriesKeys, theme]
   );
 
-  const { localizeEventName: lfn, localizeEventDescription: lfd } = useLocalizedLexicon();
+  const { localizeEventName: lfn, localizeEventDescription: lfd } =
+    useLocalizedLexicon();
 
   const eventOptions = useMemo(
-    () => availableEvents.map((e) => ({ value: e.name, label: lfn(e.name, e.display_name, e.is_reserved), icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined), meta: { eventKey: e.name, description: lfd(e.name, e.description, e.is_reserved) || undefined, category: e.category || undefined, count: e.count, isReserved: e.is_reserved } })),
+    () =>
+      availableEvents.map((e) => ({
+        value: e.name,
+        label: lfn(e.name, e.display_name, e.is_reserved),
+        icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
+        meta: {
+          eventKey: e.name,
+          description: lfd(e.name, e.description, e.is_reserved) || undefined,
+          category: e.category || undefined,
+          count: e.count,
+          isReserved: e.is_reserved,
+        },
+      })),
     [availableEvents, lfn, lfd]
   );
 
@@ -556,7 +574,9 @@ const ArgusRetentionPage: React.FC = () => {
       ...Object.fromEntries(
         cohorts.map((c) => [
           String(c.cohort_date).substring(0, 10),
-          isPercentage ? Math.min(c.retention?.[i] ?? 0, 100) : (c.retention?.[i] ?? 0),
+          isPercentage
+            ? Math.min(c.retention?.[i] ?? 0, 100)
+            : (c.retention?.[i] ?? 0),
         ])
       ),
     }));
@@ -738,7 +758,15 @@ const ArgusRetentionPage: React.FC = () => {
                 width: '100%',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0, overflow: 'hidden' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  minWidth: 0,
+                  overflow: 'hidden',
+                }}
+              >
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -834,7 +862,15 @@ const ArgusRetentionPage: React.FC = () => {
                 width: '100%',
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0, overflow: 'hidden' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  minWidth: 0,
+                  overflow: 'hidden',
+                }}
+              >
                 <Typography
                   variant="caption"
                   color="text.secondary"

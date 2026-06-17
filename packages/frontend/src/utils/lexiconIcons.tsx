@@ -79,7 +79,11 @@ import {
 } from '@phosphor-icons/react';
 
 // ── Curated Phosphor icon catalog for analytics events ──
-export const ICON_CATALOG: { name: string; component: React.FC<IconProps>; label: string }[] = [
+export const ICON_CATALOG: {
+  name: string;
+  component: React.FC<IconProps>;
+  label: string;
+}[] = [
   // Interaction
   { name: 'CursorClick', component: CursorClick, label: 'Click' },
   { name: 'Cursor', component: Cursor, label: 'Cursor' },
@@ -178,21 +182,55 @@ export const ICON_CATALOG: { name: string; component: React.FC<IconProps>; label
 const ICON_MAP = new Map(ICON_CATALOG.map((i) => [i.name, i.component]));
 
 /** Render a lexicon icon by its stored name string. Shows a default icon when iconName is null. */
-export function renderLexiconIcon(iconName: string | null | undefined, size = 20, color?: string) {
+export function renderLexiconIcon(
+  iconName: string | null | undefined,
+  size = 20,
+  color?: string
+) {
   if (!iconName) {
     // Default icon for layout consistency
-    return <Heartbeat size={size} weight="regular" color={color} style={{ opacity: 0.35 }} />;
+    return (
+      <Heartbeat
+        size={size}
+        weight="regular"
+        color={color}
+        style={{ opacity: 0.35 }}
+      />
+    );
   }
   const IconComp = ICON_MAP.get(iconName);
-  if (!IconComp) return <Heartbeat size={size} weight="regular" color={color} style={{ opacity: 0.35 }} />;
+  if (!IconComp)
+    return (
+      <Heartbeat
+        size={size}
+        weight="regular"
+        color={color}
+        style={{ opacity: 0.35 }}
+      />
+    );
   return <IconComp size={size} weight="regular" color={color} />;
 }
 
 /** Preset color palette for icon backgrounds */
 export const COLOR_PRESETS = [
-  '#6366f1', '#8b5cf6', '#a855f7', '#d946ef',
-  '#ec4899', '#f43f5e', '#ef4444', '#f97316',
-  '#f59e0b', '#eab308', '#84cc16', '#22c55e',
-  '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-  '#3b82f6', '#2563eb', '#6b7280', '#374151',
+  '#6366f1',
+  '#8b5cf6',
+  '#a855f7',
+  '#d946ef',
+  '#ec4899',
+  '#f43f5e',
+  '#ef4444',
+  '#f97316',
+  '#f59e0b',
+  '#eab308',
+  '#84cc16',
+  '#22c55e',
+  '#10b981',
+  '#14b8a6',
+  '#06b6d4',
+  '#0ea5e9',
+  '#3b82f6',
+  '#2563eb',
+  '#6b7280',
+  '#374151',
 ];

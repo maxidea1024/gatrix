@@ -90,7 +90,10 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
     handleClose();
   };
 
-  const handleItemHover = (opt: InlineSelectOption, e: React.MouseEvent<HTMLElement>) => {
+  const handleItemHover = (
+    opt: InlineSelectOption,
+    e: React.MouseEvent<HTMLElement>
+  ) => {
     if (opt.meta) {
       setHoveredOpt(opt);
       setHoveredRect(e.currentTarget.getBoundingClientRect());
@@ -141,7 +144,13 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
         }}
       >
         {selectedOption?.icon && (
-          <Box sx={{ display: 'flex', alignItems: 'center', color: isDark ? '#a5b4fc' : '#4f46e5' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              color: isDark ? '#a5b4fc' : '#4f46e5',
+            }}
+          >
             {selectedOption.icon}
           </Box>
         )}
@@ -260,7 +269,9 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      bgcolor: isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)',
+                      bgcolor: isDark
+                        ? 'rgba(99, 102, 241, 0.15)'
+                        : 'rgba(99, 102, 241, 0.08)',
                       color: isDark ? '#a5b4fc' : '#4f46e5',
                     }}
                   >
@@ -269,7 +280,11 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
                 )}
                 <ListItemText
                   primary={opt.label}
-                  secondary={opt.meta?.eventKey && opt.meta.eventKey !== opt.label ? opt.meta.eventKey : undefined}
+                  secondary={
+                    opt.meta?.eventKey && opt.meta.eventKey !== opt.label
+                      ? opt.meta.eventKey
+                      : undefined
+                  }
                   primaryTypographyProps={{
                     variant: 'body2',
                     fontWeight: value === opt.value ? 700 : 500,
@@ -303,7 +318,9 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
                       '.MuiListItemButton-root:hover &': { opacity: 0.5 },
                       '&:hover': {
                         opacity: '1 !important',
-                        bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                        bgcolor: isDark
+                          ? 'rgba(255,255,255,0.08)'
+                          : 'rgba(0,0,0,0.06)',
                       },
                     }}
                   >
@@ -318,107 +335,131 @@ const InlineSelect: React.FC<InlineSelectProps> = ({
 
       {/* ── Detail Flyout ── */}
       {hasMeta && hoveredOpt?.meta && hoveredRect && (
-          <Box
-            sx={{
-              position: 'fixed',
-              top: hoveredRect.top - 10,
-              left: hoveredRect.right + 8,
-              width: 240,
-              p: 2,
-              borderRadius: 2,
-              bgcolor: isDark ? '#1e1e2f' : '#ffffff',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
-              boxShadow: isDark
-                ? '0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)'
-                : '0 12px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)',
-              zIndex: theme.zIndex.modal + 1,
-              pointerEvents: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1,
-            }}
-          >
-            {/* Header: icon + name */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-              {hoveredOpt.icon && (
-                <Box sx={{
+        <Box
+          sx={{
+            position: 'fixed',
+            top: hoveredRect.top - 10,
+            left: hoveredRect.right + 8,
+            width: 240,
+            p: 2,
+            borderRadius: 2,
+            bgcolor: isDark ? '#1e1e2f' : '#ffffff',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
+            boxShadow: isDark
+              ? '0 12px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05)'
+              : '0 12px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05)',
+            zIndex: theme.zIndex.modal + 1,
+            pointerEvents: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1,
+          }}
+        >
+          {/* Header: icon + name */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {hoveredOpt.icon && (
+              <Box
+                sx={{
                   width: 36,
                   height: 36,
                   borderRadius: 1.5,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)',
+                  bgcolor: isDark
+                    ? 'rgba(99, 102, 241, 0.15)'
+                    : 'rgba(99, 102, 241, 0.08)',
                   color: isDark ? '#a5b4fc' : '#4f46e5',
                   flexShrink: 0,
-                }}>
-                  {hoveredOpt.icon}
-                </Box>
-              )}
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle2" fontWeight={700} noWrap>
-                  {hoveredOpt.label}
-                </Typography>
-                {hoveredOpt.meta.eventKey && (
-                  <Typography variant="caption" fontFamily="monospace" color="text.secondary" noWrap sx={{ fontSize: '0.8rem', display: 'block' }}>
-                    {hoveredOpt.meta.eventKey}
-                  </Typography>
-                )}
+                }}
+              >
+                {hoveredOpt.icon}
               </Box>
-            </Box>
-
-            {/* Description */}
-            {hoveredOpt.meta.description && (
-              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5, fontSize: '0.85rem' }}>
-                {hoveredOpt.meta.description}
-              </Typography>
             )}
-
-            {/* Tags row */}
-            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-              {hoveredOpt.meta.category && (
-                <Chip
-                  size="small"
-                  label={hoveredOpt.meta.category}
-                  variant="outlined"
-                  sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
-                />
-              )}
-              {hoveredOpt.meta.isReserved !== undefined && (
-                <Chip
-                  size="small"
-                  label={hoveredOpt.meta.isReserved ? 'System' : 'Custom'}
-                  sx={{
-                    height: 24,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    bgcolor: hoveredOpt.meta.isReserved
-                      ? alpha('#22c55e', 0.1)
-                      : alpha('#3b82f6', 0.1),
-                    color: hoveredOpt.meta.isReserved ? '#22c55e' : '#3b82f6',
-                  }}
-                />
+            <Box sx={{ minWidth: 0 }}>
+              <Typography variant="subtitle2" fontWeight={700} noWrap>
+                {hoveredOpt.label}
+              </Typography>
+              {hoveredOpt.meta.eventKey && (
+                <Typography
+                  variant="caption"
+                  fontFamily="monospace"
+                  color="text.secondary"
+                  noWrap
+                  sx={{ fontSize: '0.8rem', display: 'block' }}
+                >
+                  {hoveredOpt.meta.eventKey}
+                </Typography>
               )}
             </Box>
+          </Box>
 
-            {/* Volume */}
-            {hoveredOpt.meta.count !== undefined && (
-              <Box sx={{
+          {/* Description */}
+          {hoveredOpt.meta.description && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ lineHeight: 1.5, fontSize: '0.85rem' }}
+            >
+              {hoveredOpt.meta.description}
+            </Typography>
+          )}
+
+          {/* Tags row */}
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            {hoveredOpt.meta.category && (
+              <Chip
+                size="small"
+                label={hoveredOpt.meta.category}
+                variant="outlined"
+                sx={{ height: 24, fontSize: '0.75rem', fontWeight: 600 }}
+              />
+            )}
+            {hoveredOpt.meta.isReserved !== undefined && (
+              <Chip
+                size="small"
+                label={hoveredOpt.meta.isReserved ? 'System' : 'Custom'}
+                sx={{
+                  height: 24,
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  bgcolor: hoveredOpt.meta.isReserved
+                    ? alpha('#22c55e', 0.1)
+                    : alpha('#3b82f6', 0.1),
+                  color: hoveredOpt.meta.isReserved ? '#22c55e' : '#3b82f6',
+                }}
+              />
+            )}
+          </Box>
+
+          {/* Volume */}
+          {hoveredOpt.meta.count !== undefined && (
+            <Box
+              sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 pt: 0.75,
                 borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              }}>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                  Volume (30d)
-                </Typography>
-                <Typography variant="body2" fontWeight={700} sx={{ fontSize: '0.85rem', fontVariantNumeric: 'tabular-nums' }}>
-                  {hoveredOpt.meta.count.toLocaleString()}
-                </Typography>
-              </Box>
-            )}
-          </Box>
+              }}
+            >
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: '0.8rem' }}
+              >
+                Volume (30d)
+              </Typography>
+              <Typography
+                variant="body2"
+                fontWeight={700}
+                sx={{ fontSize: '0.85rem', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {hoveredOpt.meta.count.toLocaleString()}
+              </Typography>
+            </Box>
+          )}
+        </Box>
       )}
     </>
   );

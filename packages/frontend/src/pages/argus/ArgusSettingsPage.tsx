@@ -338,11 +338,7 @@ const ArgusSettingsPage: React.FC = () => {
 
             {/* ─── LEXICON ─── */}
             {currentSection === 'lexicon' && (
-              <LexiconSettings
-                projectId={projectId}
-                isDark={isDark}
-                t={t}
-              />
+              <LexiconSettings projectId={projectId} isDark={isDark} t={t} />
             )}
 
             {/* ─── DSN KEYS ─── */}

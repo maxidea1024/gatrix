@@ -54,13 +54,22 @@ const EventLabel: React.FC<EventLabelProps> = ({
 }) => {
   const { localizeEventName, localizeEventDescription } = useLocalizedLexicon();
 
-  const resolvedName = localizeEventName(eventName, displayName ?? null, isReserved);
-  const resolvedDescription = localizeEventDescription(eventName, description ?? null, isReserved);
+  const resolvedName = localizeEventName(
+    eventName,
+    displayName ?? null,
+    isReserved
+  );
+  const resolvedDescription = localizeEventDescription(
+    eventName,
+    description ?? null,
+    isReserved
+  );
   const hasDistinctName = resolvedName !== eventName;
 
   // Determine what to show
   const shouldShowKey = showEventKey ?? (size !== 'compact' && hasDistinctName);
-  const shouldShowDesc = showDescription ?? (size === 'full' && !!resolvedDescription);
+  const shouldShowDesc =
+    showDescription ?? (size === 'full' && !!resolvedDescription);
 
   if (size === 'compact') {
     const iconSize = 18;
@@ -145,12 +154,15 @@ const EventLabel: React.FC<EventLabelProps> = ({
             </Typography>
           );
           // Show description in tooltip only if it exists and isn't already visible
-          const tooltipDesc = !shouldShowDesc && resolvedDescription ? resolvedDescription : '';
+          const tooltipDesc =
+            !shouldShowDesc && resolvedDescription ? resolvedDescription : '';
           return tooltipDesc ? (
             <Tooltip title={tooltipDesc} placement="top" arrow>
               {nameEl}
             </Tooltip>
-          ) : nameEl;
+          ) : (
+            nameEl
+          );
         })()}
         {shouldShowKey && (
           <Typography

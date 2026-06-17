@@ -250,11 +250,15 @@ async function enqueueEvent(
  */
 async function autoRegisterLexicon(projectId: string, events: any[]) {
   try {
-    const activityEvents = events.filter(e => e.type === 'activity' && e.event_name);
+    const activityEvents = events.filter(
+      (e) => e.type === 'activity' && e.event_name
+    );
     if (activityEvents.length === 0) return;
 
     // Extract unique event names
-    const eventNames = Array.from(new Set(activityEvents.map(e => e.event_name)));
+    const eventNames = Array.from(
+      new Set(activityEvents.map((e) => e.event_name))
+    );
 
     // Extract unique property names and types
     const propertyMap = new Map<string, 'string' | 'number'>();
@@ -276,20 +280,30 @@ async function autoRegisterLexicon(projectId: string, events: any[]) {
         .where('project_id', projectId)
         .whereIn('event_name', eventNames)
         .select('event_name');
-      const existingEventNames = new Set(existingEvents.map(e => e.event_name));
+      const existingEventNames = new Set(
+        existingEvents.map((e) => e.event_name)
+      );
 
       const newEvents = eventNames
-        .filter(name => !existingEventNames.has(name))
-        .map(name => ({
+        .filter((name) => !existingEventNames.has(name))
+        .map((name) => ({
           project_id: projectId,
           event_name: name,
-          display_name: name.startsWith('$') ? name : name.split(/[_-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+          display_name: name.startsWith('$')
+            ? name
+            : name
+                .split(/[_-]/)
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' '),
           status: 'active',
           is_reserved: name.startsWith('$'),
         }));
 
       if (newEvents.length > 0) {
-        await db('g_argus_lexicon_events').insert(newEvents).onConflict().ignore();
+        await db('g_argus_lexicon_events')
+          .insert(newEvents)
+          .onConflict()
+          .ignore();
       }
     }
 
@@ -299,21 +313,31 @@ async function autoRegisterLexicon(projectId: string, events: any[]) {
         .where('project_id', projectId)
         .whereIn('property_name', propertyNames)
         .select('property_name');
-      const existingPropertyNames = new Set(existingProperties.map(p => p.property_name));
+      const existingPropertyNames = new Set(
+        existingProperties.map((p) => p.property_name)
+      );
 
       const newProperties = propertyNames
-        .filter(name => !existingPropertyNames.has(name))
-        .map(name => ({
+        .filter((name) => !existingPropertyNames.has(name))
+        .map((name) => ({
           project_id: projectId,
           property_name: name,
-          display_name: name.startsWith('$') ? name : name.split(/[_-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+          display_name: name.startsWith('$')
+            ? name
+            : name
+                .split(/[_-]/)
+                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(' '),
           data_type: propertyMap.get(name) || 'string',
           status: 'active',
           is_reserved: name.startsWith('$'),
         }));
 
       if (newProperties.length > 0) {
-        await db('g_argus_lexicon_properties').insert(newProperties).onConflict().ignore();
+        await db('g_argus_lexicon_properties')
+          .insert(newProperties)
+          .onConflict()
+          .ignore();
       }
     }
   } catch (error) {

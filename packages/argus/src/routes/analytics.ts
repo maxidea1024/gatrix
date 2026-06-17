@@ -67,8 +67,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           lexiconMap.set(row.event_name, row);
         }
 
-        allLexiconEvents = await db('g_argus_lexicon_events')
-          .where('project_id', projectId);
+        allLexiconEvents = await db('g_argus_lexicon_events').where(
+          'project_id',
+          projectId
+        );
       } catch {
         // Lexicon tables may not exist — continue without enrichment
       }
@@ -89,12 +91,18 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       });
 
       // Hide events marked as hidden in Lexicon from dropdowns
-      const filteredResponseData = responseData.filter(d => d.status !== 'hidden');
+      const filteredResponseData = responseData.filter(
+        (d) => d.status !== 'hidden'
+      );
 
       // Append reserved events with 0 counts if not captured yet
-      const existingNames = new Set(filteredResponseData.map(d => d.name));
+      const existingNames = new Set(filteredResponseData.map((d) => d.name));
       for (const lex of allLexiconEvents) {
-        if (lex.is_reserved && !existingNames.has(lex.event_name) && lex.status !== 'hidden') {
+        if (
+          lex.is_reserved &&
+          !existingNames.has(lex.event_name) &&
+          lex.status !== 'hidden'
+        ) {
           filteredResponseData.push({
             name: lex.event_name,
             count: 0,
@@ -156,7 +164,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           WHERE project_id = {projectId:String}
             AND timestamp >= now() - INTERVAL 2 DAY
         `;
-        const dauResult = await optic.rawQuery({ query: dauSql, params: { projectId } });
+        const dauResult = await optic.rawQuery({
+          query: dauSql,
+          params: { projectId },
+        });
         const dauRow = (dauResult.data as any[])?.[0] || {};
 
         // 3) Daily trend (events + users per day)
@@ -175,11 +186,13 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             STEP INTERVAL 1 DAY
         `;
         const trendResult = await optic.rawQuery({ query: trendSql, params });
-        const dailyTrend = ((trendResult.data as any[]) || []).map((r: any) => ({
-          date: r.date,
-          events: Number(r.events) || 0,
-          users: Number(r.users) || 0,
-        }));
+        const dailyTrend = ((trendResult.data as any[]) || []).map(
+          (r: any) => ({
+            date: r.date,
+            events: Number(r.events) || 0,
+            users: Number(r.users) || 0,
+          })
+        );
 
         // 4) Hourly heatmap (dayOfWeek × hourOfDay)
         const heatmapSql = `
@@ -192,12 +205,17 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           GROUP BY dow, hour
           ORDER BY dow, hour
         `;
-        const heatmapResult = await optic.rawQuery({ query: heatmapSql, params });
-        const hourlyHeatmap = ((heatmapResult.data as any[]) || []).map((r: any) => ({
-          dow: Number(r.dow),
-          hour: Number(r.hour),
-          count: Number(r.count) || 0,
-        }));
+        const heatmapResult = await optic.rawQuery({
+          query: heatmapSql,
+          params,
+        });
+        const hourlyHeatmap = ((heatmapResult.data as any[]) || []).map(
+          (r: any) => ({
+            dow: Number(r.dow),
+            hour: Number(r.hour),
+            count: Number(r.count) || 0,
+          })
+        );
 
         return reply.send({
           success: true,
@@ -1268,17 +1286,23 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       if (measurement === 'property_sum' && body.measurement_property) {
         params.measProp = body.measurement_property;
         for (let i = 0; i <= numPeriods; i++) {
-          periodSelects.push(`sumIf(prop_value, return_period ${periodOp} ${i}) AS p${i}`);
+          periodSelects.push(
+            `sumIf(prop_value, return_period ${periodOp} ${i}) AS p${i}`
+          );
         }
       } else if (measurement === 'property_avg' && body.measurement_property) {
         params.measProp = body.measurement_property;
         for (let i = 0; i <= numPeriods; i++) {
-          periodSelects.push(`avgIf(prop_value, return_period ${periodOp} ${i}) AS p${i}`);
+          periodSelects.push(
+            `avgIf(prop_value, return_period ${periodOp} ${i}) AS p${i}`
+          );
         }
       } else {
         // retention_rate or unique_users — both count distinct users
         for (let i = 0; i <= numPeriods; i++) {
-          periodSelects.push(`uniqIf(user_id, return_period ${periodOp} ${i}) AS p${i}`);
+          periodSelects.push(
+            `uniqIf(user_id, return_period ${periodOp} ${i}) AS p${i}`
+          );
         }
       }
 
@@ -1313,9 +1337,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           ? `AND ${globalRetentionConds.join(' AND ')}`
           : '';
       // Add property value column for property-based measurements
-      const propValueCol = (measurement === 'property_sum' || measurement === 'property_avg')
-        ? `,\n            r.numeric_properties[{measProp:String}] AS prop_value`
-        : '';
+      const propValueCol =
+        measurement === 'property_sum' || measurement === 'property_avg'
+          ? `,\n            r.numeric_properties[{measProp:String}] AS prop_value`
+          : '';
 
       const sql = `
         SELECT
@@ -1373,7 +1398,12 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               break;
             default:
               // retention_rate: percentage capped at 100
-              retention.push(Math.min(Math.round((periodValue / cohortSize) * 1000) / 10, 100));
+              retention.push(
+                Math.min(
+                  Math.round((periodValue / cohortSize) * 1000) / 10,
+                  100
+                )
+              );
           }
         }
         return {
@@ -1449,7 +1479,12 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 retention.push(Math.round(periodValue * 100) / 100);
                 break;
               default:
-                retention.push(Math.min(Math.round((periodValue / cohortSize) * 1000) / 10, 100));
+                retention.push(
+                  Math.min(
+                    Math.round((periodValue / cohortSize) * 1000) / 10,
+                    100
+                  )
+                );
             }
           }
           breakdowns[bv].push({

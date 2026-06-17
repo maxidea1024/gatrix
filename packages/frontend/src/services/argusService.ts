@@ -2594,15 +2594,18 @@ class ArgusService {
       `${ARGUS_BASE}/projects/${projectId}/analytics/summary`,
       { params: { period, start, end } }
     );
-    return response.data?.data || response.data || {
-      total_events: 0,
-      unique_users: 0,
-      total_sessions: 0,
-      dau_today: 0,
-      dau_yesterday: 0,
-      daily_trend: [],
-      hourly_heatmap: [],
-    };
+    return (
+      response.data?.data ||
+      response.data || {
+        total_events: 0,
+        unique_users: 0,
+        total_sessions: 0,
+        dau_today: 0,
+        dau_yesterday: 0,
+        daily_trend: [],
+        hourly_heatmap: [],
+      }
+    );
   }
 
   async getAnalyticsEventProperties(
@@ -2851,7 +2854,9 @@ class ArgusService {
 
   // === Lexicon ===
 
-  async getLexiconEvents(projectId: number | string): Promise<ArgusLexiconEvent[]> {
+  async getLexiconEvents(
+    projectId: number | string
+  ): Promise<ArgusLexiconEvent[]> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/events`
     );
@@ -2861,7 +2866,17 @@ class ArgusService {
   async updateLexiconEvent(
     projectId: number | string,
     eventName: string,
-    data: Partial<Omit<ArgusLexiconEvent, 'id' | 'project_id' | 'event_name' | 'is_reserved' | 'created_at' | 'updated_at'>>
+    data: Partial<
+      Omit<
+        ArgusLexiconEvent,
+        | 'id'
+        | 'project_id'
+        | 'event_name'
+        | 'is_reserved'
+        | 'created_at'
+        | 'updated_at'
+      >
+    >
   ): Promise<void> {
     await argusApi.patch(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/events/${eventName}`,
@@ -2869,7 +2884,9 @@ class ArgusService {
     );
   }
 
-  async getLexiconProperties(projectId: number | string): Promise<ArgusLexiconProperty[]> {
+  async getLexiconProperties(
+    projectId: number | string
+  ): Promise<ArgusLexiconProperty[]> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/properties`
     );
@@ -2879,7 +2896,17 @@ class ArgusService {
   async updateLexiconProperty(
     projectId: number | string,
     propertyName: string,
-    data: Partial<Omit<ArgusLexiconProperty, 'id' | 'project_id' | 'property_name' | 'is_reserved' | 'created_at' | 'updated_at'>>
+    data: Partial<
+      Omit<
+        ArgusLexiconProperty,
+        | 'id'
+        | 'project_id'
+        | 'property_name'
+        | 'is_reserved'
+        | 'created_at'
+        | 'updated_at'
+      >
+    >
   ): Promise<void> {
     await argusApi.patch(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/properties/${propertyName}`,
@@ -2888,14 +2915,21 @@ class ArgusService {
   }
 
   async seedLexicon(projectId: number | string): Promise<void> {
-    await argusApi.post(
-      `${ARGUS_BASE}/projects/${projectId}/lexicon/seed`
-    );
+    await argusApi.post(`${ARGUS_BASE}/projects/${projectId}/lexicon/seed`);
   }
 
   async createLexiconEvent(
     projectId: number | string,
-    data: { event_name: string; display_name?: string; icon?: string; icon_color?: string; description?: string; category?: string; status?: string; owner?: string }
+    data: {
+      event_name: string;
+      display_name?: string;
+      icon?: string;
+      icon_color?: string;
+      description?: string;
+      category?: string;
+      status?: string;
+      owner?: string;
+    }
   ): Promise<void> {
     await argusApi.post(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/events`,
@@ -2903,7 +2937,10 @@ class ArgusService {
     );
   }
 
-  async deleteLexiconEvent(projectId: number | string, eventName: string): Promise<void> {
+  async deleteLexiconEvent(
+    projectId: number | string,
+    eventName: string
+  ): Promise<void> {
     await argusApi.delete(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/events/${encodeURIComponent(eventName)}`
     );
@@ -2911,7 +2948,13 @@ class ArgusService {
 
   async createLexiconProperty(
     projectId: number | string,
-    data: { property_name: string; display_name?: string; description?: string; data_type?: string; status?: string }
+    data: {
+      property_name: string;
+      display_name?: string;
+      description?: string;
+      data_type?: string;
+      status?: string;
+    }
   ): Promise<void> {
     await argusApi.post(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/properties`,
@@ -2919,7 +2962,10 @@ class ArgusService {
     );
   }
 
-  async deleteLexiconProperty(projectId: number | string, propertyName: string): Promise<void> {
+  async deleteLexiconProperty(
+    projectId: number | string,
+    propertyName: string
+  ): Promise<void> {
     await argusApi.delete(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/properties/${encodeURIComponent(propertyName)}`
     );

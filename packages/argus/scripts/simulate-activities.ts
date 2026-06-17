@@ -135,7 +135,7 @@ const APP_VERSION_WEIGHTS = [50, 25, 18, 7];
  */
 const EVENT_DEFS = {
   // Reserved / System Events
-  '$session_start': {
+  $session_start: {
     weight: 10,
     props: () => ({
       properties: {
@@ -307,14 +307,14 @@ const EVENT_DEFS = {
   },
 
   // Session end
-  '$session_end': {
+  $session_end: {
     weight: 5,
     props: () => ({
       properties: { reason: randomPick(['manual', 'timeout', 'maintenance']) },
       numeric_properties: { session_duration_minutes: randomInt(5, 180) },
     }),
   },
-  '$page_view': {
+  $page_view: {
     weight: 12,
     props: () => ({
       properties: {
@@ -329,24 +329,32 @@ const EVENT_DEFS = {
       },
     }),
   },
-  '$click': {
+  $click: {
     weight: 15,
     props: () => ({
       properties: {
-        target: randomPick(['button#play', 'button#shop', 'tab#inventory', 'button#settings']),
+        target: randomPick([
+          'button#play',
+          'button#shop',
+          'tab#inventory',
+          'button#settings',
+        ]),
       },
     }),
   },
-  '$error': {
+  $error: {
     weight: 2,
     props: () => ({
       properties: {
         error_type: randomPick(['TypeError', 'ReferenceError', 'NetworkError']),
-        message: randomPick(['Cannot read properties of undefined', 'Connection lost']),
+        message: randomPick([
+          'Cannot read properties of undefined',
+          'Connection lost',
+        ]),
       },
     }),
   },
-  '$feedback': {
+  $feedback: {
     weight: 1,
     props: () => ({
       properties: {
