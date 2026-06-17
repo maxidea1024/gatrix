@@ -74,7 +74,7 @@ export function buildTimeFilter(
   defaultPeriod: string = '24h'
 ): string {
   if (start && end) {
-    return `timestamp >= '${start}' AND timestamp <= '${end}'`;
+    return `timestamp >= parseDateTimeBestEffort('${start}') AND timestamp <= parseDateTimeBestEffort('${end}')`;
   }
   const interval = PERIOD_TO_SQL_INTERVAL[period || defaultPeriod] || '24 HOUR';
   return `timestamp >= now() - INTERVAL ${interval}`;

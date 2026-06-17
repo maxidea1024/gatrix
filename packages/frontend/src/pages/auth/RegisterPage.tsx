@@ -675,7 +675,8 @@ const RegisterPage: React.FC = () => {
                   color: 'rgba(255, 255, 255, 0.7)',
                 },
                 '& .MuiInputBase-input': {
-                  color: 'white',
+                  color: 'white !important',
+                  WebkitTextFillColor: 'white !important',
                   '&:-webkit-autofill': {
                     WebkitBoxShadow:
                       '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -734,7 +735,8 @@ const RegisterPage: React.FC = () => {
                   color: 'rgba(255, 255, 255, 0.7)',
                 },
                 '& .MuiInputBase-input': {
-                  color: 'white',
+                  color: 'white !important',
+                  WebkitTextFillColor: 'white !important',
                   '&:-webkit-autofill': {
                     WebkitBoxShadow:
                       '0 0 0 1000px rgba(255, 255, 255, 0.05) inset !important',
@@ -803,7 +805,8 @@ const RegisterPage: React.FC = () => {
                   color: 'rgba(255, 255, 255, 0.7)',
                 },
                 '& .MuiInputBase-input': {
-                  color: 'white',
+                  color: 'white !important',
+                  WebkitTextFillColor: 'white !important',
                   // Mask characters when using type=text on WebKit browsers
                   ...(isWebkit && !showPassword
                     ? {
@@ -934,7 +937,8 @@ const RegisterPage: React.FC = () => {
                     color: 'rgba(255, 255, 255, 0.7)',
                   },
                   '& .MuiInputBase-input': {
-                    color: 'white',
+                    color: 'white !important',
+                    WebkitTextFillColor: 'white !important',
                     // Mask characters when using type=text on WebKit browsers
                     ...(isWebkit && !showConfirmPassword
                       ? {

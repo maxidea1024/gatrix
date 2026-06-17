@@ -47,6 +47,48 @@ async function releaseLock(connection) {
   }
 }
 
+function splitSql(sql) {
+  const statements = [];
+  let currentDelimiter = ';';
+  let buffer = '';
+  const lines = sql.split(/\r?\n/);
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed.toUpperCase().startsWith('DELIMITER')) {
+      if (buffer.trim()) {
+        statements.push(buffer.trim());
+        buffer = '';
+      }
+      const parts = trimmed.split(/\s+/);
+      if (parts.length > 1) {
+        currentDelimiter = parts[1];
+      }
+      continue;
+    }
+
+    if (buffer) {
+      buffer += '\n';
+    }
+    buffer += line;
+
+    if (buffer.trim().endsWith(currentDelimiter)) {
+      let stmt = buffer.trim();
+      stmt = stmt.slice(0, -currentDelimiter.length).trim();
+      if (stmt) {
+        statements.push(stmt);
+      }
+      buffer = '';
+    }
+  }
+
+  if (buffer.trim()) {
+    statements.push(buffer.trim());
+  }
+
+  return statements;
+}
+
 async function migrate() {
   let connection;
 
@@ -81,7 +123,10 @@ async function migrate() {
         console.log(`[argus] Running migration: ${file}`);
         const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
 
-        await connection.query(sql);
+        const statements = splitSql(sql);
+        for (const statement of statements) {
+          await connection.query(statement);
+        }
         console.log(`[argus] ${file} completed`);
       }
 

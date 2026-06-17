@@ -13,6 +13,7 @@ const DISCOVER_DATASETS = new Set([
   'logs',
   'transactions',
   'sessions',
+  'activities',
 ]);
 
 /**

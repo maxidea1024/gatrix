@@ -124,6 +124,9 @@ function buildTransports(): winston.transport[] {
 }
 
 const sharedTransports = buildTransports();
+sharedTransports.forEach((transport) => {
+  transport.setMaxListeners?.(100);
+});
 
 /**
  * Create a logger with a category label.

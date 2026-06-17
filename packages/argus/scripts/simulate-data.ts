@@ -3768,6 +3768,7 @@ async function main() {
     'user_feedback',
     'logs',
     'metrics',
+    'activities',
   ];
   for (const table of chTables) {
     try {
@@ -5115,9 +5116,259 @@ async function main() {
     );
   }
 
+  // ──────── 11. GENERATE & INSERT ACTIVITIES ────────
+  await generateAndInsertActivities(ch);
+
   await pool.end();
   await ch.close();
   console.log('\n🎮 Done! Refresh the Argus dashboard.');
+}
+
+const ACTIVITY_EVENT_DEFS = {
+  '$session_start': {
+    weight: 10,
+    props: () => ({
+      properties: {
+        source: randomPick(['direct', 'launcher', 'shortcut', 'deeplink']),
+      },
+    }),
+  },
+  '$session_end': {
+    weight: 5,
+    props: () => ({
+      properties: { reason: randomPick(['manual', 'timeout', 'maintenance']) },
+      numeric_properties: { session_duration_minutes: randomInt(5, 180) },
+    }),
+  },
+  '$page_view': {
+    weight: 12,
+    props: () => ({
+      properties: {
+        url: randomPick([
+          '/game/play',
+          '/game/port',
+          '/game/battle',
+          '/settings',
+          '/inventory',
+          '/guild',
+        ]),
+      },
+    }),
+  },
+  '$click': {
+    weight: 15,
+    props: () => ({
+      properties: {
+        target: randomPick(['button#play', 'button#shop', 'tab#inventory', 'button#settings']),
+      },
+    }),
+  },
+  '$error': {
+    weight: 2,
+    props: () => ({
+      properties: {
+        error_type: randomPick(['TypeError', 'ReferenceError', 'NetworkError']),
+        message: randomPick(['Cannot read properties of undefined', 'Connection lost']),
+      },
+    }),
+  },
+  '$feedback': {
+    weight: 1,
+    props: () => ({
+      properties: {
+        satisfaction: randomPick(['5', '4', '3', '2', '1']),
+      },
+    }),
+  },
+  user_login: {
+    weight: 8,
+    props: () => ({
+      properties: {
+        method: randomPick(['password', 'social', 'sso', 'steam', 'epic']),
+      },
+    }),
+  },
+  character_created: {
+    weight: 2,
+    props: () => ({
+      properties: {
+        class: randomPick(['warrior', 'mage', 'archer', 'priest', 'assassin']),
+        race: randomPick(['human', 'elf', 'dwarf', 'orc']),
+      },
+      numeric_properties: { creation_time_seconds: randomInt(30, 300) },
+    }),
+  },
+  tutorial_completed: {
+    weight: 1,
+    props: () => ({
+      properties: { tutorial_id: `tut_${randomInt(1, 5)}` },
+      numeric_properties: { duration_seconds: randomInt(120, 600) },
+    }),
+  },
+  battle_started: {
+    weight: 6,
+    props: () => ({
+      properties: {
+        mode: randomPick(['pve', 'pvp', 'raid', 'dungeon']),
+        difficulty: randomPick(['normal', 'hard', 'hell']),
+      },
+      numeric_properties: { party_size: randomInt(1, 6) },
+    }),
+  },
+  battle_won: {
+    weight: 5,
+    props: () => ({
+      properties: { reward_type: randomPick(['gold', 'item', 'exp']) },
+      numeric_properties: {
+        duration_seconds: randomInt(60, 900),
+        damage_dealt: randomInt(10000, 500000),
+      },
+    }),
+  },
+  item_purchased: {
+    weight: 6,
+    props: () => ({
+      properties: {
+        item_type: randomPick(['weapon', 'armor', 'potion', 'cosmetic']),
+        currency: randomPick(['gold', 'diamond']),
+      },
+      numeric_properties: {
+        price: randomPick([100, 500, 1000, 5000]),
+        quantity: randomInt(1, 10),
+      },
+    }),
+  },
+} as const;
+
+type ActivityEventName = keyof typeof ACTIVITY_EVENT_DEFS;
+
+async function generateAndInsertActivities(ch: any) {
+  console.log('\n📊 Phase 9: Generating Product Analytics Activities...');
+  const activeUsers = USERS.slice(0, 3000);
+  let activityCount = 0;
+  let batchBuffer: any[] = [];
+
+  for (let i = 0; i < activeUsers.length; i++) {
+    const user = activeUsers[i];
+    const joinDay = randomInt(0, DAYS_BACK - 1);
+    const retentionClass = weightedPick(
+      ['churned', 'casual', 'regular', 'core'] as const,
+      [30, 35, 25, 10]
+    );
+
+    let activeDays: number;
+    switch (retentionClass) {
+      case 'churned':
+        activeDays = randomInt(1, 2);
+        break;
+      case 'casual':
+        activeDays = randomInt(3, 6);
+        break;
+      case 'regular':
+        activeDays = randomInt(7, 11);
+        break;
+      case 'core':
+        activeDays = DAYS_BACK - joinDay;
+        break;
+    }
+
+    const daysToPlay = new Set<number>();
+    daysToPlay.add(joinDay);
+    for (let d = 1; d < activeDays; d++) {
+      const day = joinDay + randomInt(1, Math.min(activeDays + 2, DAYS_BACK - joinDay - 1));
+      if (day < DAYS_BACK) daysToPlay.add(day);
+    }
+
+    const sortedDays = [...daysToPlay].sort((a, b) => a - b);
+    let isFirstSession = true;
+
+    for (const day of sortedDays) {
+      const sessionsToday = retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
+
+      for (let s = 0; s < sessionsToday; s++) {
+        const sessionId = uuid();
+        const dayStart = new Date(NOW.getTime() - (DAYS_BACK - day) * 86400000);
+        dayStart.setUTCHours(randomInt(9, 18), randomInt(0, 59), randomInt(0, 59));
+        let ts = dayStart.getTime();
+
+        const sessionEvents: ActivityEventName[] = [];
+        sessionEvents.push('$session_start', 'user_login');
+
+        if (isFirstSession) {
+          sessionEvents.push('character_created');
+          if (Math.random() < 0.7) {
+            sessionEvents.push('tutorial_completed');
+          }
+          isFirstSession = false;
+        }
+
+        const numGameplay = retentionClass === 'core' ? randomInt(5, 12) : randomInt(2, 6);
+        const gameplayPool: ActivityEventName[] = [
+          '$page_view',
+          '$click',
+          '$error',
+          '$feedback',
+          'battle_started',
+          'battle_won',
+          'item_purchased',
+        ];
+        const gameplayWeights = gameplayPool.map(n => ACTIVITY_EVENT_DEFS[n].weight);
+
+        for (let g = 0; g < numGameplay; g++) {
+          sessionEvents.push(weightedPick(gameplayPool, gameplayWeights));
+        }
+
+        if (Math.random() < 0.9) {
+          sessionEvents.push('$session_end');
+        }
+
+        for (const eventName of sessionEvents) {
+          ts += randomInt(2000, 60000);
+          const generated = ACTIVITY_EVENT_DEFS[eventName].props();
+
+          batchBuffer.push({
+            event_id: uuid(),
+            project_id: PROJECT_ID,
+            timestamp: new Date(ts).toISOString().replace('T', ' ').replace('Z', ''),
+            event_name: eventName,
+            user_id: user.id,
+            device_id: `device_${user.id}`,
+            session_id: sessionId,
+            platform: randomPick(['Steam', 'PlayStation', 'iOS']),
+            environment: randomPick(['production', 'staging']),
+            release: randomPick(['1.14.0', '1.13.2']),
+            country: user.country,
+            city: user.city,
+            os: randomPick(['Windows 11', 'macOS 14', 'iOS 17']),
+            app_version: randomPick(['1.14.0-b201', '1.13.2-b195']),
+            properties: (generated as any).properties || {},
+            numeric_properties: (generated as any).numeric_properties || {},
+            dsn_key_id: 0,
+          });
+        }
+      }
+    }
+
+    if (batchBuffer.length >= CHUNK_SIZE) {
+      await ch.insert({
+        table: `${CH_CONFIG.database}.activities`,
+        values: batchBuffer,
+        format: 'JSONEachRow',
+      });
+      activityCount += batchBuffer.length;
+      batchBuffer = [];
+    }
+  }
+
+  if (batchBuffer.length > 0) {
+    await ch.insert({
+      table: `${CH_CONFIG.database}.activities`,
+      values: batchBuffer,
+      format: 'JSONEachRow',
+    });
+    activityCount += batchBuffer.length;
+  }
+  console.log(`   ✓ ${activityCount.toLocaleString()} activities inserted`);
 }
 
 main().catch((e) => {

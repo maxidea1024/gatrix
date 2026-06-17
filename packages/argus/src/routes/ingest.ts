@@ -7,6 +7,7 @@ import { ulid } from 'ulid';
 import { ArgusEvent, ArgusBatchPayload } from '../types/events';
 import { updateDsnKeyLastSeen } from '../utils/dsn-seen-tracker';
 import { QUEUES, STREAMS, KNOWN_STREAMS } from '../config/redis-keys';
+import db from '../config/knex';
 
 const logger = createLogger('ingest');
 
@@ -52,6 +53,8 @@ export default async function ingestRoutes(app: FastifyInstance) {
           dsn_key_id: auth.dsnKey.id,
         } as any);
         updateDsnKeyLastSeen(auth.dsnKey.id);
+
+        autoRegisterLexicon(auth.projectId, [event]).catch(() => {});
 
         return reply.code(202).send({ event_id: eventId });
       } catch (error) {
@@ -173,6 +176,8 @@ export default async function ingestRoutes(app: FastifyInstance) {
         await Promise.all(groupmqPromises);
         updateDsnKeyLastSeen(auth.dsnKey.id);
 
+        autoRegisterLexicon(auth.projectId, payload.events).catch(() => {});
+
         logger.debug('Batch ingested', {
           projectId: auth.projectId,
           count: payload.events.length,
@@ -238,4 +243,83 @@ async function enqueueEvent(
     eventType: event.type,
     eventId: event.event_id,
   });
+}
+
+/**
+ * Automatically registers newly seen activity events & properties in the Lexicon.
+ */
+async function autoRegisterLexicon(projectId: string, events: any[]) {
+  try {
+    const activityEvents = events.filter(e => e.type === 'activity' && e.event_name);
+    if (activityEvents.length === 0) return;
+
+    // Extract unique event names
+    const eventNames = Array.from(new Set(activityEvents.map(e => e.event_name)));
+
+    // Extract unique property names and types
+    const propertyMap = new Map<string, 'string' | 'number'>();
+    for (const e of activityEvents) {
+      if (e.properties) {
+        for (const key of Object.keys(e.properties)) {
+          if (!propertyMap.has(key)) propertyMap.set(key, 'string');
+        }
+      }
+      if (e.numeric_properties) {
+        for (const key of Object.keys(e.numeric_properties)) {
+          if (!propertyMap.has(key)) propertyMap.set(key, 'number');
+        }
+      }
+    }
+
+    if (eventNames.length > 0) {
+      const existingEvents = await db('g_argus_lexicon_events')
+        .where('project_id', projectId)
+        .whereIn('event_name', eventNames)
+        .select('event_name');
+      const existingEventNames = new Set(existingEvents.map(e => e.event_name));
+
+      const newEvents = eventNames
+        .filter(name => !existingEventNames.has(name))
+        .map(name => ({
+          project_id: projectId,
+          event_name: name,
+          display_name: name.startsWith('$') ? name : name.split(/[_-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+          status: 'active',
+          is_reserved: name.startsWith('$'),
+        }));
+
+      if (newEvents.length > 0) {
+        await db('g_argus_lexicon_events').insert(newEvents).onConflict().ignore();
+      }
+    }
+
+    if (propertyMap.size > 0) {
+      const propertyNames = Array.from(propertyMap.keys());
+      const existingProperties = await db('g_argus_lexicon_properties')
+        .where('project_id', projectId)
+        .whereIn('property_name', propertyNames)
+        .select('property_name');
+      const existingPropertyNames = new Set(existingProperties.map(p => p.property_name));
+
+      const newProperties = propertyNames
+        .filter(name => !existingPropertyNames.has(name))
+        .map(name => ({
+          project_id: projectId,
+          property_name: name,
+          display_name: name.startsWith('$') ? name : name.split(/[_-]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+          data_type: propertyMap.get(name) || 'string',
+          status: 'active',
+          is_reserved: name.startsWith('$'),
+        }));
+
+      if (newProperties.length > 0) {
+        await db('g_argus_lexicon_properties').insert(newProperties).onConflict().ignore();
+      }
+    }
+  } catch (error) {
+    logger.error('Failed to auto-register lexicon entries', {
+      projectId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }

@@ -41,7 +41,10 @@ import DateRangeSelector, {
 } from '@/components/common/DateRangeSelector';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import argusService from '@/services/argusService';
+import argusService, { type AnalyticsEventNameEntry } from '@/services/argusService';
+import { renderLexiconIcon } from '@/utils/lexiconIcons';
+import EventLabel from '@/components/argus/EventLabel';
+import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
 import { useFlowsStore } from '@/hooks/useAnalyticsStore';
 import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -50,6 +53,7 @@ import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
 import InlineSelect from './components/analytics/InlineSelect';
 import PropertyPicker from './components/analytics/PropertyPicker';
+import BreakdownSection from './components/analytics/BreakdownSection';
 import CsvExportButton from './components/analytics/CsvExportButton';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
@@ -58,6 +62,7 @@ import {
   formatBreakdownLabel,
   splitBreakdownValue,
 } from './components/analytics/breakdownUtils';
+import QuickLexiconEditor from './components/analytics/QuickLexiconEditor';
 
 /* ─── Types ─── */
 
@@ -113,7 +118,7 @@ const ArgusFlowsPage: React.FC = () => {
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<string[]>([]);
+  const [availableEvents, setAvailableEvents] = useState<AnalyticsEventNameEntry[]>([]);
   const [flowData, setFlowData] = useState<{
     nodes: { id: string; count: number }[];
     links: { source: string; target: string; value: number }[];
@@ -138,19 +143,26 @@ const ArgusFlowsPage: React.FC = () => {
   const lastExecutedKeyRef = useRef<string>('');
 
   // ── Fetch event names ──
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await argusService.getAnalyticsEventNames(
-          projectId,
-          '30d'
-        );
-        setAvailableEvents(data.map((e) => e.name));
-      } catch {
-        setAvailableEvents([]);
-      }
-    })();
+  const fetchEventNames = useCallback(async () => {
+    try {
+      const data = await argusService.getAnalyticsEventNames(
+        projectId,
+        '30d'
+      );
+      setAvailableEvents(data);
+    } catch {
+      setAvailableEvents([]);
+    }
   }, [projectId]);
+
+  useEffect(() => {
+    fetchEventNames();
+  }, [fetchEventNames]);
+
+  // Quick lexicon editor state
+  const [quickEditOpen, setQuickEditOpen] = useState(false);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditEventName, setQuickEditEventName] = useState('');
 
   // ── Derived direction ──
   useEffect(() => {
@@ -294,6 +306,24 @@ const ArgusFlowsPage: React.FC = () => {
     handleRun,
   ]);
 
+  // Lexicon Map for translating event keys
+  const lexiconMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const e of availableEvents) {
+      if (e.display_name) map.set(e.name, e.display_name);
+    }
+    return map;
+  }, [availableEvents]);
+
+  // Event metadata map for EventLabel
+  const eventMetaMap = useMemo(() => {
+    const map = new Map<string, AnalyticsEventNameEntry>();
+    for (const e of availableEvents) {
+      map.set(e.name, e);
+    }
+    return map;
+  }, [availableEvents]);
+
   // ── Sankey data ──
   const sankeyData = useMemo(() => {
     if (!flowData || flowData.nodes.length === 0) return null;
@@ -308,7 +338,7 @@ const ArgusFlowsPage: React.FC = () => {
 
     const nodeIdxMap = new Map<string, number>();
     activeData.nodes.forEach((n, i) => nodeIdxMap.set(n.id, i));
-    const nodes = activeData.nodes.map((n) => ({ name: n.id }));
+    const nodes = activeData.nodes.map((n) => ({ name: lexiconMap.get(n.id) || n.id }));
     let links = activeData.links
       .filter(
         (l) =>
@@ -350,7 +380,7 @@ const ArgusFlowsPage: React.FC = () => {
 
     if (validLinks.length === 0) return null;
     return { nodes, links: validLinks };
-  }, [flowData, selectedBreakdown]);
+  }, [flowData, selectedBreakdown, lexiconMap]);
 
   // ── CSV data ──
   const csvData = useMemo(() => {
@@ -368,14 +398,16 @@ const ArgusFlowsPage: React.FC = () => {
     return [];
   }, [flowData, viewMode]);
 
+  const { localizeEventName: lfn, localizeEventDescription: lfd } = useLocalizedLexicon();
+
   const eventOptions = useMemo(
-    () => availableEvents.map((name) => ({ value: name, label: name })),
-    [availableEvents]
+    () => availableEvents.map((e) => ({ value: e.name, label: lfn(e.name, e.display_name, e.is_reserved), icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined), meta: { eventKey: e.name, description: lfd(e.name, e.description, e.is_reserved) || undefined, category: e.category || undefined, count: e.count, isReserved: e.is_reserved } })),
+    [availableEvents, lfn, lfd]
   );
 
   // ── UI: Left Panel ──
   const leftPanel = (
-    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       {/* Anchor Events */}
       <Box>
         <Typography
@@ -404,6 +436,11 @@ const ArgusFlowsPage: React.FC = () => {
                 options={eventOptions}
                 emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
                 highlightEmpty
+                onEditOption={(val, anchor) => {
+                  setQuickEditEventName(val);
+                  setQuickEditAnchor(anchor);
+                  setQuickEditOpen(true);
+                }}
               />
             </Box>
           </EventBlock>
@@ -411,14 +448,51 @@ const ArgusFlowsPage: React.FC = () => {
           {/* Anchor B (optional) */}
           {showSecondAnchor && (
             <>
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: -0.5 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  my: -1,
+                }}
+              >
+                {/* Dotted line top */}
                 <Box
                   sx={{
-                    width: 2,
-                    height: 12,
-                    bgcolor: isDark
-                      ? 'rgba(255,255,255,0.1)'
-                      : 'rgba(0,0,0,0.1)',
+                    width: 0,
+                    height: 14,
+                    borderLeft: `2px dashed ${isDark ? 'rgba(236,72,153,0.4)' : 'rgba(236,72,153,0.3)'}`,
+                  }}
+                />
+                {/* Arrow circle */}
+                <Box
+                  sx={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: '50%',
+                    border: `2px solid ${isDark ? 'rgba(236,72,153,0.45)' : 'rgba(236,72,153,0.35)'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: 'background.paper',
+                    zIndex: 2,
+                  }}
+                >
+                  <ArrowDownIcon
+                    sx={{
+                      fontSize: 14,
+                      color: isDark
+                        ? 'rgba(236,72,153,0.7)'
+                        : 'rgba(236,72,153,0.5)',
+                    }}
+                  />
+                </Box>
+                {/* Dotted line bottom */}
+                <Box
+                  sx={{
+                    width: 0,
+                    height: 14,
+                    borderLeft: `2px dashed ${isDark ? 'rgba(236,72,153,0.4)' : 'rgba(236,72,153,0.3)'}`,
                   }}
                 />
               </Box>
@@ -450,6 +524,11 @@ const ArgusFlowsPage: React.FC = () => {
                       'Select Event'
                     )}
                     highlightEmpty
+                    onEditOption={(val, anchor) => {
+                      setQuickEditEventName(val);
+                      setQuickEditAnchor(anchor);
+                      setQuickEditOpen(true);
+                    }}
                   />
                 </Box>
               </EventBlock>
@@ -512,11 +591,11 @@ const ArgusFlowsPage: React.FC = () => {
           >
             {/* Direction */}
             {!showSecondAnchor && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ minWidth: 60 }}
+                  sx={{ minWidth: 70, flexShrink: 0, fontSize: '0.75rem' }}
                 >
                   {t('argus.analytics.direction', 'Direction')}
                 </Typography>
@@ -538,11 +617,11 @@ const ArgusFlowsPage: React.FC = () => {
             )}
 
             {/* Steps before/after */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ minWidth: 60 }}
+                sx={{ minWidth: 70, flexShrink: 0, fontSize: '0.75rem' }}
               >
                 {direction === 'before'
                   ? t('argus.analytics.stepsBefore', 'Steps Before')
@@ -565,11 +644,11 @@ const ArgusFlowsPage: React.FC = () => {
             </Box>
 
             {/* Depth */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Typography
                 variant="caption"
                 color="text.secondary"
-                sx={{ minWidth: 60 }}
+                sx={{ minWidth: 70, flexShrink: 0, fontSize: '0.75rem' }}
               >
                 {t('argus.analytics.depth', 'Depth')}
               </Typography>
@@ -606,10 +685,10 @@ const ArgusFlowsPage: React.FC = () => {
             overflowY: 'auto',
           }}
         >
-          {availableEvents.slice(0, 20).map((name) => (
+          {availableEvents.slice(0, 20).map((e) => (
             <Box
-              key={name}
-              onClick={() => toggleExclude(name)}
+              key={e.name}
+              onClick={() => toggleExclude(e.name)}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -619,13 +698,13 @@ const ArgusFlowsPage: React.FC = () => {
                 borderRadius: 1,
                 cursor: 'pointer',
                 fontSize: '0.75rem',
-                color: excludeEvents.includes(name)
+                color: excludeEvents.includes(e.name)
                   ? 'error.main'
                   : 'text.primary',
-                textDecoration: excludeEvents.includes(name)
+                textDecoration: excludeEvents.includes(e.name)
                   ? 'line-through'
                   : 'none',
-                opacity: excludeEvents.includes(name) ? 0.5 : 1,
+                opacity: excludeEvents.includes(e.name) ? 0.5 : 1,
                 '&:hover': {
                   bgcolor: isDark
                     ? 'rgba(255,255,255,0.04)'
@@ -635,10 +714,17 @@ const ArgusFlowsPage: React.FC = () => {
             >
               <Checkbox
                 size="small"
-                checked={!excludeEvents.includes(name)}
+                checked={!excludeEvents.includes(e.name)}
                 sx={{ p: 0.25, '& .MuiSvgIcon-root': { fontSize: 14 } }}
               />
-              {name}
+              <EventLabel
+                eventName={e.name}
+                displayName={e.display_name}
+                icon={e.icon}
+                iconColor={e.icon_color}
+                isReserved={e.is_reserved}
+                size="compact"
+              />
             </Box>
           ))}
         </Box>
@@ -647,58 +733,12 @@ const ArgusFlowsPage: React.FC = () => {
       <Divider sx={{ opacity: isDark ? 0.05 : 0.5 }} />
 
       {/* Breakdown */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-        {breakdownProperties.length > 0 ? (
-          <Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography
-                variant="overline"
-                sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
-              >
-                {t('argus.analytics.breakdownBy', 'Breakdown By')}
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={() => setBreakdownProperties([])}
-                sx={{ p: 0.25, opacity: 0.6, '&:hover': { opacity: 1 } }}
-              >
-                <CloseIcon sx={{ fontSize: 14 }} />
-              </IconButton>
-            </Box>
-            <Box
-              sx={{
-                mt: 0.5,
-                p: 1.5,
-                borderRadius: 2,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              }}
-            >
-              <PropertyPicker
-                projectId={projectId}
-                eventName={anchorEventA}
-                value={breakdownProperties}
-                onChange={setBreakdownProperties}
-                emptyLabel={t('argus.analytics.noBreakdown', 'None')}
-              />
-            </Box>
-          </Box>
-        ) : (
-          <PropertyPicker
-            projectId={projectId}
-            eventName={anchorEventA}
-            value={breakdownProperties}
-            onChange={setBreakdownProperties}
-            emptyLabel={t('argus.analytics.addBreakdown', 'Breakdown')}
-            variant="text"
-          />
-        )}
-      </Box>
+      <BreakdownSection
+        projectId={projectId}
+        eventName={anchorEventA}
+        value={breakdownProperties}
+        onChange={setBreakdownProperties}
+      />
 
       <Box sx={{ mt: 'auto', pt: 2 }}>
         <Button
@@ -1004,7 +1044,7 @@ const ArgusFlowsPage: React.FC = () => {
                     {p.path.map((step, sIdx) => (
                       <React.Fragment key={sIdx}>
                         <Chip
-                          label={step}
+                          label={lexiconMap.get(step) || step}
                           size="small"
                           sx={{
                             height: 22,
@@ -1532,6 +1572,14 @@ const ArgusFlowsPage: React.FC = () => {
           </PageContentLoader>
         </AnalyticsLayout>
       </Box>
+      <QuickLexiconEditor
+        open={quickEditOpen}
+        anchorEl={quickEditAnchor}
+        eventName={quickEditEventName}
+        projectId={projectId}
+        onClose={() => setQuickEditOpen(false)}
+        onSaved={fetchEventNames}
+      />
     </Box>
   );
 };

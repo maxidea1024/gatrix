@@ -11,6 +11,24 @@ import { CONFIG_TYPES } from '../config/redis-keys';
 const logger = createLogger('projects-api');
 const broadcaster = new ConfigBroadcaster(redis);
 
+const DEFAULT_RESERVED_EVENTS = [
+  { event_name: '$session_start', display_name: 'Session Start', icon: 'CheckCircle', icon_color: '#22c55e', description: 'Triggers when a user session begins.', is_reserved: true, status: 'active', category: 'Session' },
+  { event_name: '$session_end', display_name: 'Session End', icon: 'XCircle', icon_color: '#ef4444', description: 'Triggers when a user session ends.', is_reserved: true, status: 'active', category: 'Session' },
+  { event_name: '$page_view', display_name: 'Page View', icon: 'FileText', icon_color: '#3b82f6', description: 'Triggers when a page or screen is viewed.', is_reserved: true, status: 'active', category: 'Navigation' },
+  { event_name: '$click', display_name: 'Click', icon: 'CursorClick', icon_color: '#f59e0b', description: 'Triggers on user click interactions.', is_reserved: true, status: 'active', category: 'Interaction' },
+  { event_name: '$error', display_name: 'Error Captured', icon: 'Bug', icon_color: '#ef4444', description: 'Triggers when an application exception is captured.', is_reserved: true, status: 'active', category: 'Error' },
+  { event_name: '$feedback', display_name: 'User Feedback', icon: 'ChatCircle', icon_color: '#8b5cf6', description: 'Triggers when a user submits a feedback form.', is_reserved: true, status: 'active', category: 'Feedback' },
+];
+
+const DEFAULT_RESERVED_PROPERTIES = [
+  { property_name: '$browser', display_name: 'Browser', description: 'Web browser used', data_type: 'string', is_reserved: true, status: 'active' },
+  { property_name: '$os', display_name: 'OS', description: 'Operating system used', data_type: 'string', is_reserved: true, status: 'active' },
+  { property_name: '$country', display_name: 'Country', description: 'User country', data_type: 'string', is_reserved: true, status: 'active' },
+  { property_name: '$city', display_name: 'City', description: 'User city', data_type: 'string', is_reserved: true, status: 'active' },
+  { property_name: '$device_id', display_name: 'Device ID', description: 'Unique device identifier', data_type: 'string', is_reserved: true, status: 'active' },
+  { property_name: '$app_version', display_name: 'App Version', description: 'Version of the app', data_type: 'string', is_reserved: true, status: 'active' },
+];
+
 export default async function projectsRoutes(app: FastifyInstance) {
   // List all Argus projects
   app.get(
@@ -81,6 +99,28 @@ export default async function projectsRoutes(app: FastifyInstance) {
             secret_key: secretKey,
           });
         });
+
+        // Seed Lexicon (non-blocking — project creation succeeds even if lexicon tables don't exist yet)
+        try {
+          const eventsToInsert = DEFAULT_RESERVED_EVENTS.map(ev => ({
+            project_id: projectId,
+            ...ev,
+          }));
+          await db('g_argus_lexicon_events').insert(eventsToInsert).onConflict(['project_id', 'event_name']).ignore();
+
+          const propertiesToInsert = DEFAULT_RESERVED_PROPERTIES.map(prop => ({
+            project_id: projectId,
+            ...prop,
+          }));
+          await db('g_argus_lexicon_properties').insert(propertiesToInsert).onConflict(['project_id', 'property_name']).ignore();
+
+          logger.info('Lexicon seeded for project', { projectId });
+        } catch (seedError) {
+          logger.warn('Lexicon seeding skipped (tables may not exist yet)', {
+            projectId,
+            error: seedError instanceof Error ? seedError.message : String(seedError),
+          });
+        }
 
         const rows = await db('g_argus_projects as p')
           .select('p.*', 'd.public_key', 'd.secret_key')

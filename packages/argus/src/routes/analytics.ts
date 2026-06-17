@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
+import db from '../config/knex';
 import {
   buildTimeRangeConditions,
   getBucketingConfig,
@@ -43,11 +44,189 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         LIMIT 200
       `;
 
-      const result = await optic.rawQuery({ query: sql, params });
-      return reply.send({ success: true, data: result.data });
+      let chData: any[] = [];
+      try {
+        const result = await optic.rawQuery({ query: sql, params });
+        chData = result.data || [];
+      } catch (err) {
+        // Table activities might not exist yet in clickhouse
+        chData = [];
+      }
+
+      const eventNames = chData.map((r: any) => r.name);
+
+      // Fetch lexicon events (defensive — tables may not exist yet)
+      let lexiconMap = new Map<string, any>();
+      let allLexiconEvents: any[] = [];
+      try {
+        const lexiconRows = await db('g_argus_lexicon_events')
+          .where('project_id', projectId)
+          .whereIn('event_name', eventNames);
+
+        for (const row of lexiconRows) {
+          lexiconMap.set(row.event_name, row);
+        }
+
+        allLexiconEvents = await db('g_argus_lexicon_events')
+          .where('project_id', projectId);
+      } catch {
+        // Lexicon tables may not exist — continue without enrichment
+      }
+
+      const responseData = chData.map((r: any) => {
+        const lex = lexiconMap.get(r.name);
+        return {
+          name: r.name,
+          count: Number(r.count),
+          display_name: lex?.display_name || null,
+          icon: lex?.icon || null,
+          icon_color: lex?.icon_color || null,
+          description: lex?.description || null,
+          status: lex?.status || 'active',
+          is_reserved: !!lex?.is_reserved,
+          category: lex?.category || null,
+        };
+      });
+
+      // Hide events marked as hidden in Lexicon from dropdowns
+      const filteredResponseData = responseData.filter(d => d.status !== 'hidden');
+
+      // Append reserved events with 0 counts if not captured yet
+      const existingNames = new Set(filteredResponseData.map(d => d.name));
+      for (const lex of allLexiconEvents) {
+        if (lex.is_reserved && !existingNames.has(lex.event_name) && lex.status !== 'hidden') {
+          filteredResponseData.push({
+            name: lex.event_name,
+            count: 0,
+            display_name: lex.display_name,
+            icon: lex.icon || null,
+            icon_color: lex.icon_color || null,
+            description: lex.description || null,
+            status: lex.status,
+            is_reserved: true,
+            category: lex.category,
+          });
+        }
+      }
+
+      return reply.send({ success: true, data: filteredResponseData });
     }
   );
 
+  // GET /:projectId/analytics/summary
+  app.get(
+    '/projects/:projectId/analytics/summary',
+    async (
+      request: FastifyRequest<{
+        Params: { projectId: string };
+        Querystring: { period?: string; start?: string; end?: string };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const { projectId } = request.params;
+      const { period, start, end } = request.query;
+      const { conditions, params } = buildTimeRangeConditions(
+        period || '14d',
+        start,
+        end
+      );
+      conditions.push('project_id = {projectId:String}');
+      params.projectId = projectId;
+      const whereClause = conditions.join(' AND ');
+
+      try {
+        // 1) KPI metrics: total events, unique users, sessions
+        const kpiSql = `
+          SELECT
+            count() AS total_events,
+            uniqExact(user_id) AS unique_users,
+            uniqExact(session_id) AS total_sessions
+          FROM ${TABLE}
+          WHERE ${whereClause}
+        `;
+        const kpiResult = await optic.rawQuery({ query: kpiSql, params });
+        const kpiRow = (kpiResult.data as any[])?.[0] || {};
+
+        // 2) DAU today & yesterday
+        const dauSql = `
+          SELECT
+            uniqExactIf(user_id, toDate(timestamp) = today()) AS dau_today,
+            uniqExactIf(user_id, toDate(timestamp) = yesterday()) AS dau_yesterday
+          FROM ${TABLE}
+          WHERE project_id = {projectId:String}
+            AND timestamp >= now() - INTERVAL 2 DAY
+        `;
+        const dauResult = await optic.rawQuery({ query: dauSql, params: { projectId } });
+        const dauRow = (dauResult.data as any[])?.[0] || {};
+
+        // 3) Daily trend (events + users per day)
+        const trendSql = `
+          SELECT
+            toDate(timestamp) AS date,
+            count() AS events,
+            uniqExact(user_id) AS users
+          FROM ${TABLE}
+          WHERE ${whereClause}
+          GROUP BY date
+          ORDER BY date ASC
+          WITH FILL
+            FROM toDate(now() - INTERVAL ${period === '30d' ? '30' : period === '90d' ? '90' : period === '7d' ? '7' : '14'} DAY)
+            TO toDate(now()) + 1
+            STEP INTERVAL 1 DAY
+        `;
+        const trendResult = await optic.rawQuery({ query: trendSql, params });
+        const dailyTrend = ((trendResult.data as any[]) || []).map((r: any) => ({
+          date: r.date,
+          events: Number(r.events) || 0,
+          users: Number(r.users) || 0,
+        }));
+
+        // 4) Hourly heatmap (dayOfWeek × hourOfDay)
+        const heatmapSql = `
+          SELECT
+            toDayOfWeek(timestamp) AS dow,
+            toHour(timestamp) AS hour,
+            count() AS count
+          FROM ${TABLE}
+          WHERE ${whereClause}
+          GROUP BY dow, hour
+          ORDER BY dow, hour
+        `;
+        const heatmapResult = await optic.rawQuery({ query: heatmapSql, params });
+        const hourlyHeatmap = ((heatmapResult.data as any[]) || []).map((r: any) => ({
+          dow: Number(r.dow),
+          hour: Number(r.hour),
+          count: Number(r.count) || 0,
+        }));
+
+        return reply.send({
+          success: true,
+          data: {
+            total_events: Number(kpiRow.total_events) || 0,
+            unique_users: Number(kpiRow.unique_users) || 0,
+            total_sessions: Number(kpiRow.total_sessions) || 0,
+            dau_today: Number(dauRow.dau_today) || 0,
+            dau_yesterday: Number(dauRow.dau_yesterday) || 0,
+            daily_trend: dailyTrend,
+            hourly_heatmap: hourlyHeatmap,
+          },
+        });
+      } catch (err) {
+        return reply.send({
+          success: true,
+          data: {
+            total_events: 0,
+            unique_users: 0,
+            total_sessions: 0,
+            dau_today: 0,
+            dau_yesterday: 0,
+            daily_trend: [],
+            hourly_heatmap: [],
+          },
+        });
+      }
+    }
+  );
   // GET /:projectId/analytics/event-properties
   app.get(
     '/projects/:projectId/analytics/event-properties',
@@ -426,11 +605,17 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               cParams,
               `cev_${event.name.replace(/[^a-zA-Z0-9]/g, '')}`
             );
+            const cGlobalConditions = buildGlobalFilterConditions(
+              body.global_filters,
+              cParams,
+              `cgf_${event.name.replace(/[^a-zA-Z0-9]/g, '')}`
+            );
             const cConditions = [
               ...compareTimeConditions,
               'project_id = {projectId:String}',
               'event_name = {eventName:String}',
               ...cPropConditions,
+              ...cGlobalConditions,
             ];
             let cAggExpr = 'count()';
             switch (event.aggregation) {
@@ -646,12 +831,14 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         }
       }
 
-      const firstStepCount = stepCounts[0] || 1;
+      const firstStepCount = stepCounts[0];
       const steps = eventNames.map((name, i) => ({
         name,
         count: stepCounts[i],
         conversion_rate:
-          Math.round((stepCounts[i] / firstStepCount) * 1000) / 10,
+          firstStepCount > 0
+            ? Math.round((stepCounts[i] / firstStepCount) * 1000) / 10
+            : 0,
       }));
 
       const overallConversion =
@@ -892,7 +1079,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               segStepCounts[step - 1] += segStepCounts[step];
             }
           }
-          const segFirstCount = segStepCounts[0] || 1;
+          const segFirstCount = segStepCounts[0];
           segmentResults.push({
             id: seg.id,
             name: seg.name,
@@ -901,7 +1088,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               name,
               count: segStepCounts[i],
               conversion_rate:
-                Math.round((segStepCounts[i] / segFirstCount) * 1000) / 10,
+                segFirstCount > 0
+                  ? Math.round((segStepCounts[i] / segFirstCount) * 1000) / 10
+                  : 0,
             })),
             overall_conversion:
               segFirstCount > 0
@@ -978,13 +1167,15 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 bdStepCounts[step - 1] += bdStepCounts[step];
               }
             }
-            const bdFirstCount = bdStepCounts[0] || 1;
+            const bdFirstCount = bdStepCounts[0];
             breakdownResults[bv] = {
               steps: eventNames.map((name, i) => ({
                 name,
                 count: bdStepCounts[i],
                 conversion_rate:
-                  Math.round((bdStepCounts[i] / bdFirstCount) * 1000) / 10,
+                  bdFirstCount > 0
+                    ? Math.round((bdStepCounts[i] / bdFirstCount) * 1000) / 10
+                    : 0,
               })),
               overall_conversion:
                 bdFirstCount > 0
@@ -1065,10 +1256,30 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       params.returnEvent = body.return_event.name;
       params.numPeriods = numPeriods;
 
-      // Build dynamic period columns
+      const criteria = body.criteria || 'on';
+      const measurement = body.measurement || 'retention_rate';
+
+      // Build dynamic period columns based on measurement type
+      // 'on' = user returned exactly on that period
+      // 'on_or_after' = user returned on that period or any later period
       const periodSelects: string[] = [];
-      for (let i = 0; i <= numPeriods; i++) {
-        periodSelects.push(`countIf(return_period = ${i}) AS p${i}`);
+      const periodOp = criteria === 'on_or_after' ? '>=' : '=';
+
+      if (measurement === 'property_sum' && body.measurement_property) {
+        params.measProp = body.measurement_property;
+        for (let i = 0; i <= numPeriods; i++) {
+          periodSelects.push(`sumIf(prop_value, return_period ${periodOp} ${i}) AS p${i}`);
+        }
+      } else if (measurement === 'property_avg' && body.measurement_property) {
+        params.measProp = body.measurement_property;
+        for (let i = 0; i <= numPeriods; i++) {
+          periodSelects.push(`avgIf(prop_value, return_period ${periodOp} ${i}) AS p${i}`);
+        }
+      } else {
+        // retention_rate or unique_users — both count distinct users
+        for (let i = 0; i <= numPeriods; i++) {
+          periodSelects.push(`uniqIf(user_id, return_period ${periodOp} ${i}) AS p${i}`);
+        }
       }
 
       const firstEventConds = buildPropertyConditions(
@@ -1101,6 +1312,10 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         globalRetentionConds.length > 0
           ? `AND ${globalRetentionConds.join(' AND ')}`
           : '';
+      // Add property value column for property-based measurements
+      const propValueCol = (measurement === 'property_sum' || measurement === 'property_avg')
+        ? `,\n            r.numeric_properties[{measProp:String}] AS prop_value`
+        : '';
 
       const sql = `
         SELECT
@@ -1111,7 +1326,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           SELECT
             f.user_id,
             ${truncFunc}(f.first_ts) AS cohort_date,
-            dateDiff('${dateDiffUnit}', ${truncFunc}(f.first_ts), ${truncFunc}(r.timestamp)) AS return_period
+            dateDiff('${dateDiffUnit}', ${truncFunc}(f.first_ts), ${truncFunc}(r.timestamp)) AS return_period${propValueCol}
           FROM (
             SELECT user_id, min(timestamp) AS first_ts
             FROM ${TABLE}
@@ -1130,7 +1345,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             ${returnEventWhere}
             ${globalRetentionWhere}
             AND r.timestamp >= f.first_ts
-            AND r.timestamp <= f.first_ts + INTERVAL {numPeriods:UInt32} ${intervalUnit}
+            AND ${truncFunc}(r.timestamp) <= ${truncFunc}(f.first_ts) + INTERVAL {numPeriods:UInt32} ${intervalUnit}
         )
         WHERE return_period >= 0 AND return_period <= {numPeriods:UInt32}
         GROUP BY cohort_date
@@ -1145,8 +1360,21 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         const cohortSize = Number(row.cohort_size) || 1;
         const retention: number[] = [];
         for (let i = 0; i <= numPeriods; i++) {
-          const periodCount = Number(row[`p${i}`]) || 0;
-          retention.push(Math.round((periodCount / cohortSize) * 1000) / 10);
+          const periodValue = Number(row[`p${i}`]) || 0;
+          switch (measurement) {
+            case 'unique_users':
+              // Absolute user count per period
+              retention.push(periodValue);
+              break;
+            case 'property_sum':
+            case 'property_avg':
+              // Raw numeric value (sum or avg already computed in SQL)
+              retention.push(Math.round(periodValue * 100) / 100);
+              break;
+            default:
+              // retention_rate: percentage capped at 100
+              retention.push(Math.min(Math.round((periodValue / cohortSize) * 1000) / 10, 100));
+          }
         }
         return {
           cohort_date: row.cohort_date,
@@ -1171,7 +1399,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               f.user_id,
               ${bdCol} AS bd,
               ${truncFunc}(f.first_ts) AS cohort_date,
-              dateDiff('${dateDiffUnit}', ${truncFunc}(f.first_ts), ${truncFunc}(r.timestamp)) AS return_period
+              dateDiff('${dateDiffUnit}', ${truncFunc}(f.first_ts), ${truncFunc}(r.timestamp)) AS return_period${propValueCol}
             FROM (
               SELECT user_id, min(timestamp) AS first_ts
               FROM ${TABLE}
@@ -1190,7 +1418,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               ${returnEventWhere}
               ${globalRetentionWhere}
               AND r.timestamp >= f.first_ts
-              AND r.timestamp <= f.first_ts + INTERVAL {numPeriods:UInt32} ${intervalUnit}
+              AND ${truncFunc}(r.timestamp) <= ${truncFunc}(f.first_ts) + INTERVAL {numPeriods:UInt32} ${intervalUnit}
           )
           WHERE return_period >= 0 AND return_period <= {numPeriods:UInt32}
           GROUP BY breakdown_value, cohort_date
@@ -1211,8 +1439,18 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           const cohortSize = Number(row.cohort_size) || 1;
           const retention: number[] = [];
           for (let i = 0; i <= numPeriods; i++) {
-            const periodCount = Number(row[`p${i}`]) || 0;
-            retention.push(Math.round((periodCount / cohortSize) * 1000) / 10);
+            const periodValue = Number(row[`p${i}`]) || 0;
+            switch (measurement) {
+              case 'unique_users':
+                retention.push(periodValue);
+                break;
+              case 'property_sum':
+              case 'property_avg':
+                retention.push(Math.round(periodValue * 100) / 100);
+                break;
+              default:
+                retention.push(Math.min(Math.round((periodValue / cohortSize) * 1000) / 10, 100));
+            }
           }
           breakdowns[bv].push({
             cohort_date: row.cohort_date,

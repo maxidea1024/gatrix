@@ -67,6 +67,9 @@ import DateRangeSelector, {
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import argusService from '@/services/argusService';
+import { renderLexiconIcon } from '@/utils/lexiconIcons';
+import EventLabel from '@/components/argus/EventLabel';
+import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
 import {
   useFormulaEngine,
   evaluateFormula,
@@ -85,6 +88,7 @@ import ChartTypeSelector, {
   ChartType,
 } from './components/analytics/ChartTypeSelector';
 import PropertyPicker from './components/analytics/PropertyPicker';
+import BreakdownSection from './components/analytics/BreakdownSection';
 import PropertyValueInput from './components/analytics/PropertyValueInput';
 import CsvExportButton from './components/analytics/CsvExportButton';
 import CompareSelector, {
@@ -98,7 +102,8 @@ import {
 } from './components/analytics/useBreakdownLimit';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { formatBreakdownLabel } from './components/analytics/breakdownUtils';
+import { formatBreakdownLabel, splitBreakdownValue } from './components/analytics/breakdownUtils';
+import QuickLexiconEditor from './components/analytics/QuickLexiconEditor';
 
 /* ─── Types ─── */
 
@@ -235,8 +240,38 @@ const ArgusInsightsPage: React.FC = () => {
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Transient State (reset on refresh) ──
-  const [availableEvents, setAvailableEvents] = useState<string[]>([]);
+  const [availableEvents, setAvailableEvents] = useState<any[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
+
+  // Lexicon Map for translating keys
+  const lexiconMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const e of availableEvents) {
+      if (e.display_name) map.set(e.name, e.display_name);
+    }
+    return map;
+  }, [availableEvents]);
+
+  // Event metadata map for EventLabel
+  const eventMetaMap = useMemo(() => {
+    const map = new Map<string, any>();
+    for (const e of availableEvents) {
+      map.set(e.name, e);
+    }
+    return map;
+  }, [availableEvents]);
+
+  const tooltipFormatter = useCallback((value: any, name: string) => {
+    let label = name;
+    if (name.includes(':')) {
+      const [eventName, breakdownVal] = name.split(':');
+      const display = lexiconMap.get(eventName) || eventName;
+      label = `${display}: ${breakdownVal}`;
+    } else {
+      label = lexiconMap.get(name) || name;
+    }
+    return [value, label];
+  }, [lexiconMap]);
 
   const [series, setSeries] = useState<any[]>([]);
   const [compareSeries, setCompareSeries] = useState<any[] | undefined>();
@@ -257,12 +292,16 @@ const ArgusInsightsPage: React.FC = () => {
   const [drilldownParams, setDrilldownParams] = useState<{
     eventName: string;
     dateRange: { start: Date; end: Date };
-    breakdownProperty?: string;
-    breakdownValue?: string;
+    breakdownFilters?: { property: string; value: string }[];
   } | null>(null);
 
   const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null);
   const [refAreaRight, setRefAreaRight] = useState<string | null>(null);
+
+  // Quick lexicon editor state
+  const [quickEditOpen, setQuickEditOpen] = useState(false);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditEventName, setQuickEditEventName] = useState('');
 
   const handleZoom = useCallback(() => {
     if (refAreaLeft === refAreaRight || !refAreaLeft || !refAreaRight) {
@@ -303,7 +342,7 @@ const ArgusInsightsPage: React.FC = () => {
     setEventsLoading(true);
     try {
       const data = await argusService.getAnalyticsEventNames(projectId, '30d');
-      setAvailableEvents(data.map((e) => e.name));
+      setAvailableEvents(data);
     } catch {
       setAvailableEvents([]);
     } finally {
@@ -702,11 +741,32 @@ const ArgusInsightsPage: React.FC = () => {
         59
       );
 
+      // Build breakdownFilters from the breakdown value
+      let breakdownFilters: { property: string; value: string }[] | undefined;
+      if (bValue && breakdownProperties.length > 0) {
+        // bValue was formatted by formatBreakdownLabel, so we need to find the
+        // original composite value from series data
+        const matchingSeries = series.find((s) => {
+          if (!s.breakdown_value) return false;
+          return formatBreakdownLabel(s.breakdown_value, breakdownProperties) === bValue
+            && s.event === eventName;
+        });
+        if (matchingSeries) {
+          const parts = splitBreakdownValue(matchingSeries.breakdown_value);
+          breakdownFilters = breakdownProperties.map((prop: string, i: number) => ({
+            property: prop,
+            value: parts[i] || '',
+          })).filter((f: { property: string; value: string }) => f.value !== '');
+        } else {
+          // Fallback: single property
+          breakdownFilters = [{ property: breakdownProperties[0], value: bValue }];
+        }
+      }
+
       setDrilldownParams({
         eventName,
         dateRange: { start, end },
-        breakdownProperty: breakdownProperties[0],
-        breakdownValue: bValue,
+        breakdownFilters,
       });
       setDrilldownOpen(true);
     },
@@ -714,9 +774,22 @@ const ArgusInsightsPage: React.FC = () => {
   );
 
   // Options
+  const { localizeEventName, localizeEventDescription } = useLocalizedLexicon();
+
   const eventOptions = useMemo(
-    () => availableEvents.map((name) => ({ value: name, label: name })),
-    [availableEvents]
+    () => availableEvents.map((e) => ({
+      value: e.name,
+      label: localizeEventName(e.name, e.display_name, e.is_reserved),
+      icon: renderLexiconIcon(e.icon, 18, e.icon_color || undefined),
+      meta: {
+        eventKey: e.name,
+        description: localizeEventDescription(e.name, e.description, e.is_reserved) || undefined,
+        category: e.category || undefined,
+        count: e.count,
+        isReserved: e.is_reserved,
+      },
+    })),
+    [availableEvents, localizeEventName, localizeEventDescription]
   );
 
   const handleLegendClick = useCallback((e: any) => {
@@ -735,6 +808,14 @@ const ArgusInsightsPage: React.FC = () => {
   const renderLegendText = useCallback(
     (value: string, entry: any) => {
       const isHidden = hiddenSeriesKeys.has(entry.dataKey || value);
+      let label = value;
+      if (value.includes(':')) {
+        const [eventName, breakdownVal] = value.split(':');
+        const display = lexiconMap.get(eventName) || eventName;
+        label = `${display}: ${breakdownVal}`;
+      } else {
+        label = lexiconMap.get(value) || value;
+      }
       return (
         <span
           style={{
@@ -743,16 +824,16 @@ const ArgusInsightsPage: React.FC = () => {
             cursor: 'pointer',
           }}
         >
-          {value}
+          {label}
         </span>
       );
     },
-    [hiddenSeriesKeys, theme]
+    [hiddenSeriesKeys, theme, lexiconMap]
   );
 
   // ── UI: Left Panel (Query Builder) ──
   const leftPanel = (
-    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       {/* Events Section */}
       <Box>
         <Typography
@@ -801,6 +882,11 @@ const ArgusInsightsPage: React.FC = () => {
                             'Select Event'
                           )}
                           highlightEmpty
+                          onEditOption={(val, anchor) => {
+                            setQuickEditEventName(val);
+                            setQuickEditAnchor(anchor);
+                            setQuickEditOpen(true);
+                          }}
                         />
                         <IconButton
                           size="small"
@@ -1021,7 +1107,7 @@ const ArgusInsightsPage: React.FC = () => {
         )}
 
         <Box
-          sx={{ pl: 1.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {formulas.map((form, idx) => (
@@ -1068,9 +1154,6 @@ const ArgusInsightsPage: React.FC = () => {
                 color: 'text.secondary',
                 textTransform: 'none',
                 borderRadius: 2,
-                pl: 0.5,
-                fontSize: '0.8rem',
-                width: 'fit-content',
               }}
             >
               {t('argus.analytics.addFormula', 'Formula')}
@@ -1082,62 +1165,12 @@ const ArgusInsightsPage: React.FC = () => {
       <Divider sx={{ opacity: isDark ? 0.05 : 0.5 }} />
 
       {/* Breakdown Section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-        {breakdownProperties.length > 0 ? (
-          <Box>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography
-                variant="overline"
-                sx={{ fontWeight: 700, color: 'text.secondary', ml: 0.5 }}
-              >
-                {t('argus.analytics.breakdownBy', 'Breakdown By')}
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={() => setBreakdownProperties([])}
-                sx={{ p: 0.25, opacity: 0.6, '&:hover': { opacity: 1 } }}
-              >
-                <CloseIcon sx={{ fontSize: 14 }} />
-              </IconButton>
-            </Box>
-            <Box sx={{ pl: 1.5 }}>
-              <Box
-                sx={{
-                  mt: 0.5,
-                  p: 1.5,
-                  borderRadius: 2,
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                }}
-              >
-                <PropertyPicker
-                  projectId={projectId}
-                  eventName={events[0]?.name}
-                  value={breakdownProperties}
-                  onChange={setBreakdownProperties}
-                  emptyLabel={t('argus.analytics.noBreakdown', 'None')}
-                />
-              </Box>
-            </Box>
-          </Box>
-        ) : (
-          <Box sx={{ pl: 1.5 }}>
-            <PropertyPicker
-              projectId={projectId}
-              eventName={events[0]?.name}
-              value={breakdownProperties}
-              onChange={setBreakdownProperties}
-              emptyLabel={t('argus.analytics.addBreakdown', 'Breakdown')}
-              variant="text"
-            />
-          </Box>
-        )}
-      </Box>
+      <BreakdownSection
+        projectId={projectId}
+        eventName={events[0]?.name}
+        value={breakdownProperties}
+        onChange={setBreakdownProperties}
+      />
 
       <Box sx={{ mt: 'auto', pt: 2 }}>
         <Button
@@ -1213,6 +1246,7 @@ const ArgusInsightsPage: React.FC = () => {
           maxHeight: 600,
           width: '100%',
           pr: 2,
+          '& .recharts-responsive-container': { minHeight: '1px !important' },
         }}
       >
         <ResponsiveContainer
@@ -1270,6 +1304,7 @@ const ArgusInsightsPage: React.FC = () => {
                 contentStyle={commonTooltipStyle}
                 itemStyle={commonTooltipItemStyle}
                 labelStyle={commonTooltipLabelStyle}
+                formatter={tooltipFormatter}
               />
               <Legend
                 onClick={handleLegendClick}
@@ -1372,6 +1407,7 @@ const ArgusInsightsPage: React.FC = () => {
                 contentStyle={commonTooltipStyle}
                 itemStyle={commonTooltipItemStyle}
                 labelStyle={commonTooltipLabelStyle}
+                formatter={tooltipFormatter}
               />
               <Legend
                 onClick={handleLegendClick}
@@ -1453,7 +1489,13 @@ const ArgusInsightsPage: React.FC = () => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {key}
+                  {(() => {
+                    const eventName = key.includes(':') ? key.split(':')[0] : key;
+                    return lexiconMap.get(eventName) || eventName;
+                  })()}
+                  {key.includes(':') && (
+                    <span style={{ opacity: 0.6 }}>:{key.split(':').slice(1).join(':')}</span>
+                  )}
                 </th>
               ))}
             </tr>
@@ -1620,7 +1662,27 @@ const ArgusInsightsPage: React.FC = () => {
                         flexShrink: 0,
                       }}
                     />
-                    {label}
+                    {(() => {
+                      const meta = eventMetaMap.get(s.event);
+                      return (
+                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+                          <EventLabel
+                            eventName={s.event}
+                            displayName={meta?.display_name}
+                            icon={meta?.icon}
+                            iconColor={meta?.icon_color}
+                            isReserved={meta?.is_reserved}
+                            size="compact"
+                            showIcon={false}
+                          />
+                          {s.breakdown_value && (
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                              — {formatBreakdownLabel(s.breakdown_value, breakdownProperties)}
+                            </Typography>
+                          )}
+                        </Box>
+                      );
+                    })()}
                   </td>
                   <td
                     style={{
@@ -1830,10 +1892,18 @@ const ArgusInsightsPage: React.FC = () => {
           eventName={drilldownParams.eventName}
           dateRange={drilldownParams.dateRange}
           globalFilters={globalFilters}
-          breakdownProperty={drilldownParams.breakdownProperty}
-          breakdownValue={drilldownParams.breakdownValue}
+          breakdownFilters={drilldownParams.breakdownFilters}
         />
       )}
+
+      <QuickLexiconEditor
+        open={quickEditOpen}
+        anchorEl={quickEditAnchor}
+        eventName={quickEditEventName}
+        projectId={projectId}
+        onClose={() => setQuickEditOpen(false)}
+        onSaved={fetchEventNames}
+      />
 
       {menuAnchor && (
         <Menu

@@ -417,11 +417,6 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
         styleOverrides: {
           root: {
             transition: 'background-color 0.15s ease-in-out',
-            '&:not(:last-child)': {
-              '& td': {
-                borderBottom: `1px solid ${colors.border}`,
-              },
-            },
             '&:nth-of-type(even)': {
               backgroundColor: colors.stripeBg,
             },

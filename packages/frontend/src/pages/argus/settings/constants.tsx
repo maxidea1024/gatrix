@@ -9,6 +9,7 @@ import {
   Notifications as NotificationsIcon,
   BugReport as BugIcon,
   Security as SecurityIcon,
+  MenuBook as BookIcon,
 } from '@mui/icons-material';
 
 export const PLATFORM_OPTIONS = [
@@ -54,6 +55,7 @@ export const PLATFORM_CATEGORIES = [
 export type SectionId =
   | 'general'
   | 'sampling'
+  | 'lexicon'
   | 'dsn-keys'
   | 'sdk-setup'
   | 'source-maps'
@@ -86,6 +88,11 @@ export const NAV_GROUPS: NavGroup[] = [
         id: 'sampling',
         labelKey: 'argus.settings.samplingQuotas',
         icon: <TuneIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'lexicon',
+        labelKey: 'argus.settings.lexicon',
+        icon: <BookIcon sx={{ fontSize: 18 }} />,
       },
     ],
   },

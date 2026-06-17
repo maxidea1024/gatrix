@@ -234,7 +234,6 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
             alignItems: 'center',
             gap: 0.5,
             cursor: 'pointer',
-            px: 1,
             py: 0.25,
             borderRadius: 1,
             fontSize: '0.8rem',
@@ -243,25 +242,16 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
               isEmpty && highlightEmpty
                 ? theme.palette.primary.main
                 : 'inherit',
-            border: `1px solid ${
-              isEmpty && highlightEmpty
-                ? alpha(theme.palette.primary.main, 0.3)
-                : isDark
-                  ? 'rgba(255,255,255,0.08)'
-                  : 'rgba(0,0,0,0.08)'
-            }`,
-            background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
             '&:hover': {
-              background: isDark
-                ? 'rgba(255,255,255,0.06)'
-                : 'rgba(0,0,0,0.04)',
-              borderColor: isDark
-                ? 'rgba(255,255,255,0.15)'
-                : 'rgba(0,0,0,0.15)',
+              '& .MuiChip-root': {
+                bgcolor: alpha(
+                  theme.palette.primary.main,
+                  isDark ? 0.22 : 0.14
+                ),
+              },
             },
             transition: 'all 0.15s ease',
             flexWrap: 'wrap',
-            maxWidth: 400,
           }}
         >
           {isEmpty ? (
@@ -281,6 +271,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                   height: 20,
                   fontSize: '0.72rem',
                   fontWeight: 500,
+                  border: 'none',
                   bgcolor: alpha(
                     theme.palette.primary.main,
                     isDark ? 0.15 : 0.08
@@ -373,6 +364,7 @@ const PropertyPicker: React.FC<PropertyPickerProps> = ({
                 sx={{
                   height: 20,
                   fontSize: '0.7rem',
+                  border: 'none',
                   bgcolor: alpha(
                     theme.palette.primary.main,
                     isDark ? 0.15 : 0.08

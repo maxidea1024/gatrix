@@ -19,6 +19,7 @@ import IntegrationsSettings from './settings/IntegrationsSettings';
 import NotificationsSettings from './settings/NotificationsSettings';
 import IssueTrackersSettings from './settings/IssueTrackersSettings';
 import OwnershipSettings from './settings/OwnershipSettings';
+import LexiconSettings from './settings/LexiconSettings';
 
 // Constants and types
 import {
@@ -190,7 +191,7 @@ const ArgusSettingsPage: React.FC = () => {
         loading={loading}
         sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}
       >
-        <Box sx={{ display: 'flex', gap: 4, flex: 1, mb: -2 }}>
+        <Box sx={{ display: 'flex', gap: 3, flex: 1, mb: -2 }}>
           {/* ══════ LEFT SIDEBAR ══════ */}
           <Box
             sx={{
@@ -200,7 +201,7 @@ const ArgusSettingsPage: React.FC = () => {
               borderColor: 'divider',
             }}
           >
-            <Box sx={{ position: 'sticky', top: 0, pr: 2 }}>
+            <Box sx={{ position: 'sticky', top: 0, pr: 1 }}>
               {NAV_GROUPS.map((group, gi) => (
                 <Box key={gi} sx={{ mb: 2 }}>
                   <Typography
@@ -293,7 +294,7 @@ const ArgusSettingsPage: React.FC = () => {
           </Box>
 
           {/* ══════ RIGHT CONTENT ══════ */}
-          <Box sx={{ flex: 1, minWidth: 0, pb: 6 }}>
+          <Box sx={{ flex: 1, minWidth: 0, pb: 6, pr: 1 }}>
             {/* ─── GENERAL ─── */}
             {currentSection === 'general' && (
               <GeneralSettings
@@ -330,6 +331,15 @@ const ArgusSettingsPage: React.FC = () => {
                 saving={saving}
                 isDirty={isDirty}
                 handleSave={handleSave}
+                isDark={isDark}
+                t={t}
+              />
+            )}
+
+            {/* ─── LEXICON ─── */}
+            {currentSection === 'lexicon' && (
+              <LexiconSettings
+                projectId={projectId}
                 isDark={isDark}
                 t={t}
               />

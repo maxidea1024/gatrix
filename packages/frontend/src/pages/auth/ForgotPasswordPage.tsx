@@ -296,7 +296,8 @@ const ForgotPasswordPage: React.FC = () => {
               },
             },
             '& .MuiInputBase-input': {
-              color: 'white',
+              color: 'white !important',
+              WebkitTextFillColor: 'white !important',
               '&.Mui-disabled': {
                 color: 'rgba(255, 255, 255, 0.7)',
                 WebkitTextFillColor: 'rgba(255, 255, 255, 0.7)',

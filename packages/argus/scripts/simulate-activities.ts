@@ -36,7 +36,7 @@ const CH_CONFIG = {
 };
 
 const PROJECT_ID = '01KN8GSHBJ10JTQ9D0HD60RKFV';
-const DAYS_BACK = 14;
+const DAYS_BACK = 45;
 const NOW = new Date();
 const TOTAL_USERS = 5_000;
 const CHUNK_SIZE = 5_000;
@@ -134,8 +134,8 @@ const APP_VERSION_WEIGHTS = [50, 25, 18, 7];
  * Events are ordered by typical session flow for Funnel analysis.
  */
 const EVENT_DEFS = {
-  // Auth flow (funnel step 1-2)
-  app_opened: {
+  // Reserved / System Events
+  '$session_start': {
     weight: 10,
     props: () => ({
       properties: {
@@ -307,11 +307,51 @@ const EVENT_DEFS = {
   },
 
   // Session end
-  user_logout: {
+  '$session_end': {
     weight: 5,
     props: () => ({
       properties: { reason: randomPick(['manual', 'timeout', 'maintenance']) },
       numeric_properties: { session_duration_minutes: randomInt(5, 180) },
+    }),
+  },
+  '$page_view': {
+    weight: 12,
+    props: () => ({
+      properties: {
+        url: randomPick([
+          '/game/play',
+          '/game/port',
+          '/game/battle',
+          '/settings',
+          '/inventory',
+          '/guild',
+        ]),
+      },
+    }),
+  },
+  '$click': {
+    weight: 15,
+    props: () => ({
+      properties: {
+        target: randomPick(['button#play', 'button#shop', 'tab#inventory', 'button#settings']),
+      },
+    }),
+  },
+  '$error': {
+    weight: 2,
+    props: () => ({
+      properties: {
+        error_type: randomPick(['TypeError', 'ReferenceError', 'NetworkError']),
+        message: randomPick(['Cannot read properties of undefined', 'Connection lost']),
+      },
+    }),
+  },
+  '$feedback': {
+    weight: 1,
+    props: () => ({
+      properties: {
+        satisfaction: randomPick(['5', '4', '3', '2', '1']),
+      },
     }),
   },
 } as const;
@@ -446,8 +486,8 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
       // Session flow
       const sessionEvents: EventName[] = [];
 
-      // Always start with app_opened + user_login
-      sessionEvents.push('app_opened', 'user_login');
+      // Always start with $session_start + user_login
+      sessionEvents.push('$session_start', 'user_login');
 
       // First session: onboarding flow (funnel-critical!)
       if (isFirstSession) {
@@ -467,6 +507,10 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
             : randomInt(2, 6);
 
       const gameplayEvents: EventName[] = [
+        '$page_view',
+        '$click',
+        '$error',
+        '$feedback',
         'battle_started',
         'battle_won',
         'battle_lost',
@@ -491,7 +535,7 @@ function generateUserActivities(user: SimUser): ActivityRow[] {
 
       // End with logout (most of the time)
       if (Math.random() < 0.85) {
-        sessionEvents.push('user_logout');
+        sessionEvents.push('$session_end');
       }
 
       // Convert to ActivityRow

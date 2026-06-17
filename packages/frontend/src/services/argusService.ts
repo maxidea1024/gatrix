@@ -2568,12 +2568,41 @@ class ArgusService {
     period?: string,
     start?: string,
     end?: string
-  ): Promise<{ name: string; count: number }[]> {
+  ): Promise<AnalyticsEventNameEntry[]> {
     const response = await argusApi.get(
       `${ARGUS_BASE}/projects/${projectId}/analytics/event-names`,
       { params: { period, start, end } }
     );
     return response.data?.data || response.data || [];
+  }
+
+  async getAnalyticsSummary(
+    projectId: number | string,
+    period?: string,
+    start?: string,
+    end?: string
+  ): Promise<{
+    total_events: number;
+    unique_users: number;
+    total_sessions: number;
+    dau_today: number;
+    dau_yesterday: number;
+    daily_trend: Array<{ date: string; events: number; users: number }>;
+    hourly_heatmap: Array<{ dow: number; hour: number; count: number }>;
+  }> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/analytics/summary`,
+      { params: { period, start, end } }
+    );
+    return response.data?.data || response.data || {
+      total_events: 0,
+      unique_users: 0,
+      total_sessions: 0,
+      dau_today: 0,
+      dau_yesterday: 0,
+      daily_trend: [],
+      hourly_heatmap: [],
+    };
   }
 
   async getAnalyticsEventProperties(
@@ -2819,6 +2848,82 @@ class ArgusService {
     );
     return response.data?.data || { nodes: [], links: [] };
   }
+
+  // === Lexicon ===
+
+  async getLexiconEvents(projectId: number | string): Promise<ArgusLexiconEvent[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/events`
+    );
+    return response.data?.data || [];
+  }
+
+  async updateLexiconEvent(
+    projectId: number | string,
+    eventName: string,
+    data: Partial<Omit<ArgusLexiconEvent, 'id' | 'project_id' | 'event_name' | 'is_reserved' | 'created_at' | 'updated_at'>>
+  ): Promise<void> {
+    await argusApi.patch(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/events/${eventName}`,
+      data
+    );
+  }
+
+  async getLexiconProperties(projectId: number | string): Promise<ArgusLexiconProperty[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/properties`
+    );
+    return response.data?.data || [];
+  }
+
+  async updateLexiconProperty(
+    projectId: number | string,
+    propertyName: string,
+    data: Partial<Omit<ArgusLexiconProperty, 'id' | 'project_id' | 'property_name' | 'is_reserved' | 'created_at' | 'updated_at'>>
+  ): Promise<void> {
+    await argusApi.patch(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/properties/${propertyName}`,
+      data
+    );
+  }
+
+  async seedLexicon(projectId: number | string): Promise<void> {
+    await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/seed`
+    );
+  }
+
+  async createLexiconEvent(
+    projectId: number | string,
+    data: { event_name: string; display_name?: string; icon?: string; icon_color?: string; description?: string; category?: string; status?: string; owner?: string }
+  ): Promise<void> {
+    await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/events`,
+      data
+    );
+  }
+
+  async deleteLexiconEvent(projectId: number | string, eventName: string): Promise<void> {
+    await argusApi.delete(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/events/${encodeURIComponent(eventName)}`
+    );
+  }
+
+  async createLexiconProperty(
+    projectId: number | string,
+    data: { property_name: string; display_name?: string; description?: string; data_type?: string; status?: string }
+  ): Promise<void> {
+    await argusApi.post(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/properties`,
+      data
+    );
+  }
+
+  async deleteLexiconProperty(projectId: number | string, propertyName: string): Promise<void> {
+    await argusApi.delete(
+      `${ARGUS_BASE}/projects/${projectId}/lexicon/properties/${encodeURIComponent(propertyName)}`
+    );
+  }
 }
 
 // --- Alert Rule Types ---
@@ -2907,6 +3012,47 @@ export interface ArgusSourcemapFile {
   file_name: string;
   file_size: number;
   created_at: string;
+}
+
+export interface AnalyticsEventNameEntry {
+  name: string;
+  count: number;
+  display_name: string | null;
+  icon: string | null;
+  icon_color: string | null;
+  description: string | null;
+  status: string;
+  is_reserved: boolean;
+  category: string | null;
+}
+
+export interface ArgusLexiconEvent {
+  id: number;
+  project_id: string;
+  event_name: string;
+  display_name: string | null;
+  icon: string | null;
+  icon_color: string | null;
+  description: string | null;
+  category: string | null;
+  status: 'active' | 'deprecated' | 'hidden';
+  is_reserved: boolean;
+  owner: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ArgusLexiconProperty {
+  id: number;
+  project_id: string;
+  property_name: string;
+  display_name: string | null;
+  description: string | null;
+  data_type: 'string' | 'number' | 'boolean' | 'date';
+  status: 'active' | 'deprecated' | 'hidden';
+  is_reserved: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export const argusService = new ArgusService();
