@@ -390,7 +390,9 @@ const ArgusCronsPage: React.FC = () => {
                     {cfg.label}
                   </Typography>
                 </Box>
-                <Typography sx={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1 }}>
+                <Typography
+                  sx={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1 }}
+                >
                   {count}
                 </Typography>
               </Paper>
@@ -488,7 +490,10 @@ const ArgusCronsPage: React.FC = () => {
         <EmptyPlaceholder
           icon={<ScheduleIcon />}
           message={t('argus.crons.noMonitors', 'No cron monitors found')}
-          description={t('argus.crons.emptyDescription', 'Create a new monitor to track your background jobs and scheduled tasks.')}
+          description={t(
+            'argus.crons.emptyDescription',
+            'Create a new monitor to track your background jobs and scheduled tasks.'
+          )}
           onAddClick={() => {
             setFormErrors({ name: false, schedule_value: false });
             setCreateDialogOpen(true);

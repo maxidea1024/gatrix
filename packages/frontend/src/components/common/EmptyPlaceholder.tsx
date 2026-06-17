@@ -62,10 +62,14 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         ...(isBordered && {
           border: '2px dashed',
           borderColor: (theme) =>
-            theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.1)'
+              : 'rgba(0,0,0,0.1)',
           borderRadius: '16px',
           backgroundColor: (theme) =>
-            theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
+            theme.palette.mode === 'dark'
+              ? 'rgba(255,255,255,0.01)'
+              : 'rgba(0,0,0,0.01)',
         }),
         ...sx,
       }}
@@ -82,7 +86,9 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
             height: 72,
             borderRadius: '50%',
             backgroundColor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+              theme.palette.mode === 'dark'
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.03)',
             '& svg': {
               fontSize: 36,
             },
@@ -91,7 +97,12 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
           {icon}
         </Box>
       )}
-      <Typography variant="h6" color="text.primary" fontWeight={600} sx={{ mb: 0.5 }}>
+      <Typography
+        variant="h6"
+        color="text.primary"
+        fontWeight={600}
+        sx={{ mb: 0.5 }}
+      >
         {message}
       </Typography>
       {description && (
@@ -111,9 +122,9 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
               size="medium"
               startIcon={<AddIcon />}
               onClick={onAddClick}
-              sx={{ 
-                mt: 2, 
-                textTransform: 'none', 
+              sx={{
+                mt: 2,
+                textTransform: 'none',
                 fontWeight: 600,
                 px: 3,
                 boxShadow: addButtonVariant === 'contained' ? 2 : 0,

@@ -2753,9 +2753,9 @@ const FeatureFlagsPage: React.FC = () => {
                                               />
                                             )}
                                           <CopyButton
-                                              text={flag.flagName}
-                                              size={13}
-                                            />
+                                            text={flag.flagName}
+                                            size={13}
+                                          />
                                           <SafeTooltip
                                             title={
                                               flag.isFavorite

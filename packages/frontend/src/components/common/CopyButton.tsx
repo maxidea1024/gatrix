@@ -181,7 +181,11 @@ export const CopyableField: React.FC<CopyableFieldProps> = ({
           {value}
         </Typography>
         <SafeTooltip
-          title={copied ? `✓ ${t('common.copied')}` : t('common.clickToCopy', 'Click to copy')}
+          title={
+            copied
+              ? `✓ ${t('common.copied')}`
+              : t('common.clickToCopy', 'Click to copy')
+          }
           placement="top"
         >
           <Box
