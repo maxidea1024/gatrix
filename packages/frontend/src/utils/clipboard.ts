@@ -8,7 +8,6 @@
  */
 export const tryExecCommandCopy = (text: string): boolean => {
   try {
-    console.log('[Clipboard] Trying execCommand fallback...');
     const mark = document.createElement('span');
     mark.textContent = text;
 
@@ -61,10 +60,8 @@ export const tryExecCommandCopy = (text: string): boolean => {
     document.body.removeChild(mark);
 
     if (successful) {
-      console.log('[Clipboard] ✓ execCommand fallback success');
       return true;
     } else {
-      console.log('[Clipboard] execCommand returned false');
       return false;
     }
   } catch (error) {
@@ -81,16 +78,11 @@ export const tryExecCommandCopy = (text: string): boolean => {
 export const copyToClipboard = async (text: string): Promise<boolean> => {
   if (!text) return false;
 
-  console.log('[Clipboard] Starting copy, text length:', text.length);
-  console.log('[Clipboard] isSecureContext:', window.isSecureContext);
-  console.log('[Clipboard] protocol:', window.location.protocol);
 
   // Try modern Clipboard API first (HTTPS/localhost only)
   if (navigator.clipboard && window.isSecureContext) {
     try {
-      console.log('[Clipboard] Trying modern Clipboard API...');
       await navigator.clipboard.writeText(text);
-      console.log('[Clipboard] ✓ Modern Clipboard API success');
       return true;
     } catch (error) {
       console.warn(
@@ -106,17 +98,12 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     !window.isSecureContext || window.location.protocol === 'http:';
 
   if (isInsecureContext) {
-    console.log(
-      '[Clipboard] HTTP environment detected, trying execCommand first...'
-    );
-
     // Try execCommand - it actually works in many HTTP environments
     if (tryExecCommandCopy(text)) {
       return true;
     }
 
     // If execCommand failed, use prompt fallback as last resort
-    console.log('[Clipboard] execCommand failed, using prompt fallback');
     const result = window.prompt(
       'Automatic copy failed. Please select the text below and press Ctrl+C to copy:',
       text

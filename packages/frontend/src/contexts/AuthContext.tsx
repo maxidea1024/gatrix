@@ -258,7 +258,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const MIN_LOADING_TIME = 1500; // Minimum 1.5 seconds for better UX
 
       try {
-        devLogger.info('AuthContext: Starting initialization...');
+        devLogger.debug('AuthContext: Starting initialization...');
         setIsLoading(true);
 
         // Check if we have stored auth data
@@ -274,17 +274,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           if (isValid) {
             // Use stored user data without API call to prevent infinite loop
             setUser(storedUser);
-            devLogger.info('AuthContext: User authenticated from storage');
+            devLogger.debug('AuthContext: User authenticated from storage');
           } else {
             // Token was expired and cleared
             setUser(null);
-            devLogger.info(
+            devLogger.debug(
               'AuthContext: Stored token expired, user logged out'
             );
           }
         } else if (storedToken && !storedUser) {
           // Token exists but no user data - fetch profile (OAuth callback scenario)
-          devLogger.info(
+          devLogger.debug(
             'AuthContext: Token exists but no user data, fetching profile...'
           );
           const isValid = AuthService.initializeAuth();
@@ -292,7 +292,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             try {
               const user = await AuthService.getProfile();
               setUser(user);
-              devLogger.info('AuthContext: User profile fetched successfully');
+              devLogger.debug('AuthContext: User profile fetched successfully');
             } catch (error: any) {
               devLogger.error(
                 'AuthContext: Failed to fetch user profile:',
@@ -319,14 +319,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // Token was expired
             setUser(null);
-            devLogger.info(
+            devLogger.debug(
               'AuthContext: Stored token expired, user logged out'
             );
           }
         } else {
           // No stored auth data
           setUser(null);
-          devLogger.info(
+          devLogger.debug(
             'AuthContext: No stored auth data, user not authenticated'
           );
         }
@@ -345,7 +345,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           );
           setTimeout(() => {
             setIsLoading(false);
-            devLogger.info(
+            devLogger.debug(
               'AuthContext: Initialization complete, isLoading = false'
             );
           }, remainingTime);
