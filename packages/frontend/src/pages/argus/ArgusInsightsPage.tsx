@@ -252,7 +252,11 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Shared Event Catalog (cached across tab switches) ──
-  const { availableEvents, eventsLoading, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+  const {
+    availableEvents,
+    eventsLoading,
+    refetch: refetchEvents,
+  } = useSharedEventCatalog(projectId);
 
   // Lexicon Map for translating keys
   const lexiconMap = useMemo(() => {

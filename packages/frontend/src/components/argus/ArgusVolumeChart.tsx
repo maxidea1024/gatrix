@@ -27,7 +27,12 @@ import InteractiveTimeSeriesChart, {
 } from '@/components/argus/InteractiveTimeSeriesChart';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-export type VolumeChartType = 'bar' | 'line' | 'area' | 'stacked-bar' | 'stacked-area';
+export type VolumeChartType =
+  | 'bar'
+  | 'line'
+  | 'area'
+  | 'stacked-bar'
+  | 'stacked-area';
 
 export interface ArgusVolumeChartProps {
   /** Chart datasets */
@@ -184,12 +189,16 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
                   </SafeTooltip>
                 </ToggleButton>
                 <ToggleButton value="stacked-bar">
-                  <SafeTooltip title={t('argus.chart.stackedBar', 'Stacked Bar')}>
+                  <SafeTooltip
+                    title={t('argus.chart.stackedBar', 'Stacked Bar')}
+                  >
                     <StackedBarIcon sx={{ fontSize: 16 }} />
                   </SafeTooltip>
                 </ToggleButton>
                 <ToggleButton value="stacked-area">
-                  <SafeTooltip title={t('argus.chart.stackedArea', 'Stacked Area')}>
+                  <SafeTooltip
+                    title={t('argus.chart.stackedArea', 'Stacked Area')}
+                  >
                     <StackedAreaIcon sx={{ fontSize: 16 }} />
                   </SafeTooltip>
                 </ToggleButton>
@@ -292,7 +301,11 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
         {/* State: Loading */}
         {loading && (
           <ArgusChartSkeleton
-            type={chartType === 'bar' || chartType === 'stacked-bar' ? 'bar' : 'line'}
+            type={
+              chartType === 'bar' || chartType === 'stacked-bar'
+                ? 'bar'
+                : 'line'
+            }
             height={chartHeight}
             color={skeletonColor}
           />

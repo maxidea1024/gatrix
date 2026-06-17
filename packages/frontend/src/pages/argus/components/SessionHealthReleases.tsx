@@ -443,9 +443,9 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                   </Box>
                   <ProgressTrack isDark={isDark}>
                     <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                      sx={{
+                        minWidth: 0,
+                        height: '100%',
                         borderRadius: 3,
                         width: `${rate}%`,
                         background: `linear-gradient(90deg, ${barColor}, ${alpha(barColor, 0.6)})`,

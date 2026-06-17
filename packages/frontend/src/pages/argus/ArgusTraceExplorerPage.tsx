@@ -1052,9 +1052,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
   /* ═══ RENDER ═══ */
   return (
     <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+      sx={{
+        minWidth: 0,
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',

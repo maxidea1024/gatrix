@@ -448,4 +448,3 @@ export const useEventCatalogStore = create<EventCatalogState>()((set, get) => ({
   clearCache: () =>
     set({ availableEvents: [], cachedProjectId: null, eventsLoading: false }),
 }));
-

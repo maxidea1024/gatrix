@@ -124,7 +124,6 @@ const TABS: TabDef[] = [
   },
 ];
 
-
 /* ─── TabBar Component (goes into AnalyticsLayout's tabBar slot) ─── */
 
 interface AnalyticsTabBarProps {
@@ -201,103 +200,101 @@ const TabIconButton: React.FC<TabIconButtonProps> = React.memo(
   }
 );
 
-const AnalyticsTabBar: React.FC<AnalyticsTabBarProps> = React.memo(function AnalyticsTabBar({
-  activeTab,
-  onTabChange,
-}) {
-  const theme = useTheme();
-  const { t } = useTranslation();
-  const isDark = theme.palette.mode === 'dark';
-  const activeTabDef = TABS.find((tab) => tab.key === activeTab)!;
+const AnalyticsTabBar: React.FC<AnalyticsTabBarProps> = React.memo(
+  function AnalyticsTabBar({ activeTab, onTabChange }) {
+    const theme = useTheme();
+    const { t } = useTranslation();
+    const isDark = theme.palette.mode === 'dark';
+    const activeTabDef = TABS.find((tab) => tab.key === activeTab)!;
 
-  return (
-    <Box sx={{ flexShrink: 0 }}>
-      {/* Icon row */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.25,
-          px: 1.5,
-          py: 1,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        }}
-      >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.key;
-          return (
-            <TabIconButton
-              key={tab.key}
-              tab={tab}
-              isActive={isActive}
-              isDark={isDark}
-              label={t(tab.labelKey)}
-              onTabChange={onTabChange}
-            />
-          );
-        })}
-
-      </Box>
-
-      {/* Active tab description banner */}
-      <Box
-        key={activeTab}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          px: 1.5,
-          py: 1,
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          background: alpha(activeTabDef.color, isDark ? 0.07 : 0.05),
-          animation: 'tabDescFadeIn 0.2s ease',
-          '@keyframes tabDescFadeIn': {
-            from: { opacity: 0, transform: 'translateY(-4px)' },
-            to: { opacity: 1, transform: 'translateY(0)' },
-          },
-        }}
-      >
-        {/* Color accent bar */}
+    return (
+      <Box sx={{ flexShrink: 0 }}>
+        {/* Icon row */}
         <Box
           sx={{
-            width: 3,
-            height: 28,
-            borderRadius: '2px',
-            background: activeTabDef.color,
-            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.25,
+            px: 1.5,
+            py: 1,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           }}
-        />
-        <Box sx={{ minWidth: 0 }}>
-          <Typography
-            variant="caption"
+        >
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <TabIconButton
+                key={tab.key}
+                tab={tab}
+                isActive={isActive}
+                isDark={isDark}
+                label={t(tab.labelKey)}
+                onTabChange={onTabChange}
+              />
+            );
+          })}
+        </Box>
+
+        {/* Active tab description banner */}
+        <Box
+          key={activeTab}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1.5,
+            py: 1,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            background: alpha(activeTabDef.color, isDark ? 0.07 : 0.05),
+            animation: 'tabDescFadeIn 0.2s ease',
+            '@keyframes tabDescFadeIn': {
+              from: { opacity: 0, transform: 'translateY(-4px)' },
+              to: { opacity: 1, transform: 'translateY(0)' },
+            },
+          }}
+        >
+          {/* Color accent bar */}
+          <Box
             sx={{
-              display: 'block',
-              fontWeight: 700,
-              fontSize: '0.72rem',
-              color: activeTabDef.color,
-              lineHeight: 1.2,
+              width: 3,
+              height: 28,
+              borderRadius: '2px',
+              background: activeTabDef.color,
+              flexShrink: 0,
             }}
-          >
-            {t(activeTabDef.labelKey)}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              display: 'block',
-              fontSize: '0.68rem',
-              color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
-              lineHeight: 1.4,
-              whiteSpace: 'normal',
-              wordBreak: 'keep-all',
-            }}
-          >
-            {t(activeTabDef.descriptionKey)}
-          </Typography>
+          />
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                fontWeight: 700,
+                fontSize: '0.72rem',
+                color: activeTabDef.color,
+                lineHeight: 1.2,
+              }}
+            >
+              {t(activeTabDef.labelKey)}
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                display: 'block',
+                fontSize: '0.68rem',
+                color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
+                lineHeight: 1.4,
+                whiteSpace: 'normal',
+                wordBreak: 'keep-all',
+              }}
+            >
+              {t(activeTabDef.descriptionKey)}
+            </Typography>
+          </Box>
         </Box>
       </Box>
-    </Box>
-  );
-});
+    );
+  }
+);
 
 /* ─── Constants ─── */
 
@@ -590,7 +587,16 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
           >
             {t('argus.analytics.eventDistribution', 'Event Distribution')}
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, width: '100%', height: 140, minWidth: 0 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mt: 1,
+              width: '100%',
+              height: 140,
+              minWidth: 0,
+            }}
+          >
             <ResponsiveContainer
               width="100%"
               height={140}
@@ -846,9 +852,9 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
                           }}
                         >
                           <Box
-        sx={{
-          minWidth: 0,
-          height: 14,
+                            sx={{
+                              minWidth: 0,
+                              height: 14,
                               borderRadius: '2px',
                               backgroundColor: cellColor,
                               transition: 'box-shadow 0.15s',
@@ -1257,6 +1263,5 @@ const ArgusAnalyticsPage: React.FC = () => {
     </Box>
   );
 };
-
 
 export default ArgusAnalyticsPage;

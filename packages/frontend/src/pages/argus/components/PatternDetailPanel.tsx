@@ -570,9 +570,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                           }}
                         >
                           <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                            sx={{
+                              minWidth: 0,
+                              height: '100%',
                               width: `${(item.count / maxCount) * 100}%`,
                               bgcolor: levelColor,
                               borderRadius: '3px',

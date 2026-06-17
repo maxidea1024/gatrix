@@ -239,7 +239,8 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Shared Event Catalog (cached across tab switches) ──
-  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+  const { availableEvents, refetch: refetchEvents } =
+    useSharedEventCatalog(projectId);
 
   // ── Transient State ──
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -2193,9 +2194,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
                           }}
                         >
                           <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                            sx={{
+                              minWidth: 0,
+                              height: '100%',
                               width: `${convBarWidth}%`,
                               bgcolor:
                                 FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
@@ -3063,9 +3064,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
                           }}
                         >
                           <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                            sx={{
+                              minWidth: 0,
+                              height: '100%',
                               width: `${convBarWidth}%`,
                               bgcolor:
                                 FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
@@ -3166,9 +3167,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
           {t('argus.analytics.segmentComparison', 'Segment Comparison')}
         </Typography>
         <Box
-        sx={{
-          minWidth: 0,
-          height: { xs: 320, md: '45vh' },
+          sx={{
+            minWidth: 0,
+            height: { xs: 320, md: '45vh' },
             minHeight: 320,
             maxHeight: 550,
             width: '100%',
@@ -3709,9 +3710,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
 
         {/* Distribution histogram */}
         <Box
-        sx={{
-          minWidth: 0,
-          height: { xs: 280, md: '40vh' },
+          sx={{
+            minWidth: 0,
+            height: { xs: 280, md: '40vh' },
             minHeight: 280,
             maxHeight: 450,
             width: '100%',

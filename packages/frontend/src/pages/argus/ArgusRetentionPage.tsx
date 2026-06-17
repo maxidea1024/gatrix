@@ -170,7 +170,8 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Shared Event Catalog (cached across tab switches) ──
-  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+  const { availableEvents, refetch: refetchEvents } =
+    useSharedEventCatalog(projectId);
 
   // ── Transient State ──
   const [cohorts, setCohorts] = useState<any[]>([]);
@@ -1161,9 +1162,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
       const breakdownKeys = Object.keys(breakdownCohorts);
       return (
         <Box
-        sx={{
-          minWidth: 0,
-          height: { xs: 360, md: '50vh' },
+          sx={{
+            minWidth: 0,
+            height: { xs: 360, md: '50vh' },
             minHeight: 360,
             maxHeight: 600,
             width: '100%',
@@ -1357,9 +1358,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
       const breakdownKeys = Object.keys(breakdownCohorts).slice(0, 10);
       return (
         <Box
-        sx={{
-          minWidth: 0,
-          height: { xs: 360, md: '50vh' },
+          sx={{
+            minWidth: 0,
+            height: { xs: 360, md: '50vh' },
             minHeight: 360,
             maxHeight: 600,
             width: '100%',

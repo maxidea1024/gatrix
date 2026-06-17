@@ -963,9 +963,9 @@ const ArgusReleasesPage: React.FC = () => {
                           }}
                         >
                           <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                            sx={{
+                              minWidth: 0,
+                              height: '100%',
                               width: `${(errorCount / maxErrorCount) * 100}%`,
                               backgroundColor: alpha('#f44336', 0.6),
                               borderRadius: 1,
@@ -1013,9 +1013,9 @@ const ArgusReleasesPage: React.FC = () => {
                               }}
                             >
                               <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                                sx={{
+                                  minWidth: 0,
+                                  height: '100%',
                                   width: `${adoptionPct}%`,
                                   backgroundColor: alpha('#7c4dff', 0.6),
                                   borderRadius: 1,

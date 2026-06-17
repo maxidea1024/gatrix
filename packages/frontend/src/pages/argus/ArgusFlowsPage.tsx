@@ -129,7 +129,8 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Shared Event Catalog (cached across tab switches) ──
-  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+  const { availableEvents, refetch: refetchEvents } =
+    useSharedEventCatalog(projectId);
 
   // ── Transient State ──
   const [flowData, setFlowData] = useState<{
@@ -155,7 +156,9 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   const isInitialMount = useRef(true);
   const lastExecutedKeyRef = useRef<string>('');
   const [excludeListScrolling, setExcludeListScrolling] = useState(false);
-  const excludeScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const excludeScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   // ── Quick lexicon editor state ──
   const [quickEditOpen, setQuickEditOpen] = useState(false);
@@ -188,7 +191,8 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   // ── Exclude list scroll — suppress tooltips while scrolling ──
   const handleExcludeListScroll = useCallback(() => {
     setExcludeListScrolling(true);
-    if (excludeScrollTimerRef.current) clearTimeout(excludeScrollTimerRef.current);
+    if (excludeScrollTimerRef.current)
+      clearTimeout(excludeScrollTimerRef.current);
     excludeScrollTimerRef.current = setTimeout(() => {
       setExcludeListScrolling(false);
     }, 300);
@@ -918,9 +922,9 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
             </Box>
           )}
         <Box
-        sx={{
-          minWidth: 0,
-          height: { xs: 400, md: '60vh' },
+          sx={{
+            minWidth: 0,
+            height: { xs: 400, md: '60vh' },
             minHeight: 450,
             maxHeight: 750,
             pr: 2,

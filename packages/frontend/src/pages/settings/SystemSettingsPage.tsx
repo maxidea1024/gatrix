@@ -1,4 +1,10 @@
-import React, { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  Suspense,
+  useMemo,
+  useCallback,
+} from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import {
@@ -205,12 +211,14 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(
 
 /* ─── Section Card wrapper ─── */
 
-const SectionCard: React.FC<{ maxWidth?: number; children: React.ReactNode }> =
-  ({ maxWidth = 720, children }) => (
-    <Card sx={{ maxWidth }}>
-      <CardContent>{children}</CardContent>
-    </Card>
-  );
+const SectionCard: React.FC<{
+  maxWidth?: number;
+  children: React.ReactNode;
+}> = ({ maxWidth = 720, children }) => (
+  <Card sx={{ maxWidth }}>
+    <CardContent>{children}</CardContent>
+  </Card>
+);
 
 /* ─── Main Page ─── */
 
@@ -413,7 +421,6 @@ const SystemSettingsPage: React.FC = () => {
 
         {/* ══════ RIGHT CONTENT ══════ */}
         <Box sx={{ flex: 1, minWidth: 0, pb: 6, pr: 1 }}>
-
           {/* ─── NETWORK ─── */}
           {currentSection === 'network' && (
             <SectionCard>

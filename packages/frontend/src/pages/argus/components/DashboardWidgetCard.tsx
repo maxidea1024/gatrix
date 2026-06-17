@@ -184,9 +184,9 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
                   }}
                 >
                   <Box
-        sx={{
-          minWidth: 0,
-          height: '100%',
+                    sx={{
+                      minWidth: 0,
+                      height: '100%',
                       borderRadius: 1,
                       width: `${maxVal > 0 ? (Number(row[numKey]) / maxVal) * 100 : 0}%`,
                       background:

@@ -117,7 +117,11 @@ const EventLabel: React.FC<EventLabelProps> = ({
           modifiers: [
             { name: 'hide', enabled: false },
             { name: 'flip', enabled: true },
-            { name: 'preventOverflow', enabled: true, options: { boundary: 'window' } },
+            {
+              name: 'preventOverflow',
+              enabled: true,
+              options: { boundary: 'window' },
+            },
           ],
         }}
       >
@@ -177,9 +181,9 @@ const EventLabel: React.FC<EventLabelProps> = ({
           const tooltipDesc =
             !shouldShowDesc && resolvedDescription ? resolvedDescription : '';
           return tooltipDesc ? (
-            <Tooltip 
-              title={tooltipDesc} 
-              placement="top" 
+            <Tooltip
+              title={tooltipDesc}
+              placement="top"
               arrow
               disableInteractive
               PopperProps={{
@@ -187,7 +191,11 @@ const EventLabel: React.FC<EventLabelProps> = ({
                 modifiers: [
                   { name: 'hide', enabled: false },
                   { name: 'flip', enabled: true },
-                  { name: 'preventOverflow', enabled: true, options: { boundary: 'window' } },
+                  {
+                    name: 'preventOverflow',
+                    enabled: true,
+                    options: { boundary: 'window' },
+                  },
                 ],
               }}
             >
