@@ -81,6 +81,7 @@ type AnalyticsTab = 'overview' | 'insights' | 'funnels' | 'retention' | 'flows';
 interface TabDef {
   key: AnalyticsTab;
   labelKey: string;
+  descriptionKey: string;
   icon: React.ReactElement;
   color: string;
 }
@@ -89,34 +90,40 @@ const TABS: TabDef[] = [
   {
     key: 'overview',
     labelKey: 'argus.analytics.overview',
+    descriptionKey: 'argus.analytics.overviewDesc',
     icon: <OverviewIcon />,
     color: '#6366f1',
   },
   {
     key: 'insights',
     labelKey: 'argus.analytics.insights',
+    descriptionKey: 'argus.analytics.insightsDesc',
     icon: <InsightsIcon />,
     color: '#6366f1',
   },
   {
     key: 'funnels',
     labelKey: 'argus.analytics.funnels',
+    descriptionKey: 'argus.analytics.funnelsDesc',
     icon: <FunnelIcon />,
     color: '#f59e0b',
   },
   {
     key: 'retention',
     labelKey: 'argus.analytics.retention',
+    descriptionKey: 'argus.analytics.retentionDesc',
     icon: <RetentionIcon />,
     color: '#10b981',
   },
   {
     key: 'flows',
     labelKey: 'argus.analytics.flows',
+    descriptionKey: 'argus.analytics.flowsDesc',
     icon: <FlowsIcon />,
     color: '#ec4899',
   },
 ];
+
 
 /* ─── TabBar Component (goes into AnalyticsLayout's tabBar slot) ─── */
 
@@ -125,73 +132,172 @@ interface AnalyticsTabBarProps {
   onTabChange: (tab: AnalyticsTab) => void;
 }
 
-const AnalyticsTabBar: React.FC<AnalyticsTabBarProps> = ({
+/* ─── TabIconButton ───
+ * Owns its own tooltip `open` state so that:
+ *   1. onMouseDown closes the tooltip *before* onClick fires the tab switch.
+ *   2. enterDelay ensures rapid clicks never open the tooltip in the first place.
+ * This prevents the MUI Popper (0,0) flash that occurs when the parent
+ * re-renders during the tab transition.
+ */
+interface TabIconButtonProps {
+  tab: TabDef;
+  isActive: boolean;
+  isDark: boolean;
+  label: string;
+  onTabChange: (tab: AnalyticsTab) => void;
+}
+
+const TabIconButton: React.FC<TabIconButtonProps> = React.memo(
+  function TabIconButton({ tab, isActive, isDark, label, onTabChange }) {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <Tooltip
+        title={label}
+        placement="bottom"
+        arrow
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        enterDelay={400}
+        leaveDelay={0}
+        disableInteractive
+      >
+        <IconButton
+          size="small"
+          onMouseDown={() => setOpen(false)}
+          onClick={() => onTabChange(tab.key)}
+          sx={{
+            width: 34,
+            height: 34,
+            borderRadius: '8px',
+            color: isActive
+              ? tab.color
+              : isDark
+                ? 'rgba(255,255,255,0.4)'
+                : 'rgba(0,0,0,0.35)',
+            backgroundColor: isActive
+              ? alpha(tab.color, isDark ? 0.15 : 0.1)
+              : 'transparent',
+            transition: 'all 0.15s ease',
+            '&:hover': {
+              backgroundColor: isActive
+                ? alpha(tab.color, isDark ? 0.2 : 0.15)
+                : isDark
+                  ? 'rgba(255,255,255,0.06)'
+                  : 'rgba(0,0,0,0.04)',
+              color: isActive
+                ? tab.color
+                : isDark
+                  ? 'rgba(255,255,255,0.7)'
+                  : 'rgba(0,0,0,0.6)',
+            },
+          }}
+        >
+          {React.cloneElement(tab.icon, { sx: { fontSize: 18 } })}
+        </IconButton>
+      </Tooltip>
+    );
+  }
+);
+
+const AnalyticsTabBar: React.FC<AnalyticsTabBarProps> = React.memo(function AnalyticsTabBar({
   activeTab,
   onTabChange,
-}) => {
+}) {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
+  const activeTabDef = TABS.find((tab) => tab.key === activeTab)!;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 0.25,
-        px: 1.5,
-        py: 1,
-        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        flexShrink: 0,
-      }}
-    >
-      {TABS.map((tab) => {
-        const isActive = activeTab === tab.key;
-        return (
-          <Tooltip
-            key={tab.key}
-            title={t(tab.labelKey)}
-            placement="bottom"
-            arrow
+    <Box sx={{ flexShrink: 0 }}>
+      {/* Icon row */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.25,
+          px: 1.5,
+          py: 1,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+        }}
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key;
+          return (
+            <TabIconButton
+              key={tab.key}
+              tab={tab}
+              isActive={isActive}
+              isDark={isDark}
+              label={t(tab.labelKey)}
+              onTabChange={onTabChange}
+            />
+          );
+        })}
+
+      </Box>
+
+      {/* Active tab description banner */}
+      <Box
+        key={activeTab}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          px: 1.5,
+          py: 1,
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          background: alpha(activeTabDef.color, isDark ? 0.07 : 0.05),
+          animation: 'tabDescFadeIn 0.2s ease',
+          '@keyframes tabDescFadeIn': {
+            from: { opacity: 0, transform: 'translateY(-4px)' },
+            to: { opacity: 1, transform: 'translateY(0)' },
+          },
+        }}
+      >
+        {/* Color accent bar */}
+        <Box
+          sx={{
+            width: 3,
+            height: 28,
+            borderRadius: '2px',
+            background: activeTabDef.color,
+            flexShrink: 0,
+          }}
+        />
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'block',
+              fontWeight: 700,
+              fontSize: '0.72rem',
+              color: activeTabDef.color,
+              lineHeight: 1.2,
+            }}
           >
-            <IconButton
-              size="small"
-              onClick={() => onTabChange(tab.key)}
-              sx={{
-                width: 34,
-                height: 34,
-                borderRadius: '8px',
-                color: isActive
-                  ? tab.color
-                  : isDark
-                    ? 'rgba(255,255,255,0.4)'
-                    : 'rgba(0,0,0,0.35)',
-                backgroundColor: isActive
-                  ? alpha(tab.color, isDark ? 0.15 : 0.1)
-                  : 'transparent',
-                transition: 'all 0.15s ease',
-                '&:hover': {
-                  backgroundColor: isActive
-                    ? alpha(tab.color, isDark ? 0.2 : 0.15)
-                    : isDark
-                      ? 'rgba(255,255,255,0.06)'
-                      : 'rgba(0,0,0,0.04)',
-                  color: isActive
-                    ? tab.color
-                    : isDark
-                      ? 'rgba(255,255,255,0.7)'
-                      : 'rgba(0,0,0,0.6)',
-                },
-              }}
-            >
-              {React.cloneElement(tab.icon, { sx: { fontSize: 18 } })}
-            </IconButton>
-          </Tooltip>
-        );
-      })}
+            {t(activeTabDef.labelKey)}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'block',
+              fontSize: '0.68rem',
+              color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
+              lineHeight: 1.4,
+              whiteSpace: 'normal',
+              wordBreak: 'keep-all',
+            }}
+          >
+            {t(activeTabDef.descriptionKey)}
+          </Typography>
+        </Box>
+      </Box>
     </Box>
   );
-};
+});
 
 /* ─── Constants ─── */
 
@@ -484,7 +590,7 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
           >
             {t('argus.analytics.eventDistribution', 'Event Distribution')}
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1, width: '100%', height: 140, minWidth: 0 }}>
             <ResponsiveContainer
               width="100%"
               height={140}
@@ -740,8 +846,9 @@ const OverviewContent: React.FC<OverviewContentProps> = ({
                           }}
                         >
                           <Box
-                            sx={{
-                              height: 14,
+        sx={{
+          minWidth: 0,
+          height: 14,
                               borderRadius: '2px',
                               backgroundColor: cellColor,
                               transition: 'box-shadow 0.15s',
@@ -957,6 +1064,14 @@ const ArgusAnalyticsPage: React.FC = () => {
     'argus_analytics_active_tab',
     'overview'
   );
+
+  // Track which tabs have been mounted at least once.
+  // Once mounted, a tab stays in the DOM (display:none when inactive) to
+  // prevent the full unmount/remount cycle that causes sidebar flickering.
+  const [visitedTabs, setVisitedTabs] = useState<Set<AnalyticsTab>>(
+    () => new Set([activeTab])
+  );
+
   const [dateRange, setDateRange] = useState<DateRangeValue>({
     type: 'preset',
     preset: '14d',
@@ -984,9 +1099,18 @@ const ArgusAnalyticsPage: React.FC = () => {
     ]
   );
 
-  const handleTabChange = useCallback((tab: AnalyticsTab) => {
-    setActiveTab(tab);
-  }, []);
+  const handleTabChange = useCallback(
+    (tab: AnalyticsTab) => {
+      setActiveTab(tab);
+      setVisitedTabs((prev) => {
+        if (prev.has(tab)) return prev;
+        const next = new Set(prev);
+        next.add(tab);
+        return next;
+      });
+    },
+    [setActiveTab]
+  );
 
   const tabBar = useMemo(
     () => (
@@ -1026,60 +1150,113 @@ const ArgusAnalyticsPage: React.FC = () => {
       />
 
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-        {activeTab === 'overview' && (
+        {/* Overview: always rendered (no lazy loading needed) */}
+        <Box
+          sx={{
+            display: activeTab === 'overview' ? 'flex' : 'none',
+            flex: 1,
+            minHeight: 0,
+            minWidth: 0,
+          }}
+        >
           <OverviewContent
             dateRange={dateRange}
             setDateRange={handleDateRangeChange}
             tabBar={tabBar}
           />
-        )}
-        {activeTab === 'insights' && (
-          <Suspense
-            fallback={
-              <Box sx={{ flex: 1, display: 'flex' }}>
-                <ArgusChartSkeleton height={400} />
-              </Box>
-            }
+        </Box>
+
+        {/* Insights: mount on first visit, keep alive with display:none */}
+        {visitedTabs.has('insights') && (
+          <Box
+            sx={{
+              display: activeTab === 'insights' ? 'flex' : 'none',
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+            }}
           >
-            <ArgusInsightsPage embedded tabBar={tabBar} />
-          </Suspense>
+            <Suspense
+              fallback={
+                <Box sx={{ flex: 1, display: 'flex' }}>
+                  <ArgusChartSkeleton height={400} />
+                </Box>
+              }
+            >
+              <ArgusInsightsPage embedded tabBar={tabBar} />
+            </Suspense>
+          </Box>
         )}
-        {activeTab === 'funnels' && (
-          <Suspense
-            fallback={
-              <Box sx={{ flex: 1, display: 'flex' }}>
-                <ArgusChartSkeleton height={400} />
-              </Box>
-            }
+
+        {/* Funnels: mount on first visit, keep alive with display:none */}
+        {visitedTabs.has('funnels') && (
+          <Box
+            sx={{
+              display: activeTab === 'funnels' ? 'flex' : 'none',
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+            }}
           >
-            <ArgusFunnelsPage embedded tabBar={tabBar} />
-          </Suspense>
+            <Suspense
+              fallback={
+                <Box sx={{ flex: 1, display: 'flex' }}>
+                  <ArgusChartSkeleton height={400} />
+                </Box>
+              }
+            >
+              <ArgusFunnelsPage embedded tabBar={tabBar} />
+            </Suspense>
+          </Box>
         )}
-        {activeTab === 'retention' && (
-          <Suspense
-            fallback={
-              <Box sx={{ flex: 1, display: 'flex' }}>
-                <ArgusChartSkeleton height={400} />
-              </Box>
-            }
+
+        {/* Retention: mount on first visit, keep alive with display:none */}
+        {visitedTabs.has('retention') && (
+          <Box
+            sx={{
+              display: activeTab === 'retention' ? 'flex' : 'none',
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+            }}
           >
-            <ArgusRetentionPage embedded tabBar={tabBar} />
-          </Suspense>
+            <Suspense
+              fallback={
+                <Box sx={{ flex: 1, display: 'flex' }}>
+                  <ArgusChartSkeleton height={400} />
+                </Box>
+              }
+            >
+              <ArgusRetentionPage embedded tabBar={tabBar} />
+            </Suspense>
+          </Box>
         )}
-        {activeTab === 'flows' && (
-          <Suspense
-            fallback={
-              <Box sx={{ flex: 1, display: 'flex' }}>
-                <ArgusChartSkeleton height={400} />
-              </Box>
-            }
+
+        {/* Flows: mount on first visit, keep alive with display:none */}
+        {visitedTabs.has('flows') && (
+          <Box
+            sx={{
+              display: activeTab === 'flows' ? 'flex' : 'none',
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+            }}
           >
-            <ArgusFlowsPage embedded tabBar={tabBar} />
-          </Suspense>
+            <Suspense
+              fallback={
+                <Box sx={{ flex: 1, display: 'flex' }}>
+                  <ArgusChartSkeleton height={400} />
+                </Box>
+              }
+            >
+              <ArgusFlowsPage embedded tabBar={tabBar} />
+            </Suspense>
+          </Box>
         )}
       </Box>
     </Box>
   );
 };
+
 
 export default ArgusAnalyticsPage;

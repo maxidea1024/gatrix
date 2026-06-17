@@ -74,6 +74,7 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
     return (
       <Box
         sx={{
+          minWidth: 0,
           height: 48,
           display: 'flex',
           alignItems: 'center',
@@ -101,6 +102,7 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
     return (
       <Box
         sx={{
+          minWidth: 0,
           height: 48,
           display: 'flex',
           alignItems: 'center',

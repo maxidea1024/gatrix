@@ -13,6 +13,8 @@ import {
   BarChart as BarChartIcon,
   ShowChart as LineChartIcon,
   StackedLineChart as AreaChartIcon,
+  StackedBarChart as StackedBarIcon,
+  Layers as StackedAreaIcon,
   UnfoldLess as CompactIcon,
   UnfoldMore as ExpandIcon,
 } from '@mui/icons-material';
@@ -25,7 +27,7 @@ import InteractiveTimeSeriesChart, {
 } from '@/components/argus/InteractiveTimeSeriesChart';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-export type VolumeChartType = 'bar' | 'line' | 'area';
+export type VolumeChartType = 'bar' | 'line' | 'area' | 'stacked-bar' | 'stacked-area';
 
 export interface ArgusVolumeChartProps {
   /** Chart datasets */
@@ -181,6 +183,16 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
                     <AreaChartIcon sx={{ fontSize: 16 }} />
                   </SafeTooltip>
                 </ToggleButton>
+                <ToggleButton value="stacked-bar">
+                  <SafeTooltip title={t('argus.chart.stackedBar', 'Stacked Bar')}>
+                    <StackedBarIcon sx={{ fontSize: 16 }} />
+                  </SafeTooltip>
+                </ToggleButton>
+                <ToggleButton value="stacked-area">
+                  <SafeTooltip title={t('argus.chart.stackedArea', 'Stacked Area')}>
+                    <StackedAreaIcon sx={{ fontSize: 16 }} />
+                  </SafeTooltip>
+                </ToggleButton>
               </ToggleButtonGroup>
             )}
             {showCompactToggle && (
@@ -255,6 +267,12 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
                 <ToggleButton value="area">
                   <AreaChartIcon sx={{ fontSize: 13 }} />
                 </ToggleButton>
+                <ToggleButton value="stacked-bar">
+                  <StackedBarIcon sx={{ fontSize: 13 }} />
+                </ToggleButton>
+                <ToggleButton value="stacked-area">
+                  <StackedAreaIcon sx={{ fontSize: 13 }} />
+                </ToggleButton>
               </ToggleButtonGroup>
             )}
             {showCompactToggle && (
@@ -274,7 +292,7 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
         {/* State: Loading */}
         {loading && (
           <ArgusChartSkeleton
-            type={chartType === 'bar' ? 'bar' : 'line'}
+            type={chartType === 'bar' || chartType === 'stacked-bar' ? 'bar' : 'line'}
             height={chartHeight}
             color={skeletonColor}
           />

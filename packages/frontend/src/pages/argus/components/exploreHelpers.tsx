@@ -449,8 +449,9 @@ export const CardSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
       >
         <Box sx={{ p: 2 }}>
           <Box
-            sx={{
-              height: 14,
+        sx={{
+          minWidth: 0,
+          height: 14,
               width: '60%',
               borderRadius: 1,
               bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
@@ -458,8 +459,9 @@ export const CardSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
             }}
           />
           <Box
-            sx={{
-              height: 10,
+        sx={{
+          minWidth: 0,
+          height: 10,
               width: '80%',
               borderRadius: 1,
               bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
@@ -467,8 +469,9 @@ export const CardSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
           />
         </Box>
         <Box
-          sx={{
-            height: 48,
+        sx={{
+          minWidth: 0,
+          height: 48,
             mx: 2,
             borderRadius: 1,
             bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
@@ -476,16 +479,18 @@ export const CardSkeleton: React.FC<{ isDark: boolean }> = ({ isDark }) => (
         />
         <Box sx={{ display: 'flex', gap: 1, px: 2, py: 1.5 }}>
           <Box
-            sx={{
-              height: 18,
+        sx={{
+          minWidth: 0,
+          height: 18,
               width: 50,
               borderRadius: 1,
               bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
             }}
           />
           <Box
-            sx={{
-              height: 18,
+        sx={{
+          minWidth: 0,
+          height: 18,
               width: 40,
               borderRadius: 1,
               bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',

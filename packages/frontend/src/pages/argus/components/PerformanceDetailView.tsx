@@ -636,8 +636,9 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                       </Box>
                       <SpanProgressTrack isDark={isDark}>
                         <Box
-                          sx={{
-                            height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                             borderRadius: 2,
                             width: `${pct}%`,
                             backgroundColor: opColor,

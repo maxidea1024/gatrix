@@ -26,6 +26,8 @@ export interface EventLabelProps {
   showEventKey?: boolean;
   /** Max width override */
   maxWidth?: number | string;
+  /** Disable the tooltip entirely — use in scrollable containers where Popper repositioning causes visual glitches */
+  disableTooltip?: boolean;
 }
 
 /**
@@ -51,6 +53,7 @@ const EventLabel: React.FC<EventLabelProps> = ({
   showDescription,
   showEventKey,
   maxWidth,
+  disableTooltip = false,
 }) => {
   const { localizeEventName, localizeEventDescription } = useLocalizedLexicon();
 
@@ -73,41 +76,52 @@ const EventLabel: React.FC<EventLabelProps> = ({
 
   if (size === 'compact') {
     const iconSize = 18;
+    const inner = (
+      <Box
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.75,
+          minWidth: 0,
+          maxWidth: maxWidth || '100%',
+        }}
+      >
+        {showIcon && (
+          <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+            {renderLexiconIcon(icon, iconSize, iconColor || undefined)}
+          </Box>
+        )}
+        <Typography
+          variant="body2"
+          sx={{
+            fontSize: '0.8rem',
+            fontWeight: 500,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {resolvedName}
+        </Typography>
+      </Box>
+    );
+    if (disableTooltip) return inner;
     return (
       <Tooltip
         title={eventName}
         placement="top"
         arrow
         disableInteractive
-        PopperProps={{ popperOptions: { strategy: 'fixed' } }}
+        PopperProps={{
+          disablePortal: false,
+          modifiers: [
+            { name: 'hide', enabled: false },
+            { name: 'flip', enabled: true },
+            { name: 'preventOverflow', enabled: true, options: { boundary: 'window' } },
+          ],
+        }}
       >
-        <Box
-          sx={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0.75,
-            minWidth: 0,
-            maxWidth: maxWidth || '100%',
-          }}
-        >
-          {showIcon && (
-            <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-              {renderLexiconIcon(icon, iconSize, iconColor || undefined)}
-            </Box>
-          )}
-          <Typography
-            variant="body2"
-            sx={{
-              fontSize: '0.8rem',
-              fontWeight: 500,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {resolvedName}
-          </Typography>
-        </Box>
+        {inner}
       </Tooltip>
     );
   }
@@ -163,7 +177,20 @@ const EventLabel: React.FC<EventLabelProps> = ({
           const tooltipDesc =
             !shouldShowDesc && resolvedDescription ? resolvedDescription : '';
           return tooltipDesc ? (
-            <Tooltip title={tooltipDesc} placement="top" arrow>
+            <Tooltip 
+              title={tooltipDesc} 
+              placement="top" 
+              arrow
+              disableInteractive
+              PopperProps={{
+                disablePortal: false,
+                modifiers: [
+                  { name: 'hide', enabled: false },
+                  { name: 'flip', enabled: true },
+                  { name: 'preventOverflow', enabled: true, options: { boundary: 'window' } },
+                ],
+              }}
+            >
               {nameEl}
             </Tooltip>
           ) : (

@@ -400,3 +400,52 @@ export const useFlowsStore = create<FlowsState>()(
     }
   )
 );
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Event Catalog Store (Shared across all analytics pages)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/**
+ * AvailableEvent — shape returned by argusService.getAnalyticsEventNames().
+ * Using `any` to avoid coupling to the service type; pages cast as needed.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AvailableEvent = any;
+
+interface EventCatalogState {
+  /** Cached event list from the last successful fetch. */
+  availableEvents: AvailableEvent[];
+  /** True while a fetch is in-flight. */
+  eventsLoading: boolean;
+  /** The projectId for which the cache is valid. */
+  cachedProjectId: string | null;
+
+  setAvailableEvents: (events: AvailableEvent[], projectId: string) => void;
+  setEventsLoading: (loading: boolean) => void;
+  /**
+   * Invalidate the cache when the project changes.
+   * Returns true if the cache was valid for this projectId (no fetch needed).
+   */
+  isCacheValid: (projectId: string) => boolean;
+  clearCache: () => void;
+}
+
+export const useEventCatalogStore = create<EventCatalogState>()((set, get) => ({
+  availableEvents: [],
+  eventsLoading: false,
+  cachedProjectId: null,
+
+  setAvailableEvents: (events, projectId) =>
+    set({ availableEvents: events, cachedProjectId: projectId }),
+
+  setEventsLoading: (eventsLoading) => set({ eventsLoading }),
+
+  isCacheValid: (projectId) => {
+    const { cachedProjectId, availableEvents } = get();
+    return cachedProjectId === projectId && availableEvents.length > 0;
+  },
+
+  clearCache: () =>
+    set({ availableEvents: [], cachedProjectId: null, eventsLoading: false }),
+}));
+

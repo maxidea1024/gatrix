@@ -1,5 +1,4 @@
-import { Settings as SettingsIcon } from '@mui/icons-material';
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import {
@@ -14,11 +13,22 @@ import {
   Switch,
   FormControlLabel,
   CircularProgress,
+  useTheme,
+  alpha,
 } from '@mui/material';
+import {
+  Settings as SettingsIcon,
+  NetworkCheck as NetworkIcon,
+  Storage as StorageIcon,
+  SmartToy as AiIcon,
+  Terminal as ConsoleIcon,
+  Inventory2 as DataIcon,
+  Extension as IntegrationIcon,
+  PhoneAndroid as SdkIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { varsService } from '@/services/varsService';
-
 import { useSnackbar } from 'notistack';
 import { parseApiErrorMessage } from '../../utils/errorUtils';
 import KeyValuePage from './KeyValuePage';
@@ -26,14 +36,12 @@ import aiChatService, {
   AISettingsData,
   AIModel,
 } from '@/services/aiChatService';
-
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
-import SegmentedTabs from '@/components/common/SegmentedTabs';
 
-// Lazy-loaded tab pages
+// Lazy-loaded section pages
 const SystemConsolePage = React.lazy(
   () => import('../admin/SystemConsolePage')
 );
@@ -43,37 +51,205 @@ const DataManagementPage = React.lazy(
 const IntegrationsPage = React.lazy(() => import('./IntegrationsPage'));
 const IntegrationsSdksPage = React.lazy(() => import('./IntegrationsSdksPage'));
 
-// System Settings Page - requires admin role + system-settings permission
+/* ─── Types ─── */
+
+type SectionId =
+  | 'network'
+  | 'kv'
+  | 'ai'
+  | 'console'
+  | 'data'
+  | 'integrations'
+  | 'sdks';
+
+interface NavItem {
+  id: SectionId;
+  labelKey: string;
+  icon: React.ReactNode;
+}
+
+interface NavGroup {
+  labelKey: string;
+  items: NavItem[];
+}
+
+/* ─── Nav Structure ─── */
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    labelKey: 'settings.systemSettings.groupSystem',
+    items: [
+      {
+        id: 'network',
+        labelKey: 'settings.network.title',
+        icon: <NetworkIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'kv',
+        labelKey: 'settings.kv.title',
+        icon: <StorageIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'ai',
+        labelKey: 'aiChat.settings.title',
+        icon: <AiIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'console',
+        labelKey: 'sidebar.console',
+        icon: <ConsoleIcon sx={{ fontSize: 18 }} />,
+      },
+    ],
+  },
+  {
+    labelKey: 'settings.systemSettings.groupData',
+    items: [
+      {
+        id: 'data',
+        labelKey: 'sidebar.dataManagement',
+        icon: <DataIcon sx={{ fontSize: 18 }} />,
+      },
+    ],
+  },
+  {
+    labelKey: 'settings.systemSettings.groupIntegrations',
+    items: [
+      {
+        id: 'integrations',
+        labelKey: 'integrations.title',
+        icon: <IntegrationIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        id: 'sdks',
+        labelKey: 'integrations.sdks.title',
+        icon: <SdkIcon sx={{ fontSize: 18 }} />,
+      },
+    ],
+  },
+];
+
+/* ─── Sidebar Nav Item ─── */
+
+interface SidebarItemProps {
+  item: NavItem;
+  active: boolean;
+  isDark: boolean;
+  onClick: () => void;
+  t: (key: string) => string;
+}
+
+const SidebarItem: React.FC<SidebarItemProps> = React.memo(
+  function SidebarItem({ item, active, isDark, onClick, t }) {
+    const theme = useTheme();
+    return (
+      <Box
+        onClick={onClick}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.2,
+          px: 1.5,
+          py: 1,
+          mb: 0.2,
+          borderRadius: '6px',
+          cursor: 'pointer',
+          position: 'relative',
+          backgroundColor: active
+            ? alpha(theme.palette.primary.main, isDark ? 0.12 : 0.08)
+            : 'transparent',
+          color: active ? theme.palette.primary.main : 'text.primary',
+          transition: 'all 0.1s ease-in-out',
+          '&:hover': {
+            backgroundColor: active
+              ? alpha(theme.palette.primary.main, isDark ? 0.15 : 0.1)
+              : isDark
+                ? 'rgba(255,255,255,0.05)'
+                : 'rgba(0,0,0,0.04)',
+          },
+        }}
+      >
+        {active && (
+          <Box
+            sx={{
+              position: 'absolute',
+              left: 0,
+              top: '20%',
+              bottom: '20%',
+              width: 3,
+              borderRadius: '0 4px 4px 0',
+              backgroundColor: theme.palette.primary.main,
+            }}
+          />
+        )}
+        <Box
+          sx={{
+            display: 'flex',
+            opacity: active ? 1 : 0.6,
+            color: 'inherit',
+          }}
+        >
+          {item.icon}
+        </Box>
+        <Typography
+          sx={{
+            fontSize: '0.85rem',
+            fontWeight: active ? 600 : 400,
+          }}
+        >
+          {t(item.labelKey)}
+        </Typography>
+      </Box>
+    );
+  }
+);
+
+/* ─── Section Card wrapper ─── */
+
+const SectionCard: React.FC<{ maxWidth?: number; children: React.ReactNode }> =
+  ({ maxWidth = 720, children }) => (
+    <Card sx={{ maxWidth }}>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+
+/* ─── Main Page ─── */
+
 const SystemSettingsPage: React.FC = () => {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { user, hasPermission } = useAuth();
   const { currentEnvironmentId } = useEnvironment();
   const { getProjectApiPath } = useOrgProject();
   const projectApiPath = getProjectApiPath();
   const canManage = hasPermission([P.SYSTEM_SETTINGS_UPDATE]);
   const { enqueueSnackbar } = useSnackbar();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const TAB_KEYS = [
-    'network',
-    'kv',
-    'ai',
-    'data',
-    'integrations',
-    'sdks',
-    'console',
-  ] as const;
-  type TabKey = (typeof TAB_KEYS)[number];
-  const tabFromUrl = searchParams.get('tab') as TabKey | null;
-  const [tab, setTab] = useState<TabKey>(
-    tabFromUrl && TAB_KEYS.includes(tabFromUrl) ? tabFromUrl : 'network'
+  // ── Section routing via URL hash ──
+  const ALL_SECTION_IDS: SectionId[] = NAV_GROUPS.flatMap((g) =>
+    g.items.map((i) => i.id)
   );
 
-  // Network settings (admindUrl only — admindApiUrl removed, uses service discovery)
+  const currentSection = useMemo<SectionId>(() => {
+    const hash = location.hash.replace('#', '') as SectionId;
+    return ALL_SECTION_IDS.includes(hash) ? hash : 'network';
+  }, [location.hash]);
+
+  const setSection = useCallback(
+    (id: SectionId) => {
+      navigate({ hash: `#${id}` }, { replace: true });
+      window.scrollTo({ top: 0 });
+    },
+    [navigate]
+  );
+
+  // ── Network settings ──
   const [admindUrl, setAdmindUrl] = useState('');
   const [savedAdmindUrl, setSavedAdmindUrl] = useState('');
 
-  // AI Chat settings
+  // ── AI Chat settings ──
   const [aiSettings, setAiSettings] = useState<{
     enabled: boolean;
     provider: string;
@@ -103,7 +279,6 @@ const SystemSettingsPage: React.FC = () => {
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [modelsLoading, setModelsLoading] = useState(false);
 
-  // Check if AI settings have changed
   const isAiSettingsDirty =
     aiSettings.enabled !== savedAiSettings.enabled ||
     aiSettings.provider !== savedAiSettings.provider ||
@@ -111,22 +286,22 @@ const SystemSettingsPage: React.FC = () => {
     aiSettings.apiBaseUrl !== savedAiSettings.apiBaseUrl ||
     aiSettings.apiKey.length > 0;
 
-  // Load vars
+  // Load vars (network)
   useEffect(() => {
     (async () => {
       try {
         const admind = await varsService.get(projectApiPath, 'admindUrl');
         setAdmindUrl(admind || '');
         setSavedAdmindUrl(admind || '');
-      } catch (e) {
-        // ignore load errors
+      } catch {
+        // ignore
       }
     })();
   }, [currentEnvironmentId]);
 
-  // Load AI settings
+  // Load AI settings on section activation
   useEffect(() => {
-    if (tab === 'ai') {
+    if (currentSection === 'ai') {
       (async () => {
         try {
           setAiSettingsLoading(true);
@@ -140,23 +315,21 @@ const SystemSettingsPage: React.FC = () => {
           setAiSettings({ ...base, apiKey: '' });
           setSavedAiSettings(base);
           setMaskedApiKey(settings.apiKey || null);
-          // Also load models for current provider
           try {
             const models = await aiChatService.getModels(settings.provider);
             setAvailableModels(models);
           } catch {
             setAvailableModels([]);
           }
-        } catch (e) {
-          // ignore - settings may not exist yet
+        } catch {
+          // ignore
         } finally {
           setAiSettingsLoading(false);
         }
       })();
     }
-  }, [tab]);
+  }, [currentSection]);
 
-  // Save AI settings
   const handleSaveAiSettings = async () => {
     try {
       const payload: any = {
@@ -165,7 +338,6 @@ const SystemSettingsPage: React.FC = () => {
         model: aiSettings.model,
         apiBaseUrl: aiSettings.apiBaseUrl || null,
       };
-      // Only send apiKey if user typed something new
       if (aiSettings.apiKey) {
         payload.apiKey = aiSettings.apiKey;
       }
@@ -187,40 +359,64 @@ const SystemSettingsPage: React.FC = () => {
     }
   };
 
+  // ═══════════════════════════════════════════════════════════════
+  // RENDER
+  // ═══════════════════════════════════════════════════════════════
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <PageHeader
         icon={<SettingsIcon />}
         title={t('settings.systemSettings')}
         subtitle={t('settings.subtitle')}
-        tabs={
-          <SegmentedTabs
-            items={[
-              { key: 'network', label: t('settings.network.title') },
-              { key: 'kv', label: t('settings.kv.title') },
-              { key: 'ai', label: t('aiChat.settings.title') },
-              { key: 'data', label: t('sidebar.dataManagement') },
-              { key: 'integrations', label: t('integrations.title') },
-              { key: 'sdks', label: t('integrations.sdks.title') },
-              { key: 'console', label: t('sidebar.console') },
-            ]}
-            value={tab}
-            onChange={(key) => {
-              setTab(key as TabKey);
-              setSearchParams({ tab: key });
-            }}
-          />
-        }
       />
 
-      <Card
-        sx={{
-          ...(['network', 'ai'].includes(tab) ? { maxWidth: 720 } : {}),
-        }}
-      >
-        <CardContent>
-          {tab === 'network' && (
-            <>
+      <Box sx={{ display: 'flex', gap: 3, flex: 1, mb: -2 }}>
+        {/* ══════ LEFT SIDEBAR ══════ */}
+        <Box
+          sx={{
+            width: 220,
+            flexShrink: 0,
+            borderRight: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Box sx={{ position: 'sticky', top: 0, pr: 1 }}>
+            {NAV_GROUPS.map((group, gi) => (
+              <Box key={gi} sx={{ mb: 2 }}>
+                <Typography
+                  sx={{
+                    px: 1.5,
+                    pb: 1,
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    color: 'text.secondary',
+                    letterSpacing: '0.1em',
+                  }}
+                >
+                  {t(group.labelKey)}
+                </Typography>
+                {group.items.map((item) => (
+                  <SidebarItem
+                    key={item.id}
+                    item={item}
+                    active={currentSection === item.id}
+                    isDark={isDark}
+                    onClick={() => setSection(item.id)}
+                    t={t}
+                  />
+                ))}
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        {/* ══════ RIGHT CONTENT ══════ */}
+        <Box sx={{ flex: 1, minWidth: 0, pb: 6, pr: 1 }}>
+
+          {/* ─── NETWORK ─── */}
+          {currentSection === 'network' && (
+            <SectionCard>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t('settings.network.subtitle')}
               </Typography>
@@ -255,13 +451,15 @@ const SystemSettingsPage: React.FC = () => {
                   </Stack>
                 )}
               </Stack>
-            </>
+            </SectionCard>
           )}
 
-          {tab === 'kv' && <KeyValuePage />}
+          {/* ─── KEY-VALUE ─── */}
+          {currentSection === 'kv' && <KeyValuePage />}
 
-          {tab === 'ai' && (
-            <>
+          {/* ─── AI CHAT ─── */}
+          {currentSection === 'ai' && (
+            <SectionCard>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t('aiChat.settings.enabledDescription')}
               </Typography>
@@ -292,13 +490,11 @@ const SystemSettingsPage: React.FC = () => {
                       provider: newProvider,
                       model: '',
                     });
-                    // Fetch models for the new provider
                     setModelsLoading(true);
                     aiChatService
                       .getModels(newProvider)
                       .then((models) => {
                         setAvailableModels(models);
-                        // Auto-select first model
                         if (models.length > 0) {
                           setAiSettings((prev) => ({
                             ...prev,
@@ -391,10 +587,24 @@ const SystemSettingsPage: React.FC = () => {
                   </Stack>
                 )}
               </Stack>
-            </>
+            </SectionCard>
           )}
 
-          {tab === 'data' && (
+          {/* ─── SYSTEM CONSOLE ─── */}
+          {currentSection === 'console' && (
+            <Suspense
+              fallback={
+                <PageContentLoader loading>
+                  <div />
+                </PageContentLoader>
+              }
+            >
+              <SystemConsolePage />
+            </Suspense>
+          )}
+
+          {/* ─── DATA MANAGEMENT ─── */}
+          {currentSection === 'data' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>
@@ -406,7 +616,8 @@ const SystemSettingsPage: React.FC = () => {
             </Suspense>
           )}
 
-          {tab === 'integrations' && (
+          {/* ─── INTEGRATIONS ─── */}
+          {currentSection === 'integrations' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>
@@ -418,7 +629,8 @@ const SystemSettingsPage: React.FC = () => {
             </Suspense>
           )}
 
-          {tab === 'sdks' && (
+          {/* ─── SDK INTEGRATION ─── */}
+          {currentSection === 'sdks' && (
             <Suspense
               fallback={
                 <PageContentLoader loading>
@@ -429,20 +641,8 @@ const SystemSettingsPage: React.FC = () => {
               <IntegrationsSdksPage />
             </Suspense>
           )}
-
-          {tab === 'console' && (
-            <Suspense
-              fallback={
-                <PageContentLoader loading>
-                  <div />
-                </PageContentLoader>
-              }
-            >
-              <SystemConsolePage />
-            </Suspense>
-          )}
-        </CardContent>
-      </Card>
+        </Box>
+      </Box>
     </Box>
   );
 };

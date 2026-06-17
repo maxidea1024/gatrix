@@ -88,6 +88,7 @@ import {
   type FunnelSegment,
 } from '@/hooks/useAnalyticsStore';
 import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
+import { useSharedEventCatalog } from './hooks/useSharedEventCatalog';
 
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
@@ -237,10 +238,10 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
   const setCompareMode = useFunnelsStore((s) => s.setCompareMode);
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
+  // ── Shared Event Catalog (cached across tab switches) ──
+  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<
-    AnalyticsEventNameEntry[]
-  >([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState<{
     el: HTMLElement;
@@ -302,21 +303,8 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
     [dateRange]
   );
 
-  // ── Fetch event names ──
-  const fetchEventNames = useCallback(async () => {
-    try {
-      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
-      setAvailableEvents(data);
-    } catch {
-      setAvailableEvents([]);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    fetchEventNames();
-  }, [fetchEventNames]);
-
   // Quick lexicon editor state
+
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
     null
@@ -2205,8 +2193,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
                           }}
                         >
                           <Box
-                            sx={{
-                              height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                               width: `${convBarWidth}%`,
                               bgcolor:
                                 FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
@@ -3074,8 +3063,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
                           }}
                         >
                           <Box
-                            sx={{
-                              height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                               width: `${convBarWidth}%`,
                               bgcolor:
                                 FUNNEL_COLORS[idx % FUNNEL_COLORS.length],
@@ -3176,8 +3166,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
           {t('argus.analytics.segmentComparison', 'Segment Comparison')}
         </Typography>
         <Box
-          sx={{
-            height: { xs: 320, md: '45vh' },
+        sx={{
+          minWidth: 0,
+          height: { xs: 320, md: '45vh' },
             minHeight: 320,
             maxHeight: 550,
             width: '100%',
@@ -3581,6 +3572,7 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
     return (
       <Box
         sx={{
+          minWidth: 0,
           height: { xs: 360, md: '50vh' },
           minHeight: 360,
           maxHeight: 600,
@@ -3717,8 +3709,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
 
         {/* Distribution histogram */}
         <Box
-          sx={{
-            height: { xs: 280, md: '40vh' },
+        sx={{
+          minWidth: 0,
+          height: { xs: 280, md: '40vh' },
             minHeight: 280,
             maxHeight: 450,
             width: '100%',
@@ -3888,7 +3881,7 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
         eventName={quickEditEventName}
         projectId={projectId}
         onClose={() => setQuickEditOpen(false)}
-        onSaved={fetchEventNames}
+        onSaved={refetchEvents}
       />
 
       {menuAnchor && (

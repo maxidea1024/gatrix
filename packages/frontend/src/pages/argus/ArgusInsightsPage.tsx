@@ -80,6 +80,7 @@ import {
   type EventCondition,
 } from '@/hooks/useAnalyticsStore';
 import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
+import { useSharedEventCatalog } from './hooks/useSharedEventCatalog';
 
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
@@ -250,9 +251,8 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
   const setFormulas = useInsightsStore((s) => s.setFormulas);
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
-  // ── Transient State (reset on refresh) ──
-  const [availableEvents, setAvailableEvents] = useState<any[]>([]);
-  const [eventsLoading, setEventsLoading] = useState(true);
+  // ── Shared Event Catalog (cached across tab switches) ──
+  const { availableEvents, eventsLoading, refetch: refetchEvents } = useSharedEventCatalog(projectId);
 
   // Lexicon Map for translating keys
   const lexiconMap = useMemo(() => {
@@ -353,24 +353,8 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
     setHiddenSeriesKeys(new Set());
   }, [series]);
 
-  // ── Fetch event names ──
-  const fetchEventNames = useCallback(async () => {
-    setEventsLoading(true);
-    try {
-      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
-      setAvailableEvents(data);
-    } catch {
-      setAvailableEvents([]);
-    } finally {
-      setEventsLoading(false);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    fetchEventNames();
-  }, [fetchEventNames]);
-
   // ── Event handlers ──
+
   const handleAddEvent = useCallback(() => {
     setEvents([...events, { name: '', aggregation: 'total' }]);
   }, [events, setEvents]);
@@ -1266,8 +1250,9 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
     return (
       <Box
         sx={{
-          height: { xs: 360, md: '50vh' },
+          minWidth: 0,
           minHeight: 360,
+          height: { xs: 360, md: '50vh' },
           maxHeight: 600,
           width: '100%',
           pr: 2,
@@ -1953,7 +1938,7 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
         eventName={quickEditEventName}
         projectId={projectId}
         onClose={() => setQuickEditOpen(false)}
-        onSaved={fetchEventNames}
+        onSaved={refetchEvents}
       />
 
       {menuAnchor && (

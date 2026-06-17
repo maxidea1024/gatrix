@@ -138,8 +138,9 @@ export const CrashDistribution: React.FC<{
             </Box>
           </Box>
           <Box
-            sx={{
-              height: 4,
+        sx={{
+          minWidth: 0,
+          height: 4,
               borderRadius: 2,
               backgroundColor: isDark
                 ? 'rgba(255,255,255,0.04)'
@@ -147,8 +148,9 @@ export const CrashDistribution: React.FC<{
             }}
           >
             <Box
-              sx={{
-                height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                 borderRadius: 2,
                 width: `${Math.min(item.rate * 5, 100)}%`,
                 backgroundColor:

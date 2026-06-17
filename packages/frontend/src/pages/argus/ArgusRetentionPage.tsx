@@ -74,6 +74,7 @@ import {
 } from '@/hooks/useAnalyticsStore';
 import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useSharedEventCatalog } from './hooks/useSharedEventCatalog';
 
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
@@ -168,10 +169,10 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
   const setViewMode = useRetentionStore((s) => s.setViewMode);
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
+  // ── Shared Event Catalog (cached across tab switches) ──
+  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<
-    AnalyticsEventNameEntry[]
-  >([]);
   const [cohorts, setCohorts] = useState<any[]>([]);
   const [breakdownCohorts, setBreakdownCohorts] = useState<
     Record<string, any[]> | undefined
@@ -193,10 +194,10 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
     },
     []
   );
-
   const handleCloseMenu = useCallback(() => {
     setMenuAnchor(null);
   }, []);
+
   const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
     new Set()
   );
@@ -216,21 +217,8 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
     setHiddenSeriesKeys(new Set());
   }, [cohorts]);
 
-  // ── Fetch event names ──
-  const fetchEventNames = useCallback(async () => {
-    try {
-      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
-      setAvailableEvents(data);
-    } catch {
-      setAvailableEvents([]);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    fetchEventNames();
-  }, [fetchEventNames]);
-
   // Quick lexicon editor state
+
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
     null
@@ -1173,8 +1161,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
       const breakdownKeys = Object.keys(breakdownCohorts);
       return (
         <Box
-          sx={{
-            height: { xs: 360, md: '50vh' },
+        sx={{
+          minWidth: 0,
+          height: { xs: 360, md: '50vh' },
             minHeight: 360,
             maxHeight: 600,
             width: '100%',
@@ -1264,6 +1253,7 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
     return (
       <Box
         sx={{
+          minWidth: 0,
           height: { xs: 360, md: '50vh' },
           minHeight: 360,
           maxHeight: 600,
@@ -1367,8 +1357,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
       const breakdownKeys = Object.keys(breakdownCohorts).slice(0, 10);
       return (
         <Box
-          sx={{
-            height: { xs: 360, md: '50vh' },
+        sx={{
+          minWidth: 0,
+          height: { xs: 360, md: '50vh' },
             minHeight: 360,
             maxHeight: 600,
             width: '100%',
@@ -1452,6 +1443,7 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
     return (
       <Box
         sx={{
+          minWidth: 0,
           height: { xs: 360, md: '50vh' },
           minHeight: 360,
           maxHeight: 600,
@@ -2141,7 +2133,7 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
         eventName={quickEditEventName}
         projectId={projectId}
         onClose={() => setQuickEditOpen(false)}
-        onSaved={fetchEventNames}
+        onSaved={refetchEvents}
       />
 
       {menuAnchor && (

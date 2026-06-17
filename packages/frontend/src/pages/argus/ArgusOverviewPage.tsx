@@ -735,8 +735,9 @@ const ArgusOverviewPage: React.FC = () => {
                           arrow
                         >
                           <Box
-                            sx={{
-                              height: 20,
+        sx={{
+          minWidth: 0,
+          height: 20,
                               borderRadius: 0.5,
                               backgroundColor:
                                 count === 0
@@ -1007,8 +1008,9 @@ const ArgusOverviewPage: React.FC = () => {
                       </Box>
                     </Box>
                     <Box
-                      sx={{
-                        height: 5,
+        sx={{
+          minWidth: 0,
+          height: 5,
                         borderRadius: 3,
                         backgroundColor: isDark
                           ? 'rgba(255,255,255,0.04)'
@@ -1016,8 +1018,9 @@ const ArgusOverviewPage: React.FC = () => {
                       }}
                     >
                       <Box
-                        sx={{
-                          height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                           borderRadius: 3,
                           width: `${pct}%`,
                           background: `linear-gradient(90deg, #7c4dff, ${alpha('#7c4dff', 0.5)})`,

@@ -50,6 +50,7 @@ import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
 import { useFlowsStore } from '@/hooks/useAnalyticsStore';
 import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { useSharedEventCatalog } from './hooks/useSharedEventCatalog';
 
 import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import EventBlock from './components/analytics/EventBlock';
@@ -127,10 +128,10 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   const setBreakdownProperties = useFlowsStore((s) => s.setBreakdownProperties);
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
+  // ── Shared Event Catalog (cached across tab switches) ──
+  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+
   // ── Transient State ──
-  const [availableEvents, setAvailableEvents] = useState<
-    AnalyticsEventNameEntry[]
-  >([]);
   const [flowData, setFlowData] = useState<{
     nodes: { id: string; count: number }[];
     links: { source: string; target: string; value: number }[];
@@ -153,22 +154,10 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const isInitialMount = useRef(true);
   const lastExecutedKeyRef = useRef<string>('');
+  const [excludeListScrolling, setExcludeListScrolling] = useState(false);
+  const excludeScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Fetch event names ──
-  const fetchEventNames = useCallback(async () => {
-    try {
-      const data = await argusService.getAnalyticsEventNames(projectId, '30d');
-      setAvailableEvents(data);
-    } catch {
-      setAvailableEvents([]);
-    }
-  }, [projectId]);
-
-  useEffect(() => {
-    fetchEventNames();
-  }, [fetchEventNames]);
-
-  // Quick lexicon editor state
+  // ── Quick lexicon editor state ──
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
     null
@@ -195,6 +184,15 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
     },
     [excludeEvents, setExcludeEvents]
   );
+
+  // ── Exclude list scroll — suppress tooltips while scrolling ──
+  const handleExcludeListScroll = useCallback(() => {
+    setExcludeListScrolling(true);
+    if (excludeScrollTimerRef.current) clearTimeout(excludeScrollTimerRef.current);
+    excludeScrollTimerRef.current = setTimeout(() => {
+      setExcludeListScrolling(false);
+    }, 300);
+  }, []);
 
   // ── Run Query ──
   const handleRun = useCallback(async () => {
@@ -702,6 +700,7 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
           {t('argus.analytics.excludeEvents', 'Exclude Events')}
         </Typography>
         <Box
+          onScroll={handleExcludeListScroll}
           sx={{
             mt: 1,
             display: 'flex',
@@ -750,6 +749,7 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
                 iconColor={e.icon_color}
                 isReserved={e.is_reserved}
                 size="compact"
+                disableTooltip={excludeListScrolling}
               />
             </Box>
           ))}
@@ -918,8 +918,9 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
             </Box>
           )}
         <Box
-          sx={{
-            height: { xs: 400, md: '60vh' },
+        sx={{
+          minWidth: 0,
+          height: { xs: 400, md: '60vh' },
             minHeight: 450,
             maxHeight: 750,
             pr: 2,
@@ -947,7 +948,7 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
               link={
                 <CustomSankeyLink isDark={isDark} hoveredNode={hoveredNode} />
               }
-              margin={{ top: 20, right: 100, bottom: 20, left: 100 }}
+              margin={{ top: 20, right: 150, bottom: 20, left: 20 }}
               nodePadding={24}
               nodeWidth={12}
               iterations={0}
@@ -1613,7 +1614,7 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
         eventName={quickEditEventName}
         projectId={projectId}
         onClose={() => setQuickEditOpen(false)}
-        onSaved={fetchEventNames}
+        onSaved={refetchEvents}
       />
     </Box>
   );

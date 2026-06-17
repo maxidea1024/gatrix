@@ -420,8 +420,9 @@ const PerformanceTransactionTable: React.FC<
                       {p50Val.toFixed(0)}ms
                     </Typography>
                     <Box
-                      sx={{
-                        height: 3,
+        sx={{
+          minWidth: 0,
+          height: 3,
                         borderRadius: 2,
                         mt: 0.3,
                         backgroundColor: isDark
@@ -430,8 +431,9 @@ const PerformanceTransactionTable: React.FC<
                       }}
                     >
                       <Box
-                        sx={{
-                          height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                           borderRadius: 2,
                           width: `${(p50Val / maxP95) * 100}%`,
                           backgroundColor: '#4caf50',
@@ -466,8 +468,9 @@ const PerformanceTransactionTable: React.FC<
                       {p95Val.toFixed(0)}ms
                     </Typography>
                     <Box
-                      sx={{
-                        height: 3,
+        sx={{
+          minWidth: 0,
+          height: 3,
                         borderRadius: 2,
                         mt: 0.3,
                         backgroundColor: isDark
@@ -476,8 +479,9 @@ const PerformanceTransactionTable: React.FC<
                       }}
                     >
                       <Box
-                        sx={{
-                          height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                           borderRadius: 2,
                           width: `${(p95Val / maxP95) * 100}%`,
                           backgroundColor:
@@ -521,8 +525,9 @@ const PerformanceTransactionTable: React.FC<
                         }}
                       >
                         <Box
-                          sx={{
-                            height: '100%',
+        sx={{
+          minWidth: 0,
+          height: '100%',
                             borderRadius: 3,
                             width: `${Math.min(errRate, 100)}%`,
                             backgroundColor:
