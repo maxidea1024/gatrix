@@ -984,7 +984,7 @@ const GatrixEdgesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
 
   return (
     <Box sx={embedded ? { pt: 2 } : { p: 2 }}>
-      <PageHeader title={t('gatrixEdges.title', 'Edge Nodes')} />
+      {!embedded && <PageHeader title={t('gatrixEdges.title', 'Edge Nodes')} />}
       {/* Compact Grouping Controls */}
       <Box
         sx={{

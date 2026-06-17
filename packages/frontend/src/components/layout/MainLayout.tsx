@@ -394,9 +394,7 @@ const AppBarPageHeader: React.FC<{
                     },
                   },
                 },
-                '& .MuiButton-root:not(.MuiButtonGroup-grouped)': {
-                  borderRadius: 1.5,
-                },
+                '& .MuiButton-root:not(.MuiButtonGroup-grouped)': {},
                 '& .MuiIconButton-root': {
                   width: '28px !important',
                   height: '28px !important',

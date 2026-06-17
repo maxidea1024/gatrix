@@ -1808,32 +1808,21 @@ const FeatureFlagsPage: React.FC = () => {
           <>
             {canManage && (
               <>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={() => handleOpenCreateDialog('featureFlag')}
-                  endIcon={
-                    <Box
-                      component="span"
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        setCreateMenuAnchor(e.currentTarget as HTMLElement);
-                      }}
-                      sx={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        ml: 0.5,
-                        pl: 0.75,
-                        borderLeft: '1px solid rgba(255,255,255,0.3)',
-                      }}
-                    >
-                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
-                    </Box>
-                  }
-                >
-                  {t('featureFlags.createFlagOrRemoteConfig')}
-                </Button>
+                <ButtonGroup variant="contained" size="small">
+                  <Button
+                    startIcon={<AddIcon />}
+                    onClick={() => handleOpenCreateDialog('featureFlag')}
+                  >
+                    {t('featureFlags.createFlagOrRemoteConfig')}
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+                    sx={{ px: '4px !important', minWidth: '24px !important' }}
+                  >
+                    <ExpandMoreIcon sx={{ fontSize: 16 }} />
+                  </Button>
+                </ButtonGroup>
                 <Menu
                   anchorEl={createMenuAnchor}
                   open={Boolean(createMenuAnchor)}
@@ -2763,15 +2752,10 @@ const FeatureFlagsPage: React.FC = () => {
                                                 }}
                                               />
                                             )}
-                                          <Tooltip
-                                            title={t('common.copy')}
-                                            disableFocusListener
-                                          >
-                                            <CopyButton
+                                          <CopyButton
                                               text={flag.flagName}
                                               size={13}
                                             />
-                                          </Tooltip>
                                           <SafeTooltip
                                             title={
                                               flag.isFavorite

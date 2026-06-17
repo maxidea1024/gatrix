@@ -56,13 +56,16 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: minHeight,
-        py: 3,
+        minHeight: minHeight || 240,
+        py: 5,
         px: 3,
         ...(isBordered && {
           border: '2px dashed',
-          borderColor: 'divider',
-          borderRadius: '4px',
+          borderColor: (theme) =>
+            theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+          borderRadius: '16px',
+          backgroundColor: (theme) =>
+            theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
         }),
         ...sx,
       }}
@@ -70,23 +73,32 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
       {icon && (
         <Box
           sx={{
-            mb: 1,
-            color: 'text.disabled',
+            mb: 2,
+            color: 'text.secondary',
             display: 'flex',
             justifyContent: 'center',
+            alignItems: 'center',
+            width: 72,
+            height: 72,
+            borderRadius: '50%',
+            backgroundColor: (theme) =>
+              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+            '& svg': {
+              fontSize: 36,
+            },
           }}
         >
           {icon}
         </Box>
       )}
-      <Typography variant="subtitle1" color="text.secondary" fontWeight={500}>
+      <Typography variant="h6" color="text.primary" fontWeight={600} sx={{ mb: 0.5 }}>
         {message}
       </Typography>
       {description && (
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ display: 'block', mt: 0.5, px: 2 }}
+          sx={{ display: 'block', mb: 1, px: 2, maxWidth: 400 }}
         >
           {description}
         </Typography>
@@ -96,10 +108,16 @@ const EmptyPlaceholder: React.FC<EmptyPlaceholderProps> = ({
         : onAddClick && (
             <Button
               variant={addButtonVariant}
-              size="small"
+              size="medium"
               startIcon={<AddIcon />}
               onClick={onAddClick}
-              sx={{ mt: 1.5 }}
+              sx={{ 
+                mt: 2, 
+                textTransform: 'none', 
+                fontWeight: 600,
+                px: 3,
+                boxShadow: addButtonVariant === 'contained' ? 2 : 0,
+              }}
             >
               {addButtonLabel}
             </Button>

@@ -260,7 +260,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
           root: {
             textTransform: 'none',
             fontWeight: 600,
-            borderRadius: 4,
+            borderRadius: 3,
             border: 'none',
             boxShadow: 'none',
             transition:

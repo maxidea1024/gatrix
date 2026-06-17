@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, IconButton, useTheme } from '@mui/material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import {
@@ -22,9 +23,9 @@ interface CopyButtonProps {
   size?: number;
   /** Tooltip placement */
   tooltipPlacement?: 'top' | 'bottom' | 'left' | 'right';
-  /** Tooltip label (default: '복사') */
+  /** Tooltip label (default: localized 'Copy') */
   tooltip?: string;
-  /** Copied label (default: '복사됨') */
+  /** Copied label (default: localized 'Copied') */
   copiedTooltip?: string;
   /** Optional callback after successful copy */
   onCopied?: () => void;
@@ -32,54 +33,63 @@ interface CopyButtonProps {
   sx?: Record<string, any>;
 }
 
-export const CopyButton: React.FC<CopyButtonProps> = ({
-  text,
-  size = 16,
-  tooltipPlacement = 'top',
-  tooltip = '복사',
-  copiedTooltip = '✓ 복사됨',
-  onCopied,
-  sx,
-}) => {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(
-    async (e: React.MouseEvent) => {
-      e.stopPropagation();
-      const ok = await copyToClipboard(text);
-      if (ok) {
-        setCopied(true);
-        onCopied?.();
-        setTimeout(() => setCopied(false), 2000);
-      }
+export const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
+  (
+    {
+      text,
+      size = 16,
+      tooltipPlacement = 'top',
+      tooltip,
+      copiedTooltip,
+      onCopied,
+      sx,
     },
-    [text, onCopied]
-  );
+    ref
+  ) => {
+    const { t } = useTranslation();
+    const resolvedTooltip = tooltip ?? t('common.copy');
+    const resolvedCopiedTooltip = copiedTooltip ?? `✓ ${t('common.copied')}`;
+    const [copied, setCopied] = useState(false);
 
-  return (
-    <SafeTooltip
-      title={copied ? copiedTooltip : tooltip}
-      placement={tooltipPlacement}
-    >
-      <IconButton
-        onClick={handleCopy}
-        size="small"
-        sx={{
-          color: copied ? '#2ea44f' : 'text.secondary',
-          transition: 'color 0.15s ease',
-          '&:hover': { color: copied ? '#2ea44f' : 'text.primary' },
-          ...sx,
-        }}
+    const handleCopy = useCallback(
+      async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const ok = await copyToClipboard(text);
+        if (ok) {
+          setCopied(true);
+          onCopied?.();
+          setTimeout(() => setCopied(false), 2000);
+        }
+      },
+      [text, onCopied]
+    );
+
+    return (
+      <SafeTooltip
+        title={copied ? resolvedCopiedTooltip : resolvedTooltip}
+        placement={tooltipPlacement}
       >
-        {copied ? (
-          <CheckIcon sx={{ fontSize: size }} />
-        ) : (
-          <CopyIcon sx={{ fontSize: size }} />
-        )}
-      </IconButton>
-    </SafeTooltip>
-  );
-};
+        <IconButton
+          ref={ref}
+          onClick={handleCopy}
+          size="small"
+          sx={{
+            color: copied ? '#2ea44f' : 'text.secondary',
+            transition: 'color 0.15s ease',
+            '&:hover': { color: copied ? '#2ea44f' : 'text.primary' },
+            ...sx,
+          }}
+        >
+          {copied ? (
+            <CheckIcon sx={{ fontSize: size }} />
+          ) : (
+            <CopyIcon sx={{ fontSize: size }} />
+          )}
+        </IconButton>
+      </SafeTooltip>
+    );
+  }
+);
 
 // ─── CopyableField ──────────────────────────────────────────────────
 // A read-only field row with label, monospace value, and copy button.
@@ -107,6 +117,7 @@ export const CopyableField: React.FC<CopyableFieldProps> = ({
   monoFont = true,
   showLabel = true,
 }) => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [copied, setCopied] = useState(false);
@@ -170,7 +181,7 @@ export const CopyableField: React.FC<CopyableFieldProps> = ({
           {value}
         </Typography>
         <SafeTooltip
-          title={copied ? '✓ 복사됨' : '클릭하여 복사'}
+          title={copied ? `✓ ${t('common.copied')}` : t('common.clickToCopy', 'Click to copy')}
           placement="top"
         >
           <Box

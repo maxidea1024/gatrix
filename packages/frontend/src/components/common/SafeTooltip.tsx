@@ -55,10 +55,15 @@ const SafeTooltip: React.FC<SafeTooltipProps> = ({
     setOpen(false);
   }, [clearTimer]);
 
-  // Close on mousedown (before portal opens for Select/Menu)
+  // Close on mousedown (before portal opens for Select/Menu),
+  // then re-show after a short delay if still hovering so updated
+  // title (e.g. "Copied!") is visible to the user.
   const handleMouseDown = useCallback(() => {
     clearTimer();
     setOpen(false);
+    timerRef.current = setTimeout(() => {
+      if (hoverRef.current) setOpen(true);
+    }, 200);
   }, [clearTimer]);
 
   // Don't render tooltip if no title

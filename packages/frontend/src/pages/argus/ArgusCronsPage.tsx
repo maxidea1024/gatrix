@@ -336,33 +336,70 @@ const ArgusCronsPage: React.FC = () => {
       />
 
       {/* Status Summary */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
+          gap: 2,
+          mb: 3,
+        }}
+      >
         {Object.entries(STATUS_CONFIG)
           .filter(([key]) => key !== 'in_progress')
-          .map(([key, cfg]) => (
-            <Chip
-              key={key}
-              icon={cfg.icon}
-              label={`${cfg.label}: ${statusCounts[key] || 0}`}
-              size="small"
-              onClick={() =>
-                setStatusFilter(statusFilter === key ? 'all' : key)
-              }
-              sx={{
-                fontSize: '0.72rem',
-                fontWeight: 600,
-                borderColor: statusFilter === key ? cfg.color : 'transparent',
-                backgroundColor:
-                  statusFilter === key ? alpha(cfg.color, 0.1) : 'transparent',
-                border: `1px solid ${statusFilter === key ? cfg.color : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                color: cfg.color,
-              }}
-            />
-          ))}
+          .map(([key, cfg]) => {
+            const count = statusCounts[key] || 0;
+            const isSelected = statusFilter === key;
+            return (
+              <Paper
+                key={key}
+                elevation={0}
+                onClick={() => setStatusFilter(isSelected ? 'all' : key)}
+                sx={{
+                  p: 2.5,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: isSelected ? cfg.color : 'divider',
+                  backgroundColor: isSelected
+                    ? alpha(cfg.color, 0.08)
+                    : 'background.paper',
+                  borderRadius: 3,
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  ...(isSelected && {
+                    boxShadow: `0 0 0 1px ${cfg.color}`,
+                  }),
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: (theme) => theme.shadows[4],
+                    borderColor: isSelected ? cfg.color : 'divider',
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    mb: 1,
+                    color: cfg.color,
+                  }}
+                >
+                  {cfg.icon}
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                    {cfg.label}
+                  </Typography>
+                </Box>
+                <Typography sx={{ fontSize: '1.5rem', fontWeight: 700, lineHeight: 1 }}>
+                  {count}
+                </Typography>
+              </Paper>
+            );
+          })}
       </Box>
 
       {/* Toolbar */}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', gap: 1.5, mb: 3, alignItems: 'center' }}>
         <TextField
           size="small"
           placeholder={t('argus.crons.searchPlaceholder', 'Search monitors...')}
@@ -372,22 +409,39 @@ const ArgusCronsPage: React.FC = () => {
             input: {
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 18 }} />
+                  <SearchIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
                 </InputAdornment>
               ),
-              sx: { fontSize: '0.8rem', borderRadius: '8px' },
+              sx: {
+                fontSize: '0.85rem',
+                backgroundColor: 'background.paper',
+                transition: 'all 0.2s ease',
+                '&:hover': { backgroundColor: 'action.hover' },
+                '&.Mui-focused': { backgroundColor: 'background.paper' },
+              },
             },
           }}
           sx={{ flex: 1, maxWidth: 400 }}
         />
         <Tooltip title={t('common.refresh', 'Refresh')}>
-          <IconButton onClick={fetchMonitors} size="small">
-            <RefreshIcon sx={{ fontSize: 18 }} />
+          <IconButton
+            onClick={fetchMonitors}
+            size="small"
+            sx={{
+              backgroundColor: 'background.paper',
+              p: 1,
+              border: '1px solid',
+              borderColor: 'divider',
+              '&:hover': { backgroundColor: 'action.hover' },
+            }}
+          >
+            <RefreshIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </Tooltip>
+        <Box sx={{ flexGrow: 1 }} />
         <Button
           variant="contained"
-          size="small"
+          size="medium"
           startIcon={<AddIcon />}
           onClick={() => {
             setFormErrors({ name: false, schedule_value: false });
@@ -395,9 +449,14 @@ const ArgusCronsPage: React.FC = () => {
           }}
           sx={{
             textTransform: 'none',
-            borderRadius: '8px',
-            fontSize: '0.78rem',
+            fontSize: '0.85rem',
             fontWeight: 600,
+            px: 3,
+            boxShadow: 'none',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              boxShadow: (theme) => theme.shadows[2],
+            },
           }}
         >
           {t('argus.crons.createMonitor', 'Create Monitor')}
@@ -405,15 +464,15 @@ const ArgusCronsPage: React.FC = () => {
       </Box>
 
       {/* Monitor Table */}
-      <Paper
-        elevation={0}
-        sx={{
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-          borderRadius: 2,
-          overflow: 'hidden',
-        }}
-      >
-        {loading ? (
+      {loading ? (
+        <Paper
+          elevation={0}
+          sx={{
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            borderRadius: 2,
+            overflow: 'hidden',
+          }}
+        >
           <Box sx={{ p: 2 }}>
             {[...Array(4)].map((_, i) => (
               <Skeleton
@@ -424,11 +483,27 @@ const ArgusCronsPage: React.FC = () => {
               />
             ))}
           </Box>
-        ) : filtered.length === 0 ? (
-          <EmptyPlaceholder
-            message={t('argus.crons.noMonitors', 'No cron monitors found')}
-          />
-        ) : (
+        </Paper>
+      ) : filtered.length === 0 ? (
+        <EmptyPlaceholder
+          icon={<ScheduleIcon />}
+          message={t('argus.crons.noMonitors', 'No cron monitors found')}
+          description={t('argus.crons.emptyDescription', 'Create a new monitor to track your background jobs and scheduled tasks.')}
+          onAddClick={() => {
+            setFormErrors({ name: false, schedule_value: false });
+            setCreateDialogOpen(true);
+          }}
+          addButtonLabel={t('argus.crons.createMonitor', 'Create Monitor')}
+        />
+      ) : (
+        <Paper
+          elevation={0}
+          sx={{
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            borderRadius: 2,
+            overflow: 'hidden',
+          }}
+        >
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -501,6 +576,10 @@ const ArgusCronsPage: React.FC = () => {
                     onClick={() => handleOpenDetail(monitor)}
                     sx={{
                       cursor: 'pointer',
+                      transition: 'background-color 0.2s ease',
+                      '&:hover': {
+                        backgroundColor: 'action.hover',
+                      },
                       '&:last-child td': { borderBottom: 0 },
                     }}
                   >
@@ -574,8 +653,8 @@ const ArgusCronsPage: React.FC = () => {
               })}
             </TableBody>
           </Table>
-        )}
-      </Paper>
+        </Paper>
+      )}
 
       {/* Create Monitor Dialog */}
       <Dialog

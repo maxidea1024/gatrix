@@ -109,7 +109,7 @@ export const GrafanaDashboardPage: React.FC<{ embedded?: boolean }> = ({
         flexDirection: 'column',
       }}
     >
-      <PageHeader title={t('monitoring.grafana.title', 'Grafana Dashboard')} />
+      {!embedded && <PageHeader title={t('monitoring.grafana.title', 'Grafana Dashboard')} />}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={selectedDashboard}

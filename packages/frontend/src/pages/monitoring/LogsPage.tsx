@@ -31,7 +31,7 @@ function resolveGrafanaUrl(): string | null {
   return null;
 }
 
-const LogsPage: React.FC<{ embedded?: boolean }> = () => {
+const LogsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { isDark } = useTheme();
   const { t } = useTranslation();
 
@@ -57,7 +57,7 @@ const LogsPage: React.FC<{ embedded?: boolean }> = () => {
         justifyContent: 'center',
       }}
     >
-      <PageHeader title={t('monitoring.logs.title')} />
+      {!embedded && <PageHeader title={t('monitoring.logs.title')} />}
       {iframeUrl ? (
         <iframe
           key={iframeUrl}
