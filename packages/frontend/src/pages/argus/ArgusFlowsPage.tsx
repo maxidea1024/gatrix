@@ -87,7 +87,12 @@ const NODE_COLORS = [
 
 /* ─── Component ─── */
 
-const ArgusFlowsPage: React.FC = () => {
+interface ArgusFlowsPageProps {
+  embedded?: boolean;
+  tabBar?: React.ReactNode;
+}
+
+const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({ embedded = false, tabBar }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -794,7 +799,7 @@ const ArgusFlowsPage: React.FC = () => {
           },
         ]}
       />
-      <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
       <CsvExportButton
         data={csvData}
         filename="flows"
@@ -913,6 +918,8 @@ const ArgusFlowsPage: React.FC = () => {
             minHeight: 450,
             maxHeight: 750,
             pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
           }}
         >
           <ResponsiveContainer
@@ -1125,26 +1132,28 @@ const ArgusFlowsPage: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 64px)',
+        height: embedded ? '100%' : 'calc(100vh - 64px)',
         overflow: 'hidden',
-        m: -2,
+        ...(embedded ? { width: '100%' } : { m: -2 }),
       }}
     >
-      <PageHeader
-        enableAutoBack
-        title={
-          <ArgusBreadcrumbs
-            paths={[
-              {
-                label: t('argus.analytics.title', 'Analytics'),
-                to: '/argus/analytics',
-              },
-              { label: t('argus.analytics.flows', 'Flows') },
-            ]}
-            size="title"
-          />
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          enableAutoBack
+          title={
+            <ArgusBreadcrumbs
+              paths={[
+                {
+                  label: t('argus.analytics.title', 'Analytics'),
+                  to: '/argus/analytics',
+                },
+                { label: t('argus.analytics.flows', 'Flows') },
+              ]}
+              size="title"
+            />
+          }
+        />
+      )}
       <Box
         sx={{
           display: 'flex',
@@ -1155,6 +1164,7 @@ const ArgusFlowsPage: React.FC = () => {
       >
         <AnalyticsLayout
           leftPanel={leftPanel}
+          tabBar={tabBar}
           toolbar={toolbar}
           projectId={projectId}
         >

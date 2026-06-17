@@ -24,7 +24,6 @@ import {
   History as HistoryIcon,
   ViewColumn as ViewColumnIcon,
   Refresh as RefreshIcon,
-  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -73,9 +72,7 @@ const SurveyLogsPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
 
   // Sort state
   const [sortBy, setSortBy] = useState<string>('createdAt');
@@ -592,32 +589,7 @@ const SurveyLogsPage: React.FC = () => {
               }
             />
           </Box>
-          <Box sx={{ flexShrink: 0 }}>
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  load();
-                }}
-                disabled={loading}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </Menu>
-          </Box>
+
         </Box>
       </Box>
 

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { ClientController } from '../../controllers/client-controller';
-import { ClientCrashController } from '../../controllers/client-crash-controller';
 import { BannerClientController } from '../../controllers/banner-client-controller';
 import { requestLogger } from '../../middleware/request-logger';
 import { clientSDKAuth } from '../../middleware/api-token-auth';
@@ -75,29 +74,7 @@ router.get('/test', clientSDKAuth, (req: any, res: any) => {
   });
 });
 
-// Crash upload endpoint (requires client API token)
-// Response always includes logUploadUrl for direct client upload to storage
-router.post(
-  '/crashes',
-  clientSDKAuth,
-  body('platform').isString().notEmpty(),
-  body('branch').isString().notEmpty(),
-  body('stack').isString().notEmpty(),
-  body('channel').optional({ nullable: true }).isString(),
-  body('subchannel').optional({ nullable: true }).isString(),
-  body('isEditor').optional({ nullable: true }).isBoolean(),
-  body('appVersion').optional({ nullable: true }).isString(),
-  body('resVersion').optional({ nullable: true }).isString(),
-  body('accountId').optional({ nullable: true }).isString(),
-  body('characterId').optional({ nullable: true }).isString(),
-  body('gameUserId').optional({ nullable: true }).isString(),
-  body('userName').optional({ nullable: true }).isString(),
-  body('gameServerId').optional({ nullable: true }).isString(),
-  body('userMessage').optional({ nullable: true }).isString(),
-  body('log').optional({ nullable: true }).isString(),
-  validateRequest,
-  ClientCrashController.uploadCrash
-);
+
 
 // Banner routes for game client
 router.get('/banners', clientSDKAuth, BannerClientController.getBanners);

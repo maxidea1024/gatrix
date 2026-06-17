@@ -34,6 +34,8 @@ import {
   LinearProgress,
   Popover,
   TextField,
+  Paper,
+  Stack,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -1061,14 +1063,18 @@ export default function AllPlayersTab({
 
   return (
     <Box>
-      {/* Toolbar */}
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
           display: 'flex',
+          gap: 1.5,
           alignItems: 'center',
-          gap: 1,
           flexWrap: 'wrap',
-          mb: 1.5,
+          p: 1.5,
+          mb: 2,
+          bgcolor: (theme) => alpha(theme.palette.action.hover, 0.04),
+          borderRadius: 2.5,
+          borderColor: 'divider',
         }}
       >
         <SearchTextField
@@ -1085,8 +1091,14 @@ export default function AllPlayersTab({
             size="small"
             onClick={(e) => setMultiSearchAnchor(e.currentTarget)}
             color={activeMultiSearch ? 'primary' : 'default'}
+            sx={{
+              bgcolor: 'background.paper',
+              border: 1,
+              borderColor: 'divider',
+              '&:hover': { bgcolor: 'action.hover' },
+            }}
           >
-            <ManageSearchIcon />
+            <ManageSearchIcon fontSize="small" />
           </IconButton>
         </Tooltip>
 
@@ -1232,30 +1244,48 @@ export default function AllPlayersTab({
 
         <Box sx={{ flex: 1 }} />
 
-        {/* Right side */}
-        <Typography variant="body2" color="text.secondary">
-          {t('playerConnections.allPlayers.totalCount', {
-            count: data.total,
-          })}
-        </Typography>
-        <Tooltip title={t('common.refresh')}>
-          <span>
-            <IconButton size="small" onClick={fetchData} disabled={loading}>
-              <RefreshIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-        <Tooltip title={t('common.export')}>
-          <span>
-            <IconButton
-              size="small"
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-              disabled={exporting || data.total === 0}
-            >
-              <DownloadIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
+        {/* Right side actions */}
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8125rem', fontWeight: 500 }}>
+            {t('playerConnections.allPlayers.totalCount', {
+              count: data.total,
+            })}
+          </Typography>
+          <Tooltip title={t('common.refresh')}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={fetchData}
+                disabled={loading}
+                sx={{
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
+              >
+                <RefreshIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title={t('common.export')}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+                disabled={exporting || data.total === 0}
+                sx={{
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
+              >
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Stack>
         <Menu
           anchorEl={exportMenuAnchor}
           open={Boolean(exportMenuAnchor)}
@@ -1264,7 +1294,7 @@ export default function AllPlayersTab({
           <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
           <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
         </Menu>
-      </Box>
+      </Paper>
 
       {/* Table content — hide everything until first fetch completes */}
       {isInitialLoad ? null : data.users.length === 0 && !loading ? (

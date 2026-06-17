@@ -75,7 +75,6 @@ import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Refresh as RefreshIcon,
   LocalOffer as LocalOfferIcon,
   ContentCopy as ContentCopyIcon,
   TextFields as TextFieldsIcon,
@@ -115,9 +114,7 @@ import DynamicFilterBar, {
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { api } from '@/services/api';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
-import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
-import ImportDialog from '../../components/common/ImportDialog';
+
 import PageHeader from '@/components/common/PageHeader';
 import ColumnSettingsDialog from '@/components/common/ColumnSettingsDialog';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
@@ -218,10 +215,6 @@ const MessageTemplatesPage: React.FC = () => {
   const [items, setItems] = useState<MessageTemplate[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadStartTimeRef = useRef<number>(0);
   // Copy helper with type/label for proper i18n interpolation
@@ -993,78 +986,15 @@ const MessageTemplatesPage: React.FC = () => {
         title={t('messageTemplates.title')}
         subtitle={t('messageTemplates.subtitle')}
         actions={
-          <>
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              {canManage && (
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleAdd}
-                >
-                  {t('messageTemplates.addTemplate')}
-                </Button>
-              )}
-              <IconButton
-                onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-                aria-label="more options"
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </Box>
-            <MuiMenu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
+          canManage ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAdd}
             >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'name', header: t('common.name') },
-                    { key: 'type', header: t('common.type') },
-                    {
-                      key: 'defaultMessage',
-                      header: t('messageTemplates.defaultMessage'),
-                    },
-                    { key: 'isEnabled', header: t('common.status') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      items,
-                      exportColumns,
-                      'message-templates',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  load();
-                }}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </MuiMenu>
-          </>
+              {t('messageTemplates.addTemplate')}
+            </Button>
+          ) : undefined
         }
       />
 
@@ -1581,15 +1511,7 @@ const MessageTemplatesPage: React.FC = () => {
         onReset={handleResetColumns}
       />
 
-      {/* Import Dialog */}
-      <ImportDialog
-        open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
-        title={t('common.import')}
-        onImport={async (data) => {
-          enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
-        }}
-      />
+
     </Box>
   );
 };

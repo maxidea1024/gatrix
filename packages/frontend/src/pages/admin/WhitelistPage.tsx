@@ -71,9 +71,6 @@ import ResizableDrawer from '@/components/common/ResizableDrawer';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
-import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
-import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
-import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 
 const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
@@ -167,10 +164,6 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bulkData, setBulkData] = useState('');
   const [fullEditingData, setFullEditingData] = useState<any>(null);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [fullInfoDrawerOpen, setFullInfoDrawerOpen] = useState(false);
 
   const isDirty = useMemo(() => {
@@ -622,58 +615,6 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                   >
                     {t('whitelist.addEntry')}
                   </Button>
-                  <IconButton
-                    onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-                    aria-label="more options"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={pageMenuAnchor}
-                    open={Boolean(pageMenuAnchor)}
-                    onClose={() => setPageMenuAnchor(null)}
-                  >
-                    <ExportImportMenuItems
-                      onExport={(format) => {
-                        setPageMenuAnchor(null);
-                        const exportColumns: ExportColumn[] = [
-                          {
-                            key: 'accountId',
-                            header: t('whitelist.form.accountId'),
-                          },
-                          {
-                            key: 'ipAddress',
-                            header: t('whitelist.form.ipAddress'),
-                          },
-                          {
-                            key: 'purpose',
-                            header: t('whitelist.form.purpose'),
-                          },
-                          { key: 'isEnabled', header: t('common.status') },
-                          { key: 'createdAt', header: t('common.createdAt') },
-                        ];
-                        try {
-                          exportToFile(
-                            whitelists,
-                            exportColumns,
-                            'account-whitelist',
-                            format
-                          );
-                          enqueueSnackbar(t('common.exportSuccess'), {
-                            variant: 'success',
-                          });
-                        } catch (err) {
-                          enqueueSnackbar(t('common.exportFailed'), {
-                            variant: 'error',
-                          });
-                        }
-                      }}
-                      onImportClick={() => {
-                        setPageMenuAnchor(null);
-                        setImportDialogOpen(true);
-                      }}
-                    />
-                  </Menu>
                 </Box>
               )}
             </Box>
@@ -1185,106 +1126,7 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
         onClose={() => setFullInfoDrawerOpen(false)}
       />
 
-      {/* Import Dialog */}
-      <ImportDialog
-        open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
-        title={t('common.import')}
-        onImport={async (data) => {
-          // Helper: find a value from a row by trying multiple possible keys
-          const resolveField = (
-            item: Record<string, any>,
-            ...candidates: string[]
-          ): string => {
-            for (const key of candidates) {
-              if (key && item[key] !== undefined && item[key] !== null) {
-                return String(item[key]).trim();
-              }
-            }
-            // Fallback: case-insensitive key match against first candidate
-            const lowerCandidates = candidates
-              .filter(Boolean)
-              .map((c) => c.toLowerCase());
-            for (const key of Object.keys(item)) {
-              if (lowerCandidates.includes(key.toLowerCase())) {
-                return String(item[key]).trim();
-              }
-            }
-            return '';
-          };
 
-          let successCount = 0;
-          let failCount = 0;
-          const failedItems: string[] = [];
-
-          // Log first row keys for debugging
-          if (data.length > 0) {
-            console.log('[Import] First row keys:', Object.keys(data[0]));
-            console.log('[Import] First row:', data[0]);
-          }
-
-          for (const item of data) {
-            try {
-              const accountId = resolveField(
-                item,
-                t('whitelist.form.accountId'),
-                'accountId',
-                'Account ID',
-                '계정ID',
-                '账户ID'
-              );
-              const ipAddress = resolveField(
-                item,
-                t('whitelist.form.ipAddress'),
-                'ipAddress',
-                'IP Address',
-                'IP주소',
-                'IP地址'
-              );
-              const purpose = resolveField(
-                item,
-                t('whitelist.form.purpose'),
-                'purpose',
-                'Purpose',
-                '용도',
-                '用途'
-              );
-
-              if (!accountId) {
-                failCount++;
-                failedItems.push(`(empty accountId)`);
-                continue;
-              }
-
-              await WhitelistService.createWhitelist({
-                accountId,
-                ipAddress: ipAddress || undefined,
-                purpose: purpose || undefined,
-              });
-              successCount++;
-            } catch (err: any) {
-              failCount++;
-              const id =
-                item[t('whitelist.form.accountId')] || item.accountId || '?';
-              failedItems.push(String(id));
-            }
-          }
-          if (successCount > 0) {
-            enqueueSnackbar(
-              t('common.importSuccess') + ` (${successCount}/${data.length})`,
-              { variant: 'success' }
-            );
-            loadWhitelists();
-          }
-          if (failCount > 0) {
-            enqueueSnackbar(
-              t('common.importFailed') +
-                ` (${failCount}): ${failedItems.slice(0, 5).join(', ')}`,
-              { variant: 'error' }
-            );
-          }
-        }}
-      />
     </Box>
   );
 };

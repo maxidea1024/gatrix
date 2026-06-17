@@ -151,9 +151,7 @@ const IngamePopupNoticesPage: React.FC = () => {
     useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Action menu state
@@ -520,65 +518,6 @@ const IngamePopupNoticesPage: React.FC = () => {
                 {t('ingamePopupNotices.createNotice')}
               </Button>
             )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'content', header: t('ingamePopupNotices.content') },
-                    { key: 'isActive', header: t('common.status') },
-                    {
-                      key: 'displayPriority',
-                      header: t('ingamePopupNotices.priority'),
-                    },
-                    { key: 'startDate', header: t('common.start') },
-                    { key: 'endDate', header: t('common.end') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      notices,
-                      exportColumns,
-                      'ingame-popup-notices',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  loadNotices();
-                }}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </Menu>
           </>
         }
       />

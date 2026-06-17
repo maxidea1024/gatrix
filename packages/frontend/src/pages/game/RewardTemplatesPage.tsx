@@ -99,9 +99,7 @@ const RewardTemplatesPage: React.FC = () => {
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
     useState<null | HTMLElement>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
   const [rowMenuTemplate, setRowMenuTemplate] = useState<RewardTemplate | null>(
@@ -622,60 +620,6 @@ const RewardTemplatesPage: React.FC = () => {
                 {t('rewardTemplates.createTemplate')}
               </Button>
             )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'name', header: t('common.name') },
-                    { key: 'description', header: t('common.description') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      templates,
-                      exportColumns,
-                      'reward-templates',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  loadTemplates();
-                }}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </Menu>
           </>
         }
       />

@@ -6,6 +6,8 @@ import GlobalFilterBar from './GlobalFilterBar';
 export interface AnalyticsLayoutProps {
   /** The content of the left sidebar (Query Builder) */
   leftPanel: React.ReactNode;
+  /** Optional tab bar rendered at the top of the left sidebar */
+  tabBar?: React.ReactNode;
   /** The top toolbar above the chart */
   toolbar?: React.ReactNode;
   /** The main chart/table content */
@@ -18,6 +20,7 @@ export interface AnalyticsLayoutProps {
 
 const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
   leftPanel,
+  tabBar,
   toolbar,
   children,
   title,
@@ -65,6 +68,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
             },
           }}
         >
+          {tabBar}
           {leftPanel}
         </Box>
         <Box
@@ -111,49 +115,38 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
           position: 'relative',
         }}
       >
-        {/* Toolbar Row */}
-        {(toolbar || title) && (
+        {/* Toolbar Row (with filter bar integrated) */}
+        {(toolbar || title || projectId) && (
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               px: 3,
-              py: 2,
+              py: 1.5,
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-              minHeight: 64,
+              minHeight: 48,
+              gap: 2,
             }}
           >
             {title ? (
               <Typography
                 variant="h6"
                 fontWeight={700}
-                sx={{ fontSize: '1.1rem' }}
+                sx={{ fontSize: '1.1rem', flexShrink: 0 }}
               >
                 {title}
               </Typography>
+            ) : projectId ? (
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <GlobalFilterBar projectId={projectId} />
+              </Box>
             ) : (
-              <Box /> // Spacer
+              <Box />
             )}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
               {toolbar}
             </Box>
-          </Box>
-        )}
-
-        {/* Global Filter Bar */}
-        {projectId && (
-          <Box
-            sx={{
-              px: 3,
-              py: 1,
-              borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
-              minHeight: 32,
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <GlobalFilterBar projectId={projectId} />
           </Box>
         )}
 

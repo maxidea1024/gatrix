@@ -28,8 +28,6 @@ import environmentRoutes from './environments';
 import jobRoutes from './jobs';
 import maintenanceRoutes from './maintenance';
 import invitationRoutes from './invitations';
-import crashEventRoutes from './crash-events';
-import crashesRoutes from './crashes';
 import fileStorageRoutes from './file-storage';
 import consoleRoutes from './console';
 import surveyRoutes from './surveys';
@@ -518,24 +516,10 @@ router.use(
   invitationRoutes
 );
 
-// Crashes (grouped)
-router.use(
-  '/crashes',
-  requireOrgPermission(P.CRASH_EVENTS_READ) as any,
-  crashesRoutes
-);
-
-// Crash events
-router.use(
-  '/crash-events',
-  requireOrgPermission(P.CRASH_EVENTS_READ) as any,
-  crashEventRoutes
-);
-
 // File Storage
 router.use(
   '/file-storage',
-  requireOrgPermission(P.CRASH_EVENTS_READ) as any,
+  requireOrgPermission(P.SYSTEM_SETTINGS_READ) as any,
   fileStorageRoutes
 );
 

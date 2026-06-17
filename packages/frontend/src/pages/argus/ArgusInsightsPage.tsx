@@ -171,7 +171,12 @@ const FORMULA_COLORS = ['#8b5cf6', '#d946ef', '#ec4899', '#f43f5e', '#a855f7'];
 
 /* ─── Component ─── */
 
-const ArgusInsightsPage: React.FC = () => {
+interface ArgusInsightsPageProps {
+  embedded?: boolean;
+  tabBar?: React.ReactNode;
+}
+
+const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({ embedded = false, tabBar }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -1218,7 +1223,7 @@ const ArgusInsightsPage: React.FC = () => {
         availableTypes={['line', 'bar', 'stacked-bar', 'table']}
       />
       <CompareSelector value={comparePeriod} onChange={setComparePeriod} />
-      <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
       <CsvExportButton
         data={csvData}
         filename="insights"
@@ -1261,6 +1266,8 @@ const ArgusInsightsPage: React.FC = () => {
           maxHeight: 600,
           width: '100%',
           pr: 2,
+          userSelect: 'none',
+          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
           '& .recharts-responsive-container': { minHeight: '1px !important' },
         }}
       >
@@ -1306,7 +1313,7 @@ const ArgusInsightsPage: React.FC = () => {
                 tick={tickStyle}
                 tickLine={false}
                 axisLine={false}
-                tickMargin={10}
+                tickMargin={16}
               />
               <YAxis
                 tick={tickStyle}
@@ -1409,7 +1416,7 @@ const ArgusInsightsPage: React.FC = () => {
                 tick={tickStyle}
                 tickLine={false}
                 axisLine={false}
-                tickMargin={10}
+                tickMargin={16}
               />
               <YAxis
                 tick={tickStyle}
@@ -1847,26 +1854,28 @@ const ArgusInsightsPage: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 64px)',
+        height: embedded ? '100%' : 'calc(100vh - 64px)',
         overflow: 'hidden',
-        m: -2,
+        ...(embedded ? { width: '100%' } : { m: -2 }),
       }}
     >
-      <PageHeader
-        enableAutoBack
-        title={
-          <ArgusBreadcrumbs
-            paths={[
-              {
-                label: t('argus.analytics.title', 'Analytics'),
-                to: '/argus/analytics',
-              },
-              { label: t('argus.analytics.insights', 'Insights') },
-            ]}
-            size="title"
-          />
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          enableAutoBack
+          title={
+            <ArgusBreadcrumbs
+              paths={[
+                {
+                  label: t('argus.analytics.title', 'Analytics'),
+                  to: '/argus/analytics',
+                },
+                { label: t('argus.analytics.insights', 'Insights') },
+              ]}
+              size="title"
+            />
+          }
+        />
+      )}
       <Box
         sx={{
           display: 'flex',
@@ -1877,6 +1886,7 @@ const ArgusInsightsPage: React.FC = () => {
       >
         <AnalyticsLayout
           leftPanel={leftPanel}
+          tabBar={tabBar}
           toolbar={toolbar}
           projectId={projectId}
         >

@@ -67,9 +67,7 @@ import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import PageContentLoader from '../common/PageContentLoader';
 import SearchTextField from '../common/SearchTextField';
 
-import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
-import ExportImportMenuItems from '../common/ExportImportMenuItems';
-import ImportDialog from '../common/ImportDialog';
+
 
 interface IpWhitelistTabProps {
   canManage?: boolean;
@@ -104,10 +102,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
   const [addDialog, setAddDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [bulkDialog, setBulkDialog] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
+
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     title: '',
@@ -460,48 +455,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
             >
               {t('ipWhitelist.addEntry')}
             </Button>
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'ipAddress', header: t('ipWhitelist.ipAddress') },
-                    { key: 'purpose', header: t('ipWhitelist.purpose') },
-                    { key: 'isEnabled', header: t('ipWhitelist.status') },
-                    { key: 'createdAt', header: t('ipWhitelist.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      ipWhitelists,
-                      exportColumns,
-                      'ip-whitelist',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-            </Menu>
           </Box>
         )}
       </Box>
@@ -927,67 +880,7 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Import Dialog */}
-      <ImportDialog
-        open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
-        title={t('common.import')}
-        onImport={async (data) => {
-          let successCount = 0;
-          let failCount = 0;
-          const failedItems: string[] = [];
-          for (const item of data) {
-            try {
-              const ipAddress = (
-                item[t('ipWhitelist.ipAddress')] ||
-                item.ipAddress ||
-                ''
-              )
-                .toString()
-                .trim();
-              const purpose = (
-                item[t('ipWhitelist.purpose')] ||
-                item.purpose ||
-                ''
-              )
-                .toString()
-                .trim();
 
-              if (!ipAddress) {
-                failCount++;
-                failedItems.push(`(empty ipAddress)`);
-                continue;
-              }
-
-              await IpWhitelistService.createIpWhitelist({
-                ipAddress,
-                purpose: purpose || 'Imported',
-                isEnabled: true,
-              });
-              successCount++;
-            } catch (err: any) {
-              failCount++;
-              const ip =
-                item[t('ipWhitelist.ipAddress')] || item.ipAddress || '?';
-              failedItems.push(ip.toString());
-            }
-          }
-          if (successCount > 0) {
-            enqueueSnackbar(
-              t('common.importSuccess') + ` (${successCount}/${data.length})`,
-              { variant: 'success' }
-            );
-            loadIpWhitelists();
-          }
-          if (failCount > 0) {
-            enqueueSnackbar(
-              t('common.importFailed') +
-                ` (${failCount}): ${failedItems.slice(0, 5).join(', ')}`,
-              { variant: 'error' }
-            );
-          }
-        }}
-      />
     </>
   );
 };

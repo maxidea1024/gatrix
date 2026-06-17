@@ -7,6 +7,9 @@ import {
   IconButton,
   Tooltip,
   useTheme,
+  ToggleButton,
+  ToggleButtonGroup,
+  alpha,
 } from '@mui/material';
 import DateRangeSelector, {
   DateRangeValue,
@@ -14,7 +17,11 @@ import DateRangeSelector, {
 } from '../common/DateRangeSelector';
 import {
   OpenInNew as OpenInNewIcon,
-  Refresh as RefreshIcon,
+  BarChart as BarChartIcon,
+  StackedBarChart as StackedBarChartIcon,
+  ShowChart as LineChartIcon,
+  Timeline as AreaChartIcon,
+  StackedLineChart as StackedAreaChartIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -24,12 +31,13 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip as ChartTooltip,
   Legend,
   Filler,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
 import playerConnectionService from '../../services/playerConnectionService';
 import type { CcuHistoryRecord } from '../../services/playerConnectionService';
 
@@ -38,6 +46,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   ChartTooltip,
   Legend,
@@ -75,6 +84,16 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
       localStorage.setItem('ccu-time-range', v.preset);
     }
   }, []);
+
+  const [chartType, setChartTypeRaw] = useState<
+    'bar' | 'stacked-bar' | 'line' | 'area' | 'stacked-area'
+  >(() => (localStorage.getItem('dashboard.ccuChart.chartType') as any) || 'line');
+
+  const setChartType = useCallback((val: 'bar' | 'stacked-bar' | 'line' | 'area' | 'stacked-area') => {
+    setChartTypeRaw(val);
+    localStorage.setItem('dashboard.ccuChart.chartType', val);
+  }, []);
+
   const [showLegend] = useState(
     () => localStorage.getItem('ccu-show-legend') !== 'false'
   );
@@ -161,8 +180,23 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
       colorIdx++;
     });
 
-    return { labels, datasets };
-  }, [records, t]);
+    const finalDatasets = datasets.map((ds) => {
+      const isBar = chartType === 'bar' || chartType === 'stacked-bar';
+      const isArea = chartType === 'area' || chartType === 'stacked-area';
+      return {
+        ...ds,
+        type: isBar ? 'bar' : 'line',
+        fill: isArea,
+        backgroundColor: isBar || isArea ? ds.backgroundColor : 'transparent',
+        borderWidth: isBar ? 0 : ds.borderWidth || 2,
+        borderRadius: isBar ? 4 : 0,
+      };
+    });
+
+    return { labels, datasets: finalDatasets };
+  }, [records, t, chartType]);
+
+  const isStacked = chartType === 'stacked-bar' || chartType === 'stacked-area';
 
   const chartOptions = useMemo(
     () => ({
@@ -183,6 +217,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
       },
       scales: {
         x: {
+          stacked: isStacked,
           grid: { display: false },
           ticks: {
             maxRotation: 0,
@@ -192,6 +227,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
           },
         },
         y: {
+          stacked: isStacked,
           beginAtZero: true,
           grid: { color: 'rgba(0,0,0,0.05)' },
           ticks: { font: { size: 10 } },
@@ -203,7 +239,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
         intersect: false,
       },
     }),
-    [showLegend]
+    [showLegend, isStacked]
   );
 
   return (
@@ -220,21 +256,69 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
           <Typography variant="subtitle1" fontWeight={600}>
             {t('dashboard.ccuChartTitle')}
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <DateRangeSelector
               value={dateRange}
               onChange={setDateRange}
               compact
             />
-            <Tooltip title={t('common.refresh')}>
-              <IconButton size="small" onClick={loadHistory}>
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+            <ToggleButtonGroup
+              value={chartType}
+              exclusive
+              onChange={(_, val) => val && setChartType(val)}
+              size="small"
+              sx={{
+                bgcolor: 'background.paper',
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'divider',
+                p: 0.25,
+                '& .MuiToggleButton-root': {
+                  px: 1,
+                  py: 0.25,
+                  border: 'none',
+                  borderRadius: 1.5,
+                  color: 'text.secondary',
+                  '&.Mui-selected': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                    color: 'primary.main',
+                    '&:hover': {
+                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                    },
+                  },
+                },
+              }}
+            >
+              <ToggleButton value="bar">
+                <Tooltip title={t('argus.chart.bar', 'Bar')}>
+                  <BarChartIcon sx={{ fontSize: 14 }} />
+                </Tooltip>
+              </ToggleButton>
+              <ToggleButton value="stacked-bar">
+                <Tooltip title={t('argus.chart.stackedBar', 'Stacked Bar')}>
+                  <StackedBarChartIcon sx={{ fontSize: 14 }} />
+                </Tooltip>
+              </ToggleButton>
+              <ToggleButton value="line">
+                <Tooltip title={t('argus.chart.line', 'Line')}>
+                  <LineChartIcon sx={{ fontSize: 14 }} />
+                </Tooltip>
+              </ToggleButton>
+              <ToggleButton value="area">
+                <Tooltip title={t('argus.chart.area', 'Area')}>
+                  <AreaChartIcon sx={{ fontSize: 14 }} />
+                </Tooltip>
+              </ToggleButton>
+              <ToggleButton value="stacked-area">
+                <Tooltip title={t('argus.chart.stackedArea', 'Stacked Area')}>
+                  <StackedAreaChartIcon sx={{ fontSize: 14 }} />
+                </Tooltip>
+              </ToggleButton>
+            </ToggleButtonGroup>
             <Tooltip title={t('dashboard.ccuChartViewDetail')}>
               <IconButton
                 size="small"
-                onClick={() => navigate('/admin/player-connections?tab=1')}
+                onClick={() => navigate('/admin/player-connections?tab=ccu-graph')}
               >
                 <OpenInNewIcon fontSize="small" />
               </IconButton>
@@ -326,7 +410,7 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
               },
             }}
           >
-            <Line data={chartData} options={chartOptions} />
+            <Chart type={chartType === 'bar' || chartType === 'stacked-bar' ? 'bar' : 'line'} data={chartData} options={chartOptions as any} />
           </Box>
         )}
       </CardContent>

@@ -30,6 +30,8 @@ export interface MenuItemConfig {
   badge?: string | number;
   /** Additional paths that should activate this menu item */
   matchPaths?: string[];
+  /** Section header label (locale key) displayed above this item */
+  sectionHeader?: string;
 }
 
 export interface MenuCategoryConfig {
@@ -66,6 +68,7 @@ export interface MenuItem {
   divider?: boolean;
   badge?: string | number;
   matchPaths?: string[];
+  sectionHeader?: string;
 }
 
 export interface MenuCategory {
@@ -423,35 +426,43 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
     ],
   },
 
-  // Argus (Error Tracking)
+  // Argus
   {
     id: 'argus',
     text: 'sidebar.argus',
     icon: 'Argus',
     children: [
       {
+        text: 'sidebar.argusDashboards',
+        icon: 'Dashboard',
+        path: '/argus/dashboards',
+        requiredPermission: P.MONITORING_READ,
+      },
+      // ── Tracking ──
+      {
         text: 'sidebar.argusOverview',
         icon: 'Argus',
         path: '/argus/overview',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
+        sectionHeader: 'sidebar.argusSection.tracking',
       },
       {
         text: 'sidebar.argusIssues',
         icon: 'BugReport',
         path: '/argus/issues',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
       },
       {
         text: 'sidebar.argusPerformance',
         icon: 'Speed',
         path: '/argus/performance',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
       },
       {
         text: 'sidebar.argusExplore',
         icon: 'Explore',
         path: '/argus/explore',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
         matchPaths: [
           '/argus/explore',
           '/argus/explore/traces',
@@ -461,10 +472,30 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         ],
       },
       {
+        text: 'sidebar.argusSessions',
+        icon: 'Devices',
+        path: '/argus/sessions',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'sidebar.argusFeedback',
+        icon: 'Feedback',
+        path: '/argus/feedback',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'sidebar.argusReleases',
+        icon: 'NewReleases',
+        path: '/argus/releases',
+        requiredPermission: P.MONITORING_READ,
+      },
+      // ── Analytics ──
+      {
         text: 'sidebar.argusAnalytics',
         icon: 'Analytics',
         path: '/argus/analytics',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
+        sectionHeader: 'sidebar.argusSection.analytics',
         matchPaths: [
           '/argus/analytics',
           '/argus/analytics/insights',
@@ -473,54 +504,33 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
           '/argus/analytics/flows',
         ],
       },
-      {
-        text: 'sidebar.argusSessions',
-        icon: 'Devices',
-        path: '/argus/sessions',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
-      {
-        text: 'sidebar.argusFeedback',
-        icon: 'Feedback',
-        path: '/argus/feedback',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
-      {
-        text: 'sidebar.argusReleases',
-        icon: 'NewReleases',
-        path: '/argus/releases',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
+      // ── Monitoring ──
       {
         text: 'sidebar.argusAlerts',
         icon: 'NotificationsActive',
         path: '/argus/alerts',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
+        sectionHeader: 'sidebar.argusSection.monitoring',
       },
       {
         text: 'sidebar.argusCrons',
         icon: 'Schedule',
         path: '/argus/crons',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
       },
       {
         text: 'sidebar.argusUptime',
         icon: 'MonitorHeart',
         path: '/argus/uptime',
-        requiredPermission: P.CRASH_EVENTS_READ,
+        requiredPermission: P.MONITORING_READ,
       },
-      {
-        text: 'sidebar.argusDashboards',
-        icon: 'Dashboard',
-        path: '/argus/dashboards',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
+      // ── Settings ──
       {
         text: 'sidebar.argusSettings',
         icon: 'Settings',
         path: '/argus/settings',
-        requiredPermission: P.CRASH_EVENTS_READ,
-        divider: true,
+        requiredPermission: P.MONITORING_READ,
+        sectionHeader: 'sidebar.argusSection.settings',
       },
     ],
   },
@@ -582,24 +592,6 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.AUDIT_LOGS_READ,
         divider: true,
       },
-      {
-        text: 'sidebar.realtimeEvents',
-        icon: 'Timeline',
-        path: '/admin/realtime-events',
-        requiredPermission: P.REALTIME_EVENTS_READ,
-      },
-      {
-        text: 'sidebar.crashes',
-        icon: 'BugReport',
-        path: '/admin/crashes',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
-      {
-        text: 'sidebar.crashEvents',
-        icon: 'BugReport',
-        path: '/admin/crash-events',
-        requiredPermission: P.CRASH_EVENTS_READ,
-      },
       // Security & settings
       {
         text: 'sidebar.security',
@@ -647,6 +639,7 @@ function convertMenuItem(config: MenuItemConfig): MenuItem {
     divider: config.divider,
     badge: config.badge,
     matchPaths: getMatchPaths(config),
+    sectionHeader: config.sectionHeader,
   };
 }
 

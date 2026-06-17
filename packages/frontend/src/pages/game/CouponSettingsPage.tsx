@@ -212,9 +212,7 @@ const CouponSettingsPage: React.FC = () => {
   const exportAbortControllerRef = useRef<AbortController | null>(null);
   const codesRequestIdRef = useRef(0);
 
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
   const [rowMenuCoupon, setRowMenuCoupon] = useState<CouponSetting | null>(
@@ -1545,68 +1543,6 @@ const CouponSettingsPage: React.FC = () => {
                 {t('coupons.couponSettings.createCoupon')}
               </Button>
             )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'name', header: t('common.name') },
-                    {
-                      key: 'code',
-                      header: t('coupons.couponSettings.columns.code'),
-                    },
-                    { key: 'type', header: t('common.type') },
-                    { key: 'status', header: t('common.status') },
-                    { key: 'description', header: t('common.description') },
-                    { key: 'startsAt', header: t('common.start') },
-                    { key: 'expiresAt', header: t('common.end') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      sortedItems,
-                      exportColumns,
-                      'coupon-definitions',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  load();
-                }}
-                disabled={loading}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </Menu>
           </Box>
         </Box>
       </Box>

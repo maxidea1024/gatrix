@@ -74,7 +74,13 @@ const EventLabel: React.FC<EventLabelProps> = ({
   if (size === 'compact') {
     const iconSize = 18;
     return (
-      <Tooltip title={eventName} placement="top" arrow>
+      <Tooltip
+        title={eventName}
+        placement="top"
+        arrow
+        disableInteractive
+        PopperProps={{ popperOptions: { strategy: 'fixed' } }}
+      >
         <Box
           sx={{
             display: 'inline-flex',

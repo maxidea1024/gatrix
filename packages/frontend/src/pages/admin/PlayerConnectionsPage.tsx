@@ -66,14 +66,10 @@ import {
   ArrowUpward as ArrowUpIcon,
   ArrowDownward as ArrowDownIcon,
   Sync as SyncIcon,
-  Fullscreen as FullscreenIcon,
-  MoreVert as MoreVertIcon,
   Timer as TimerIcon,
   HourglassEmpty as QueueIcon,
   Settings as SettingsIcon,
 } from '@mui/icons-material';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useSearchParams } from 'react-router-dom';
@@ -121,11 +117,26 @@ const PlayerConnectionsPage: React.FC = () => {
   const projectApiPath = getProjectApiPath();
 
   // State
-  const [activeTab, setActiveTab] = useState(() => {
+  const [activeTab, setActiveTab] = useState<string>(() => {
     const p = searchParams.get('tab');
-    return p ? parseInt(p, 10) : 0;
+    if (!p) return 'overview';
+    switch (p) {
+      case '0': return 'overview';
+      case '1': return 'ccu-graph';
+      case '2': return 'player-graph';
+      case '3': return 'character-graph';
+      case '4': return 'players';
+      case '5': return 'all-players';
+      case '6': return 'all-characters';
+      default: return p;
+    }
   });
+
+  const isGraphTab = useMemo(() => {
+    return ['overview', 'ccu-graph', 'player-graph', 'character-graph'].includes(activeTab);
+  }, [activeTab]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [ccuData, setCcuData] = useState<CcuData | null>(null);
   const [ccuError, setCcuError] = useState<string | null>(null);
   const prevCcuRef = useRef<CcuData | null>(null);
@@ -184,9 +195,6 @@ const PlayerConnectionsPage: React.FC = () => {
   const [countdownOpen, setCountdownOpen] = useState(false);
   const [ddayDialogOpen, setDdayDialogOpen] = useState(false);
   const [ddayDate, setDdayDate] = useState<string>('');
-  const [moreMenuAnchor, setMoreMenuAnchor] = useState<null | HTMLElement>(
-    null
-  );
 
   // Scoreboard background settings
   const BG_TYPE_KEY = 'gx_scoreboard_bg_type';
@@ -253,6 +261,7 @@ const PlayerConnectionsPage: React.FC = () => {
   // Load CCU
   const loadCcu = useCallback(async () => {
     if (!projectApiPath) return;
+    setRefreshing(true);
     try {
       setCcuError(null);
       const [data] = await Promise.all([
@@ -287,6 +296,7 @@ const PlayerConnectionsPage: React.FC = () => {
       console.error('CCU load failed:', err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [projectApiPath, t, loadLoginQueue]);
 
@@ -299,18 +309,18 @@ const PlayerConnectionsPage: React.FC = () => {
   useEffect(() => {
     if (scoreboardOpen) {
       intervalRef.current = setInterval(loadCcu, 10000);
-    } else if (refreshInterval > 0 && activeTab < 4) {
+    } else if (refreshInterval > 0 && isGraphTab) {
       intervalRef.current = setInterval(loadCcu, refreshInterval);
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [refreshInterval, loadCcu, activeTab, scoreboardOpen]);
+  }, [refreshInterval, loadCcu, isGraphTab, scoreboardOpen]);
 
-  const handleTabChange = (_: React.SyntheticEvent, val: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, val: string) => {
     setActiveTab(val);
     const params = new URLSearchParams(searchParams);
-    if (val > 0) params.set('tab', String(val));
+    if (val !== 'overview') params.set('tab', val);
     else params.delete('tab');
     // Clean up tab-specific params to prevent cross-contamination between tabs
     params.delete('size');
@@ -1198,6 +1208,7 @@ const PlayerConnectionsPage: React.FC = () => {
         icon={<PeopleIcon />}
         title={t('playerConnections.title')}
         subtitle={t('playerConnections.subtitle')}
+        actionsUpdateTrigger={`${activeTab}-${refreshing}-${dataRefreshKey}-${refreshMenuAnchor ? '1' : '0'}`}
         actions={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {ccuData?.admindUrl && (
@@ -1214,19 +1225,32 @@ const PlayerConnectionsPage: React.FC = () => {
                 <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
               </>
             )}
-            {activeTab < 4 && (
+            {isGraphTab ? (
               <>
                 <ButtonGroup
                   variant="contained"
                   size="small"
+                  disabled={refreshing}
                   sx={{ borderRadius: 1.5, overflow: 'hidden' }}
                 >
-                  <Button startIcon={<RefreshIcon />} onClick={loadCcu}>
+                  <Button
+                    startIcon={
+                      refreshing ? (
+                        <CircularProgress size={16} color="inherit" />
+                      ) : (
+                        <RefreshIcon />
+                      )
+                    }
+                    onClick={loadCcu}
+                  >
                     {t('common.refresh')}
                   </Button>
                   <Button
                     size="small"
-                    onClick={(e) => setRefreshMenuAnchor(e.currentTarget)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRefreshMenuAnchor(e.currentTarget);
+                    }}
                     sx={{
                       minWidth: 'auto',
                       px: 1,
@@ -1238,7 +1262,6 @@ const PlayerConnectionsPage: React.FC = () => {
                     <ArrowDropDownIcon sx={{ ml: 0.25, fontSize: 18 }} />
                   </Button>
                 </ButtonGroup>
-                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
                 <Menu
                   anchorEl={refreshMenuAnchor}
                   open={Boolean(refreshMenuAnchor)}
@@ -1258,85 +1281,24 @@ const PlayerConnectionsPage: React.FC = () => {
                   ))}
                 </Menu>
               </>
+            ) : (
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={
+                  refreshing ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : (
+                    <RefreshIcon />
+                  )
+                }
+                onClick={loadCcu}
+                disabled={refreshing}
+                sx={{ borderRadius: 1.5 }}
+              >
+                {t('common.refresh')}
+              </Button>
             )}
-            <IconButton
-              size="small"
-              onClick={(e) => setMoreMenuAnchor(e.currentTarget)}
-              sx={{
-                color: 'text.secondary',
-                bgcolor: 'action.hover',
-                '&:hover': { bgcolor: 'action.selected' },
-              }}
-            >
-              <MoreVertIcon fontSize="small" />
-            </IconButton>
-            <Menu
-              anchorEl={moreMenuAnchor}
-              open={Boolean(moreMenuAnchor)}
-              onClose={() => setMoreMenuAnchor(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-              <MenuItem
-                onClick={() => {
-                  setMoreMenuAnchor(null);
-                  setScoreboardOpen(true);
-                  sessionStorage.setItem(SCOREBOARD_STORAGE_KEY, 'true');
-                  document.documentElement
-                    .requestFullscreen?.()
-                    .catch(() => {});
-                }}
-              >
-                <ListItemIcon>
-                  <FullscreenIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('playerConnections.scoreboard.dropdown.ccuCounter')}
-                </ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setMoreMenuAnchor(null);
-                  setBgSettingsOpen(true);
-                }}
-              >
-                <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('playerConnections.scoreboard.dropdown.bgSettings')}
-                </ListItemText>
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setMoreMenuAnchor(null);
-                  setDdayDate('');
-                  setDdayDialogOpen(true);
-                }}
-              >
-                <ListItemIcon>
-                  <TimerIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('playerConnections.scoreboard.dropdown.countdown')}
-                </ListItemText>
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setMoreMenuAnchor(null);
-                  handleOpenSyncDialog();
-                }}
-              >
-                <ListItemIcon>
-                  <SyncIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('playerConnections.sync.button')}
-                </ListItemText>
-              </MenuItem>
-            </Menu>
           </Box>
         }
       />
@@ -1351,17 +1313,17 @@ const PlayerConnectionsPage: React.FC = () => {
           '& .MuiTab-root': { textTransform: 'none', fontWeight: 500 },
         }}
       >
-        <Tab label={t('playerConnections.tabs.overview')} />
-        <Tab label={t('playerConnections.tabs.ccuGraph')} />
-        <Tab label={t('playerConnections.tabs.playerGraph')} />
-        <Tab label={t('playerConnections.tabs.characterGraph')} />
-        <Tab label={t('playerConnections.tabs.players')} />
-        <Tab label={t('playerConnections.tabs.allPlayers')} />
-        <Tab label={t('playerConnections.tabs.allCharacters')} />
+        <Tab value="overview" label={t('playerConnections.tabs.overview')} />
+        <Tab value="ccu-graph" label={t('playerConnections.tabs.ccuGraph')} />
+        <Tab value="player-graph" label={t('playerConnections.tabs.playerGraph')} />
+        <Tab value="character-graph" label={t('playerConnections.tabs.characterGraph')} />
+        <Tab value="players" label={t('playerConnections.tabs.players')} />
+        <Tab value="all-players" label={t('playerConnections.tabs.allPlayers')} />
+        <Tab value="all-characters" label={t('playerConnections.tabs.allCharacters')} />
       </Tabs>
 
       {/* Tab 0: Overview */}
-      {activeTab === 0 && (
+      {activeTab === 'overview' && (
         <PageContentLoader loading={loading}>
           {/* Error banner */}
           {ccuError && (
@@ -2410,7 +2372,7 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 1: CCU Graph — persist once mounted to avoid flicker */}
       {projectApiPath && (
-        <Box sx={{ display: activeTab === 1 ? 'block' : 'none' }}>
+        <Box sx={{ display: activeTab === 'ccu-graph' ? 'block' : 'none' }}>
           <CcuGraphTab
             projectApiPath={projectApiPath}
             refreshKey={dataRefreshKey}
@@ -2420,7 +2382,7 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 2: Player Graph — persist once mounted */}
       {projectApiPath && (
-        <Box sx={{ display: activeTab === 2 ? 'block' : 'none' }}>
+        <Box sx={{ display: activeTab === 'player-graph' ? 'block' : 'none' }}>
           <PlayerGraphTab
             projectApiPath={projectApiPath}
             refreshKey={dataRefreshKey}
@@ -2430,7 +2392,7 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 3: Character Graph — persist once mounted */}
       {projectApiPath && (
-        <Box sx={{ display: activeTab === 3 ? 'block' : 'none' }}>
+        <Box sx={{ display: activeTab === 'character-graph' ? 'block' : 'none' }}>
           <CharacterGraphTab
             projectApiPath={projectApiPath}
             refreshKey={dataRefreshKey}
@@ -2439,7 +2401,7 @@ const PlayerConnectionsPage: React.FC = () => {
       )}
 
       {/* Tab 4: Player List */}
-      {activeTab === 4 && projectApiPath && (
+      {activeTab === 'players' && projectApiPath && (
         <PlayerListTab
           key={`playerlist-${dataRefreshKey}`}
           projectApiPath={projectApiPath}
@@ -2451,7 +2413,7 @@ const PlayerConnectionsPage: React.FC = () => {
       )}
 
       {/* Tab 5: All Players (DB) */}
-      {activeTab === 5 && projectApiPath && (
+      {activeTab === 'all-players' && projectApiPath && (
         <AllPlayersTab
           key={`allplayers-${dataRefreshKey}`}
           projectApiPath={projectApiPath}
@@ -2460,7 +2422,7 @@ const PlayerConnectionsPage: React.FC = () => {
       )}
 
       {/* Tab 6: All Characters (DB) */}
-      {activeTab === 6 && projectApiPath && (
+      {activeTab === 'all-characters' && projectApiPath && (
         <AllCharactersTab
           key={`allchars-${dataRefreshKey}`}
           projectApiPath={projectApiPath}

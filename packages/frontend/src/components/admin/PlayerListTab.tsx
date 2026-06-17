@@ -34,6 +34,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  Paper,
+  Stack,
 } from '@mui/material';
 import {
   Block as KickIcon,
@@ -417,7 +419,7 @@ const PlayerListTab: React.FC<Props> = ({
   // Persist to URL
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
-    params.set('tab', '2');
+    params.set('tab', 'players');
     if (page > 0) params.set('page', String(page + 1));
     else params.delete('page');
     const wf = getFilterValue('worldId');
@@ -855,13 +857,18 @@ const PlayerListTab: React.FC<Props> = ({
   return (
     <Box>
       {/* Filter bar */}
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
           display: 'flex',
-          gap: 1,
+          gap: 1.5,
           alignItems: 'center',
           flexWrap: 'wrap',
-          mb: 1.5,
+          p: 1.5,
+          mb: 2,
+          bgcolor: (theme) => alpha(theme.palette.action.hover, 0.04),
+          borderRadius: 2.5,
+          borderColor: 'divider',
         }}
       >
         <SearchTextField
@@ -924,60 +931,72 @@ const PlayerListTab: React.FC<Props> = ({
         </Tooltip>
         <Box sx={{ flex: 1 }} />
 
-        {/* Total online counter */}
-        {totalOnline !== undefined && (
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'text.secondary',
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              mr: 0.5,
-            }}
-          >
-            {totalOnline.toLocaleString()}
+        {/* Right side actions */}
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          {/* Total online counter */}
+          {totalOnline !== undefined && (
             <Typography
-              component="span"
+              variant="body2"
               sx={{
-                fontSize: '0.75rem',
-                color: 'text.disabled',
-                fontWeight: 400,
+                color: 'text.secondary',
+                fontSize: '0.8125rem',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
               }}
             >
-              ({t('playerConnections.players.playerLabel')}{' '}
-              {((totalOnline ?? 0) - (botTotal ?? 0)).toLocaleString()}
-              {' · '}
-              {t('playerConnections.players.botLabel')}{' '}
-              {(botTotal ?? 0).toLocaleString()})
+              {totalOnline.toLocaleString()}
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: '0.75rem',
+                  color: 'text.disabled',
+                  fontWeight: 400,
+                }}
+              >
+                ({t('playerConnections.players.playerLabel')}{' '}
+                {((totalOnline ?? 0) - (botTotal ?? 0)).toLocaleString()}
+                {' · '}
+                {t('playerConnections.players.botLabel')}{' '}
+                {(botTotal ?? 0).toLocaleString()})
+              </Typography>
             </Typography>
-          </Typography>
-        )}
+          )}
 
-        <Tooltip title={t('common.refresh')}>
-          <IconButton
-            onClick={loadUsers}
-            disabled={loading}
-            size="small"
-            sx={{ color: 'text.secondary' }}
-          >
-            <RefreshIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('common.export')}>
-          <span>
+          <Tooltip title={t('common.refresh')}>
             <IconButton
+              onClick={loadUsers}
+              disabled={loading}
               size="small"
-              onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-              disabled={exporting || total === 0}
-              sx={{ color: 'text.secondary' }}
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
             >
-              <DownloadIcon />
+              <RefreshIcon fontSize="small" />
             </IconButton>
-          </span>
-        </Tooltip>
+          </Tooltip>
+          <Tooltip title={t('common.export')}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+                disabled={exporting || total === 0}
+                sx={{
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  '&:hover': { bgcolor: 'action.hover' },
+                }}
+              >
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Stack>
         <Menu
           anchorEl={exportMenuAnchor}
           open={Boolean(exportMenuAnchor)}
@@ -986,7 +1005,7 @@ const PlayerListTab: React.FC<Props> = ({
           <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
           <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
         </Menu>
-      </Box>
+      </Paper>
 
       {/* Active groupBy indicator */}
       {groupBy && (

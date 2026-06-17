@@ -107,9 +107,7 @@ const SurveysPage: React.FC = () => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingSurvey, setDeletingSurvey] = useState<Survey | null>(null);
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Logs drawer state
@@ -496,71 +494,6 @@ const SurveysPage: React.FC = () => {
                 {t('surveys.createSurvey')}
               </Button>
             )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  handleConfigOpen();
-                }}
-              >
-                <ListItemIcon>
-                  <SettingsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('surveys.config')}</ListItemText>
-              </MenuItem>
-              <Divider />
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    {
-                      key: 'platformSurveyId',
-                      header: t('surveys.platformSurveyId'),
-                    },
-                    { key: 'surveyTitle', header: t('surveys.surveyTitle') },
-                    { key: 'isActive', header: t('common.status') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(surveys, exportColumns, 'surveys', format);
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  loadSurveys();
-                }}
-                disabled={loading}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </Menu>
           </Box>
         </Box>
       </Box>

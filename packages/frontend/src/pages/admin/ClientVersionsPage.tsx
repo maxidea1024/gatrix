@@ -132,7 +132,6 @@ import {
 import { ClientVersionService } from '../../services/clientVersionService';
 import ClientVersionForm from '../../components/admin/ClientVersionForm';
 import BulkClientVersionForm from '../../components/admin/BulkClientVersionForm';
-import PlatformDefaultsDialog from '../../components/admin/PlatformDefaultsDialog';
 import {
   formatDateTimeDetailed,
   formatRelativeTime,
@@ -160,7 +159,6 @@ import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { useDebounce } from '../../hooks/useDebounce';
-import ImportDialog from '../../components/common/ImportDialog';
 import ClientStatusIcon from '../../components/common/ClientStatusIcon';
 import { CopyButton } from '@/components/common/CopyButton';
 
@@ -500,8 +498,6 @@ const ClientVersionsPage: React.FC = () => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | ''>('');
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [bulkFormDialogOpen, setBulkFormDialogOpen] = useState(false);
-  const [platformDefaultsDialogOpen, setPlatformDefaultsDialogOpen] =
-    useState(false);
   const [editingClientVersion, setEditingClientVersion] =
     useState<ClientVersion | null>(null);
   const [isCopyMode, setIsCopyMode] = useState(false);
@@ -533,13 +529,8 @@ const ClientVersionsPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-  // Export menu state
-  const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(
-    null
-  );
   const [selectedExportMenuAnchor, setSelectedExportMenuAnchor] =
     useState<null | HTMLElement>(null);
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Default column configuration
   const defaultColumns: ColumnConfig[] = [
@@ -1090,119 +1081,6 @@ const ClientVersionsPage: React.FC = () => {
   );
 
   // Export functions
-  const handleExport = useCallback(
-    async (format: 'csv' | 'json' | 'xlsx') => {
-      try {
-        let blob: Blob;
-        let filename: string;
-        const now = new Date();
-        const dateTimeStr = now
-          .toISOString()
-          .replace(/[:.]/g, '-')
-          .slice(0, 19); // YYYY-MM-DDTHH-MM-SS
-
-        if (format === 'csv') {
-          blob = await ClientVersionService.exportToCSV(
-            projectApiPath,
-            pageState.filters || {}
-          );
-          filename = `client-versions-${dateTimeStr}.csv`;
-        } else if (format === 'json') {
-          // JSON export
-          const result = await ClientVersionService.exportToCSV(
-            projectApiPath,
-            pageState.filters || {}
-          ); // Same data source
-          const text = await result.text();
-          const lines = text.split('\n');
-          const headers = lines[0].split(',');
-          const jsonData = lines
-            .slice(1)
-            .filter((line) => line.trim())
-            .map((line) => {
-              const values = line.split(',');
-              const obj: any = {};
-              headers.forEach((header, index) => {
-                obj[header.replace(/"/g, '')] =
-                  values[index]?.replace(/"/g, '') || '';
-              });
-              return obj;
-            });
-          blob = new Blob([JSON.stringify(jsonData, null, 2)], {
-            type: 'application/json',
-          });
-          filename = `client-versions-${dateTimeStr}.json`;
-        } else if (format === 'xlsx') {
-          // XLSX export
-          const result = await ClientVersionService.exportToCSV(
-            projectApiPath,
-            pageState.filters || {}
-          );
-          const text = await result.text();
-          const lines = text.split('\n');
-          const headers = lines[0].split(',').map((h) => h.replace(/"/g, ''));
-          const data = lines
-            .slice(1)
-            .filter((line) => line.trim())
-            .map((line) => {
-              const values = line.split(',');
-              const obj: any = {};
-              headers.forEach((header, index) => {
-                obj[header] = values[index]?.replace(/"/g, '') || '';
-              });
-              return obj;
-            });
-
-          // Create XLSX workbook
-          const worksheet = XLSX.utils.json_to_sheet(data);
-          const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, 'Client Versions');
-
-          // Auto-adjust column widths
-          const colWidths = headers.map((header) => ({
-            wch: Math.max(header.length, 15),
-          }));
-          worksheet['!cols'] = colWidths;
-
-          // Create XLSX file
-          const xlsxBuffer = XLSX.write(workbook, {
-            bookType: 'xlsx',
-            type: 'array',
-          });
-          blob = new Blob([xlsxBuffer], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          });
-          filename = `client-versions-${dateTimeStr}.xlsx`;
-        } else {
-          enqueueSnackbar('Unsupported export format', { variant: 'warning' });
-          return;
-        }
-
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-
-        enqueueSnackbar(t('clientVersions.exportSuccess'), {
-          variant: 'success',
-        });
-        setExportMenuAnchor(null);
-      } catch (error: any) {
-        console.error('Error exporting:', error);
-        enqueueSnackbar(
-          parseApiErrorMessage(error, 'clientVersions.exportError'),
-          {
-            variant: 'error',
-          }
-        );
-      }
-    },
-    [pageState.filters, t, enqueueSnackbar]
-  );
 
   // Export selected items
   const handleExportSelected = useCallback(
@@ -1664,113 +1542,32 @@ const ClientVersionsPage: React.FC = () => {
         title={t('clientVersions.title')}
         subtitle={t('clientVersions.description')}
         actions={
-          <>
+          canManage ? (
             <Box sx={{ display: 'flex', gap: 1 }}>
-              {canManage && (
-                <>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<AddIcon />}
-                    onClick={() => {
-                      setEditingClientVersion(null);
-                      setIsCopyMode(false);
-                      setFormDialogOpen(true);
-                    }}
-                  >
-                    {t('clientVersions.addIndividual')}
-                  </Button>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<AddIcon />}
-                    onClick={() => {
-                      setBulkFormDialogOpen(true);
-                    }}
-                  >
-                    {t('clientVersions.addBulk')}
-                  </Button>
-                </>
-              )}
-              <IconButton onClick={(e) => setExportMenuAnchor(e.currentTarget)}>
-                <MoreVertIcon />
-              </IconButton>
-            </Box>
-            <Menu
-              anchorEl={exportMenuAnchor}
-              open={Boolean(exportMenuAnchor)}
-              onClose={() => setExportMenuAnchor(null)}
-            >
-              {canManage && [
-                <MenuItem
-                  key="platform-defaults"
-                  onClick={() => {
-                    setExportMenuAnchor(null);
-                    setPlatformDefaultsDialogOpen(true);
-                  }}
-                >
-                  <ListItemIcon>
-                    <SettingsIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>{t('platformDefaults.title')}</ListItemText>
-                </MenuItem>,
-                <Divider key="divider-after-settings" />,
-              ]}
-              <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
-                <ListItemIcon>
-                  <DownloadIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('common.export')}
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => handleExport('csv')} sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <TableChartIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>CSV</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => handleExport('json')} sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <JsonIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>JSON</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => handleExport('xlsx')} sx={{ pl: 4 }}>
-                <ListItemIcon>
-                  <ExcelIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Excel (XLSX)</ListItemText>
-              </MenuItem>
-              <Divider />
-              <MenuItem disabled sx={{ opacity: 1, pointerEvents: 'none' }}>
-                <ListItemIcon>
-                  <AddIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('common.import')}
-                  </Typography>
-                </ListItemText>
-              </MenuItem>
-              <MenuItem
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<AddIcon />}
                 onClick={() => {
-                  setExportMenuAnchor(null);
-                  setImportDialogOpen(true);
+                  setEditingClientVersion(null);
+                  setIsCopyMode(false);
+                  setFormDialogOpen(true);
                 }}
-                sx={{ pl: 4 }}
               >
-                <ListItemIcon>
-                  <AddIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('common.import')} (CSV/JSON/XLSX)
-                </ListItemText>
-              </MenuItem>
-            </Menu>
-          </>
+                {t('clientVersions.addIndividual')}
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setBulkFormDialogOpen(true);
+                }}
+              >
+                {t('clientVersions.addBulk')}
+              </Button>
+            </Box>
+          ) : undefined
         }
       />
 
@@ -2475,11 +2272,7 @@ const ClientVersionsPage: React.FC = () => {
         }}
       />
 
-      {/* Platform Defaults Dialog */}
-      <PlatformDefaultsDialog
-        open={platformDefaultsDialogOpen}
-        onClose={() => setPlatformDefaultsDialogOpen(false)}
-      />
+
 
       {/* Bulk Delete Confirm Dialog */}
       <Dialog
@@ -2770,53 +2563,7 @@ const ClientVersionsPage: React.FC = () => {
         </ClickAwayListener>
       </Popover>
 
-      {/* Import Dialog */}
-      <ImportDialog
-        open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
-        title={t('common.import')}
-        onImport={async (data) => {
-          let successCount = 0;
-          let failCount = 0;
-          for (const item of data) {
-            try {
-              await ClientVersionService.createClientVersion(projectApiPath, {
-                platform: item.platform || '',
-                clientVersion: item.clientVersion || item.version || '',
-                clientStatus: item.clientStatus || 'ONLINE',
-                gameServerAddress: item.gameServerAddress || '',
-                gameServerAddressForWhiteList:
-                  item.gameServerAddressForWhiteList ||
-                  item['Game Server (Whitelist)'] ||
-                  '',
-                patchAddress: item.patchAddress || '',
-                patchAddressForWhiteList:
-                  item.patchAddressForWhiteList ||
-                  item['Patch Address (Whitelist)'] ||
-                  '',
-                guestModeAllowed:
-                  item.guestModeAllowed !== undefined
-                    ? Boolean(item.guestModeAllowed)
-                    : false,
-                externalClickLink: item.externalClickLink || '',
-                memo: item.memo || item.Memo || '',
-                customPayload:
-                  item.customPayload || item['Custom Payload'] || '',
-              });
-              successCount++;
-            } catch (err) {
-              failCount++;
-            }
-          }
-          if (successCount > 0) {
-            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
-            mutateClientVersions();
-          }
-          if (failCount > 0) {
-            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
-          }
-        }}
-      />
+
     </Box>
   );
 };

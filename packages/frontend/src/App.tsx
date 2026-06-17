@@ -123,10 +123,6 @@ const CustomQueueMonitorPage = React.lazy(
   () => import('./pages/admin/CustomQueueMonitorPage')
 );
 const ApiTokensPage = React.lazy(() => import('./pages/admin/ApiTokensPage'));
-const CrashEventsPage = React.lazy(
-  () => import('./pages/admin/CrashEventsPage')
-);
-const CrashesPage = React.lazy(() => import('./pages/admin/CrashesPage'));
 const ChatPage = React.lazy(() => import('./pages/chat/ChatPage'));
 const MailboxPage = React.lazy(() => import('./pages/mailbox/MailboxPage'));
 const SystemConsolePage = React.lazy(
@@ -134,9 +130,6 @@ const SystemConsolePage = React.lazy(
 );
 const LogsPage = React.lazy(() => import('./pages/monitoring/LogsPage'));
 const AlertsPage = React.lazy(() => import('./pages/monitoring/AlertsPage'));
-const RealtimeEventsPage = React.lazy(
-  () => import('./pages/admin/RealtimeEventsPage')
-);
 const ServerListPage = React.lazy(() => import('./pages/admin/ServerListPage'));
 const ServerLifecyclePage = React.lazy(
   () => import('./pages/admin/ServerLifecyclePage')
@@ -839,18 +832,6 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="audit-logs"
                                           element={<AuditLogsPage />}
-                                        />
-                                        <Route
-                                          path="realtime-events"
-                                          element={<RealtimeEventsPage />}
-                                        />
-                                        <Route
-                                          path="crash-events"
-                                          element={<CrashEventsPage />}
-                                        />
-                                        <Route
-                                          path="crashes"
-                                          element={<CrashesPage />}
                                         />
                                         {/* Security - Tabbed */}
                                         <Route

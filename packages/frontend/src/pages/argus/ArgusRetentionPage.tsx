@@ -112,7 +112,12 @@ const SERIES_COLORS = [
 
 /* ─── Component ─── */
 
-const ArgusRetentionPage: React.FC = () => {
+interface ArgusRetentionPageProps {
+  embedded?: boolean;
+  tabBar?: React.ReactNode;
+}
+
+const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = false, tabBar }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -1143,7 +1148,7 @@ const ArgusRetentionPage: React.FC = () => {
         onChange={(val) => setViewMode(val as RetentionViewMode)}
         availableTypes={['line', 'bar', 'table', 'metric'] as ChartType[]}
       />
-      <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
       <CsvExportButton
         data={csvData}
         filename="retention"
@@ -1169,6 +1174,8 @@ const ArgusRetentionPage: React.FC = () => {
             maxHeight: 600,
             width: '100%',
             pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
           }}
         >
           <ResponsiveContainer
@@ -1177,6 +1184,7 @@ const ArgusRetentionPage: React.FC = () => {
             minWidth={0}
             minHeight={0}
             debounce={50}
+            style={{ outline: 'none' }}
           >
             <LineChart
               data={breakdownCurveData}
@@ -1192,6 +1200,7 @@ const ArgusRetentionPage: React.FC = () => {
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                 tickLine={false}
                 axisLine={false}
+                tickMargin={16}
               />
               <YAxis
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -1219,7 +1228,7 @@ const ArgusRetentionPage: React.FC = () => {
               <Legend
                 onClick={handleLegendClick}
                 formatter={renderLegendText}
-                wrapperStyle={{ fontSize: 11 }}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
               />
               {breakdownKeys.map((key, idx) => (
                 <Line
@@ -1253,6 +1262,8 @@ const ArgusRetentionPage: React.FC = () => {
           maxHeight: 600,
           width: '100%',
           pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
         }}
       >
         <ResponsiveContainer
@@ -1261,6 +1272,7 @@ const ArgusRetentionPage: React.FC = () => {
           minWidth={0}
           minHeight={0}
           debounce={50}
+          style={{ outline: 'none' }}
         >
           <LineChart
             data={curveData}
@@ -1276,6 +1288,7 @@ const ArgusRetentionPage: React.FC = () => {
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
               tickLine={false}
               axisLine={false}
+              tickMargin={16}
             />
             <YAxis
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -1303,7 +1316,7 @@ const ArgusRetentionPage: React.FC = () => {
             <Legend
               onClick={handleLegendClick}
               formatter={renderLegendText}
-              wrapperStyle={{ fontSize: 11 }}
+              wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
             />
             {/* Average line (bold) */}
             <Line
@@ -1351,6 +1364,8 @@ const ArgusRetentionPage: React.FC = () => {
             maxHeight: 600,
             width: '100%',
             pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
           }}
         >
           <ResponsiveContainer
@@ -1359,6 +1374,7 @@ const ArgusRetentionPage: React.FC = () => {
             minWidth={0}
             minHeight={0}
             debounce={50}
+            style={{ outline: 'none' }}
           >
             <BarChart
               data={breakdownCurveData}
@@ -1374,6 +1390,7 @@ const ArgusRetentionPage: React.FC = () => {
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                 tickLine={false}
                 axisLine={false}
+                tickMargin={16}
               />
               <YAxis
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -1401,7 +1418,7 @@ const ArgusRetentionPage: React.FC = () => {
               <Legend
                 onClick={handleLegendClick}
                 formatter={renderLegendText}
-                wrapperStyle={{ fontSize: 11 }}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
               />
               {breakdownKeys.map((key, idx) => (
                 <Bar
@@ -1429,6 +1446,8 @@ const ArgusRetentionPage: React.FC = () => {
           maxHeight: 600,
           width: '100%',
           pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
         }}
       >
         <ResponsiveContainer
@@ -1437,6 +1456,7 @@ const ArgusRetentionPage: React.FC = () => {
           minWidth={0}
           minHeight={0}
           debounce={50}
+          style={{ outline: 'none' }}
         >
           <BarChart
             data={curveData}
@@ -1452,6 +1472,7 @@ const ArgusRetentionPage: React.FC = () => {
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
               tickLine={false}
               axisLine={false}
+              tickMargin={16}
             />
             <YAxis
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -1856,7 +1877,7 @@ const ArgusRetentionPage: React.FC = () => {
     };
 
     return (
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: viewMode === 'table' ? 0 : 2 }}>
         {/* Breakdown summary (all values at once) */}
         {renderBreakdownSummary()}
 
@@ -1864,7 +1885,7 @@ const ArgusRetentionPage: React.FC = () => {
         <Box
           sx={{
             overflowX: 'auto',
-            borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            ...(viewMode !== 'table' && { borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }),
           }}
         >
           <table
@@ -2007,26 +2028,28 @@ const ArgusRetentionPage: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 64px)',
+        height: embedded ? '100%' : 'calc(100vh - 64px)',
         overflow: 'hidden',
-        m: -2,
+        ...(embedded ? { width: '100%' } : { m: -2 }),
       }}
     >
-      <PageHeader
-        enableAutoBack
-        title={
-          <ArgusBreadcrumbs
-            paths={[
-              {
-                label: t('argus.analytics.title', 'Analytics'),
-                to: '/argus/analytics',
-              },
-              { label: t('argus.analytics.retention', 'Retention') },
-            ]}
-            size="title"
-          />
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          enableAutoBack
+          title={
+            <ArgusBreadcrumbs
+              paths={[
+                {
+                  label: t('argus.analytics.title', 'Analytics'),
+                  to: '/argus/analytics',
+                },
+                { label: t('argus.analytics.retention', 'Retention') },
+              ]}
+              size="title"
+            />
+          }
+        />
+      )}
       <Box
         sx={{
           display: 'flex',
@@ -2037,6 +2060,7 @@ const ArgusRetentionPage: React.FC = () => {
       >
         <AnalyticsLayout
           leftPanel={leftPanel}
+          tabBar={tabBar}
           toolbar={toolbar}
           projectId={projectId}
         >

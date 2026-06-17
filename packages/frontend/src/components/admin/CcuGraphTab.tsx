@@ -21,6 +21,9 @@ import {
   useTheme,
   IconButton,
   Tooltip,
+  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import DateRangeSelector, {
   DateRangeValue,
@@ -33,6 +36,11 @@ import {
   Groups as AllIcon,
   Visibility as LegendOnIcon,
   VisibilityOff as LegendOffIcon,
+  BarChart as BarChartIcon,
+  StackedBarChart as StackedBarChartIcon,
+  ShowChart as LineChartIcon,
+  Timeline as AreaChartIcon,
+  StackedLineChart as StackedAreaChartIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -42,12 +50,14 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip as ChartTooltip,
   Legend,
   Filler,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import playerConnectionService from '../../services/playerConnectionService';
 import type { CcuHistoryRecord } from '../../services/playerConnectionService';
 import PageContentLoader from '../common/PageContentLoader';
@@ -59,6 +69,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   ChartTooltip,
   Legend,
@@ -293,6 +304,9 @@ interface Props {
 const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [chartType, setChartType] = useLocalStorage<
+    'bar' | 'stacked-bar' | 'line' | 'area' | 'stacked-area'
+  >('playerConnections.ccuGraph.chartType', 'line');
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CcuHistoryRecord[]>([]);
   const [dateRange, setDateRangeRaw] = useState<DateRangeValue>(() => {
@@ -375,14 +389,17 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
 
   // Persist range to URL
   useEffect(() => {
+    const currentTab = searchParams.get('tab') || 'overview';
+    if (currentTab !== 'ccu-graph') return;
+
     const params = new URLSearchParams(searchParams);
     const preset =
       dateRange.type === 'preset' ? dateRange.preset || '24h' : 'custom';
     if (preset !== '24h') params.set('range', preset);
     else params.delete('range');
-    params.set('tab', '1');
+    params.set('tab', 'ccu-graph');
     setSearchParams(params, { replace: true });
-  }, [dateRange]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dateRange, searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Build chart data
   const chartData = useMemo(() => {
@@ -481,8 +498,23 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       colorIdx++;
     });
 
-    return { labels, datasets };
-  }, [records, t, displayMode]);
+    const finalDatasets = datasets.map((ds) => {
+      const isBar = chartType === 'bar' || chartType === 'stacked-bar';
+      const isArea = chartType === 'area' || chartType === 'stacked-area';
+      return {
+        ...ds,
+        type: isBar ? 'bar' : 'line',
+        fill: isArea,
+        backgroundColor: isBar || isArea ? ds.backgroundColor : 'transparent',
+        borderWidth: isBar ? 0 : ds.borderWidth || 2,
+        borderRadius: isBar ? 4 : 0,
+      };
+    });
+
+    return { labels, datasets: finalDatasets };
+  }, [records, t, displayMode, chartType]);
+
+  const isStacked = chartType === 'stacked-bar' || chartType === 'stacked-area';
 
   const chartOptions = useMemo(
     () => ({
@@ -495,6 +527,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       },
       scales: {
         x: {
+          stacked: isStacked,
           grid: { display: true, color: 'rgba(0,0,0,0.05)' },
           ticks: {
             maxRotation: 45,
@@ -503,7 +536,11 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             maxTicksLimit: 16,
           },
         },
-        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+        y: {
+          stacked: isStacked,
+          beginAtZero: true,
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
       },
       interaction: {
         mode: 'nearest' as const,
@@ -511,49 +548,127 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
         intersect: false,
       },
     }),
-    [showLegend]
+    [showLegend, isStacked]
   );
 
   return (
     <Box>
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          p: 1,
+          px: 1.5,
           mb: 2,
+          bgcolor: (theme) => alpha(theme.palette.action.hover, 0.04),
+          borderRadius: 2.5,
+          borderColor: 'divider',
           flexWrap: 'wrap',
-          gap: 1,
+          gap: 1.5,
         }}
       >
-        <Stack direction="row" spacing={0.5}>
-          <Chip
-            icon={<AllIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.ccuGraph.all')}
+        <Stack direction="row" spacing={1} alignItems="center">
+          <ToggleButtonGroup
+            value={displayMode}
+            exclusive
+            onChange={(_, val) => val && setDisplayMode(val)}
             size="small"
-            variant={displayMode === 'all' ? 'filled' : 'outlined'}
-            color={displayMode === 'all' ? 'primary' : 'default'}
-            onClick={() => setDisplayMode('all')}
-            sx={{ borderRadius: 1.5 }}
-          />
-          <Chip
-            icon={<PeopleIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.ccuGraph.usersOnly')}
+            sx={{
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              border: 1,
+              borderColor: 'divider',
+              p: 0.25,
+              '& .MuiToggleButton-root': {
+                px: 1.5,
+                py: 0.35,
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.8125rem',
+                border: 'none',
+                borderRadius: 1.5,
+                color: 'text.secondary',
+                gap: 0.5,
+                '&.Mui-selected': {
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  color: 'primary.main',
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                  },
+                },
+              },
+            }}
+          >
+            <ToggleButton value="all">
+              <AllIcon sx={{ fontSize: 16 }} />
+              {t('playerConnections.ccuGraph.all')}
+            </ToggleButton>
+            <ToggleButton value="users">
+              <PeopleIcon sx={{ fontSize: 16 }} />
+              {t('playerConnections.ccuGraph.usersOnly')}
+            </ToggleButton>
+            <ToggleButton value="bots">
+              <BotIcon sx={{ fontSize: 16 }} />
+              {t('playerConnections.ccuGraph.botsOnly')}
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          <ToggleButtonGroup
+            value={chartType}
+            exclusive
+            onChange={(_, val) => val && setChartType(val)}
             size="small"
-            variant={displayMode === 'users' ? 'filled' : 'outlined'}
-            color={displayMode === 'users' ? 'primary' : 'default'}
-            onClick={() => setDisplayMode('users')}
-            sx={{ borderRadius: 1.5 }}
-          />
-          <Chip
-            icon={<BotIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.ccuGraph.botsOnly')}
-            size="small"
-            variant={displayMode === 'bots' ? 'filled' : 'outlined'}
-            color={displayMode === 'bots' ? 'secondary' : 'default'}
-            onClick={() => setDisplayMode('bots')}
-            sx={{ borderRadius: 1.5 }}
-          />
+            sx={{
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              border: 1,
+              borderColor: 'divider',
+              p: 0.25,
+              '& .MuiToggleButton-root': {
+                px: 1.2,
+                py: 0.35,
+                border: 'none',
+                borderRadius: 1.5,
+                color: 'text.secondary',
+                '&.Mui-selected': {
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  color: 'primary.main',
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                  },
+                },
+              },
+            }}
+          >
+            <ToggleButton value="bar">
+              <Tooltip title={t('argus.chart.bar', 'Bar')}>
+                <BarChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="stacked-bar">
+              <Tooltip title={t('argus.chart.stackedBar', 'Stacked Bar')}>
+                <StackedBarChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="line">
+              <Tooltip title={t('argus.chart.line', 'Line')}>
+                <LineChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="area">
+              <Tooltip title={t('argus.chart.area', 'Area')}>
+                <AreaChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="stacked-area">
+              <Tooltip title={t('argus.chart.stackedArea', 'Stacked Area')}>
+                <StackedAreaChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
+
           <Tooltip
             title={
               showLegend
@@ -564,7 +679,12 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             <IconButton
               size="small"
               onClick={() => setShowLegend(!showLegend)}
-              sx={{ ml: 0.5 }}
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
             >
               {showLegend ? (
                 <LegendOnIcon fontSize="small" />
@@ -575,7 +695,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           </Tooltip>
         </Stack>
         <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
-      </Box>
+      </Paper>
 
       <PageContentLoader loading={loading}>
         {chartData.datasets.length === 0 ? (
@@ -587,7 +707,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           <>
             <Card variant="outlined" sx={{ p: 2 }}>
               <Box sx={{ height: 400 }}>
-                <Line data={chartData} options={chartOptions} />
+                <Chart type={(chartType === 'bar' || chartType === 'stacked-bar') ? 'bar' : 'line'} data={chartData} options={chartOptions as any} />
               </Box>
             </Card>
 

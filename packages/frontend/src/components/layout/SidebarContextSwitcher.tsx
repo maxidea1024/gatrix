@@ -378,6 +378,9 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
             th.palette.mode === 'dark'
               ? 'rgba(255,255,255,0.06)'
               : 'rgba(0,0,0,0.04)',
+          '& .context-unfold-icon': {
+            opacity: 0.6,
+          },
         },
       }}
     >
@@ -427,9 +430,11 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
         )}
       </Box>
       <UnfoldMoreIcon
+        className="context-unfold-icon"
         sx={{
           fontSize: 16,
-          opacity: 0.4,
+          opacity: 0,
+          transition: 'opacity 0.15s ease',
           flexShrink: 0,
         }}
       />

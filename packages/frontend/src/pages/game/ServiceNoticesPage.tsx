@@ -196,9 +196,7 @@ const ServiceNoticesPage: React.FC = () => {
   // Webview menu state
   const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] =
     useState<null | HTMLElement>(null);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
 
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
@@ -659,108 +657,6 @@ const ServiceNoticesPage: React.FC = () => {
                 {t('serviceNotices.createNotice')}
               </Button>
             )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  setPreviewDialogOpen(true);
-                }}
-              >
-                <ListItemIcon>
-                  <VisibilityIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('serviceNotices.preview')}</ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  handleOpenWebviewPreview();
-                }}
-              >
-                <ListItemIcon>
-                  <SportsEsportsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('serviceNotices.webviewPreview')}
-                </ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  handleCopyNoticeUrl();
-                }}
-              >
-                <ListItemIcon>
-                  <ContentCopyIcon sx={{ fontSize: 13 }} />
-                </ListItemIcon>
-                <ListItemText>
-                  {t('serviceNotices.copyWebviewUrl')}
-                </ListItemText>
-              </MenuItem>
-              <Divider />
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'title', header: t('serviceNotices.form.title') },
-                    {
-                      key: 'content',
-                      header: t('serviceNotices.form.content'),
-                    },
-                    {
-                      key: 'category',
-                      header: t('serviceNotices.form.category'),
-                    },
-                    { key: 'isActive', header: t('common.status') },
-                    { key: 'isPinned', header: t('serviceNotices.pinned') },
-                    { key: 'startDate', header: t('common.start') },
-                    { key: 'endDate', header: t('common.end') },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(
-                      notices,
-                      exportColumns,
-                      'service-notices',
-                      format
-                    );
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setPageMenuAnchor(null);
-                  loadNotices();
-                }}
-              >
-                <ListItemIcon>
-                  <RefreshIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>{t('common.refresh')}</ListItemText>
-              </MenuItem>
-            </Menu>
           </>
         }
       />

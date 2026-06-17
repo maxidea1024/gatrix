@@ -57,7 +57,6 @@ import {
   Mail as MailIcon,
   Menu as MenuIcon,
   MenuBook as MenuBookIcon,
-  MoreVert as MoreVertIcon,
   Security as SecurityIcon,
   History as HistoryIcon,
   Label as LabelIcon,
@@ -204,12 +203,12 @@ const AppBarPageHeader: React.FC<{
   showSidebar: boolean;
   isMobile: boolean;
   onDrawerToggle: () => void;
-}> = ({ showSidebar, isMobile, onDrawerToggle }) => {
+  subPanelOpen?: boolean;
+}> = ({ showSidebar, isMobile, onDrawerToggle, subPanelOpen }) => {
   const { headerProps } = usePageHeaderContext();
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
 
   const isFromSidebar = (location.state as any)?.fromSidebar === true;
   const showBackButton = headerProps
@@ -222,8 +221,7 @@ const AppBarPageHeader: React.FC<{
   const showRightSection = headerProps
     ? headerProps.tabs ||
       headerProps.actions ||
-      headerProps.headerActions ||
-      headerProps.onRefresh
+      headerProps.headerActions
     : false;
 
   return (
@@ -234,6 +232,8 @@ const AppBarPageHeader: React.FC<{
         flex: 1,
         minWidth: 0,
         gap: 1,
+        pl: showSidebar && !isMobile && subPanelOpen ? 1.5 : 0,
+        transition: 'padding-left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
       {/* Mobile hamburger */}
@@ -410,43 +410,6 @@ const AppBarPageHeader: React.FC<{
               {headerProps.headerActions}
               {headerProps.tabs}
               {headerProps.actions}
-              {headerProps.onRefresh && (
-                <>
-                  <IconButton
-                    onClick={(e) => setMenuAnchor(e.currentTarget)}
-                    size="small"
-                  >
-                    <MoreVertIcon />
-                  </IconButton>
-                  <Menu
-                    anchorEl={menuAnchor}
-                    open={Boolean(menuAnchor)}
-                    onClose={() => setMenuAnchor(null)}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                  >
-                    {headerProps.menuItems}
-                    {headerProps.menuItems && <Divider />}
-                    <MenuItem
-                      onClick={() => {
-                        headerProps.onRefresh!();
-                        setMenuAnchor(null);
-                      }}
-                    >
-                      <ListItemIcon>
-                        <RefreshIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>{t('common.refresh')}</ListItemText>
-                    </MenuItem>
-                  </Menu>
-                </>
-              )}
             </Box>
           )}
         </>
@@ -1798,6 +1761,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                 showSidebar={showSidebar}
                 isMobile={isMobile}
                 onDrawerToggle={handleDrawerToggle}
+                subPanelOpen={subPanelOpen}
               />
             </Toolbar>
           </AppBar>

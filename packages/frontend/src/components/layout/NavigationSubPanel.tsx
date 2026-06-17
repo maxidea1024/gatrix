@@ -15,11 +15,16 @@ import {
   alpha,
 } from '@mui/material';
 import {
+  ChevronLeft as ChevronLeftIcon,
   ExpandLess,
   ExpandMore,
   Close as CloseIcon,
   AccessTime as AccessTimeIcon,
   KeyboardDoubleArrowLeft as KeyboardDoubleArrowLeftIcon,
+  GpsFixed as TrackingIcon,
+  Insights as AnalyticsIcon,
+  MonitorHeart as MonitoringIcon,
+  Tune as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -265,12 +270,52 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
     index: number,
     siblings: NavMenuItem[]
   ) => {
+    const sectionHeader = item.sectionHeader ? (
+      <Box sx={{ px: 1.75, pt: index === 0 ? 0 : 1.5, pb: 0.25 }}>
+        {index > 0 && (
+          <Divider sx={{ mb: 1, opacity: 0.4 }} />
+        )}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          {item.sectionHeader === 'sidebar.argusSection.tracking' && (
+            <TrackingIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+          )}
+          {item.sectionHeader === 'sidebar.argusSection.analytics' && (
+            <AnalyticsIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+          )}
+          {item.sectionHeader === 'sidebar.argusSection.monitoring' && (
+            <MonitoringIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+          )}
+          {item.sectionHeader === 'sidebar.argusSection.settings' && (
+            <SettingsIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+          )}
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 700,
+              color: 'text.disabled',
+              fontSize: '0.575rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+            }}
+          >
+            {t(item.sectionHeader)}
+          </Typography>
+        </Box>
+      </Box>
+    ) : null;
+
     if (item.children && item.children.length > 0) {
-      return renderParentItem(item, index, siblings);
+      return (
+        <React.Fragment key={index}>
+          {sectionHeader}
+          {renderParentItem(item, index, siblings)}
+        </React.Fragment>
+      );
     }
     return (
       <React.Fragment key={index}>
-        {item.divider && <Divider sx={{ mx: 1.5, my: 0.5 }} />}
+        {sectionHeader}
+        {item.divider && !item.sectionHeader && <Divider sx={{ mx: 1.5, my: 0.5 }} />}
         {renderLeafItem(item)}
       </React.Fragment>
     );
@@ -279,57 +324,85 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
   return (
     <Box
       sx={{
-        width: isOpen ? SUBPANEL_WIDTH : 0,
+        position: 'relative',
         flexShrink: 0,
         height: '100vh',
-        overflow: 'hidden',
-        transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-        borderRight: isOpen ? `1px solid ${theme.palette.divider}` : 'none',
-        bgcolor: theme.palette.background.paper,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        zIndex: theme.zIndex.drawer,
       }}
     >
-      {/* Inner content wrapper - prevents content from being compressed */}
-      <Box
-        sx={{
-          width: SUBPANEL_WIDTH,
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Header: Context Switcher + Close */}
+      {/* Edge collapse button - centered on right border */}
+      {isOpen && (
         <Box
+          className="collapse-edge-btn"
+          onClick={onClose}
           sx={{
-            height: 64,
-            flexShrink: 0,
+            position: 'absolute',
+            right: -12,
+            top: 32,
+            transform: 'translateY(-50%)',
+            zIndex: theme.zIndex.drawer + 2,
+            width: 24,
+            height: 24,
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
-            px: 1.5,
-            gap: 0.5,
-            borderBottom: `1px solid ${theme.palette.divider}`,
+            justifyContent: 'center',
+            bgcolor: theme.palette.background.paper,
+            border: `1px solid ${theme.palette.divider}`,
+            cursor: 'pointer',
+            opacity: 1,
+            color: 'text.secondary',
+            transition: 'background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
+            '&:hover': {
+              bgcolor: isDark ? '#252525' : '#f5f5f5',
+              boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
+              color: isDark ? 'primary.main' : 'text.primary',
+            },
           }}
         >
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <SidebarContextSwitcher collapsed={false} />
-          </Box>
-          <Tooltip title={t('common.close')} placement="bottom" arrow>
-            <IconButton
-              size="small"
-              onClick={onClose}
-              sx={{
-                opacity: 0.5,
-                '&:hover': { opacity: 1 },
-              }}
-            >
-              <KeyboardDoubleArrowLeftIcon sx={{ fontSize: 18 }} />
-            </IconButton>
-          </Tooltip>
+          <ChevronLeftIcon sx={{ fontSize: 14, color: 'inherit' }} />
         </Box>
+      )}
+
+      {/* Collapsing panel */}
+      <Box
+        sx={{
+          width: isOpen ? SUBPANEL_WIDTH : 0,
+          height: '100%',
+          overflow: 'hidden',
+          transition: 'width 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          borderRight: isOpen ? `1px solid ${theme.palette.divider}` : 'none',
+          bgcolor: theme.palette.background.paper,
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: theme.zIndex.drawer,
+        }}
+      >
+        {/* Inner content wrapper - prevents content from being compressed */}
+        <Box
+          sx={{
+            width: SUBPANEL_WIDTH,
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Header: Context Switcher */}
+          <Box
+            sx={{
+              height: 64,
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              px: 1.5,
+              gap: 0.5,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <SidebarContextSwitcher collapsed={false} />
+            </Box>
+          </Box>
 
         {/* Scrollable area */}
         <Box
@@ -544,6 +617,7 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
         </Box>
       </Box>
     </Box>
+  </Box>
   );
 };
 

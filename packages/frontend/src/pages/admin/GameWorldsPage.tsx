@@ -148,9 +148,6 @@ import { parseJson5 } from '../../components/common/JsonEditor';
 import { TableLoadingRow } from '@/components/common/TableLoadingRow';
 import { TableSkeletonRows } from '@/components/common/TableSkeletonRows';
 import SearchTextField from '../../components/common/SearchTextField';
-import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
-import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
-import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 
 import { CopyButton } from '@/components/common/CopyButton';
@@ -618,12 +615,7 @@ const GameWorldsPage: React.FC = () => {
     loadTemplates();
   }, []);
 
-  // Import dialog state
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
 
   // 점검 메시지 Locale 관리 함수들
   const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
@@ -1795,65 +1787,15 @@ const GameWorldsPage: React.FC = () => {
         title={t('gameWorlds.title')}
         subtitle={t('gameWorlds.subtitle')}
         actions={
-          <>
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-              {canManage && (
-                <Button
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddWorld}
-                >
-                  {t('gameWorlds.addGameWorld')}
-                </Button>
-              )}
-              <IconButton
-                onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-                aria-label="more options"
-              >
-                <MoreVertIcon />
-              </IconButton>
-            </Box>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
+          canManage ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddWorld}
             >
-              <ExportImportMenuItems
-                onExport={(format) => {
-                  setPageMenuAnchor(null);
-                  const exportColumns: ExportColumn[] = [
-                    { key: 'worldId', header: t('gameWorlds.worldId') },
-                    { key: 'name', header: t('gameWorlds.name') },
-                    { key: 'description', header: t('gameWorlds.description') },
-                    {
-                      key: 'worldServerAddress',
-                      header: t('gameWorlds.worldServerAddress'),
-                    },
-                    { key: 'isVisible', header: t('gameWorlds.isVisible') },
-                    {
-                      key: 'isMaintenance',
-                      header: t('gameWorlds.isMaintenance'),
-                    },
-                    { key: 'createdAt', header: t('common.createdAt') },
-                  ];
-                  try {
-                    exportToFile(worlds, exportColumns, 'game-worlds', format);
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                onImportClick={() => {
-                  setPageMenuAnchor(null);
-                  setImportDialogOpen(true);
-                }}
-              />
-            </Menu>
-          </>
+              {t('gameWorlds.addGameWorld')}
+            </Button>
+          ) : undefined
         }
       />
 
@@ -2501,63 +2443,7 @@ const GameWorldsPage: React.FC = () => {
         </ClickAwayListener>
       </Popover>
 
-      {/* Import Dialog */}
-      <ImportDialog
-        open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
-        title={t('common.import')}
-        onImport={async (data) => {
-          let successCount = 0;
-          let failCount = 0;
-          for (const item of data) {
-            try {
-              const createData: CreateGameWorldData = {
-                worldId: item[t('gameWorlds.worldId')] || item.worldId || '',
-                name: item[t('gameWorlds.name')] || item.name || '',
-                description:
-                  item[t('gameWorlds.description')] || item.description || '',
-                worldServerAddress:
-                  item[t('gameWorlds.worldServerAddress')] ||
-                  item.worldServerAddress ||
-                  '',
-                isVisible:
-                  item[t('gameWorlds.isVisible')] !== undefined
-                    ? String(item[t('gameWorlds.isVisible')]) === 'true'
-                    : item.isVisible !== undefined
-                      ? String(item.isVisible) === 'true'
-                      : true,
-                isMaintenance:
-                  item[t('gameWorlds.isMaintenance')] !== undefined
-                    ? String(item[t('gameWorlds.isMaintenance')]) === 'true'
-                    : item.isMaintenance !== undefined
-                      ? String(item.isMaintenance) === 'true'
-                      : false,
-              };
-              await gameWorldService.createGameWorld(
-                projectApiPath,
-                createData
-              );
-              successCount++;
-            } catch (err) {
-              failCount++;
-            }
-          }
-          if (successCount > 0) {
-            enqueueSnackbar(t('common.importSuccess'), { variant: 'success' });
-            // Reload worlds
-            try {
-              const result =
-                await gameWorldService.getGameWorlds(projectApiPath);
-              setWorlds(result.worlds);
-            } catch (err) {
-              // Ignore
-            }
-          }
-          if (failCount > 0) {
-            enqueueSnackbar(t('common.importFailed'), { variant: 'error' });
-          }
-        }}
-      />
+
     </Box>
   );
 };

@@ -21,12 +21,18 @@ import {
   useTheme,
   IconButton,
   Tooltip,
+  Paper,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
 import {
   People as AllIcon,
   PersonAdd as NewIcon,
   Visibility as LegendOnIcon,
   VisibilityOff as LegendOffIcon,
+  BarChart as BarChartIcon,
+  ShowChart as LineChartIcon,
+  StackedLineChart as AreaChartIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -35,12 +41,14 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip as ChartTooltip,
   Legend,
   Filler,
 } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Chart } from 'react-chartjs-2';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import playerConnectionService from '../../services/playerConnectionService';
 import type { CharacterHistoryRecord } from '../../services/playerConnectionService';
 import PageContentLoader from '../common/PageContentLoader';
@@ -56,6 +64,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   ChartTooltip,
   Legend,
@@ -315,6 +324,10 @@ interface Props {
 
 const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
   const { t } = useTranslation();
+  const [chartType, setChartType] = useLocalStorage<'bar' | 'line' | 'area'>(
+    'playerConnections.characterGraph.chartType',
+    'line'
+  );
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<CharacterHistoryRecord[]>([]);
 
@@ -501,8 +514,21 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
       colorIdx++;
     });
 
-    return { labels: allLabels, datasets };
-  }, [records, t, displayMode, getDateRange]);
+    const finalDatasets = datasets.map((ds) => {
+      const isBar = chartType === 'bar';
+      const isArea = chartType === 'area';
+      return {
+        ...ds,
+        type: isBar ? 'bar' : 'line',
+        fill: isArea,
+        backgroundColor: isBar || isArea ? ds.backgroundColor : 'transparent',
+        borderWidth: isBar ? 0 : ds.borderWidth || 2,
+        borderRadius: isBar ? 4 : 0,
+      };
+    });
+
+    return { labels: allLabels, datasets: finalDatasets };
+  }, [records, t, displayMode, getDateRange, chartType]);
 
   const chartOptions = useMemo(
     () => ({
@@ -553,35 +579,108 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
 
   return (
     <Box>
-      <Box
+      <Paper
+        variant="outlined"
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          p: 1,
+          px: 1.5,
           mb: 2,
+          bgcolor: (theme) => alpha(theme.palette.action.hover, 0.04),
+          borderRadius: 2.5,
+          borderColor: 'divider',
           flexWrap: 'wrap',
-          gap: 1,
+          gap: 1.5,
         }}
       >
-        <Stack direction="row" spacing={0.5}>
-          <Chip
-            icon={<AllIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.character.totalCharacters')}
+        <Stack direction="row" spacing={1} alignItems="center">
+          <ToggleButtonGroup
+            value={displayMode}
+            exclusive
+            onChange={(_, val) => val && setDisplayMode(val)}
             size="small"
-            variant={displayMode === 'total' ? 'filled' : 'outlined'}
-            color={displayMode === 'total' ? 'primary' : 'default'}
-            onClick={() => setDisplayMode('total')}
-            sx={{ borderRadius: 1.5 }}
-          />
-          <Chip
-            icon={<NewIcon sx={{ fontSize: 16 }} />}
-            label={t('playerConnections.character.newCharacters')}
+            sx={{
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              border: 1,
+              borderColor: 'divider',
+              p: 0.25,
+              '& .MuiToggleButton-root': {
+                px: 1.5,
+                py: 0.35,
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.8125rem',
+                border: 'none',
+                borderRadius: 1.5,
+                color: 'text.secondary',
+                gap: 0.5,
+                '&.Mui-selected': {
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  color: 'primary.main',
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                  },
+                },
+              },
+            }}
+          >
+            <ToggleButton value="total">
+              <AllIcon sx={{ fontSize: 16 }} />
+              {t('playerConnections.character.totalCharacters')}
+            </ToggleButton>
+            <ToggleButton value="new">
+              <NewIcon sx={{ fontSize: 16 }} />
+              {t('playerConnections.character.newCharacters')}
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          <ToggleButtonGroup
+            value={chartType}
+            exclusive
+            onChange={(_, val) => val && setChartType(val)}
             size="small"
-            variant={displayMode === 'new' ? 'filled' : 'outlined'}
-            color={displayMode === 'new' ? 'success' : 'default'}
-            onClick={() => setDisplayMode('new')}
-            sx={{ borderRadius: 1.5 }}
-          />
+            sx={{
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              border: 1,
+              borderColor: 'divider',
+              p: 0.25,
+              '& .MuiToggleButton-root': {
+                px: 1.2,
+                py: 0.35,
+                border: 'none',
+                borderRadius: 1.5,
+                color: 'text.secondary',
+                '&.Mui-selected': {
+                  bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  color: 'primary.main',
+                  '&:hover': {
+                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                  },
+                },
+              },
+            }}
+          >
+            <ToggleButton value="bar">
+              <Tooltip title={t('argus.chart.bar', 'Bar')}>
+                <BarChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="line">
+              <Tooltip title={t('argus.chart.line', 'Line')}>
+                <LineChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+            <ToggleButton value="area">
+              <Tooltip title={t('argus.chart.area', 'Area')}>
+                <AreaChartIcon sx={{ fontSize: 16 }} />
+              </Tooltip>
+            </ToggleButton>
+          </ToggleButtonGroup>
+
           <Tooltip
             title={
               showLegend
@@ -592,7 +691,12 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
             <IconButton
               size="small"
               onClick={() => setShowLegend(!showLegend)}
-              sx={{ ml: 0.5 }}
+              sx={{
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
             >
               {showLegend ? (
                 <LegendOnIcon fontSize="small" />
@@ -603,7 +707,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           </Tooltip>
         </Stack>
         <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
-      </Box>
+      </Paper>
 
       <PageContentLoader loading={loading}>
         {chartData.datasets.length === 0 ? (
@@ -615,7 +719,7 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           <>
             <Card variant="outlined" sx={{ p: 2 }}>
               <Box sx={{ height: 400 }}>
-                <Line data={chartData} options={chartOptions as any} />
+                <Chart type={chartType === 'bar' ? 'bar' : 'line'} data={chartData} options={chartOptions as any} />
               </Box>
             </Card>
 

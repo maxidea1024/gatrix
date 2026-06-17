@@ -146,9 +146,7 @@ const StoreProductsPage: React.FC = () => {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [pageMenuAnchor, setPageMenuAnchor] = useState<HTMLElement | null>(
-    null
-  );
+
   const [formDrawerOpen, setFormDrawerOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(
     null
@@ -906,87 +904,6 @@ const StoreProductsPage: React.FC = () => {
                 </Button>
               </>
             )}
-            <IconButton
-              onClick={(e) => setPageMenuAnchor(e.currentTarget)}
-              aria-label="more options"
-            >
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={pageMenuAnchor}
-              open={Boolean(pageMenuAnchor)}
-              onClose={() => setPageMenuAnchor(null)}
-            >
-              <ExportImportMenuItems
-                onExport={async (format) => {
-                  setPageMenuAnchor(null);
-
-                  const exportToastId = enqueueSnackbar(
-                    t('common.export') + '...',
-                    {
-                      variant: 'info',
-                    }
-                  );
-
-                  // Fetch all products for export, ignoring pagination but applying current search/filters
-                  try {
-                    const result = await storeProductService.getStoreProducts(
-                      projectApiPath,
-                      {
-                        page: 1,
-                        limit: 100000, // Large number to get all
-                        search: debouncedSearchTerm || undefined,
-                        sortBy: orderBy,
-                        sortOrder: order,
-                      }
-                    );
-
-                    if (!result || !result.products) {
-                      throw new Error('Failed to fetch products for export');
-                    }
-
-                    const exportColumns: ExportColumn[] = [
-                      { key: 'cmsProductId', header: 'cmsProductId' },
-                      { key: 'productId', header: 'productId' },
-                      { key: 'productName', header: 'productName' },
-                      { key: 'nameKo', header: 'nameKo' },
-                      { key: 'nameEn', header: 'nameEn' },
-                      { key: 'nameZh', header: 'nameZh' },
-                      { key: 'store', header: 'store' },
-                      { key: 'price', header: 'price' },
-                      { key: 'currency', header: 'currency' },
-                      { key: 'isActive', header: 'isActive' },
-                      { key: 'description', header: 'description' },
-                      { key: 'descriptionKo', header: 'descriptionKo' },
-                      { key: 'descriptionEn', header: 'descriptionEn' },
-                      { key: 'descriptionZh', header: 'descriptionZh' },
-                      { key: 'saleStartAt', header: 'saleStartAt' },
-                      { key: 'saleEndAt', header: 'saleEndAt' },
-                      { key: 'createdAt', header: 'createdAt' },
-                      { key: 'updatedAt', header: 'updatedAt' },
-                    ];
-
-                    exportToFile(
-                      result.products,
-                      exportColumns,
-                      'store-products',
-                      format
-                    );
-                    closeSnackbar(exportToastId);
-                    enqueueSnackbar(t('common.exportSuccess'), {
-                      variant: 'success',
-                    });
-                  } catch (err) {
-                    console.error('Export error:', err);
-                    closeSnackbar(exportToastId);
-                    enqueueSnackbar(t('common.exportFailed'), {
-                      variant: 'error',
-                    });
-                  }
-                }}
-                exportOnly={true}
-              />
-            </Menu>
           </>
         }
       />

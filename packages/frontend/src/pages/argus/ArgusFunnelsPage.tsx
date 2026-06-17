@@ -171,7 +171,12 @@ const SEGMENT_COLORS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981'];
 
 /* ─── Component ─── */
 
-const ArgusFunnelsPage: React.FC = () => {
+interface ArgusFunnelsPageProps {
+  embedded?: boolean;
+  tabBar?: React.ReactNode;
+}
+
+const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({ embedded = false, tabBar }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -1617,7 +1622,7 @@ const ArgusFunnelsPage: React.FC = () => {
           </IconButton>
         </Box>
       )}
-      <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
       <CsvExportButton
         data={csvData}
         filename="funnels"
@@ -3172,6 +3177,8 @@ const ArgusFunnelsPage: React.FC = () => {
             maxHeight: 550,
             width: '100%',
             pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
           }}
         >
           <ResponsiveContainer
@@ -3194,6 +3201,7 @@ const ArgusFunnelsPage: React.FC = () => {
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                 tickLine={false}
                 axisLine={false}
+                tickMargin={16}
               />
               <YAxis
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -3220,7 +3228,7 @@ const ArgusFunnelsPage: React.FC = () => {
               <Legend
                 onClick={handleLegendClick}
                 formatter={renderLegendText}
-                wrapperStyle={{ fontSize: 11 }}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
               />
               {allKeys.map((key, idx) => (
                 <Bar
@@ -3571,6 +3579,8 @@ const ArgusFunnelsPage: React.FC = () => {
           maxHeight: 600,
           width: '100%',
           pr: 2,
+          userSelect: 'none',
+          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
         }}
       >
         <ResponsiveContainer
@@ -3593,6 +3603,7 @@ const ArgusFunnelsPage: React.FC = () => {
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
               tickLine={false}
               axisLine={false}
+              tickMargin={16}
             />
             <YAxis
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -3703,6 +3714,8 @@ const ArgusFunnelsPage: React.FC = () => {
             maxHeight: 450,
             width: '100%',
             pr: 2,
+            userSelect: 'none',
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
           }}
         >
           <ResponsiveContainer
@@ -3725,6 +3738,7 @@ const ArgusFunnelsPage: React.FC = () => {
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                 tickLine={false}
                 axisLine={false}
+                tickMargin={16}
               />
               <YAxis
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -3764,29 +3778,32 @@ const ArgusFunnelsPage: React.FC = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 64px)',
+        height: embedded ? '100%' : 'calc(100vh - 64px)',
         overflow: 'hidden',
-        m: -2,
+        ...(embedded ? { width: '100%' } : { m: -2 }),
       }}
     >
-      <PageHeader
-        enableAutoBack
-        title={
-          <ArgusBreadcrumbs
-            paths={[
-              {
-                label: t('argus.analytics.title', 'Analytics'),
-                to: '/argus/analytics',
-              },
-              { label: t('argus.analytics.funnels', 'Funnels') },
-            ]}
-            size="title"
-          />
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          enableAutoBack
+          title={
+            <ArgusBreadcrumbs
+              paths={[
+                {
+                  label: t('argus.analytics.title', 'Analytics'),
+                  to: '/argus/analytics',
+                },
+                { label: t('argus.analytics.funnels', 'Funnels') },
+              ]}
+              size="title"
+            />
+          }
+        />
+      )}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
         <AnalyticsLayout
           leftPanel={leftPanel}
+          tabBar={tabBar}
           toolbar={toolbar}
           projectId={projectId}
         >

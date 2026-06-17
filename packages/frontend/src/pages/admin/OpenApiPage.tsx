@@ -15590,22 +15590,6 @@ function createClientSdkApiSpec() {
           },
         },
       },
-      '/client/crashes/upload': {
-        post: {
-          summary: 'Upload crash report',
-          tags: ['Crash Reports'],
-          security: [
-            {
-              apiKeyHeader: [],
-            },
-          ],
-          responses: {
-            '200': {
-              description: 'Success',
-            },
-          },
-        },
-      },
       '/client/banners': {
         get: {
           summary: 'Get banners',
