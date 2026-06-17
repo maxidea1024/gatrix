@@ -212,7 +212,6 @@ const CouponSettingsPage: React.FC = () => {
   const exportAbortControllerRef = useRef<AbortController | null>(null);
   const codesRequestIdRef = useRef(0);
 
-
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [rowMenuAnchor, setRowMenuAnchor] = useState<HTMLElement | null>(null);
   const [rowMenuCoupon, setRowMenuCoupon] = useState<CouponSetting | null>(

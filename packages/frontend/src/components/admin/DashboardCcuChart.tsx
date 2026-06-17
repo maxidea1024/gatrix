@@ -87,12 +87,18 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
 
   const [chartType, setChartTypeRaw] = useState<
     'bar' | 'stacked-bar' | 'line' | 'area' | 'stacked-area'
-  >(() => (localStorage.getItem('dashboard.ccuChart.chartType') as any) || 'line');
+  >(
+    () =>
+      (localStorage.getItem('dashboard.ccuChart.chartType') as any) || 'line'
+  );
 
-  const setChartType = useCallback((val: 'bar' | 'stacked-bar' | 'line' | 'area' | 'stacked-area') => {
-    setChartTypeRaw(val);
-    localStorage.setItem('dashboard.ccuChart.chartType', val);
-  }, []);
+  const setChartType = useCallback(
+    (val: 'bar' | 'stacked-bar' | 'line' | 'area' | 'stacked-area') => {
+      setChartTypeRaw(val);
+      localStorage.setItem('dashboard.ccuChart.chartType', val);
+    },
+    []
+  );
 
   const [showLegend] = useState(
     () => localStorage.getItem('ccu-show-legend') !== 'false'
@@ -283,7 +289,8 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
                     bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
                     color: 'primary.main',
                     '&:hover': {
-                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                      bgcolor: (theme) =>
+                        alpha(theme.palette.primary.main, 0.12),
                     },
                   },
                 },
@@ -318,7 +325,9 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
             <Tooltip title={t('dashboard.ccuChartViewDetail')}>
               <IconButton
                 size="small"
-                onClick={() => navigate('/admin/player-connections?tab=ccu-graph')}
+                onClick={() =>
+                  navigate('/admin/player-connections?tab=ccu-graph')
+                }
               >
                 <OpenInNewIcon fontSize="small" />
               </IconButton>
@@ -410,7 +419,15 @@ const DashboardCcuChart: React.FC<Props> = ({ projectApiPath }) => {
               },
             }}
           >
-            <Chart type={chartType === 'bar' || chartType === 'stacked-bar' ? 'bar' : 'line'} data={chartData} options={chartOptions as any} />
+            <Chart
+              type={
+                chartType === 'bar' || chartType === 'stacked-bar'
+                  ? 'bar'
+                  : 'line'
+              }
+              data={chartData}
+              options={chartOptions as any}
+            />
           </Box>
         )}
       </CardContent>

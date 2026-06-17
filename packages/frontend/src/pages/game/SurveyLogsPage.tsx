@@ -73,7 +73,6 @@ const SurveyLogsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
 
-
   // Sort state
   const [sortBy, setSortBy] = useState<string>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -589,7 +588,6 @@ const SurveyLogsPage: React.FC = () => {
               }
             />
           </Box>
-
         </Box>
       </Box>
 

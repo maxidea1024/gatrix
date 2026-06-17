@@ -197,7 +197,6 @@ const ServiceNoticesPage: React.FC = () => {
   const [webviewMenuAnchorEl, setWebviewMenuAnchorEl] =
     useState<null | HTMLElement>(null);
 
-
   // Action menu state
   const [actionMenuAnchorEl, setActionMenuAnchorEl] =
     useState<null | HTMLElement>(null);

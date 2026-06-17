@@ -219,9 +219,7 @@ const AppBarPageHeader: React.FC<{
     : false;
 
   const showRightSection = headerProps
-    ? headerProps.tabs ||
-      headerProps.actions ||
-      headerProps.headerActions
+    ? headerProps.tabs || headerProps.actions || headerProps.headerActions
     : false;
 
   return (

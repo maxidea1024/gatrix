@@ -2272,8 +2272,6 @@ const ClientVersionsPage: React.FC = () => {
         }}
       />
 
-
-
       {/* Bulk Delete Confirm Dialog */}
       <Dialog
         open={bulkDeleteDialogOpen}
@@ -2562,8 +2560,6 @@ const ClientVersionsPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
-
-
     </Box>
   );
 };

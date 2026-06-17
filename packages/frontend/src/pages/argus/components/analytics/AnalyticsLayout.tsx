@@ -144,7 +144,14 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
             ) : (
               <Box />
             )}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2,
+                flexShrink: 0,
+              }}
+            >
               {toolbar}
             </Box>
           </Box>

@@ -92,7 +92,10 @@ interface ArgusFlowsPageProps {
   tabBar?: React.ReactNode;
 }
 
-const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({ embedded = false, tabBar }) => {
+const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
+  embedded = false,
+  tabBar,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -799,7 +802,9 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({ embedded = false, tabBa
           },
         ]}
       />
-      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
+      {!embedded && (
+        <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      )}
       <CsvExportButton
         data={csvData}
         filename="flows"
@@ -919,7 +924,9 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({ embedded = false, tabBa
             maxHeight: 750,
             pr: 2,
             userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+              outline: 'none',
+            },
           }}
         >
           <ResponsiveContainer

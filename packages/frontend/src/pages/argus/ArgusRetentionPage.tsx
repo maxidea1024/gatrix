@@ -117,7 +117,10 @@ interface ArgusRetentionPageProps {
   tabBar?: React.ReactNode;
 }
 
-const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = false, tabBar }) => {
+const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
+  embedded = false,
+  tabBar,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -1148,7 +1151,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = fals
         onChange={(val) => setViewMode(val as RetentionViewMode)}
         availableTypes={['line', 'bar', 'table', 'metric'] as ChartType[]}
       />
-      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
+      {!embedded && (
+        <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      )}
       <CsvExportButton
         data={csvData}
         filename="retention"
@@ -1175,7 +1180,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = fals
             width: '100%',
             pr: 2,
             userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+              outline: 'none',
+            },
           }}
         >
           <ResponsiveContainer
@@ -1262,8 +1269,10 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = fals
           maxHeight: 600,
           width: '100%',
           pr: 2,
-            userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+          userSelect: 'none',
+          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+            outline: 'none',
+          },
         }}
       >
         <ResponsiveContainer
@@ -1365,7 +1374,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = fals
             width: '100%',
             pr: 2,
             userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+              outline: 'none',
+            },
           }}
         >
           <ResponsiveContainer
@@ -1446,8 +1457,10 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = fals
           maxHeight: 600,
           width: '100%',
           pr: 2,
-            userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+          userSelect: 'none',
+          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+            outline: 'none',
+          },
         }}
       >
         <ResponsiveContainer
@@ -1885,7 +1898,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({ embedded = fals
         <Box
           sx={{
             overflowX: 'auto',
-            ...(viewMode !== 'table' && { borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }),
+            ...(viewMode !== 'table' && {
+              borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            }),
           }}
         >
           <table

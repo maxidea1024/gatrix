@@ -272,21 +272,27 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
   ) => {
     const sectionHeader = item.sectionHeader ? (
       <Box sx={{ px: 1.75, pt: index === 0 ? 0 : 1.5, pb: 0.25 }}>
-        {index > 0 && (
-          <Divider sx={{ mb: 1, opacity: 0.4 }} />
-        )}
+        {index > 0 && <Divider sx={{ mb: 1, opacity: 0.4 }} />}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           {item.sectionHeader === 'sidebar.argusSection.tracking' && (
-            <TrackingIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+            <TrackingIcon
+              sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }}
+            />
           )}
           {item.sectionHeader === 'sidebar.argusSection.analytics' && (
-            <AnalyticsIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+            <AnalyticsIcon
+              sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }}
+            />
           )}
           {item.sectionHeader === 'sidebar.argusSection.monitoring' && (
-            <MonitoringIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+            <MonitoringIcon
+              sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }}
+            />
           )}
           {item.sectionHeader === 'sidebar.argusSection.settings' && (
-            <SettingsIcon sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }} />
+            <SettingsIcon
+              sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }}
+            />
           )}
           <Typography
             variant="caption"
@@ -315,7 +321,9 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
     return (
       <React.Fragment key={index}>
         {sectionHeader}
-        {item.divider && !item.sectionHeader && <Divider sx={{ mx: 1.5, my: 0.5 }} />}
+        {item.divider && !item.sectionHeader && (
+          <Divider sx={{ mx: 1.5, my: 0.5 }} />
+        )}
         {renderLeafItem(item)}
       </React.Fragment>
     );
@@ -351,7 +359,8 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
             cursor: 'pointer',
             opacity: 1,
             color: 'text.secondary',
-            transition: 'background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
+            transition:
+              'background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
             '&:hover': {
               bgcolor: isDark ? '#252525' : '#f5f5f5',
               boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
@@ -404,220 +413,224 @@ const NavigationSubPanel: React.FC<NavigationSubPanelProps> = ({
             </Box>
           </Box>
 
-        {/* Scrollable area */}
-        <Box
-          sx={{
-            flex: 1,
-            overflow: 'auto',
-            // Slim scrollbar
-            '&::-webkit-scrollbar': { width: 4 },
-            '&::-webkit-scrollbar-thumb': {
-              bgcolor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
-              borderRadius: 2,
-            },
-          }}
-        >
-          {/* Recent Pages Section */}
-          {recentPages.length > 0 && (
-            <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
-              <Box
-                onClick={toggleRecentCollapsed}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  px: 0.75,
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <AccessTimeIcon
-                    sx={{ fontSize: 11, color: 'text.disabled', opacity: 0.7 }}
-                  />
+          {/* Scrollable area */}
+          <Box
+            sx={{
+              flex: 1,
+              overflow: 'auto',
+              // Slim scrollbar
+              '&::-webkit-scrollbar': { width: 4 },
+              '&::-webkit-scrollbar-thumb': {
+                bgcolor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
+                borderRadius: 2,
+              },
+            }}
+          >
+            {/* Recent Pages Section */}
+            {recentPages.length > 0 && (
+              <Box sx={{ px: 1, pt: 1, pb: 0.5 }}>
+                <Box
+                  onClick={toggleRecentCollapsed}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    px: 0.75,
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <AccessTimeIcon
+                      sx={{
+                        fontSize: 11,
+                        color: 'text.disabled',
+                        opacity: 0.7,
+                      }}
+                    />
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 600,
+                        color: 'text.disabled',
+                        fontSize: '0.575rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                      }}
+                    >
+                      {t('sidebar.recentPages')}
+                    </Typography>
+                    {recentCollapsed ? (
+                      <ExpandMore
+                        sx={{
+                          fontSize: 13,
+                          color: 'text.disabled',
+                          opacity: 0.5,
+                        }}
+                      />
+                    ) : (
+                      <ExpandLess
+                        sx={{
+                          fontSize: 13,
+                          color: 'text.disabled',
+                          opacity: 0.5,
+                        }}
+                      />
+                    )}
+                  </Box>
+                  <Tooltip title={t('sidebar.clearRecentPages')} arrow>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onClearRecent();
+                      }}
+                      sx={{
+                        p: 0.25,
+                        opacity: 0.3,
+                        '&:hover': { opacity: 1 },
+                      }}
+                    >
+                      <CloseIcon sx={{ fontSize: 11 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+
+                <Collapse in={!recentCollapsed} timeout={200}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1px',
+                      mt: 0.5,
+                    }}
+                  >
+                    {recentPages.map((page) => {
+                      const isActive = isActivePath(page.path);
+                      return (
+                        <Box
+                          key={page.path}
+                          onClick={() =>
+                            onNavigate(page.path, { skipRecentUpdate: true })
+                          }
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            borderRadius: '6px',
+                            py: 0.5,
+                            px: 1,
+                            cursor: 'pointer',
+                            color: isActive
+                              ? theme.palette.primary.main
+                              : theme.palette.text.secondary,
+                            bgcolor: isActive
+                              ? isDark
+                                ? alpha(theme.palette.primary.main, 0.12)
+                                : alpha(theme.palette.primary.main, 0.08)
+                              : 'transparent',
+                            transition: 'background-color 0.15s ease',
+                            '&:hover': {
+                              bgcolor: isActive
+                                ? isDark
+                                  ? alpha(theme.palette.primary.main, 0.18)
+                                  : alpha(theme.palette.primary.main, 0.12)
+                                : isDark
+                                  ? 'rgba(255,255,255,0.05)'
+                                  : 'rgba(0,0,0,0.03)',
+                              '& .recent-close': { opacity: 0.5 },
+                            },
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: isActive ? 5 : 3,
+                              height: isActive ? 5 : 3,
+                              borderRadius: '50%',
+                              bgcolor: isActive
+                                ? theme.palette.primary.main
+                                : isDark
+                                  ? 'rgba(255,255,255,0.15)'
+                                  : 'rgba(0,0,0,0.1)',
+                              mr: 1,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <Typography
+                            variant="body2"
+                            noWrap
+                            title={
+                              page.parentText
+                                ? `${t(page.parentText)} / ${t(page.text)}`
+                                : t(page.text)
+                            }
+                            sx={{
+                              flex: 1,
+                              fontSize: '0.75rem',
+                              fontWeight: isActive ? 600 : 400,
+                            }}
+                          >
+                            {t(page.text)}
+                          </Typography>
+                          <IconButton
+                            className="recent-close"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRemoveRecent(page.path);
+                            }}
+                            sx={{
+                              p: 0.15,
+                              opacity: 0,
+                              transition: 'opacity 0.15s',
+                            }}
+                          >
+                            <CloseIcon sx={{ fontSize: 10 }} />
+                          </IconButton>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Collapse>
+
+                <Divider sx={{ mt: 0.75, opacity: 0.5 }} />
+              </Box>
+            )}
+
+            {/* Category header + Menu items with slide-down animation */}
+            {category && (
+              <Box ref={menuContentRef}>
+                <Box sx={{ px: 1.75, pt: 1.25, pb: 0.5 }}>
                   <Typography
                     variant="caption"
                     sx={{
-                      fontWeight: 600,
+                      fontWeight: 700,
                       color: 'text.disabled',
-                      fontSize: '0.575rem',
+                      fontSize: '0.6rem',
                       textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
+                      letterSpacing: '0.08em',
                     }}
                   >
-                    {t('sidebar.recentPages')}
+                    {t(category.text)}
                   </Typography>
-                  {recentCollapsed ? (
-                    <ExpandMore
-                      sx={{
-                        fontSize: 13,
-                        color: 'text.disabled',
-                        opacity: 0.5,
-                      }}
-                    />
-                  ) : (
-                    <ExpandLess
-                      sx={{
-                        fontSize: 13,
-                        color: 'text.disabled',
-                        opacity: 0.5,
-                      }}
-                    />
+                </Box>
+
+                <List component="nav" disablePadding sx={{ pb: 1 }}>
+                  {category.children.map((item, index) =>
+                    renderMenuItem(item, index, category.children)
                   )}
-                </Box>
-                <Tooltip title={t('sidebar.clearRecentPages')} arrow>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onClearRecent();
-                    }}
-                    sx={{
-                      p: 0.25,
-                      opacity: 0.3,
-                      '&:hover': { opacity: 1 },
-                    }}
-                  >
-                    <CloseIcon sx={{ fontSize: 11 }} />
-                  </IconButton>
-                </Tooltip>
+                </List>
               </Box>
+            )}
+          </Box>
 
-              <Collapse in={!recentCollapsed} timeout={200}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1px',
-                    mt: 0.5,
-                  }}
-                >
-                  {recentPages.map((page) => {
-                    const isActive = isActivePath(page.path);
-                    return (
-                      <Box
-                        key={page.path}
-                        onClick={() =>
-                          onNavigate(page.path, { skipRecentUpdate: true })
-                        }
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          borderRadius: '6px',
-                          py: 0.5,
-                          px: 1,
-                          cursor: 'pointer',
-                          color: isActive
-                            ? theme.palette.primary.main
-                            : theme.palette.text.secondary,
-                          bgcolor: isActive
-                            ? isDark
-                              ? alpha(theme.palette.primary.main, 0.12)
-                              : alpha(theme.palette.primary.main, 0.08)
-                            : 'transparent',
-                          transition: 'background-color 0.15s ease',
-                          '&:hover': {
-                            bgcolor: isActive
-                              ? isDark
-                                ? alpha(theme.palette.primary.main, 0.18)
-                                : alpha(theme.palette.primary.main, 0.12)
-                              : isDark
-                                ? 'rgba(255,255,255,0.05)'
-                                : 'rgba(0,0,0,0.03)',
-                            '& .recent-close': { opacity: 0.5 },
-                          },
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: isActive ? 5 : 3,
-                            height: isActive ? 5 : 3,
-                            borderRadius: '50%',
-                            bgcolor: isActive
-                              ? theme.palette.primary.main
-                              : isDark
-                                ? 'rgba(255,255,255,0.15)'
-                                : 'rgba(0,0,0,0.1)',
-                            mr: 1,
-                            flexShrink: 0,
-                          }}
-                        />
-                        <Typography
-                          variant="body2"
-                          noWrap
-                          title={
-                            page.parentText
-                              ? `${t(page.parentText)} / ${t(page.text)}`
-                              : t(page.text)
-                          }
-                          sx={{
-                            flex: 1,
-                            fontSize: '0.75rem',
-                            fontWeight: isActive ? 600 : 400,
-                          }}
-                        >
-                          {t(page.text)}
-                        </Typography>
-                        <IconButton
-                          className="recent-close"
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onRemoveRecent(page.path);
-                          }}
-                          sx={{
-                            p: 0.15,
-                            opacity: 0,
-                            transition: 'opacity 0.15s',
-                          }}
-                        >
-                          <CloseIcon sx={{ fontSize: 10 }} />
-                        </IconButton>
-                      </Box>
-                    );
-                  })}
-                </Box>
-              </Collapse>
-
-              <Divider sx={{ mt: 0.75, opacity: 0.5 }} />
-            </Box>
-          )}
-
-          {/* Category header + Menu items with slide-down animation */}
-          {category && (
-            <Box ref={menuContentRef}>
-              <Box sx={{ px: 1.75, pt: 1.25, pb: 0.5 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 700,
-                    color: 'text.disabled',
-                    fontSize: '0.6rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  {t(category.text)}
-                </Typography>
-              </Box>
-
-              <List component="nav" disablePadding sx={{ pb: 1 }}>
-                {category.children.map((item, index) =>
-                  renderMenuItem(item, index, category.children)
-                )}
-              </List>
-            </Box>
-          )}
-        </Box>
-
-        {/* Quick Links - fixed at bottom, outside scroll area with bottom padding */}
-        <Box sx={{ flexShrink: 0, pb: 2.5 }}>
-          <Divider sx={{ mx: 1.5, opacity: 0.5 }} />
-          <QuickLinksSection />
+          {/* Quick Links - fixed at bottom, outside scroll area with bottom padding */}
+          <Box sx={{ flexShrink: 0, pb: 2.5 }}>
+            <Divider sx={{ mx: 1.5, opacity: 0.5 }} />
+            <QuickLinksSection />
+          </Box>
         </Box>
       </Box>
     </Box>
-  </Box>
   );
 };
 

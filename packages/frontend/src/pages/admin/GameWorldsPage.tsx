@@ -615,8 +615,6 @@ const GameWorldsPage: React.FC = () => {
     loadTemplates();
   }, []);
 
-
-
   // 점검 메시지 Locale 관리 함수들
   const addMaintenanceLocale = (lang: 'ko' | 'en' | 'zh') => {
     if (!maintenanceLocales.find((l) => l.lang === lang)) {
@@ -2442,8 +2440,6 @@ const GameWorldsPage: React.FC = () => {
           </Box>
         </ClickAwayListener>
       </Popover>
-
-
     </Box>
   );
 };

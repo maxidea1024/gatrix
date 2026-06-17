@@ -719,7 +719,11 @@ const CharacterGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           <>
             <Card variant="outlined" sx={{ p: 2 }}>
               <Box sx={{ height: 400 }}>
-                <Chart type={chartType === 'bar' ? 'bar' : 'line'} data={chartData} options={chartOptions as any} />
+                <Chart
+                  type={chartType === 'bar' ? 'bar' : 'line'}
+                  data={chartData}
+                  options={chartOptions as any}
+                />
               </Box>
             </Card>
 

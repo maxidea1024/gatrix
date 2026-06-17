@@ -1125,8 +1125,6 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
         open={fullInfoDrawerOpen}
         onClose={() => setFullInfoDrawerOpen(false)}
       />
-
-
     </Box>
   );
 };

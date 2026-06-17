@@ -121,19 +121,32 @@ const PlayerConnectionsPage: React.FC = () => {
     const p = searchParams.get('tab');
     if (!p) return 'overview';
     switch (p) {
-      case '0': return 'overview';
-      case '1': return 'ccu-graph';
-      case '2': return 'player-graph';
-      case '3': return 'character-graph';
-      case '4': return 'players';
-      case '5': return 'all-players';
-      case '6': return 'all-characters';
-      default: return p;
+      case '0':
+        return 'overview';
+      case '1':
+        return 'ccu-graph';
+      case '2':
+        return 'player-graph';
+      case '3':
+        return 'character-graph';
+      case '4':
+        return 'players';
+      case '5':
+        return 'all-players';
+      case '6':
+        return 'all-characters';
+      default:
+        return p;
     }
   });
 
   const isGraphTab = useMemo(() => {
-    return ['overview', 'ccu-graph', 'player-graph', 'character-graph'].includes(activeTab);
+    return [
+      'overview',
+      'ccu-graph',
+      'player-graph',
+      'character-graph',
+    ].includes(activeTab);
   }, [activeTab]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -1315,11 +1328,23 @@ const PlayerConnectionsPage: React.FC = () => {
       >
         <Tab value="overview" label={t('playerConnections.tabs.overview')} />
         <Tab value="ccu-graph" label={t('playerConnections.tabs.ccuGraph')} />
-        <Tab value="player-graph" label={t('playerConnections.tabs.playerGraph')} />
-        <Tab value="character-graph" label={t('playerConnections.tabs.characterGraph')} />
+        <Tab
+          value="player-graph"
+          label={t('playerConnections.tabs.playerGraph')}
+        />
+        <Tab
+          value="character-graph"
+          label={t('playerConnections.tabs.characterGraph')}
+        />
         <Tab value="players" label={t('playerConnections.tabs.players')} />
-        <Tab value="all-players" label={t('playerConnections.tabs.allPlayers')} />
-        <Tab value="all-characters" label={t('playerConnections.tabs.allCharacters')} />
+        <Tab
+          value="all-players"
+          label={t('playerConnections.tabs.allPlayers')}
+        />
+        <Tab
+          value="all-characters"
+          label={t('playerConnections.tabs.allCharacters')}
+        />
       </Tabs>
 
       {/* Tab 0: Overview */}
@@ -2392,7 +2417,9 @@ const PlayerConnectionsPage: React.FC = () => {
 
       {/* Tab 3: Character Graph — persist once mounted */}
       {projectApiPath && (
-        <Box sx={{ display: activeTab === 'character-graph' ? 'block' : 'none' }}>
+        <Box
+          sx={{ display: activeTab === 'character-graph' ? 'block' : 'none' }}
+        >
           <CharacterGraphTab
             projectApiPath={projectApiPath}
             refreshKey={dataRefreshKey}

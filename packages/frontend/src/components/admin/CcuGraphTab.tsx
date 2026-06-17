@@ -539,7 +539,7 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
         y: {
           stacked: isStacked,
           beginAtZero: true,
-          grid: { color: 'rgba(0,0,0,0.05)' }
+          grid: { color: 'rgba(0,0,0,0.05)' },
         },
       },
       interaction: {
@@ -707,7 +707,15 @@ const CcuGraphTab: React.FC<Props> = ({ projectApiPath, refreshKey }) => {
           <>
             <Card variant="outlined" sx={{ p: 2 }}>
               <Box sx={{ height: 400 }}>
-                <Chart type={(chartType === 'bar' || chartType === 'stacked-bar') ? 'bar' : 'line'} data={chartData} options={chartOptions as any} />
+                <Chart
+                  type={
+                    chartType === 'bar' || chartType === 'stacked-bar'
+                      ? 'bar'
+                      : 'line'
+                  }
+                  data={chartData}
+                  options={chartOptions as any}
+                />
               </Box>
             </Card>
 

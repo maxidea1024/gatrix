@@ -243,12 +243,10 @@ export default async function lexiconRoutes(app: FastifyInstance) {
         return reply.code(201).send({ success: true });
       } catch (error: any) {
         if (error.code === 'ER_DUP_ENTRY') {
-          return reply
-            .code(409)
-            .send({
-              success: false,
-              message: 'Event already exists in lexicon',
-            });
+          return reply.code(409).send({
+            success: false,
+            message: 'Event already exists in lexicon',
+          });
         }
         logger.error('Failed to create lexicon event', {
           projectId,
@@ -345,12 +343,10 @@ export default async function lexiconRoutes(app: FastifyInstance) {
             .send({ success: false, message: 'Event not found' });
         }
         if (existing.is_reserved) {
-          return reply
-            .code(403)
-            .send({
-              success: false,
-              message: 'Cannot delete reserved system events',
-            });
+          return reply.code(403).send({
+            success: false,
+            message: 'Cannot delete reserved system events',
+          });
         }
 
         await db('g_argus_lexicon_events')
@@ -393,12 +389,10 @@ export default async function lexiconRoutes(app: FastifyInstance) {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({
-            success: false,
-            message: 'Failed to list lexicon properties',
-          });
+        return reply.code(500).send({
+          success: false,
+          message: 'Failed to list lexicon properties',
+        });
       }
     }
   );
@@ -446,23 +440,19 @@ export default async function lexiconRoutes(app: FastifyInstance) {
         return reply.code(201).send({ success: true });
       } catch (error: any) {
         if (error.code === 'ER_DUP_ENTRY') {
-          return reply
-            .code(409)
-            .send({
-              success: false,
-              message: 'Property already exists in lexicon',
-            });
+          return reply.code(409).send({
+            success: false,
+            message: 'Property already exists in lexicon',
+          });
         }
         logger.error('Failed to create lexicon property', {
           projectId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({
-            success: false,
-            message: 'Failed to create lexicon property',
-          });
+        return reply.code(500).send({
+          success: false,
+          message: 'Failed to create lexicon property',
+        });
       }
     }
   );
@@ -516,12 +506,10 @@ export default async function lexiconRoutes(app: FastifyInstance) {
           propertyName,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({
-            success: false,
-            message: 'Failed to update lexicon property',
-          });
+        return reply.code(500).send({
+          success: false,
+          message: 'Failed to update lexicon property',
+        });
       }
     }
   );
@@ -547,12 +535,10 @@ export default async function lexiconRoutes(app: FastifyInstance) {
             .send({ success: false, message: 'Property not found' });
         }
         if (existing.is_reserved) {
-          return reply
-            .code(403)
-            .send({
-              success: false,
-              message: 'Cannot delete reserved system properties',
-            });
+          return reply.code(403).send({
+            success: false,
+            message: 'Cannot delete reserved system properties',
+          });
         }
 
         await db('g_argus_lexicon_properties')
@@ -567,12 +553,10 @@ export default async function lexiconRoutes(app: FastifyInstance) {
           propertyName,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({
-            success: false,
-            message: 'Failed to delete lexicon property',
-          });
+        return reply.code(500).send({
+          success: false,
+          message: 'Failed to delete lexicon property',
+        });
       }
     }
   );

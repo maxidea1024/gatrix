@@ -74,8 +74,6 @@ router.get('/test', clientSDKAuth, (req: any, res: any) => {
   });
 });
 
-
-
 // Banner routes for game client
 router.get('/banners', clientSDKAuth, BannerClientController.getBanners);
 router.get(

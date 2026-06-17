@@ -1246,7 +1246,11 @@ export default function AllPlayersTab({
 
         {/* Right side actions */}
         <Stack direction="row" spacing={1.5} alignItems="center">
-          <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8125rem', fontWeight: 500 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontSize: '0.8125rem', fontWeight: 500 }}
+          >
             {t('playerConnections.allPlayers.totalCount', {
               count: data.total,
             })}

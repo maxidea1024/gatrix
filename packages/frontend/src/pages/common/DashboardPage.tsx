@@ -652,10 +652,6 @@ const DashboardPage: React.FC = () => {
     };
   }, [hasAnyPermissions, hasPermission]);
 
-
-
-
-
   // Load maintenance status
   useEffect(() => {
     if (!hasAnyPermissions || !hasPermission(P.MAINTENANCE_READ)) {
@@ -2045,8 +2041,6 @@ const DashboardPage: React.FC = () => {
             </Grid>
           </Grid>
         )}
-
-
       </Box>
     </PageContentLoader>
   );

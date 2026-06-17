@@ -176,7 +176,10 @@ interface ArgusInsightsPageProps {
   tabBar?: React.ReactNode;
 }
 
-const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({ embedded = false, tabBar }) => {
+const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
+  embedded = false,
+  tabBar,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -1223,7 +1226,9 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({ embedded = false,
         availableTypes={['line', 'bar', 'stacked-bar', 'table']}
       />
       <CompareSelector value={comparePeriod} onChange={setComparePeriod} />
-      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
+      {!embedded && (
+        <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      )}
       <CsvExportButton
         data={csvData}
         filename="insights"
@@ -1267,7 +1272,9 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({ embedded = false,
           width: '100%',
           pr: 2,
           userSelect: 'none',
-          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+            outline: 'none',
+          },
           '& .recharts-responsive-container': { minHeight: '1px !important' },
         }}
       >

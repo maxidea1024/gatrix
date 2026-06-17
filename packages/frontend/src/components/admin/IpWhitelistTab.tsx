@@ -67,8 +67,6 @@ import EmptyPagePlaceholder from '../common/EmptyPagePlaceholder';
 import PageContentLoader from '../common/PageContentLoader';
 import SearchTextField from '../common/SearchTextField';
 
-
-
 interface IpWhitelistTabProps {
   canManage?: boolean;
 }
@@ -879,8 +877,6 @@ const IpWhitelistTab: React.FC<IpWhitelistTabProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-
-
     </>
   );
 };

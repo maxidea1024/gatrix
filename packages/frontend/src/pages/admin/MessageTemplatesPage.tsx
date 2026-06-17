@@ -1510,8 +1510,6 @@ const MessageTemplatesPage: React.FC = () => {
         }}
         onReset={handleResetColumns}
       />
-
-
     </Box>
   );
 };

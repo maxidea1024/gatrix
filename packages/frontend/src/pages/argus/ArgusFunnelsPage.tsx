@@ -176,7 +176,10 @@ interface ArgusFunnelsPageProps {
   tabBar?: React.ReactNode;
 }
 
-const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({ embedded = false, tabBar }) => {
+const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
+  embedded = false,
+  tabBar,
+}) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
@@ -1622,7 +1625,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({ embedded = false, t
           </IconButton>
         </Box>
       )}
-      {!embedded && <DateRangeSelector value={dateRange} onChange={setDateRange} compact />}
+      {!embedded && (
+        <DateRangeSelector value={dateRange} onChange={setDateRange} compact />
+      )}
       <CsvExportButton
         data={csvData}
         filename="funnels"
@@ -3178,7 +3183,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({ embedded = false, t
             width: '100%',
             pr: 2,
             userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+              outline: 'none',
+            },
           }}
         >
           <ResponsiveContainer
@@ -3580,7 +3587,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({ embedded = false, t
           width: '100%',
           pr: 2,
           userSelect: 'none',
-          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+          '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+            outline: 'none',
+          },
         }}
       >
         <ResponsiveContainer
@@ -3715,7 +3724,9 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({ embedded = false, t
             width: '100%',
             pr: 2,
             userSelect: 'none',
-            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': { outline: 'none' },
+            '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
+              outline: 'none',
+            },
           }}
         >
           <ResponsiveContainer

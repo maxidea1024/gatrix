@@ -151,7 +151,6 @@ const IngamePopupNoticesPage: React.FC = () => {
     useState<IngamePopupNotice | null>(null);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
-
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   // Action menu state
