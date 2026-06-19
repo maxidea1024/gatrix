@@ -113,7 +113,7 @@ const DEFAULT_FACET_WIDTH = 220;
 const MIN_FACET_WIDTH = 150;
 const MAX_FACET_WIDTH = 400;
 
-type FeedbackStatusTab = 'unresolved' | 'resolved' | 'spam' | '';
+type FeedbackStatusTab = 'all' | 'unresolved' | 'resolved' | 'spam';
 
 // ─── Main Component ───
 const ArgusFeedbackPage: React.FC = () => {
@@ -421,7 +421,7 @@ const ArgusFeedbackPage: React.FC = () => {
         page,
         limit: rowsPerPage,
         search: search || undefined,
-        status: statusTab || undefined,
+        status: statusTab === 'all' ? undefined : (statusTab || undefined),
         sort: sortOrder,
       });
       setData(result);
@@ -1011,7 +1011,7 @@ const ArgusFeedbackPage: React.FC = () => {
           value="spam"
           label={`${t('argus.feedback.statusSpam')} (${formatCompactNumber(spamCount)})`}
         />
-        <Tab value="" label={t('argus.feedback.statusAll')} />
+        <Tab value="all" label={t('argus.feedback.statusAll')} />
       </FeedbackTabs>
 
       {/* Bulk Action Toolbar */}
