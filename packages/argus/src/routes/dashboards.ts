@@ -777,11 +777,9 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           };
           const route = analyticsRouteMap[query.analytics_type];
           if (!route) {
-            return reply
-              .code(400)
-              .send({
-                error: `Unknown analytics_type: ${query.analytics_type}`,
-              });
+            return reply.code(400).send({
+              error: `Unknown analytics_type: ${query.analytics_type}`,
+            });
           }
 
           // Inject period/start/end from widget query into analytics config

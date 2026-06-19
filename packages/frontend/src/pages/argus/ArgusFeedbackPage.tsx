@@ -421,7 +421,7 @@ const ArgusFeedbackPage: React.FC = () => {
         page,
         limit: rowsPerPage,
         search: search || undefined,
-        status: statusTab === 'all' ? undefined : (statusTab || undefined),
+        status: statusTab === 'all' ? undefined : statusTab || undefined,
         sort: sortOrder,
       });
       setData(result);
