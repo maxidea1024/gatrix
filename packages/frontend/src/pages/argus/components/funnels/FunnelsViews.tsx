@@ -2,7 +2,6 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { Box, Typography, Tooltip, useTheme, alpha } from '@mui/material';
 import {
   ArrowDownward as ArrowDownIcon,
-  Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,8 +14,8 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  Cell,
   Legend,
+  ReferenceArea,
 } from 'recharts';
 
 import { useOrgProject } from '@/contexts/OrgProjectContext';
@@ -26,7 +25,7 @@ import { useSharedEventCatalog } from '../../hooks/useSharedEventCatalog';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { splitBreakdownValue } from '../analytics/breakdownUtils';
 import EventLabel from '@/components/argus/EventLabel';
-import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
+
 import { FUNNEL_COLORS, SEGMENT_COLORS } from './FunnelsLeftPanel';
 import type { AnalyticsEventNameEntry } from '@/services/argusService';
 
@@ -51,14 +50,59 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
   const viewMode = useFunnelsStore((s) => s.viewMode);
   const chartLayout = useFunnelsStore((s) => s.chartLayout);
   const breakdownProperties = useFunnelsStore((s) => s.breakdownProperties);
+  const setDateRange = useFunnelsStore((s) => s.setDateRange);
 
   // ── Shared Event Catalog ──
   const { availableEvents } = useSharedEventCatalog(projectId);
 
   // ── Local Visualization State ──
-  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
-    new Set()
-  );
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null);
+  const [refAreaRight, setRefAreaRight] = useState<string | null>(null);
+
+  const handleZoom = useCallback(() => {
+    if (refAreaLeft === refAreaRight || !refAreaLeft || !refAreaRight) {
+      setRefAreaLeft(null);
+      setRefAreaRight(null);
+      return;
+    }
+
+    const parseLocalDate = (dateStr: string) => {
+      const cleanStr = dateStr.replace(' ', 'T');
+      if (cleanStr.includes('T')) {
+        return new Date(cleanStr);
+      }
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        return new Date(year, month, day);
+      }
+      return new Date(dateStr);
+    };
+
+    const leftDate = parseLocalDate(refAreaLeft);
+    const rightDate = parseLocalDate(refAreaRight);
+
+    if (isNaN(leftDate.getTime()) || isNaN(rightDate.getTime())) {
+      setRefAreaLeft(null);
+      setRefAreaRight(null);
+      return;
+    }
+
+    const start = leftDate <= rightDate ? leftDate : rightDate;
+    const end = leftDate <= rightDate ? rightDate : leftDate;
+
+    // Set end to the end of that day (23:59:59.999) if it was just a date string (no time part)
+    if (!refAreaRight.includes(':') && !refAreaLeft.includes(':')) {
+      end.setHours(23, 59, 59, 999);
+    }
+
+    setDateRange({ type: 'custom', start, end });
+    setRefAreaLeft(null);
+    setRefAreaRight(null);
+  }, [refAreaLeft, refAreaRight, setDateRange]);
 
   // Reset hidden keys when result changes
   React.useEffect(() => {
@@ -99,10 +143,55 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
 
   const trendingData = useMemo(() => {
     if (!result?.trending) return [];
-    return result.trending.map((t: any) => ({
-      date: t.date,
-      conversion_rate: t.conversion_rate,
-    }));
+    
+    const dataMap = new Map<string, Record<string, any>>();
+    for (const t of result.trending) {
+      dataMap.set(t.date, {
+        date: t.date,
+        conversion_rate: t.conversion_rate,
+      });
+    }
+
+    if (result.breakdowns) {
+      for (const [bdKey, bdVal] of Object.entries(result.breakdowns)) {
+        const bdTrending = (bdVal as any).trending || [];
+        const displayName =
+          splitBreakdownValue(bdKey).join(' · ') || bdKey || '(empty)';
+        for (const t of bdTrending) {
+          const entry = dataMap.get(t.date) || { date: t.date };
+          entry[displayName] = t.conversion_rate;
+          dataMap.set(t.date, entry);
+        }
+      }
+    }
+
+    if (result.segments) {
+      const segKeys = result.segments.map((s: any, idx: number) => {
+        let label = s.name || `Segment ${idx + 1}`;
+        if (label === 'Overall') label = `${label} (${idx + 1})`;
+        return label;
+      });
+      const seen = new Set<string>();
+      const uniqueKeys = segKeys.map((k: string, idx: number) => {
+        if (seen.has(k)) return `${k} (${idx + 1})`;
+        seen.add(k);
+        return k;
+      });
+
+      result.segments.forEach((seg: any, idx: number) => {
+        const segTrending = seg.trending || [];
+        const key = uniqueKeys[idx];
+        for (const t of segTrending) {
+          const entry = dataMap.get(t.date) || { date: t.date };
+          entry[key] = t.conversion_rate;
+          dataMap.set(t.date, entry);
+        }
+      });
+    }
+
+    return Array.from(dataMap.values()).sort((a, b) =>
+      a.date.localeCompare(b.date)
+    );
   }, [result]);
 
   const timeToConvertData = useMemo(() => {
@@ -485,7 +574,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversion', 'Overall Conversion Rate')}
+            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
           </Typography>
         </Box>
 
@@ -870,7 +959,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversion', 'Overall Conversion Rate')}
+            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
           </Typography>
         </Box>
         <Box
@@ -1075,6 +1164,257 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
     );
   };
 
+  /* ─── Render: Breakdown Horizontal Chart ─── */
+  const renderBreakdownHorizontalChart = () => {
+    const breakdowns = result.breakdowns;
+    const bdKeys = Object.keys(breakdowns).slice(0, 10);
+    const stepDefs = result.steps as any[];
+    const BDC = [
+      '#6366f1',
+      '#f59e0b',
+      '#10b981',
+      '#ec4899',
+      '#3b82f6',
+      '#ef4444',
+      '#8b5cf6',
+      '#14b8a6',
+      '#f97316',
+      '#84cc16',
+    ];
+    const globalMax = Math.max(
+      ...bdKeys.flatMap((bk) =>
+        ((breakdowns[bk].steps || []) as any[]).map((s: any) => s.count ?? 0)
+      ),
+      1
+    );
+
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, px: 1 }}>
+          <Typography variant="h3" fontWeight={800} sx={{ color: '#6366f1' }}>
+            {result.overall_conversion ?? 0}%
+          </Typography>
+          <Typography
+            variant="subtitle1"
+            color="text.secondary"
+            fontWeight={500}
+          >
+            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', px: 1 }}>
+          {bdKeys.map((key, idx) => (
+            <Box
+              key={key}
+              sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
+            >
+              <Box
+                sx={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  bgcolor: BDC[idx % BDC.length],
+                  flexShrink: 0,
+                }}
+              />
+              <Typography
+                variant="caption"
+                sx={{ fontSize: '0.72rem', color: 'text.secondary' }}
+              >
+                {splitBreakdownValue(key).join(' · ') || key || '(empty)'}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+
+        <Box sx={{ px: 1, py: 1 }}>
+          {stepDefs.map((step, stepIdx) => {
+            const stepColor = FUNNEL_COLORS[stepIdx % FUNNEL_COLORS.length];
+
+            return (
+              <React.Fragment key={stepIdx}>
+                {stepIdx > 0 && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.75,
+                      pl: '142px',
+                      py: 0.25,
+                      minHeight: 16,
+                      opacity: 0.6,
+                    }}
+                  >
+                    <ArrowDownIcon
+                      sx={{ fontSize: 12, color: 'text.disabled' }}
+                    />
+                  </Box>
+                )}
+                <Box sx={{ mb: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      mb: 0.5,
+                      px: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: '5px',
+                        bgcolor: stepColor,
+                        color: '#fff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.6rem',
+                        fontWeight: 800,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {stepIdx + 1}
+                    </Box>
+                    <Tooltip title={step.name} placement="top" arrow>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: '0.8rem',
+                          maxWidth: 200,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {lexiconMap.get(step.name) || step.name}
+                      </Typography>
+                    </Tooltip>
+                  </Box>
+                  {bdKeys.map((bdKey, bdIdx) => {
+                    const bdSteps = (breakdowns[bdKey].steps || []) as any[];
+                    const bdStep = bdSteps[stepIdx];
+                    const count = bdStep?.count ?? 0;
+                    const rate = bdStep?.conversion_rate ?? 0;
+                    const color = BDC[bdIdx % BDC.length];
+                    const barWidth =
+                      globalMax > 0 ? (count / globalMax) * 100 : 0;
+
+                    return (
+                      <Box
+                        key={bdKey}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          px: 1,
+                          py: '2px',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            width: 120,
+                            flexShrink: 0,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: '0.68rem',
+                              color: 'text.secondary',
+                            }}
+                          >
+                            {splitBreakdownValue(bdKey).join(' · ') ||
+                              bdKey ||
+                              '(empty)'}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ flex: 1, position: 'relative', height: 22 }}>
+                          <Box
+                            onClick={() => handleBarClick(step.name)}
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              bottom: 0,
+                              width: count > 0 ? `${Math.max(barWidth, 0.5)}%` : 0,
+                              bgcolor: color,
+                              borderRadius: 1,
+                              transition: 'width 0.6s ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
+                              pr: barWidth > 15 ? 0.75 : 0,
+                              cursor: 'pointer',
+                              '&:hover': { filter: 'brightness(1.15)' },
+                            }}
+                          >
+                            {barWidth > 15 && (
+                              <Typography
+                                variant="caption"
+                                sx={{
+                                  color: '#fff',
+                                  fontWeight: 700,
+                                  fontSize: '0.65rem',
+                                  lineHeight: 1,
+                                  textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+                                }}
+                              >
+                                {rate}%
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                            minWidth: 40,
+                            textAlign: 'right',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {formatCompactNumber(count)}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: '0.65rem',
+                            color:
+                              rate >= 70
+                                ? '#10b981'
+                                : rate >= 30
+                                  ? '#f59e0b'
+                                  : '#ef4444',
+                            minWidth: 32,
+                            textAlign: 'right',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {rate}%
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </React.Fragment>
+            );
+          })}
+        </Box>
+
+        {renderBreakdownComparison()}
+      </Box>
+    );
+  };
+
   /* ─── Render: Steps View ─── */
   const renderStepsView = () => {
     if (chartData.length === 0) return null;
@@ -1083,7 +1423,11 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
       breakdownProperties.length > 0 &&
       result?.breakdowns &&
       Object.keys(result.breakdowns).length > 0;
-    if (hasBreakdown) return renderBreakdownFunnelChart();
+    if (hasBreakdown) {
+      return chartLayout === 'vertical'
+        ? renderBreakdownFunnelChart()
+        : renderBreakdownHorizontalChart();
+    }
 
     const gridStroke = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
     const maxCount = Math.max(...chartData.map((d: any) => d.count), 1);
@@ -1107,7 +1451,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversion', 'Overall Conversion Rate')}
+            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
           </Typography>
         </Box>
 
@@ -2036,6 +2380,85 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
   const renderTrendingView = () => {
     if (trendingData.length === 0) return null;
 
+    let lines: {
+      dataKey: string;
+      stroke: string;
+      strokeDasharray?: string;
+      name: string;
+    }[] = [];
+
+    const hasBreakdown =
+      breakdownProperties.length > 0 &&
+      result?.breakdowns &&
+      Object.keys(result.breakdowns).length > 0;
+
+    const hasSegments = result?.segments && result.segments.length > 0;
+
+    if (hasBreakdown) {
+      const BDC = [
+        '#6366f1',
+        '#f59e0b',
+        '#10b981',
+        '#ef4444',
+        '#8b5cf6',
+        '#06b6d4',
+        '#f97316',
+        '#ec4899',
+        '#14b8a6',
+        '#84cc16',
+      ];
+      const bdKeys = Object.keys(result.breakdowns || {});
+      lines = bdKeys.map((bk, idx) => {
+        const displayName =
+          splitBreakdownValue(bk).join(' · ') || bk || '(empty)';
+        return {
+          dataKey: displayName,
+          stroke: BDC[idx % BDC.length],
+          name: displayName,
+        };
+      });
+    } else if (hasSegments) {
+      const segs = result.segments || [];
+      const segKeys = segs.map((s: any, idx: number) => {
+        let label = s.name || `Segment ${idx + 1}`;
+        if (label === 'Overall') label = `${label} (${idx + 1})`;
+        return label;
+      });
+      const seen = new Set<string>();
+      const uniqueKeys = segKeys.map((k: string, idx: number) => {
+        if (seen.has(k)) return `${k} (${idx + 1})`;
+        seen.add(k);
+        return k;
+      });
+
+      // Segment lines
+      lines = segs.map((s: any, idx: number) => {
+        const key = uniqueKeys[idx];
+        return {
+          dataKey: key,
+          stroke: s.color || SEGMENT_COLORS[idx % SEGMENT_COLORS.length],
+          name: key,
+        };
+      });
+
+      // Plus "Overall" dashed line
+      lines.unshift({
+        dataKey: 'conversion_rate',
+        stroke: '#94a3b8',
+        strokeDasharray: '5 5',
+        name: t('argus.analytics.overallConversion', 'Overall'),
+      });
+    } else {
+      // Just single overall line
+      lines = [
+        {
+          dataKey: 'conversion_rate',
+          stroke: '#6366f1',
+          name: t('argus.analytics.conversionRatePercent', 'Conversion %'),
+        },
+      ];
+    }
+
     return (
       <Box
         sx={{
@@ -2060,12 +2483,30 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
           <LineChart
             data={trendingData}
             margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            onMouseDown={(e) =>
+              e && setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
+            }
+            onMouseMove={(e) =>
+              e &&
+              refAreaLeft &&
+              setRefAreaRight(e.activeLabel ? String(e.activeLabel) : null)
+            }
+            onMouseUp={handleZoom}
           >
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
               stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
             />
+            {refAreaLeft && refAreaRight && (
+              <ReferenceArea
+                x1={refAreaLeft}
+                x2={refAreaRight}
+                strokeOpacity={0.3}
+                fill={theme.palette.primary.main}
+                fillOpacity={0.15}
+              />
+            )}
             <XAxis
               dataKey="date"
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
@@ -2095,15 +2536,27 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
                 fontWeight: 600,
               }}
             />
-            <Line
-              type="monotone"
-              dataKey="conversion_rate"
-              stroke="#6366f1"
-              strokeWidth={2.5}
-              dot={{ r: 3 }}
-              activeDot={{ r: 6 }}
-              name="Conversion %"
-            />
+            {(hasBreakdown || hasSegments) && (
+              <Legend
+                onClick={handleLegendClick}
+                formatter={renderLegendText}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
+              />
+            )}
+            {lines.map((line) => (
+              <Line
+                key={line.dataKey}
+                type="monotone"
+                dataKey={line.dataKey}
+                stroke={line.stroke}
+                strokeDasharray={line.strokeDasharray}
+                strokeWidth={2.5}
+                dot={{ r: 3 }}
+                activeDot={{ r: 6 }}
+                name={line.name}
+                hide={hiddenSeriesKeys.has(line.dataKey)}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </Box>
@@ -2225,7 +2678,12 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
                   fontWeight: 600,
                 }}
               />
-              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="count"
+                fill="#6366f1"
+                radius={[4, 4, 0, 0]}
+                name={t('argus.common.count', 'Count')}
+              />
             </BarChart>
           </ResponsiveContainer>
         </Box>

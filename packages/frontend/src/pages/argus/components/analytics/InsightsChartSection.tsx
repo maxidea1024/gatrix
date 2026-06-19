@@ -552,18 +552,18 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
           maxHeight: 600,
           width: '100%',
           pr: 2,
+          position: 'relative',
           userSelect: 'none',
           '& .recharts-wrapper, & .recharts-surface, & svg, & svg *': {
             outline: 'none',
           },
-          '& .recharts-responsive-container': { minHeight: '1px !important' },
         }}
       >
         <ResponsiveContainer
           width="100%"
           height="100%"
-          minWidth={0}
-          minHeight={0}
+          minWidth={1}
+          minHeight={1}
           debounce={100}
         >
           {chartType === 'line' ? (

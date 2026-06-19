@@ -375,15 +375,15 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
       >
         {(
           [
-            { label: 'Funnel Steps', apiMode: 'steps', sub: 'funnel' },
-            { label: 'Line', apiMode: 'trending', sub: 'funnel' },
-            { label: 'Metric', apiMode: 'steps', sub: 'metric' },
+            { label: t('argus.analytics.funnelSteps', 'Funnel Steps'), apiMode: 'steps', sub: 'funnel' },
+            { label: t('argus.analytics.lineChart', 'Line'), apiMode: 'trending', sub: 'funnel' },
+            { label: t('argus.analytics.metricView', 'Metric'), apiMode: 'steps', sub: 'metric' },
             {
-              label: 'Time to Conv.',
+              label: t('argus.analytics.timeToConvert', 'Time to Conv.'),
               apiMode: 'time_to_convert',
               sub: 'funnel',
             },
-          ] as const
+          ]
         ).map(({ label, apiMode, sub }) => {
           const isActive =
             viewMode === apiMode &&

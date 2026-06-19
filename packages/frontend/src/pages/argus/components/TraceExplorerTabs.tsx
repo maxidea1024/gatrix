@@ -231,13 +231,13 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
                   }}
                 >
                   <colgroup>
-                    <col style={{ width: '13%' }} /> {/* TIMESTAMP */}
-                    <col style={{ width: '7%' }} /> {/* OP */}
-                    <col style={{ width: '40%' }} /> {/* DESCRIPTION */}
-                    <col style={{ width: '10%' }} /> {/* DURATION */}
-                    <col style={{ width: '8%' }} /> {/* STATUS */}
-                    <col style={{ width: '15%' }} /> {/* TRACE */}
-                    <col style={{ width: '7%' }} /> {/* ACTIONS */}
+                    <col style={{ width: '13%' }} />
+                    <col style={{ width: '7%' }} />
+                    <col style={{ width: '40%' }} />
+                    <col style={{ width: '10%' }} />
+                    <col style={{ width: '8%' }} />
+                    <col style={{ width: '15%' }} />
+                    <col style={{ width: '7%' }} />
                   </colgroup>
                   <TableHead>
                     <TableRow>

@@ -293,7 +293,7 @@ async function autoRegisterLexicon(projectId: string, events: any[]) {
             ? name
             : name
                 .split(/[_-]/)
-                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
                 .join(' '),
           status: 'active',
           is_reserved: name.startsWith('$'),
@@ -326,7 +326,7 @@ async function autoRegisterLexicon(projectId: string, events: any[]) {
             ? name
             : name
                 .split(/[_-]/)
-                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
                 .join(' '),
           data_type: propertyMap.get(name) || 'string',
           status: 'active',

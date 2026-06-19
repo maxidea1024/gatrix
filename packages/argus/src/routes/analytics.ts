@@ -1063,60 +1063,114 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               ? `${whereClause} AND ${segFilterConds.join(' AND ')}`
               : whereClause;
 
-          const segSql = `
-            SELECT
-              level,
-              count() AS cnt
-            FROM (
+          if (body.mode === 'trending') {
+            const bucketing = getBucketingConfig(
+              body.period || '14d',
+              body.start,
+              body.end
+            );
+            const segTrendingSql = `
               SELECT
-                user_id,
-                windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
-              FROM ${TABLE}
-              WHERE ${segWhereClause}
-              ${exclusionFilter}
-              GROUP BY user_id
-            )
-            WHERE level > 0
-            GROUP BY level
-            ORDER BY level ASC
-          `;
+                toDate(min_ts) AS bucket,
+                count() AS total_users,
+                countIf(level >= ${totalSteps}) AS converted_users
+              FROM (
+                SELECT
+                  user_id,
+                  min(timestamp) AS min_ts,
+                  windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
+                FROM ${TABLE}
+                WHERE ${segWhereClause}
+                  ${exclusionFilter}
+                GROUP BY user_id
+              )
+              WHERE level > 0
+              GROUP BY bucket
+              ORDER BY bucket ASC
+              WITH FILL
+                FROM toDate(toDateTime({fillStart:UInt32}))
+                TO toDate(toDateTime({fillEnd:UInt32}))
+                STEP INTERVAL 1 DAY
+            `;
 
-          const { data: segRows } = (await optic.rawQuery({
-            query: segSql,
-            params: segParams,
-          })) as { data: any[] };
+            const trendingParams = { ...segParams, ...bucketing.queryParams };
+            const { data: trendingRows } = (await optic.rawQuery({
+              query: segTrendingSql,
+              params: trendingParams,
+            })) as { data: any[] };
 
-          const segLevelCounts = new Array(totalSteps + 1).fill(0);
-          for (const row of segRows) {
-            segLevelCounts[Number(row.level)] = Number(row.cnt);
-          }
-          const segStepCounts = new Array(totalSteps).fill(0);
-          for (let step = totalSteps; step >= 1; step--) {
-            segStepCounts[step - 1] = segLevelCounts[step];
-            if (step < totalSteps) {
-              segStepCounts[step - 1] += segStepCounts[step];
+            segmentResults.push({
+              id: seg.id,
+              name: seg.name,
+              color: seg.color,
+              trending: trendingRows.map((r: any) => ({
+                date: String(r.bucket),
+                conversion_rate:
+                  Number(r.total_users) > 0
+                    ? Math.round(
+                        (Number(r.converted_users) / Number(r.total_users)) * 1000
+                      ) / 10
+                    : 0,
+                total_users: Number(r.total_users) || 0,
+                converted_users: Number(r.converted_users) || 0,
+              })),
+            });
+          } else {
+            const segSql = `
+              SELECT
+                level,
+                count() AS cnt
+              FROM (
+                SELECT
+                  user_id,
+                  windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
+                FROM ${TABLE}
+                WHERE ${segWhereClause}
+                ${exclusionFilter}
+                GROUP BY user_id
+              )
+              WHERE level > 0
+              GROUP BY level
+              ORDER BY level ASC
+            `;
+
+            const { data: segRows } = (await optic.rawQuery({
+              query: segSql,
+              params: segParams,
+            })) as { data: any[] };
+
+            const segLevelCounts = new Array(totalSteps + 1).fill(0);
+            for (const row of segRows) {
+              segLevelCounts[Number(row.level)] = Number(row.cnt);
             }
-          }
-          const segFirstCount = segStepCounts[0];
-          segmentResults.push({
-            id: seg.id,
-            name: seg.name,
-            color: seg.color,
-            steps: eventNames.map((name, i) => ({
-              name,
-              count: segStepCounts[i],
-              conversion_rate:
+            const segStepCounts = new Array(totalSteps).fill(0);
+            for (let step = totalSteps; step >= 1; step--) {
+              segStepCounts[step - 1] = segLevelCounts[step];
+              if (step < totalSteps) {
+                segStepCounts[step - 1] += segStepCounts[step];
+              }
+            }
+            const segFirstCount = segStepCounts[0];
+            segmentResults.push({
+              id: seg.id,
+              name: seg.name,
+              color: seg.color,
+              steps: eventNames.map((name, i) => ({
+                name,
+                count: segStepCounts[i],
+                conversion_rate:
+                  segFirstCount > 0
+                    ? Math.round((segStepCounts[i] / segFirstCount) * 1000) / 10
+                    : 0,
+              })),
+              overall_conversion:
                 segFirstCount > 0
-                  ? Math.round((segStepCounts[i] / segFirstCount) * 1000) / 10
+                  ? Math.round(
+                      (segStepCounts[totalSteps - 1] / segFirstCount) * 1000
+                    ) / 10
                   : 0,
-            })),
-            overall_conversion:
-              segFirstCount > 0
-                ? Math.round(
-                    (segStepCounts[totalSteps - 1] / segFirstCount) * 1000
-                  ) / 10
-                : 0,
-          });
+            });
+          }
         }
         baseResult.segments = segmentResults;
       }
@@ -1151,57 +1205,108 @@ export default async function analyticsRoutes(app: FastifyInstance) {
 
             const bdWhereClause = `${whereClause} AND ${bdCol} = {${bdParamKey}:String}`;
 
-            const bdSql = `
-              SELECT
-                level,
-                count() AS cnt
-              FROM (
+            if (body.mode === 'trending') {
+              const bucketing = getBucketingConfig(
+                body.period || '14d',
+                body.start,
+                body.end
+              );
+              const bdTrendingSql = `
                 SELECT
-                  user_id,
-                  windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
-                FROM ${TABLE}
-                WHERE ${bdWhereClause}
-                ${exclusionFilter}
-                GROUP BY user_id
-              )
-              WHERE level > 0
-              GROUP BY level
-              ORDER BY level ASC
-            `;
+                  toDate(min_ts) AS bucket,
+                  count() AS total_users,
+                  countIf(level >= ${totalSteps}) AS converted_users
+                FROM (
+                  SELECT
+                    user_id,
+                    min(timestamp) AS min_ts,
+                    windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
+                  FROM ${TABLE}
+                  WHERE ${bdWhereClause}
+                    ${exclusionFilter}
+                  GROUP BY user_id
+                )
+                WHERE level > 0
+                GROUP BY bucket
+                ORDER BY bucket ASC
+                WITH FILL
+                  FROM toDate(toDateTime({fillStart:UInt32}))
+                  TO toDate(toDateTime({fillEnd:UInt32}))
+                  STEP INTERVAL 1 DAY
+              `;
 
-            const { data: bdRows } = (await optic.rawQuery({
-              query: bdSql,
-              params: bdParams,
-            })) as { data: any[] };
+              const trendingParams = { ...bdParams, ...bucketing.queryParams };
+              const { data: trendingRows } = (await optic.rawQuery({
+                query: bdTrendingSql,
+                params: trendingParams,
+              })) as { data: any[] };
 
-            const bdLevelCounts = new Array(totalSteps + 1).fill(0);
-            for (const row of bdRows) {
-              bdLevelCounts[Number(row.level)] = Number(row.cnt);
-            }
-            const bdStepCounts = new Array(totalSteps).fill(0);
-            for (let step = totalSteps; step >= 1; step--) {
-              bdStepCounts[step - 1] = bdLevelCounts[step];
-              if (step < totalSteps) {
-                bdStepCounts[step - 1] += bdStepCounts[step];
+              breakdownResults[bv] = {
+                trending: trendingRows.map((r: any) => ({
+                  date: String(r.bucket),
+                  conversion_rate:
+                    Number(r.total_users) > 0
+                      ? Math.round(
+                          (Number(r.converted_users) / Number(r.total_users)) * 1000
+                        ) / 10
+                      : 0,
+                  total_users: Number(r.total_users) || 0,
+                  converted_users: Number(r.converted_users) || 0,
+                })),
+              };
+            } else {
+              const bdSql = `
+                SELECT
+                  level,
+                  count() AS cnt
+                FROM (
+                  SELECT
+                    user_id,
+                    windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
+                  FROM ${TABLE}
+                  WHERE ${bdWhereClause}
+                  ${exclusionFilter}
+                  GROUP BY user_id
+                )
+                WHERE level > 0
+                GROUP BY level
+                ORDER BY level ASC
+              `;
+
+              const { data: bdRows } = (await optic.rawQuery({
+                query: bdSql,
+                params: bdParams,
+              })) as { data: any[] };
+
+              const bdLevelCounts = new Array(totalSteps + 1).fill(0);
+              for (const row of bdRows) {
+                bdLevelCounts[Number(row.level)] = Number(row.cnt);
               }
-            }
-            const bdFirstCount = bdStepCounts[0];
-            breakdownResults[bv] = {
-              steps: eventNames.map((name, i) => ({
-                name,
-                count: bdStepCounts[i],
-                conversion_rate:
+              const bdStepCounts = new Array(totalSteps).fill(0);
+              for (let step = totalSteps; step >= 1; step--) {
+                bdStepCounts[step - 1] = bdLevelCounts[step];
+                if (step < totalSteps) {
+                  bdStepCounts[step - 1] += bdStepCounts[step];
+                }
+              }
+              const bdFirstCount = bdStepCounts[0];
+              breakdownResults[bv] = {
+                steps: eventNames.map((name, i) => ({
+                  name,
+                  count: bdStepCounts[i],
+                  conversion_rate:
+                    bdFirstCount > 0
+                      ? Math.round((bdStepCounts[i] / bdFirstCount) * 1000) / 10
+                      : 0,
+                })),
+                overall_conversion:
                   bdFirstCount > 0
-                    ? Math.round((bdStepCounts[i] / bdFirstCount) * 1000) / 10
+                    ? Math.round(
+                        (bdStepCounts[totalSteps - 1] / bdFirstCount) * 1000
+                      ) / 10
                     : 0,
-              })),
-              overall_conversion:
-                bdFirstCount > 0
-                  ? Math.round(
-                      (bdStepCounts[totalSteps - 1] / bdFirstCount) * 1000
-                    ) / 10
-                  : 0,
-            };
+              };
+            }
           }
 
           baseResult.breakdowns = breakdownResults;
