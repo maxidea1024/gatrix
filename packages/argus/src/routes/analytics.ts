@@ -1108,7 +1108,8 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 conversion_rate:
                   Number(r.total_users) > 0
                     ? Math.round(
-                        (Number(r.converted_users) / Number(r.total_users)) * 1000
+                        (Number(r.converted_users) / Number(r.total_users)) *
+                          1000
                       ) / 10
                     : 0,
                 total_users: Number(r.total_users) || 0,
@@ -1247,7 +1248,8 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                   conversion_rate:
                     Number(r.total_users) > 0
                       ? Math.round(
-                          (Number(r.converted_users) / Number(r.total_users)) * 1000
+                          (Number(r.converted_users) / Number(r.total_users)) *
+                            1000
                         ) / 10
                       : 0,
                   total_users: Number(r.total_users) || 0,

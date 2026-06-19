@@ -373,18 +373,28 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
           flexShrink: 0,
         }}
       >
-        {(
-          [
-            { label: t('argus.analytics.funnelSteps', 'Funnel Steps'), apiMode: 'steps', sub: 'funnel' },
-            { label: t('argus.analytics.lineChart', 'Line'), apiMode: 'trending', sub: 'funnel' },
-            { label: t('argus.analytics.metricView', 'Metric'), apiMode: 'steps', sub: 'metric' },
-            {
-              label: t('argus.analytics.timeToConvert', 'Time to Conv.'),
-              apiMode: 'time_to_convert',
-              sub: 'funnel',
-            },
-          ]
-        ).map(({ label, apiMode, sub }) => {
+        {[
+          {
+            label: t('argus.analytics.funnelSteps', 'Funnel Steps'),
+            apiMode: 'steps',
+            sub: 'funnel',
+          },
+          {
+            label: t('argus.analytics.lineChart', 'Line'),
+            apiMode: 'trending',
+            sub: 'funnel',
+          },
+          {
+            label: t('argus.analytics.metricView', 'Metric'),
+            apiMode: 'steps',
+            sub: 'metric',
+          },
+          {
+            label: t('argus.analytics.timeToConvert', 'Time to Conv.'),
+            apiMode: 'time_to_convert',
+            sub: 'funnel',
+          },
+        ].map(({ label, apiMode, sub }) => {
           const isActive =
             viewMode === apiMode &&
             (apiMode !== 'steps' || chartSubType === sub);

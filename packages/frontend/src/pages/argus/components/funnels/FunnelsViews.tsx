@@ -1,8 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Box, Typography, Tooltip, useTheme, alpha } from '@mui/material';
-import {
-  ArrowDownward as ArrowDownIcon,
-} from '@mui/icons-material';
+import { ArrowDownward as ArrowDownIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart,
@@ -56,7 +54,9 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
   const { availableEvents } = useSharedEventCatalog(projectId);
 
   // ── Local Visualization State ──
-  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
+    new Set()
+  );
   const [refAreaLeft, setRefAreaLeft] = useState<string | null>(null);
   const [refAreaRight, setRefAreaRight] = useState<string | null>(null);
 
@@ -143,7 +143,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
 
   const trendingData = useMemo(() => {
     if (!result?.trending) return [];
-    
+
     const dataMap = new Map<string, Record<string, any>>();
     for (const t of result.trending) {
       dataMap.set(t.date, {
@@ -574,7 +574,10 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
+            {t(
+              'argus.analytics.overallConversionRate',
+              'Overall Conversion Rate'
+            )}
           </Typography>
         </Box>
 
@@ -959,7 +962,10 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
+            {t(
+              'argus.analytics.overallConversionRate',
+              'Overall Conversion Rate'
+            )}
           </Typography>
         </Box>
         <Box
@@ -1199,7 +1205,10 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
+            {t(
+              'argus.analytics.overallConversionRate',
+              'Overall Conversion Rate'
+            )}
           </Typography>
         </Box>
 
@@ -1343,7 +1352,8 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
                               top: 0,
                               left: 0,
                               bottom: 0,
-                              width: count > 0 ? `${Math.max(barWidth, 0.5)}%` : 0,
+                              width:
+                                count > 0 ? `${Math.max(barWidth, 0.5)}%` : 0,
                               bgcolor: color,
                               borderRadius: 1,
                               transition: 'width 0.6s ease',
@@ -1451,7 +1461,10 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             color="text.secondary"
             fontWeight={500}
           >
-            {t('argus.analytics.overallConversionRate', 'Overall Conversion Rate')}
+            {t(
+              'argus.analytics.overallConversionRate',
+              'Overall Conversion Rate'
+            )}
           </Typography>
         </Box>
 
