@@ -533,7 +533,6 @@ const ArgusExplorePage: React.FC = () => {
               onSelect={handleSortSelect}
             />
 
-
             <Menu
               anchorEl={newMenuAnchor}
               open={Boolean(newMenuAnchor)}
