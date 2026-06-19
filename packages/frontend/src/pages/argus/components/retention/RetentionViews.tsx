@@ -14,7 +14,10 @@ import {
 } from 'recharts';
 import { useTranslation } from 'react-i18next';
 import { formatCompactNumber } from '@/utils/numberFormat';
-import { splitBreakdownValue, formatBreakdownLabel } from '../analytics/breakdownUtils';
+import {
+  splitBreakdownValue,
+  formatBreakdownLabel,
+} from '../analytics/breakdownUtils';
 
 const SERIES_COLORS = [
   '#6366f1',
@@ -31,11 +34,18 @@ interface RetentionViewsProps {
   cohorts: any[];
   breakdownCohorts: Record<string, any[]> | undefined;
   retentionType: 'day' | 'week' | 'month';
-  measurement: 'retention_rate' | 'unique_users' | 'property_sum' | 'property_avg';
+  measurement:
+    | 'retention_rate'
+    | 'unique_users'
+    | 'property_sum'
+    | 'property_avg';
   viewMode: 'curve' | 'line' | 'bar' | 'table' | 'metric';
   breakdownProperties: string[];
   handleCellClick: (cohortDateStr: string, periodIndex: number) => void;
-  handleBreakdownCellClick: (breakdownValue: string, periodIndex: number) => void;
+  handleBreakdownCellClick: (
+    breakdownValue: string,
+    periodIndex: number
+  ) => void;
 }
 
 export const RetentionViews: React.FC<RetentionViewsProps> = ({
@@ -52,9 +62,12 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-  const periodPrefix = retentionType === 'day' ? 'D' : retentionType === 'week' ? 'W' : 'M';
+  const periodPrefix =
+    retentionType === 'day' ? 'D' : retentionType === 'week' ? 'W' : 'M';
 
-  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
+    new Set()
+  );
 
   // Reset hidden keys when cohorts change
   useEffect(() => {
@@ -95,7 +108,9 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
   // ── Curve data ──
   const curveData = useMemo(() => {
     if (cohorts.length === 0) return [];
-    const maxPeriods = Math.max(...cohorts.map((c) => c.retention?.length || 0));
+    const maxPeriods = Math.max(
+      ...cohorts.map((c) => c.retention?.length || 0)
+    );
     const avgRetention: number[] = Array(maxPeriods).fill(0);
     const counts: number[] = Array(maxPeriods).fill(0);
 
@@ -130,7 +145,8 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
 
   // ── Breakdown curve data ──
   const breakdownCurveData = useMemo(() => {
-    if (!breakdownCohorts || Object.keys(breakdownCohorts).length === 0) return null;
+    if (!breakdownCohorts || Object.keys(breakdownCohorts).length === 0)
+      return null;
 
     let maxPeriods = 0;
     for (const bvCohorts of Object.values(breakdownCohorts)) {
@@ -145,8 +161,14 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
     const BREAKDOWN_LIMIT = 10;
     if (breakdownKeys.length > BREAKDOWN_LIMIT) {
       breakdownKeys.sort((a, b) => {
-        const sumA = breakdownCohorts[a].reduce((s: number, c: any) => s + (c.cohort_size || 0), 0);
-        const sumB = breakdownCohorts[b].reduce((s: number, c: any) => s + (c.cohort_size || 0), 0);
+        const sumA = breakdownCohorts[a].reduce(
+          (s: number, c: any) => s + (c.cohort_size || 0),
+          0
+        );
+        const sumB = breakdownCohorts[b].reduce(
+          (s: number, c: any) => s + (c.cohort_size || 0),
+          0
+        );
         return sumB - sumA;
       });
       breakdownKeys = breakdownKeys.slice(0, BREAKDOWN_LIMIT);
@@ -178,7 +200,11 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
 
   // ── Render: Retention Curve ──
   const renderCurveView = () => {
-    if (breakdownCurveData && breakdownCurveData.length > 0 && breakdownCohorts) {
+    if (
+      breakdownCurveData &&
+      breakdownCurveData.length > 0 &&
+      breakdownCohorts
+    ) {
       const breakdownKeys = Object.keys(breakdownCohorts);
       return (
         <Box
@@ -195,10 +221,29 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
             },
           }}
         >
-          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-            <LineChart data={breakdownCurveData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} />
-              <XAxis dataKey="period" tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} tickMargin={16} />
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+            debounce={50}
+          >
+            <LineChart
+              data={breakdownCurveData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
+              />
+              <XAxis
+                dataKey="period"
+                tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={16}
+              />
               <YAxis
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                 tickLine={false}
@@ -217,9 +262,16 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                   fontSize: 12,
                 }}
                 itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
-                labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+                labelStyle={{
+                  color: isDark ? '#a1a1aa' : '#52525b',
+                  fontWeight: 600,
+                }}
               />
-              <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
+              <Legend
+                onClick={handleLegendClick}
+                formatter={renderLegendText}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
+              />
               {breakdownKeys.map((key, idx) => (
                 <Line
                   key={key}
@@ -239,7 +291,9 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
     }
 
     if (curveData.length === 0) return null;
-    const cohortKeys = cohorts.map((c) => String(c.cohort_date).substring(0, 10));
+    const cohortKeys = cohorts.map((c) =>
+      String(c.cohort_date).substring(0, 10)
+    );
 
     return (
       <Box
@@ -256,10 +310,29 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
           },
         }}
       >
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-          <LineChart data={curveData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} />
-            <XAxis dataKey="period" tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} tickMargin={16} />
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={0}
+          debounce={50}
+        >
+          <LineChart
+            data={curveData}
+            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
+            />
+            <XAxis
+              dataKey="period"
+              tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={16}
+            />
             <YAxis
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
               tickLine={false}
@@ -278,9 +351,16 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                 fontSize: 12,
               }}
               itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
-              labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+              labelStyle={{
+                color: isDark ? '#a1a1aa' : '#52525b',
+                fontWeight: 600,
+              }}
             />
-            <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
+            <Legend
+              onClick={handleLegendClick}
+              formatter={renderLegendText}
+              wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
+            />
             <Line
               type="monotone"
               dataKey="average"
@@ -310,7 +390,11 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
 
   // ── Render: Bar Chart ──
   const renderBarView = () => {
-    if (breakdownCurveData && breakdownCurveData.length > 0 && breakdownCohorts) {
+    if (
+      breakdownCurveData &&
+      breakdownCurveData.length > 0 &&
+      breakdownCohorts
+    ) {
       const breakdownKeys = Object.keys(breakdownCohorts).slice(0, 10);
       return (
         <Box
@@ -327,10 +411,29 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
             },
           }}
         >
-          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-            <BarChart data={breakdownCurveData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} />
-              <XAxis dataKey="period" tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} tickMargin={16} />
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+            debounce={50}
+          >
+            <BarChart
+              data={breakdownCurveData}
+              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
+              />
+              <XAxis
+                dataKey="period"
+                tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={16}
+              />
               <YAxis
                 tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
                 tickLine={false}
@@ -349,11 +452,25 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                   fontSize: 12,
                 }}
                 itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
-                labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+                labelStyle={{
+                  color: isDark ? '#a1a1aa' : '#52525b',
+                  fontWeight: 600,
+                }}
               />
-              <Legend onClick={handleLegendClick} formatter={renderLegendText} wrapperStyle={{ fontSize: 11, paddingTop: 12 }} />
+              <Legend
+                onClick={handleLegendClick}
+                formatter={renderLegendText}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
+              />
               {breakdownKeys.map((key, idx) => (
-                <Bar key={key} dataKey={key} hide={hiddenSeriesKeys.has(key)} fill={SERIES_COLORS[idx % SERIES_COLORS.length]} radius={[4, 4, 0, 0]} name={key} />
+                <Bar
+                  key={key}
+                  dataKey={key}
+                  hide={hiddenSeriesKeys.has(key)}
+                  fill={SERIES_COLORS[idx % SERIES_COLORS.length]}
+                  radius={[4, 4, 0, 0]}
+                  name={key}
+                />
               ))}
             </BarChart>
           </ResponsiveContainer>
@@ -377,10 +494,29 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
           },
         }}
       >
-        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={50}>
-          <BarChart data={curveData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} />
-            <XAxis dataKey="period" tick={{ fontSize: 11, fill: theme.palette.text.secondary }} tickLine={false} axisLine={false} tickMargin={16} />
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+          minWidth={0}
+          minHeight={0}
+          debounce={50}
+        >
+          <BarChart
+            data={curveData}
+            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}
+            />
+            <XAxis
+              dataKey="period"
+              tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={16}
+            />
             <YAxis
               tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
               tickLine={false}
@@ -399,9 +535,17 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                 fontSize: 12,
               }}
               itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
-              labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+              labelStyle={{
+                color: isDark ? '#a1a1aa' : '#52525b',
+                fontWeight: 600,
+              }}
             />
-            <Bar dataKey="average" fill="#6366f1" radius={[4, 4, 0, 0]} name={t('argus.analytics.average', 'Average')} />
+            <Bar
+              dataKey="average"
+              fill="#6366f1"
+              radius={[4, 4, 0, 0]}
+              name={t('argus.analytics.average', 'Average')}
+            />
           </BarChart>
         </ResponsiveContainer>
       </Box>
@@ -411,23 +555,36 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
   // ── Render: Metric view ──
   const renderMetricView = () => {
     if (cohorts.length === 0) return null;
-    const avgRetention = cohorts.reduce((sum, c) => sum + (c.retention?.[1] ?? 0), 0) / cohorts.length;
+    const avgRetention =
+      cohorts.reduce((sum, c) => sum + (c.retention?.[1] ?? 0), 0) /
+      cohorts.length;
 
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 300 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: 300,
+        }}
+      >
         <Box sx={{ textAlign: 'center' }}>
           <Typography variant="h2" fontWeight={800} sx={{ color: '#6366f1' }}>
             {Math.round(avgRetention * 10) / 10}%
           </Typography>
           <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 1 }}>
-            {t('argus.analytics.avgRetentionLabel', 'Average {{period}} Retention', {
-              period:
-                retentionType === 'day'
-                  ? t('argus.analytics.day1', 'Day 1')
-                  : retentionType === 'week'
-                    ? t('argus.analytics.week1', 'Week 1')
-                    : t('argus.analytics.month1', 'Month 1'),
-            })}
+            {t(
+              'argus.analytics.avgRetentionLabel',
+              'Average {{period}} Retention',
+              {
+                period:
+                  retentionType === 'day'
+                    ? t('argus.analytics.day1', 'Day 1')
+                    : retentionType === 'week'
+                      ? t('argus.analytics.week1', 'Week 1')
+                      : t('argus.analytics.month1', 'Month 1'),
+              }
+            )}
           </Typography>
         </Box>
       </Box>
@@ -438,7 +595,8 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
   const renderHeatmapTable = () => {
     if (cohorts.length === 0) return null;
 
-    const hasBreakdown = breakdownCohorts && Object.keys(breakdownCohorts).length > 0;
+    const hasBreakdown =
+      breakdownCohorts && Object.keys(breakdownCohorts).length > 0;
 
     const renderBreakdownSummary = () => {
       if (!hasBreakdown || maxPeriods === 0) return null;
@@ -447,7 +605,10 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
 
       const summaryRows = bdKeys.map((bv, idx) => {
         const bvCohorts = breakdownCohorts![bv];
-        const totalSize = bvCohorts.reduce((s: number, c: any) => s + (c.cohort_size || 0), 0);
+        const totalSize = bvCohorts.reduce(
+          (s: number, c: any) => s + (c.cohort_size || 0),
+          0
+        );
 
         const avgRetention: number[] = [];
         for (let p = 0; p < maxPeriods; p++) {
@@ -461,7 +622,11 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
               totalWeight += size;
             }
           }
-          avgRetention.push(totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : 0);
+          avgRetention.push(
+            totalWeight > 0
+              ? Math.round((weightedSum / totalWeight) * 10) / 10
+              : 0
+          );
         }
 
         return {
@@ -473,18 +638,47 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
         };
       });
 
-      summaryRows.sort((a, b) => (b.retention[1] ?? b.retention[0] ?? 0) - (a.retention[1] ?? a.retention[0] ?? 0));
+      summaryRows.sort(
+        (a, b) =>
+          (b.retention[1] ?? b.retention[0] ?? 0) -
+          (a.retention[1] ?? a.retention[0] ?? 0)
+      );
 
       return (
         <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, px: 0.5, color: 'text.secondary', fontSize: '0.78rem' }}>
+          <Typography
+            variant="subtitle2"
+            fontWeight={700}
+            sx={{
+              mb: 1,
+              px: 0.5,
+              color: 'text.secondary',
+              fontSize: '0.78rem',
+            }}
+          >
             {t('argus.analytics.breakdownComparison', 'Breakdown Comparison')}
-            <Typography component="span" variant="caption" sx={{ ml: 1, opacity: 0.6 }}>
+            <Typography
+              component="span"
+              variant="caption"
+              sx={{ ml: 1, opacity: 0.6 }}
+            >
               ({breakdownProperties.join(' · ')})
             </Typography>
           </Typography>
-          <Box sx={{ overflowX: 'auto', border: `1px solid ${borderColor}`, borderRadius: 1 }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+          <Box
+            sx={{
+              overflowX: 'auto',
+              border: `1px solid ${borderColor}`,
+              borderRadius: 1,
+            }}
+          >
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.78rem',
+              }}
+            >
               <thead>
                 <tr>
                   {breakdownProperties.length > 1 ? (
@@ -558,12 +752,16 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                 {summaryRows.map((row, rowIdx) => (
                   <tr
                     key={rowIdx}
-                    style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}` }}
+                    style={{
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+                    }}
                     onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.backgroundColor = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+                      (e.currentTarget as HTMLElement).style.backgroundColor =
+                        isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
                     }}
                     onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                      (e.currentTarget as HTMLElement).style.backgroundColor =
+                        'transparent';
                     }}
                   >
                     {breakdownProperties.length > 1 ? (
@@ -583,11 +781,32 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                               : {}),
                           }}
                         >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1,
+                            }}
+                          >
                             {pIdx === 0 && (
-                              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: row.color, flexShrink: 0 }} />
+                              <Box
+                                sx={{
+                                  width: 10,
+                                  height: 10,
+                                  borderRadius: '50%',
+                                  bgcolor: row.color,
+                                  flexShrink: 0,
+                                }}
+                              />
                             )}
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>
+                            <span
+                              style={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                maxWidth: 140,
+                              }}
+                            >
                               {part || '(empty)'}
                             </span>
                           </Box>
@@ -607,17 +826,44 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                           zIndex: 1,
                         }}
                       >
-                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: row.color, flexShrink: 0 }} />
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 140 }}>{row.label}</span>
+                        <Box
+                          sx={{
+                            width: 10,
+                            height: 10,
+                            borderRadius: '50%',
+                            bgcolor: row.color,
+                            flexShrink: 0,
+                          }}
+                        />
+                        <span
+                          style={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            maxWidth: 140,
+                          }}
+                        >
+                          {row.label}
+                        </span>
                       </td>
                     )}
-                    <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                    <td
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'right',
+                        fontWeight: 700,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
                       {formatCompactNumber(row.size)}
                     </td>
                     {row.retention.map((pct, colIdx) => (
                       <td key={colIdx} style={{ padding: '6px 4px' }}>
                         <Box
-                          onClick={() => pct > 0 && handleBreakdownCellClick(row.label, colIdx)}
+                          onClick={() =>
+                            pct > 0 &&
+                            handleBreakdownCellClick(row.label, colIdx)
+                          }
                           sx={{
                             width: '100%',
                             height: 26,
@@ -625,12 +871,29 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                             alignItems: 'center',
                             justifyContent: 'center',
                             borderRadius: 0.5,
-                            background: pct > 0 ? alpha(row.color, Math.min(0.15 + (pct / 100) * 0.55, 0.7)) : 'transparent',
-                            color: pct > 60 ? '#fff' : pct > 0 ? theme.palette.text.primary : theme.palette.text.disabled,
+                            background:
+                              pct > 0
+                                ? alpha(
+                                    row.color,
+                                    Math.min(0.15 + (pct / 100) * 0.55, 0.7)
+                                  )
+                                : 'transparent',
+                            color:
+                              pct > 60
+                                ? '#fff'
+                                : pct > 0
+                                  ? theme.palette.text.primary
+                                  : theme.palette.text.disabled,
                             fontWeight: pct > 0 ? 600 : 400,
                             fontSize: '0.72rem',
                             cursor: pct > 0 ? 'pointer' : 'default',
-                            '&:hover': pct > 0 ? { filter: 'brightness(1.15)', transform: 'scale(1.02)' } : {},
+                            '&:hover':
+                              pct > 0
+                                ? {
+                                    filter: 'brightness(1.15)',
+                                    transform: 'scale(1.02)',
+                                  }
+                                : {},
                             transition: 'all 0.1s ease',
                           }}
                         >
@@ -651,8 +914,21 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
       <Box sx={{ mt: viewMode === 'table' ? 0 : 2 }}>
         {renderBreakdownSummary()}
 
-        <Box sx={{ overflowX: 'auto', ...(viewMode !== 'table' && { borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }) }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+        <Box
+          sx={{
+            overflowX: 'auto',
+            ...(viewMode !== 'table' && {
+              borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            }),
+          }}
+        >
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '0.8rem',
+            }}
+          >
             <thead>
               <tr>
                 <th
@@ -715,13 +991,29 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                   >
                     {String(cohort.cohort_date).substring(0, 10)}
                   </td>
-                  <td style={{ padding: '6px 12px', textAlign: 'right', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`, fontWeight: 700 }}>
+                  <td
+                    style={{
+                      padding: '6px 12px',
+                      textAlign: 'right',
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      fontWeight: 700,
+                    }}
+                  >
                     {formatCompactNumber(cohort.cohort_size)}
                   </td>
                   {cohort.retention?.map((pct: number, colIdx: number) => (
-                    <td key={colIdx} style={{ padding: '6px 4px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
+                    <td
+                      key={colIdx}
+                      style={{
+                        padding: '6px 4px',
+                        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                      }}
+                    >
                       <Box
-                        onClick={() => pct > 0 && handleCellClick(String(cohort.cohort_date), colIdx)}
+                        onClick={() =>
+                          pct > 0 &&
+                          handleCellClick(String(cohort.cohort_date), colIdx)
+                        }
                         sx={{
                           width: '100%',
                           height: 28,
@@ -729,11 +1021,25 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
                           alignItems: 'center',
                           justifyContent: 'center',
                           borderRadius: 1,
-                          background: pct > 0 ? alpha(getHeatColor(pct), isDark ? 0.6 : 0.85) : 'transparent',
-                          color: pct > 50 ? '#fff' : pct > 0 ? theme.palette.text.primary : theme.palette.text.disabled,
+                          background:
+                            pct > 0
+                              ? alpha(getHeatColor(pct), isDark ? 0.6 : 0.85)
+                              : 'transparent',
+                          color:
+                            pct > 50
+                              ? '#fff'
+                              : pct > 0
+                                ? theme.palette.text.primary
+                                : theme.palette.text.disabled,
                           fontWeight: pct > 0 ? 600 : 400,
                           cursor: pct > 0 ? 'pointer' : 'default',
-                          '&:hover': pct > 0 ? { filter: 'brightness(1.15)', transform: 'scale(1.02)' } : {},
+                          '&:hover':
+                            pct > 0
+                              ? {
+                                  filter: 'brightness(1.15)',
+                                  transform: 'scale(1.02)',
+                                }
+                              : {},
                           transition: 'all 0.1s ease',
                         }}
                       >

@@ -1,11 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  Tooltip,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Tooltip, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import EventLabel from '@/components/argus/EventLabel';

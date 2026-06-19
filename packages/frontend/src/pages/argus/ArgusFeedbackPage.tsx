@@ -894,7 +894,10 @@ const ArgusFeedbackPage: React.FC = () => {
             paths={[{ label: t('argus.feedback.title') }]}
           />
         }
-        subtitle={t('argus.feedback.subtitle', '사용자 피드백을 수집, 분류 및 관리합니다.')}
+        subtitle={t(
+          'argus.feedback.subtitle',
+          '사용자 피드백을 수집, 분류 및 관리합니다.'
+        )}
         actions={
           !loading && total > 0 ? (
             <TotalCountChip label={formatCompactNumber(total)} size="small" />

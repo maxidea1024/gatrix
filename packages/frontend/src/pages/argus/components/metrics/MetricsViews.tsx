@@ -105,13 +105,22 @@ export const MetricsViews: React.FC<MetricsViewsProps> = ({
               size="small"
               sx={{
                 '& td, & th': {
-                  borderColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                  borderColor: isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.04)',
                 },
               }}
             >
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1 }}>
+                  <TableCell
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.7rem',
+                      textTransform: 'uppercase',
+                      py: 1,
+                    }}
+                  >
                     {t('argus.metrics.timestamp', 'TIMESTAMP')}
                   </TableCell>
                   {displayedData.chartDatasets.map((ds) => (
@@ -135,20 +144,36 @@ export const MetricsViews: React.FC<MetricsViewsProps> = ({
                   return (
                     <TableRow key={idx} hover>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary' }}>
-                          {formatDateTimeUI(parseChDate(displayedData.buckets[idx]))}
+                        <Typography
+                          sx={{ fontSize: '0.73rem', color: 'text.secondary' }}
+                        >
+                          {formatDateTimeUI(
+                            parseChDate(displayedData.buckets[idx])
+                          )}
                         </Typography>
                       </TableCell>
                       {displayedData.chartDatasets.map((ds) => {
                         const qId = ds.id.split('_')[0];
-                        const queryObj = displayedData.queries.find((q) => q.id === qId);
+                        const queryObj = displayedData.queries.find(
+                          (q) => q.id === qId
+                        );
                         const metricName = queryObj?.metric;
-                        const unit = metricName ? displayedData.metricUnits[metricName] : undefined;
-                        const metricType = metricName ? displayedData.metricTypes[metricName] : undefined;
+                        const unit = metricName
+                          ? displayedData.metricUnits[metricName]
+                          : undefined;
+                        const metricType = metricName
+                          ? displayedData.metricTypes[metricName]
+                          : undefined;
                         return (
                           <TableCell key={ds.id} sx={{ py: 0.6 }}>
-                            <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
-                              {formatMetricValue(Number(ds.data[idx]), unit, metricType)}
+                            <Typography
+                              sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                            >
+                              {formatMetricValue(
+                                Number(ds.data[idx]),
+                                unit,
+                                metricType
+                              )}
                             </Typography>
                           </TableCell>
                         );
@@ -199,14 +224,32 @@ export const MetricsViews: React.FC<MetricsViewsProps> = ({
               size="small"
               sx={{
                 '& td, & th': {
-                  borderColor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                  borderColor: isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.04)',
                 },
               }}
             >
               <TableHead>
                 <TableRow>
-                  {['Timestamp', 'Name', 'Type', 'Value', 'Unit', 'Environment', 'Release'].map((h) => (
-                    <TableCell key={h} sx={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', py: 1 }}>
+                  {[
+                    'Timestamp',
+                    'Name',
+                    'Type',
+                    'Value',
+                    'Unit',
+                    'Environment',
+                    'Release',
+                  ].map((h) => (
+                    <TableCell
+                      key={h}
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: '0.7rem',
+                        textTransform: 'uppercase',
+                        py: 1,
+                      }}
+                    >
                       {h}
                     </TableCell>
                   ))}
@@ -214,16 +257,25 @@ export const MetricsViews: React.FC<MetricsViewsProps> = ({
               </TableHead>
               <TableBody>
                 {displayedSamplesData.map((row, idx) => {
-                  const valRaw = typeof row.value === 'object' ? JSON.stringify(row.value) : row.value;
+                  const valRaw =
+                    typeof row.value === 'object'
+                      ? JSON.stringify(row.value)
+                      : row.value;
                   return (
                     <TableRow key={idx} hover>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary' }}>
+                        <Typography
+                          sx={{ fontSize: '0.73rem', color: 'text.secondary' }}
+                        >
                           {formatDateTimeUI(row.timestamp)}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>{row.name}</Typography>
+                        <Typography
+                          sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                        >
+                          {row.name}
+                        </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.6 }}>
                         <Typography
@@ -232,7 +284,10 @@ export const MetricsViews: React.FC<MetricsViewsProps> = ({
                             px: 0.8,
                             py: 0.2,
                             borderRadius: 1,
-                            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                            backgroundColor: alpha(
+                              theme.palette.primary.main,
+                              0.08
+                            ),
                             display: 'inline-block',
                           }}
                         >
@@ -240,18 +295,32 @@ export const MetricsViews: React.FC<MetricsViewsProps> = ({
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem', fontWeight: 600 }}>
-                          {formatMetricValue(Number(valRaw), row.unit, row.metric_type)}
+                        <Typography
+                          sx={{ fontSize: '0.73rem', fontWeight: 600 }}
+                        >
+                          {formatMetricValue(
+                            Number(valRaw),
+                            row.unit,
+                            row.metric_type
+                          )}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem', color: 'text.secondary' }}>{row.unit || '—'}</Typography>
+                        <Typography
+                          sx={{ fontSize: '0.73rem', color: 'text.secondary' }}
+                        >
+                          {row.unit || '—'}
+                        </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem' }}>{row.environment || '—'}</Typography>
+                        <Typography sx={{ fontSize: '0.73rem' }}>
+                          {row.environment || '—'}
+                        </Typography>
                       </TableCell>
                       <TableCell sx={{ py: 0.6 }}>
-                        <Typography sx={{ fontSize: '0.73rem' }}>{row.release || '—'}</Typography>
+                        <Typography sx={{ fontSize: '0.73rem' }}>
+                          {row.release || '—'}
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   );

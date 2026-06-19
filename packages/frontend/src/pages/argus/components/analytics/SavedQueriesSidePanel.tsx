@@ -72,7 +72,9 @@ const SavedQueriesSidePanel: React.FC<SavedQueriesSidePanelProps> = ({
   const [drawerWidth, setDrawerWidth] = useState(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, Number(stored))) : DEFAULT_WIDTH;
+      return stored
+        ? Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, Number(stored)))
+        : DEFAULT_WIDTH;
     } catch {
       return DEFAULT_WIDTH;
     }

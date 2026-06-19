@@ -15,7 +15,6 @@ export interface WizardFieldDef {
   required?: boolean;
 }
 
-
 export interface WizardProviderConfig {
   id: string;
   name: string;

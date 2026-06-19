@@ -1,6 +1,14 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Paper, Chip, useTheme, alpha, Skeleton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Paper,
+  Chip,
+  useTheme,
+  alpha,
+  Skeleton,
+} from '@mui/material';
 import {
   StatsRowSkeleton,
   ListSkeleton,
@@ -210,7 +218,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                 borderRadius: 2,
               }}
             >
-              <Skeleton variant="text" width={100} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <Skeleton
+                variant="text"
+                width={100}
+                height={18}
+                sx={{ mb: 2, borderRadius: 0.5 }}
+              />
               <ArgusChartSkeleton height={260} />
             </Paper>
             <Paper
@@ -221,7 +234,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                 borderRadius: 2,
               }}
             >
-              <Skeleton variant="text" width={120} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <Skeleton
+                variant="text"
+                width={120}
+                height={18}
+                sx={{ mb: 2, borderRadius: 0.5 }}
+              />
               <ArgusChartSkeleton height={220} />
             </Paper>
           </Box>
@@ -236,8 +254,17 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                 borderRadius: 2,
               }}
             >
-              <Skeleton variant="text" width={150} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
-              <Skeleton variant="rounded" height={60} sx={{ borderRadius: 1.5 }} />
+              <Skeleton
+                variant="text"
+                width={150}
+                height={18}
+                sx={{ mb: 2, borderRadius: 0.5 }}
+              />
+              <Skeleton
+                variant="rounded"
+                height={60}
+                sx={{ borderRadius: 1.5 }}
+              />
             </Paper>
 
             {/* Related Issues Skeleton */}
@@ -249,7 +276,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                 borderRadius: 2,
               }}
             >
-              <Skeleton variant="text" width={120} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <Skeleton
+                variant="text"
+                width={120}
+                height={18}
+                sx={{ mb: 2, borderRadius: 0.5 }}
+              />
               <ListSkeleton rows={3} />
             </Paper>
 
@@ -269,15 +301,42 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                   borderRadius: 2,
                 }}
               >
-                <Skeleton variant="text" width={110} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <Skeleton
+                  variant="text"
+                  width={110}
+                  height={18}
+                  sx={{ mb: 2, borderRadius: 0.5 }}
+                />
+                <Box
+                  sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
+                >
                   {[1, 2, 3].map((i) => (
                     <Box key={i}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                        <Skeleton variant="text" width="40%" height={14} sx={{ borderRadius: 0.5 }} />
-                        <Skeleton variant="text" width="15%" height={14} sx={{ borderRadius: 0.5 }} />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          mb: 0.5,
+                        }}
+                      >
+                        <Skeleton
+                          variant="text"
+                          width="40%"
+                          height={14}
+                          sx={{ borderRadius: 0.5 }}
+                        />
+                        <Skeleton
+                          variant="text"
+                          width="15%"
+                          height={14}
+                          sx={{ borderRadius: 0.5 }}
+                        />
                       </Box>
-                      <Skeleton variant="rectangular" height={8} sx={{ borderRadius: 1 }} />
+                      <Skeleton
+                        variant="rectangular"
+                        height={8}
+                        sx={{ borderRadius: 1 }}
+                      />
                     </Box>
                   ))}
                 </Box>
@@ -291,7 +350,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                   borderRadius: 2,
                 }}
               >
-                <Skeleton variant="text" width={110} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+                <Skeleton
+                  variant="text"
+                  width={110}
+                  height={18}
+                  sx={{ mb: 2, borderRadius: 0.5 }}
+                />
                 <TableSkeleton rows={4} cols={3} />
               </Paper>
             </Box>

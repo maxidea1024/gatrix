@@ -43,7 +43,6 @@ import { Chart as ChartJS, ArcElement } from 'chart.js';
 import { Pie, Doughnut, Bar as BarChart } from 'react-chartjs-2';
 import TreemapChart from './TreemapChart';
 
-
 ChartJS.register(ArcElement);
 
 interface AggData {

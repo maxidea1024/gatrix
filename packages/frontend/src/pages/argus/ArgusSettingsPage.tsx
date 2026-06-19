@@ -93,7 +93,9 @@ const ArgusSettingsPage: React.FC = () => {
     try {
       const [trackers, channels] = await Promise.all([
         argusService.listIssueTrackers(projectId).catch(() => []),
-        (argusService as any).listNotificationChannels(projectId).catch(() => []),
+        (argusService as any)
+          .listNotificationChannels(projectId)
+          .catch(() => []),
       ]);
       setTrackerCount(trackers.length);
       setNotifCount(channels.length);
@@ -241,9 +243,10 @@ const ArgusSettingsPage: React.FC = () => {
             px: 0.6,
             py: 0.1,
             borderRadius: 1,
-            backgroundColor: notifCount > 0 
-              ? alpha(theme.palette.primary.main, 0.1) 
-              : 'transparent',
+            backgroundColor:
+              notifCount > 0
+                ? alpha(theme.palette.primary.main, 0.1)
+                : 'transparent',
           }}
         >
           {notifCount}
@@ -272,7 +275,9 @@ const ArgusSettingsPage: React.FC = () => {
               {trackerCount}
             </Typography>
           ) : (
-            <Tooltip title={t('argus.settings.trackerRequired', 'Connection Required')}>
+            <Tooltip
+              title={t('argus.settings.trackerRequired', 'Connection Required')}
+            >
               <Box
                 sx={{
                   display: 'flex',
@@ -391,7 +396,15 @@ const ArgusSettingsPage: React.FC = () => {
                             }}
                           />
                         )}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, minWidth: 0, flex: 1 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.2,
+                            minWidth: 0,
+                            flex: 1,
+                          }}
+                        >
                           <Box
                             sx={{
                               display: 'flex',

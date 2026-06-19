@@ -18,7 +18,10 @@ import {
   MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useRetentionStore, type EventCondition } from '@/hooks/useAnalyticsStore';
+import {
+  useRetentionStore,
+  type EventCondition,
+} from '@/hooks/useAnalyticsStore';
 import { useSharedEventCatalog } from '@/pages/argus/hooks/useSharedEventCatalog';
 import { renderLexiconIcon } from '@/utils/lexiconIcons';
 import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
@@ -73,15 +76,20 @@ export const RetentionLeftPanel: React.FC<RetentionLeftPanelProps> = ({
   const measurement = useRetentionStore((s) => s.measurement);
   const setMeasurement = useRetentionStore((s) => s.setMeasurement);
   const measurementProperty = useRetentionStore((s) => s.measurementProperty);
-  const setMeasurementProperty = useRetentionStore((s) => s.setMeasurementProperty);
+  const setMeasurementProperty = useRetentionStore(
+    (s) => s.setMeasurementProperty
+  );
   const minFrequency = useRetentionStore((s) => s.minFrequency);
   const setMinFrequency = useRetentionStore((s) => s.setMinFrequency);
   const breakdownProperties = useRetentionStore((s) => s.breakdownProperties);
-  const setBreakdownProperties = useRetentionStore((s) => s.setBreakdownProperties);
+  const setBreakdownProperties = useRetentionStore(
+    (s) => s.setBreakdownProperties
+  );
 
   // ── Catalog & Localization ──
   const { availableEvents } = useSharedEventCatalog(projectId);
-  const { localizeEventName: lfn, localizeEventDescription: lfd } = useLocalizedLexicon();
+  const { localizeEventName: lfn, localizeEventDescription: lfd } =
+    useLocalizedLexicon();
 
   const eventOptions = useMemo(
     () =>
@@ -346,7 +354,9 @@ export const RetentionLeftPanel: React.FC<RetentionLeftPanelProps> = ({
               <ArrowDownIcon
                 sx={{
                   fontSize: 14,
-                  color: isDark ? 'rgba(99,102,241,0.7)' : 'rgba(99,102,241,0.5)',
+                  color: isDark
+                    ? 'rgba(99,102,241,0.7)'
+                    : 'rgba(99,102,241,0.5)',
                 }}
               />
             </Box>

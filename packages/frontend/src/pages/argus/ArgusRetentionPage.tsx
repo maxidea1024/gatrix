@@ -93,7 +93,9 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
 
   // Quick lexicon editor state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   // ── Run Query ──
@@ -370,7 +372,10 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
               size="title"
             />
           }
-          subtitle={t('argus.analytics.retentionSubtitle', '코호트 기반 사용자 리텐션을 측정하고 분석합니다.')}
+          subtitle={t(
+            'argus.analytics.retentionSubtitle',
+            '코호트 기반 사용자 리텐션을 측정하고 분석합니다.'
+          )}
         />
       )}
       <Box

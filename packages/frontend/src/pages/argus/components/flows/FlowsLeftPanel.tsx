@@ -67,7 +67,8 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
 
   // ── Shared Event Catalog ──
   const { availableEvents } = useSharedEventCatalog(projectId);
-  const { localizeEventName: lfn, localizeEventDescription: lfd } = useLocalizedLexicon();
+  const { localizeEventName: lfn, localizeEventDescription: lfd } =
+    useLocalizedLexicon();
 
   const eventOptions = useMemo(
     () =>
@@ -91,7 +92,9 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
     false
   );
   const [excludeListScrolling, setExcludeListScrolling] = useState(false);
-  const excludeScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const excludeScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   // ── Derived direction ──
   React.useEffect(() => {
@@ -117,7 +120,8 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
   // ── Exclude list scroll — suppress tooltips while scrolling ──
   const handleExcludeListScroll = useCallback(() => {
     setExcludeListScrolling(true);
-    if (excludeScrollTimerRef.current) clearTimeout(excludeScrollTimerRef.current);
+    if (excludeScrollTimerRef.current)
+      clearTimeout(excludeScrollTimerRef.current);
     excludeScrollTimerRef.current = setTimeout(() => {
       setExcludeListScrolling(false);
     }, 300);
@@ -194,7 +198,9 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
                   <ArrowDownIconMui
                     sx={{
                       fontSize: 14,
-                      color: isDark ? 'rgba(236,72,153,0.7)' : 'rgba(236,72,153,0.5)',
+                      color: isDark
+                        ? 'rgba(236,72,153,0.7)'
+                        : 'rgba(236,72,153,0.5)',
                     }}
                   />
                 </Box>
@@ -230,7 +236,10 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
                     value={anchorEventB}
                     onChange={setAnchorEventB}
                     options={eventOptions}
-                    emptyLabel={t('argus.analytics.selectEvent', 'Select Event')}
+                    emptyLabel={t(
+                      'argus.analytics.selectEvent',
+                      'Select Event'
+                    )}
                     highlightEmpty
                     onEditOption={onEditOption}
                   />
@@ -290,7 +299,9 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
         </Box>
 
         <Collapse in={settingsExpanded} timeout={200}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, pt: 0.5 }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, pt: 0.5 }}
+          >
             {/* Direction */}
             {!showSecondAnchor && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -305,8 +316,14 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
                   value={direction}
                   onChange={(val) => setDirection(val as any)}
                   options={[
-                    { value: 'after', label: t('argus.analytics.after', 'After') },
-                    { value: 'before', label: t('argus.analytics.before', 'Before') },
+                    {
+                      value: 'after',
+                      label: t('argus.analytics.after', 'After'),
+                    },
+                    {
+                      value: 'before',
+                      label: t('argus.analytics.before', 'Before'),
+                    },
                   ]}
                 />
               </Box>
@@ -324,7 +341,9 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
                   : t('argus.analytics.stepsAfter', 'Steps After')}
               </Typography>
               <InlineSelect
-                value={String(direction === 'before' ? stepsBefore : stepsAfter)}
+                value={String(
+                  direction === 'before' ? stepsBefore : stepsAfter
+                )}
                 onChange={(val) => {
                   const n = Number(val);
                   if (direction === 'before') setStepsBefore(n);
@@ -393,11 +412,17 @@ export const FlowsLeftPanel: React.FC<FlowsLeftPanelProps> = ({
                 borderRadius: 1,
                 cursor: 'pointer',
                 fontSize: '0.75rem',
-                color: excludeEvents.includes(e.name) ? 'error.main' : 'text.primary',
-                textDecoration: excludeEvents.includes(e.name) ? 'line-through' : 'none',
+                color: excludeEvents.includes(e.name)
+                  ? 'error.main'
+                  : 'text.primary',
+                textDecoration: excludeEvents.includes(e.name)
+                  ? 'line-through'
+                  : 'none',
                 opacity: excludeEvents.includes(e.name) ? 0.5 : 1,
                 '&:hover': {
-                  bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                  bgcolor: isDark
+                    ? 'rgba(255,255,255,0.04)'
+                    : 'rgba(0,0,0,0.04)',
                 },
               }}
             >

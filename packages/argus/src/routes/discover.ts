@@ -637,7 +637,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
         if (
           String(error?.message || '').includes('is_favorite') &&
           (error?.code === 'ER_BAD_FIELD_ERROR' ||
-            String(error?.message || '').includes("Unknown column"))
+            String(error?.message || '').includes('Unknown column'))
         ) {
           try {
             await db.schema.alterTable('g_argus_saved_queries', (table) => {
@@ -649,7 +649,10 @@ export default async function discoverRoutes(app: FastifyInstance) {
             return reply.send({ success: true });
           } catch (retryError) {
             logger.error('Failed to add is_favorite column', {
-              error: retryError instanceof Error ? retryError.message : String(retryError),
+              error:
+                retryError instanceof Error
+                  ? retryError.message
+                  : String(retryError),
             });
           }
         }
@@ -658,9 +661,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
           queryId,
           error: error instanceof Error ? error.message : String(error),
         });
-        return reply
-          .code(500)
-          .send({ error: 'Failed to toggle favorite' });
+        return reply.code(500).send({ error: 'Failed to toggle favorite' });
       }
     }
   );

@@ -193,9 +193,10 @@ const ArgusExplorePage: React.FC = () => {
   const handleQueryClick = (query: ArgusSavedQuery) => {
     const config = DATASET_CONFIG[query.query_type];
     if (!config) return;
-    const cfg = typeof query.query_config === 'string'
-      ? JSON.parse(query.query_config)
-      : query.query_config || {};
+    const cfg =
+      typeof query.query_config === 'string'
+        ? JSON.parse(query.query_config)
+        : query.query_config || {};
     const params = new URLSearchParams();
     if (query.id) params.set('queryId', String(query.id));
 
@@ -306,86 +307,84 @@ const ArgusExplorePage: React.FC = () => {
           mb: 2,
         }}
       >
-          {(
-            Object.entries(DATASET_CONFIG) as [
-              SavedQueryType,
-              (typeof DATASET_CONFIG)[SavedQueryType],
-            ][]
-          ).map(([type, cfg]) => (
+        {(
+          Object.entries(DATASET_CONFIG) as [
+            SavedQueryType,
+            (typeof DATASET_CONFIG)[SavedQueryType],
+          ][]
+        ).map(([type, cfg]) => (
+          <Box
+            key={type}
+            onClick={() => navigate(cfg.path)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.2,
+              p: 1.5,
+              borderRadius: 2,
+              cursor: 'pointer',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.015)' : '#fff',
+              transition: 'all 0.2s',
+              '&:hover': {
+                borderColor: cfg.color,
+                backgroundColor: alpha(cfg.color, 0.04),
+                transform: 'translateY(-1px)',
+                boxShadow: `0 4px 12px ${alpha(cfg.color, 0.1)}`,
+              },
+            }}
+          >
             <Box
-              key={type}
-              onClick={() => navigate(cfg.path)}
               sx={{
+                width: 32,
+                height: 32,
+                minWidth: 32,
+                borderRadius: '8px',
+                backgroundColor: alpha(cfg.color, 0.12),
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1.2,
-                p: 1.5,
-                borderRadius: 2,
-                cursor: 'pointer',
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.015)'
-                  : '#fff',
-                transition: 'all 0.2s',
-                '&:hover': {
-                  borderColor: cfg.color,
-                  backgroundColor: alpha(cfg.color, 0.04),
-                  transform: 'translateY(-1px)',
-                  boxShadow: `0 4px 12px ${alpha(cfg.color, 0.1)}`,
-                },
+                justifyContent: 'center',
+                color: cfg.color,
               }}
             >
-              <Box
+              {React.cloneElement(cfg.icon as React.ReactElement, {
+                sx: { fontSize: 18, color: cfg.color },
+              })}
+            </Box>
+            <Box sx={{ minWidth: 0 }}>
+              <Typography
                 sx={{
-                  width: 32,
-                  height: 32,
-                  minWidth: 32,
-                  borderRadius: '8px',
-                  backgroundColor: alpha(cfg.color, 0.12),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: cfg.color,
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
-                {React.cloneElement(cfg.icon as React.ReactElement, {
-                  sx: { fontSize: 18, color: cfg.color },
-                })}
-              </Box>
-              <Box sx={{ minWidth: 0 }}>
-                <Typography
-                  sx={{
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {t(
-                    `argus.explore.new${type.charAt(0).toUpperCase() + type.slice(1)}`
-                  )}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: '0.65rem',
-                    color: 'text.disabled',
-                    lineHeight: 1.3,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {type === 'traces' && t('argus.explore.tracesDesc')}
-                  {type === 'logs' && t('argus.explore.logsDesc')}
-                  {type === 'metrics' && t('argus.explore.metricsDesc')}
-                  {type === 'discover' && t('argus.explore.discoverDesc')}
-                  {type === 'issues' && t('argus.explore.issuesDesc')}
-                </Typography>
-              </Box>
+                {t(
+                  `argus.explore.new${type.charAt(0).toUpperCase() + type.slice(1)}`
+                )}
+              </Typography>
+              <Typography
+                sx={{
+                  fontSize: '0.65rem',
+                  color: 'text.disabled',
+                  lineHeight: 1.3,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {type === 'traces' && t('argus.explore.tracesDesc')}
+                {type === 'logs' && t('argus.explore.logsDesc')}
+                {type === 'metrics' && t('argus.explore.metricsDesc')}
+                {type === 'discover' && t('argus.explore.discoverDesc')}
+                {type === 'issues' && t('argus.explore.issuesDesc')}
+              </Typography>
             </Box>
-          ))}
+          </Box>
+        ))}
       </Box>
 
       {/* ── Saved Queries Panel ── */}
@@ -423,7 +422,9 @@ const ArgusExplorePage: React.FC = () => {
               borderRadius: '10px',
             }}
           />
-          <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Box
+            sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}
+          >
             {/* Search */}
             <Box
               sx={{
@@ -589,9 +590,7 @@ const ArgusExplorePage: React.FC = () => {
 
         {/* Card Grid */}
         <Box sx={{ p: 2 }}>
-          <PageContentLoader
-            loading={loading}
-          >
+          <PageContentLoader loading={loading}>
             {filteredQueries.length > 0 ? (
               <Box
                 sx={{

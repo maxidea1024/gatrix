@@ -452,7 +452,10 @@ const ArgusDashboardsPage: React.FC = () => {
               paths={[{ label: t('argus.dashboards.title', 'Dashboards') }]}
             />
           }
-          subtitle={t('argus.dashboards.subtitle', '커스텀 대시보드를 생성하고 관리합니다.')}
+          subtitle={t(
+            'argus.dashboards.subtitle',
+            '커스텀 대시보드를 생성하고 관리합니다.'
+          )}
           actions={
             <Button
               variant="contained"

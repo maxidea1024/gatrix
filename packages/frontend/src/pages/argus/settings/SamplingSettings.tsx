@@ -86,7 +86,9 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
             size="small"
             sx={{ ...inpSx, width: 200 }}
             InputProps={{
-              endAdornment: <InputAdornment position="end">/day</InputAdornment>,
+              endAdornment: (
+                <InputAdornment position="end">/day</InputAdornment>
+              ),
             }}
           />
         </FieldBlock>

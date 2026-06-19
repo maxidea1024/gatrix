@@ -60,9 +60,7 @@ const PerformanceTransactionTable: React.FC<
   }, [transactions]);
 
   return (
-    <PageContentLoader
-      loading={loading}
-    >
+    <PageContentLoader loading={loading}>
       {/* Performance Summary Stats */}
       {transactions.length > 0 && (
         <Box

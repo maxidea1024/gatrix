@@ -5,12 +5,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import {
-  Box,
-  IconButton,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, IconButton, useTheme, alpha } from '@mui/material';
 import {
   ViewColumn as VerticalIcon,
   ViewStream as HorizontalIcon,
@@ -506,7 +501,10 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
               size="title"
             />
           }
-          subtitle={t('argus.analytics.funnelsSubtitle', '단계별 전환율을 측정하고 이탈 구간을 파악합니다.')}
+          subtitle={t(
+            'argus.analytics.funnelsSubtitle',
+            '단계별 전환율을 측정하고 이탈 구간을 파악합니다.'
+          )}
         />
       )}
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>

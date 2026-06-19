@@ -19,9 +19,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import argusService from '@/services/argusService';
 import { useLocalizedLexicon } from '@/pages/argus/hooks/useLocalizedLexicon';
 import { evaluateFormula } from '@/pages/argus/hooks/useFormulaEngine';
-import {
-  useInsightsStore,
-} from '@/hooks/useAnalyticsStore';
+import { useInsightsStore } from '@/hooks/useAnalyticsStore';
 import { useGlobalAnalyticsFilter } from '@/hooks/useGlobalAnalyticsFilter';
 import { useSharedEventCatalog } from './hooks/useSharedEventCatalog';
 
@@ -29,10 +27,16 @@ import AnalyticsLayout from './components/analytics/AnalyticsLayout';
 import CsvExportButton from './components/analytics/CsvExportButton';
 import ChartTypeSelector from './components/analytics/ChartTypeSelector';
 import CompareSelector from './components/analytics/CompareSelector';
-import { useBreakdownLimit, limitBreakdownSeries } from './components/analytics/useBreakdownLimit';
+import {
+  useBreakdownLimit,
+  limitBreakdownSeries,
+} from './components/analytics/useBreakdownLimit';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { formatBreakdownLabel, splitBreakdownValue } from './components/analytics/breakdownUtils';
+import {
+  formatBreakdownLabel,
+  splitBreakdownValue,
+} from './components/analytics/breakdownUtils';
 import { InsightsLeftPanel } from './components/analytics/InsightsLeftPanel';
 import { InsightsChartSection } from './components/analytics/InsightsChartSection';
 
@@ -44,7 +48,9 @@ interface ArgusInsightsPageProps {
   onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
   isPanelDragging?: boolean;
   /** Called when the chart drag-zoom sets a new date range (so parent UI can sync) */
-  onDateRangeChange?: (v: import('@/components/common/DateRangeSelector').DateRangeValue) => void;
+  onDateRangeChange?: (
+    v: import('@/components/common/DateRangeSelector').DateRangeValue
+  ) => void;
 }
 
 const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
@@ -125,11 +131,11 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
     // new Date("06/19 09:00") → Invalid Date because the format is non-standard.
     // We look up the original ISO string stored in formattedToRawBucketRef.
     const lookup = formattedToRawBucketRef.current;
-    const rawLeft  = lookup.get(refAreaLeft)  ?? refAreaLeft;
+    const rawLeft = lookup.get(refAreaLeft) ?? refAreaLeft;
     const rawRight = lookup.get(refAreaRight) ?? refAreaRight;
 
     // Parse the ISO string (replace space separator with 'T' for safety)
-    const leftDate  = new Date(rawLeft.replace(' ', 'T'));
+    const leftDate = new Date(rawLeft.replace(' ', 'T'));
     const rightDate = new Date(rawRight.replace(' ', 'T'));
 
     if (isNaN(leftDate.getTime()) || isNaN(rightDate.getTime())) {
@@ -140,7 +146,7 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
 
     // Ensure chronological order (user may drag right-to-left)
     const start = leftDate <= rightDate ? leftDate : rightDate;
-    const end   = leftDate <= rightDate ? rightDate : leftDate;
+    const end = leftDate <= rightDate ? rightDate : leftDate;
     end.setHours(23, 59, 59, 999);
 
     setDateRange({ type: 'custom', start, end });
@@ -293,7 +299,10 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
       .map(([bucket, values]) => {
         // _rawBucket preserves the original ISO string so handleZoom can
         // parse it correctly (the formatted "MM/DD HH:mm" label is not parseable by new Date)
-        const filled: Record<string, any> = { bucket: formatBucket(bucket), _rawBucket: bucket };
+        const filled: Record<string, any> = {
+          bucket: formatBucket(bucket),
+          _rawBucket: bucket,
+        };
         for (const k of allKeys) {
           filled[k] = values[k] ?? 0;
         }
@@ -471,12 +480,21 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
       });
       setDrilldownOpen(true);
     },
-    [breakdownProperties, validFormulaResults, refAreaLeft, refAreaRight, series]
+    [
+      breakdownProperties,
+      validFormulaResults,
+      refAreaLeft,
+      refAreaRight,
+      series,
+    ]
   );
 
   // ── UI: Left Panel ──
   const leftPanel = (
-    <InsightsLeftPanel queryLoading={queryLoading} onRunQuery={handleRunQuery} />
+    <InsightsLeftPanel
+      queryLoading={queryLoading}
+      onRunQuery={handleRunQuery}
+    />
   );
 
   // ── UI: Toolbar ──
@@ -524,7 +542,10 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
               size="title"
             />
           }
-          subtitle={t('argus.analytics.insightsSubtitle', '이벤트 데이터를 다양한 차트로 분석합니다.')}
+          subtitle={t(
+            'argus.analytics.insightsSubtitle',
+            '이벤트 데이터를 다양한 차트로 분석합니다.'
+          )}
         />
       )}
       <Box

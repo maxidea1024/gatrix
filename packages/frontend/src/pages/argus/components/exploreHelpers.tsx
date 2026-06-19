@@ -165,7 +165,9 @@ const MiniVolumeBar: React.FC<{
             height={barH}
             rx={1.5}
             fill={color}
-            opacity={isDark ? 0.4 + (v / maxVal) * 0.6 : 0.25 + (v / maxVal) * 0.55}
+            opacity={
+              isDark ? 0.4 + (v / maxVal) * 0.6 : 0.25 + (v / maxVal) * 0.55
+            }
           />
         );
       })}
@@ -224,7 +226,13 @@ export const QueryCard: React.FC<{
         setVolumeData(data.map((d) => Number(d.count)));
       })
       .catch(() => setVolumeData([]));
-  }, [query.id, projectId, periodLabel, query.query_type, query.query_config?.conditions]);
+  }, [
+    query.id,
+    projectId,
+    periodLabel,
+    query.query_type,
+    query.query_config?.conditions,
+  ]);
 
   return (
     <Paper

@@ -29,7 +29,6 @@ export const ChartSkeleton: React.FC<{ height?: number }> = ({
   );
 };
 
-
 /* ─── Stats Row Skeleton (4 cards) ─── */
 export const StatsRowSkeleton: React.FC<{ count?: number }> = ({
   count = 4,

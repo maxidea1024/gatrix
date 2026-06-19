@@ -1,11 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  Tooltip,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Tooltip, useTheme, alpha } from '@mui/material';
 import {
   ArrowDownward as ArrowDownIcon,
   Close as CloseIcon,
@@ -62,7 +56,9 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
   const { availableEvents } = useSharedEventCatalog(projectId);
 
   // ── Local Visualization State ──
-  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
+    new Set()
+  );
 
   // Reset hidden keys when result changes
   React.useEffect(() => {
@@ -783,14 +779,17 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
             </Box>
           </Box>
 
-          <Box sx={{ display: 'flex', gap: '8px', mt: 0.25, height: 44, pl: '40px' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '8px',
+              mt: 0.25,
+              height: 44,
+              pl: '40px',
+            }}
+          >
             {stepDefs.map((step, stepIdx) => (
-              <Tooltip
-                key={stepIdx}
-                title={step.name}
-                placement="bottom"
-                arrow
-              >
+              <Tooltip key={stepIdx} title={step.name} placement="bottom" arrow>
                 <Box
                   sx={{
                     flex: 1,
@@ -2244,9 +2243,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
         gap: 3,
       }}
     >
-      {viewMode === 'steps' &&
-        chartSubType === 'funnel' &&
-        renderStepsView()}
+      {viewMode === 'steps' && chartSubType === 'funnel' && renderStepsView()}
       {/* renderSegmentComparison only when no breakdown active */}
       {viewMode === 'steps' &&
         chartSubType === 'funnel' &&

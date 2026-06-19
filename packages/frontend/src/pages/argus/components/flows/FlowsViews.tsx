@@ -1,10 +1,18 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Box, Typography, Chip, useTheme, alpha } from '@mui/material';
-import { Sankey, Tooltip as RechartsTooltip, ResponsiveContainer, Rectangle } from 'recharts';
+import {
+  Sankey,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Rectangle,
+} from 'recharts';
 import { useTranslation } from 'react-i18next';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { formatCompactNumber } from '@/utils/numberFormat';
-import { formatBreakdownLabel, splitBreakdownValue } from '../analytics/breakdownUtils';
+import {
+  formatBreakdownLabel,
+  splitBreakdownValue,
+} from '../analytics/breakdownUtils';
 
 const NODE_COLORS = [
   '#6366f1',
@@ -135,7 +143,9 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
       '#84cc16',
     ];
     const bdKeys = flowData?.breakdowns ? Object.keys(flowData.breakdowns) : [];
-    const selectedBdIdx = selectedBreakdown ? bdKeys.indexOf(selectedBreakdown) : -1;
+    const selectedBdIdx = selectedBreakdown
+      ? bdKeys.indexOf(selectedBreakdown)
+      : -1;
     const selectedBdColor =
       selectedBdIdx >= 0
         ? BD_COLORS_SANKEY[selectedBdIdx % BD_COLORS_SANKEY.length]
@@ -144,54 +154,76 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
     return (
       <Box sx={{ width: '100%' }}>
         {/* Breakdown indicator */}
-        {flowData?.breakdowns && Object.keys(flowData.breakdowns).length > 0 && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.72rem' }}>
-              {t('argus.analytics.showing', 'Showing')}:
-            </Typography>
-            <Box
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.5,
-                px: 1,
-                py: 0.25,
-                borderRadius: 1,
-                bgcolor: selectedBdColor
-                  ? alpha(selectedBdColor, 0.15)
-                  : isDark
-                    ? 'rgba(255,255,255,0.06)'
-                    : 'rgba(0,0,0,0.04)',
-                border: `1px solid ${
-                  selectedBdColor
-                    ? alpha(selectedBdColor, 0.3)
-                    : isDark
-                      ? 'rgba(255,255,255,0.1)'
-                      : 'rgba(0,0,0,0.08)'
-                }`,
-              }}
-            >
-              {selectedBdColor && (
-                <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: selectedBdColor }} />
-              )}
+        {flowData?.breakdowns &&
+          Object.keys(flowData.breakdowns).length > 0 && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <Typography
                 variant="caption"
+                color="text.secondary"
+                sx={{ fontSize: '0.72rem' }}
+              >
+                {t('argus.analytics.showing', 'Showing')}:
+              </Typography>
+              <Box
                 sx={{
-                  fontWeight: 700,
-                  fontSize: '0.72rem',
-                  color: selectedBdColor || theme.palette.text.primary,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  px: 1,
+                  py: 0.25,
+                  borderRadius: 1,
+                  bgcolor: selectedBdColor
+                    ? alpha(selectedBdColor, 0.15)
+                    : isDark
+                      ? 'rgba(255,255,255,0.06)'
+                      : 'rgba(0,0,0,0.04)',
+                  border: `1px solid ${
+                    selectedBdColor
+                      ? alpha(selectedBdColor, 0.3)
+                      : isDark
+                        ? 'rgba(255,255,255,0.1)'
+                        : 'rgba(0,0,0,0.08)'
+                  }`,
                 }}
               >
-                {selectedBreakdown
-                  ? formatBreakdownLabel(selectedBreakdown, breakdownProperties)
-                  : t('common.all', 'All')}
+                {selectedBdColor && (
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: selectedBdColor,
+                    }}
+                  />
+                )}
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: '0.72rem',
+                    color: selectedBdColor || theme.palette.text.primary,
+                  }}
+                >
+                  {selectedBreakdown
+                    ? formatBreakdownLabel(
+                        selectedBreakdown,
+                        breakdownProperties
+                      )
+                    : t('common.all', 'All')}
+                </Typography>
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.disabled"
+                sx={{ fontSize: '0.68rem', fontStyle: 'italic' }}
+              >
+                {t(
+                  'argus.analytics.clickTableToSwitch',
+                  '↑ Click a row above to switch'
+                )}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.disabled" sx={{ fontSize: '0.68rem', fontStyle: 'italic' }}>
-              {t('argus.analytics.clickTableToSwitch', '↑ Click a row above to switch')}
-            </Typography>
-          </Box>
-        )}
+          )}
         <Box
           sx={{
             minWidth: 0,
@@ -205,11 +237,24 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
             },
           }}
         >
-          <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+          >
             <Sankey
               data={sankeyData}
-              node={<CustomSankeyNode isDark={isDark} theme={theme} onHoverNode={setHoveredNode} />}
-              link={<CustomSankeyLink isDark={isDark} hoveredNode={hoveredNode} />}
+              node={
+                <CustomSankeyNode
+                  isDark={isDark}
+                  theme={theme}
+                  onHoverNode={setHoveredNode}
+                />
+              }
+              link={
+                <CustomSankeyLink isDark={isDark} hoveredNode={hoveredNode} />
+              }
               margin={{ top: 20, right: 150, bottom: 20, left: 20 }}
               nodePadding={24}
               nodeWidth={12}
@@ -226,7 +271,10 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
                   fontSize: 12,
                 }}
                 itemStyle={{ color: isDark ? '#e4e4e7' : '#1a1a2e' }}
-                labelStyle={{ color: isDark ? '#a1a1aa' : '#52525b', fontWeight: 600 }}
+                labelStyle={{
+                  color: isDark ? '#a1a1aa' : '#52525b',
+                  fontWeight: 600,
+                }}
               />
             </Sankey>
           </ResponsiveContainer>
@@ -241,7 +289,10 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
     if (!paths || paths.length === 0) {
       return (
         <EmptyPagePlaceholder
-          message={t('argus.analytics.topPathsEmpty', 'No top paths data available.')}
+          message={t(
+            'argus.analytics.topPathsEmpty',
+            'No top paths data available.'
+          )}
           minHeight={300}
         />
       );
@@ -249,7 +300,13 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
 
     return (
       <Box sx={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+        <table
+          style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontSize: '0.8rem',
+          }}
+        >
           <thead>
             <tr>
               <th
@@ -300,10 +357,30 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
           </thead>
           <tbody>
             {paths.map((p, idx) => (
-              <tr key={idx} style={{ borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}` }}>
-                <td style={{ padding: '10px 16px', fontWeight: 600, color: theme.palette.text.secondary }}>{idx + 1}</td>
+              <tr
+                key={idx}
+                style={{
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}`,
+                }}
+              >
+                <td
+                  style={{
+                    padding: '10px 16px',
+                    fontWeight: 600,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  {idx + 1}
+                </td>
                 <td style={{ padding: '10px 16px' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      gap: 0.5,
+                    }}
+                  >
                     {p.path.map((step, sIdx) => (
                       <React.Fragment key={sIdx}>
                         <Chip
@@ -313,13 +390,20 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
                             height: 22,
                             fontSize: '0.7rem',
                             fontWeight: 600,
-                            bgcolor: alpha(NODE_COLORS[sIdx % NODE_COLORS.length], isDark ? 0.2 : 0.1),
+                            bgcolor: alpha(
+                              NODE_COLORS[sIdx % NODE_COLORS.length],
+                              isDark ? 0.2 : 0.1
+                            ),
                             color: NODE_COLORS[sIdx % NODE_COLORS.length],
                             border: `1px solid ${alpha(NODE_COLORS[sIdx % NODE_COLORS.length], 0.3)}`,
                           }}
                         />
                         {sIdx < p.path.length - 1 && (
-                          <Typography variant="caption" color="text.disabled" sx={{ px: 0.25 }}>
+                          <Typography
+                            variant="caption"
+                            color="text.disabled"
+                            sx={{ px: 0.25 }}
+                          >
                             →
                           </Typography>
                         )}
@@ -327,10 +411,25 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
                     ))}
                   </Box>
                 </td>
-                <td style={{ padding: '10px 16px', textAlign: 'right', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
+                <td
+                  style={{
+                    padding: '10px 16px',
+                    textAlign: 'right',
+                    fontWeight: 600,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {p.count.toLocaleString()}
                 </td>
-                <td style={{ padding: '10px 16px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{p.percentage}%</td>
+                <td
+                  style={{
+                    padding: '10px 16px',
+                    textAlign: 'right',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {p.percentage}%
+                </td>
               </tr>
             ))}
           </tbody>
@@ -340,7 +439,8 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
   };
 
   const renderBreakdownComparison = () => {
-    if (!flowData?.breakdowns || Object.keys(flowData.breakdowns).length === 0) return null;
+    if (!flowData?.breakdowns || Object.keys(flowData.breakdowns).length === 0)
+      return null;
 
     const BD_COLORS = [
       '#6366f1',
@@ -357,10 +457,21 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
     const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
     const hoverBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
 
-    const buildRow = (label: string, data: { nodes: any[]; links: any[] }, color: string, isAll: boolean) => {
+    const buildRow = (
+      label: string,
+      data: { nodes: any[]; links: any[] },
+      color: string,
+      isAll: boolean
+    ) => {
       const totalEvents = data.links.reduce((s, l) => s + l.value, 0);
       const uniqueNodes = data.nodes.length;
-      const topLink = data.links.length > 0 ? data.links.reduce((max, l) => (l.value > max.value ? l : max), data.links[0]) : null;
+      const topLink =
+        data.links.length > 0
+          ? data.links.reduce(
+              (max, l) => (l.value > max.value ? l : max),
+              data.links[0]
+            )
+          : null;
       const topPath = topLink ? `${topLink.source} → ${topLink.target}` : '—';
       return {
         label,
@@ -375,7 +486,14 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
     const allRow = buildRow(t('common.all', 'All'), flowData, '#94a3b8', true);
     const bdKeys = Object.keys(flowData.breakdowns!);
     const bdTableRows = bdKeys
-      .map((bv, idx) => buildRow(bv, flowData.breakdowns![bv], BD_COLORS[idx % BD_COLORS.length], false))
+      .map((bv, idx) =>
+        buildRow(
+          bv,
+          flowData.breakdowns![bv],
+          BD_COLORS[idx % BD_COLORS.length],
+          false
+        )
+      )
       .sort((a, b) => b.totalEvents - a.totalEvents);
 
     const tableRows = [allRow, ...bdTableRows];
@@ -392,19 +510,42 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
 
     return (
       <Box sx={{ mb: 2 }}>
-        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, px: 0.5, color: 'text.secondary', fontSize: '0.78rem' }}>
+        <Typography
+          variant="subtitle2"
+          fontWeight={700}
+          sx={{ mb: 1, px: 0.5, color: 'text.secondary', fontSize: '0.78rem' }}
+        >
           {t('argus.analytics.breakdownComparison', 'Breakdown Comparison')}
-          <Typography component="span" variant="caption" sx={{ ml: 1, opacity: 0.6 }}>
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ ml: 1, opacity: 0.6 }}
+          >
             ({breakdownProperties.join(' · ')})
           </Typography>
         </Typography>
-        <Box sx={{ overflowX: 'auto', border: `1px solid ${borderColor}`, borderRadius: 1 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+        <Box
+          sx={{
+            overflowX: 'auto',
+            border: `1px solid ${borderColor}`,
+            borderRadius: 1,
+          }}
+        >
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'collapse',
+              fontSize: '0.78rem',
+            }}
+          >
             <thead>
               <tr>
                 {breakdownProperties.length > 1 ? (
                   breakdownProperties.map((prop) => (
-                    <th key={prop} style={{ ...thStyle, textAlign: 'left', minWidth: 90 }}>
+                    <th
+                      key={prop}
+                      style={{ ...thStyle, textAlign: 'left', minWidth: 90 }}
+                    >
                       {prop}
                     </th>
                   ))
@@ -426,7 +567,9 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
             </thead>
             <tbody>
               {tableRows.map((row, idx) => {
-                const isActive = row.isAll ? !selectedBreakdown : selectedBreakdown === row.label;
+                const isActive = row.isAll
+                  ? !selectedBreakdown
+                  : selectedBreakdown === row.label;
                 return (
                   <tr
                     key={idx}
@@ -434,58 +577,190 @@ export const FlowsViews: React.FC<FlowsViewsProps> = ({
                       borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                       cursor: 'pointer',
                       opacity: row.isAll ? 0.7 : 1,
-                      backgroundColor: isActive ? (isDark ? 'rgba(99,102,241,0.08)' : 'rgba(99,102,241,0.04)') : 'transparent',
+                      backgroundColor: isActive
+                        ? isDark
+                          ? 'rgba(99,102,241,0.08)'
+                          : 'rgba(99,102,241,0.04)'
+                        : 'transparent',
                     }}
-                    onClick={() => setSelectedBreakdown(row.isAll ? '' : row.label)}
+                    onClick={() =>
+                      setSelectedBreakdown(row.isAll ? '' : row.label)
+                    }
                     onMouseEnter={(e) => {
-                      if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = hoverBg;
+                      if (!isActive)
+                        (e.currentTarget as HTMLElement).style.backgroundColor =
+                          hoverBg;
                     }}
                     onMouseLeave={(e) => {
-                      if (!isActive) (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                      if (!isActive)
+                        (e.currentTarget as HTMLElement).style.backgroundColor =
+                          'transparent';
                     }}
                   >
                     {breakdownProperties.length > 1 && !row.isAll ? (
-                      splitBreakdownValue(row.label).map((part: string, pIdx: number) => (
-                        <td key={pIdx} style={{ padding: '8px 12px', fontWeight: isActive ? 700 : 500 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {pIdx === 0 && (
-                              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: row.color, flexShrink: 0 }} />
-                            )}
-                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130 }}>
-                              {part || '(empty)'}
-                            </span>
-                            {pIdx === 0 && isActive && (
-                              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: theme.palette.primary.main, ml: 0.5, flexShrink: 0 }} />
-                            )}
-                          </Box>
-                        </td>
-                      ))
+                      splitBreakdownValue(row.label).map(
+                        (part: string, pIdx: number) => (
+                          <td
+                            key={pIdx}
+                            style={{
+                              padding: '8px 12px',
+                              fontWeight: isActive ? 700 : 500,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                              }}
+                            >
+                              {pIdx === 0 && (
+                                <Box
+                                  sx={{
+                                    width: 10,
+                                    height: 10,
+                                    borderRadius: '50%',
+                                    bgcolor: row.color,
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                              <span
+                                style={{
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap',
+                                  maxWidth: 130,
+                                }}
+                              >
+                                {part || '(empty)'}
+                              </span>
+                              {pIdx === 0 && isActive && (
+                                <Box
+                                  sx={{
+                                    width: 6,
+                                    height: 6,
+                                    borderRadius: '50%',
+                                    bgcolor: theme.palette.primary.main,
+                                    ml: 0.5,
+                                    flexShrink: 0,
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </td>
+                        )
+                      )
                     ) : (
                       <td
-                        style={{ padding: '8px 12px', fontWeight: isActive ? 700 : 500 }}
-                        colSpan={breakdownProperties.length > 1 ? breakdownProperties.length : 1}
+                        style={{
+                          padding: '8px 12px',
+                          fontWeight: isActive ? 700 : 500,
+                        }}
+                        colSpan={
+                          breakdownProperties.length > 1
+                            ? breakdownProperties.length
+                            : 1
+                        }
                       >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: row.color, flexShrink: 0 }} />
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 130 }}>{row.label}</span>
+                        <Box
+                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        >
+                          <Box
+                            sx={{
+                              width: 10,
+                              height: 10,
+                              borderRadius: '50%',
+                              bgcolor: row.color,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span
+                            style={{
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap',
+                              maxWidth: 130,
+                            }}
+                          >
+                            {row.label}
+                          </span>
                           {isActive && (
-                            <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: theme.palette.primary.main, ml: 0.5, flexShrink: 0 }} />
+                            <Box
+                              sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
+                                bgcolor: theme.palette.primary.main,
+                                ml: 0.5,
+                                flexShrink: 0,
+                              }}
+                            />
                           )}
                         </Box>
                       </td>
                     )}
                     <td style={{ padding: '8px 12px' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ flex: 1, height: 14, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', borderRadius: 0.5, overflow: 'hidden', position: 'relative' }}>
-                          <Box sx={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${(row.totalEvents / maxEvents) * 100}%`, bgcolor: alpha(row.color, 0.6), borderRadius: 0.5, transition: 'width 0.3s ease' }} />
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Box
+                          sx={{
+                            flex: 1,
+                            height: 14,
+                            bgcolor: isDark
+                              ? 'rgba(255,255,255,0.06)'
+                              : 'rgba(0,0,0,0.04)',
+                            borderRadius: 0.5,
+                            overflow: 'hidden',
+                            position: 'relative',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              height: '100%',
+                              width: `${(row.totalEvents / maxEvents) * 100}%`,
+                              bgcolor: alpha(row.color, 0.6),
+                              borderRadius: 0.5,
+                              transition: 'width 0.3s ease',
+                            }}
+                          />
                         </Box>
-                        <Typography variant="caption" sx={{ fontWeight: 600, minWidth: 40, textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontWeight: 600,
+                            minWidth: 40,
+                            textAlign: 'right',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
+                        >
                           {formatCompactNumber(row.totalEvents)}
                         </Typography>
                       </Box>
                     </td>
-                    <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>{row.uniqueNodes}</td>
-                    <td style={{ padding: '8px 12px', fontSize: '0.72rem', color: theme.palette.text.secondary }}>{row.topPath}</td>
+                    <td
+                      style={{
+                        padding: '8px 12px',
+                        textAlign: 'right',
+                        fontWeight: 500,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {row.uniqueNodes}
+                    </td>
+                    <td
+                      style={{
+                        padding: '8px 12px',
+                        fontSize: '0.72rem',
+                        color: theme.palette.text.secondary,
+                      }}
+                    >
+                      {row.topPath}
+                    </td>
                   </tr>
                 );
               })}
@@ -532,8 +807,21 @@ const CustomSankeyNode: React.FC<CustomSankeyNodeProps> = ({
   if (!payload) return null;
   const color = NODE_COLORS[index % NODE_COLORS.length];
   return (
-    <g onMouseEnter={() => onHoverNode?.(payload.name)} onMouseLeave={() => onHoverNode?.(null)} style={{ cursor: 'pointer' }}>
-      <Rectangle x={x} y={y} width={width} height={height} fill={color} fillOpacity={0.9} rx={3} ry={3} />
+    <g
+      onMouseEnter={() => onHoverNode?.(payload.name)}
+      onMouseLeave={() => onHoverNode?.(null)}
+      style={{ cursor: 'pointer' }}
+    >
+      <Rectangle
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={color}
+        fillOpacity={0.9}
+        rx={3}
+        ry={3}
+      />
       <text
         x={x + width + 8}
         y={y + height / 2}
@@ -576,10 +864,13 @@ const CustomSankeyLink: React.FC<CustomSankeyLinkProps> = ({
   isDark,
   hoveredNode,
 }) => {
-  const srcName = typeof payload?.source === 'object' ? payload.source.name : undefined;
-  const tgtName = typeof payload?.target === 'object' ? payload.target.name : undefined;
+  const srcName =
+    typeof payload?.source === 'object' ? payload.source.name : undefined;
+  const tgtName =
+    typeof payload?.target === 'object' ? payload.target.name : undefined;
 
-  const isConnected = hoveredNode === null || srcName === hoveredNode || tgtName === hoveredNode;
+  const isConnected =
+    hoveredNode === null || srcName === hoveredNode || tgtName === hoveredNode;
 
   const baseColor = isDark ? 'rgba(255,255,255,' : 'rgba(0,0,0,';
   const opacity = isConnected ? (hoveredNode !== null ? 0.25 : 0.15) : 0.03;

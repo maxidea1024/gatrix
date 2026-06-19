@@ -73,18 +73,21 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
-  const aggOptions = useMemo(() => [
-    { value: 'avg', label: t('argus.metrics.agg.avg', 'Average') },
-    { value: 'sum', label: t('argus.metrics.agg.sum', 'Sum') },
-    { value: 'min', label: t('argus.metrics.agg.min', 'Minimum') },
-    { value: 'max', label: t('argus.metrics.agg.max', 'Maximum') },
-    { value: 'count', label: t('argus.metrics.agg.count', 'Count') },
-    { value: 'p50', label: 'p50 (Median)' },
-    { value: 'p75', label: 'p75' },
-    { value: 'p90', label: 'p90' },
-    { value: 'p95', label: 'p95' },
-    { value: 'p99', label: 'p99' },
-  ], [t]);
+  const aggOptions = useMemo(
+    () => [
+      { value: 'avg', label: t('argus.metrics.agg.avg', 'Average') },
+      { value: 'sum', label: t('argus.metrics.agg.sum', 'Sum') },
+      { value: 'min', label: t('argus.metrics.agg.min', 'Minimum') },
+      { value: 'max', label: t('argus.metrics.agg.max', 'Maximum') },
+      { value: 'count', label: t('argus.metrics.agg.count', 'Count') },
+      { value: 'p50', label: 'p50 (Median)' },
+      { value: 'p75', label: 'p75' },
+      { value: 'p90', label: 'p90' },
+      { value: 'p95', label: 'p95' },
+      { value: 'p99', label: 'p99' },
+    ],
+    [t]
+  );
 
   const addQuery = () => {
     const nextId = String.fromCharCode(97 + queries.length);
@@ -174,12 +177,16 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
           gap: 1,
         }}
       >
-        <SettingsIcon sx={{ fontSize: 16 }} /> {t('argus.metrics.queryBuilder', 'Query Builder')}
+        <SettingsIcon sx={{ fontSize: 16 }} />{' '}
+        {t('argus.metrics.queryBuilder', 'Query Builder')}
       </Typography>
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         {queries.map((q, idx) => (
-          <Box key={q.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box
+            key={q.id}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}
+          >
             <Box
               sx={{
                 width: 24,
@@ -202,11 +209,14 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
               freeSolo
               options={metricNames.map((m) => m.name)}
               value={q.metric}
-              onInputChange={(_, newVal) => updateQuery(q.id, { metric: newVal })}
+              onInputChange={(_, newVal) =>
+                updateQuery(q.id, { metric: newVal })
+              }
               onChange={(_, newVal) => {
                 if (newVal) {
                   const metaMatch = metricNames.find((m) => m.name === newVal);
-                  const mType = metaMatch?.metric_type || metricTypes[newVal] || 'counter';
+                  const mType =
+                    metaMatch?.metric_type || metricTypes[newVal] || 'counter';
                   const defaultAgg = DEFAULT_AGG_BY_TYPE[mType] || 'avg';
                   updateQuery(q.id, { metric: newVal, agg: defaultAgg });
                 }
@@ -214,7 +224,10 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder={t('argus.metrics.selectMetric', 'Select metric...')}
+                  placeholder={t(
+                    'argus.metrics.selectMetric',
+                    'Select metric...'
+                  )}
                   sx={{
                     '& .MuiInputBase-root': {
                       fontSize: '0.8rem',
@@ -302,9 +315,15 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
                 <IconButton
                   size="small"
                   onClick={() => updateQuery(q.id, { isHidden: !q.isHidden })}
-                  sx={{ color: q.isHidden ? 'text.disabled' : getQueryColor(idx) }}
+                  sx={{
+                    color: q.isHidden ? 'text.disabled' : getQueryColor(idx),
+                  }}
                 >
-                  {q.isHidden ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
+                  {q.isHidden ? (
+                    <VisibilityOffIcon sx={{ fontSize: 18 }} />
+                  ) : (
+                    <VisibilityIcon sx={{ fontSize: 18 }} />
+                  )}
                 </IconButton>
               </Tooltip>
               {queries.length > 1 && (
@@ -312,7 +331,10 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
                   <IconButton
                     size="small"
                     onClick={() => removeQuery(q.id)}
-                    sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+                    sx={{
+                      color: 'text.disabled',
+                      '&:hover': { color: 'error.main' },
+                    }}
                   >
                     <DeleteIcon sx={{ fontSize: 18 }} />
                   </IconButton>
@@ -323,13 +345,19 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
         ))}
 
         {equations.map((eq, idx) => (
-          <Box key={eq.id} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}>
+          <Box
+            key={eq.id}
+            sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 0.5 }}
+          >
             <Box
               sx={{
                 width: 24,
                 height: 24,
                 borderRadius: 1,
-                backgroundColor: alpha(getQueryColor(queries.length + idx), 0.1),
+                backgroundColor: alpha(
+                  getQueryColor(queries.length + idx),
+                  0.1
+                ),
                 color: getQueryColor(queries.length + idx),
                 display: 'flex',
                 alignItems: 'center',
@@ -343,9 +371,14 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
 
             <TextField
               size="small"
-              placeholder={t('argus.metrics.equationPlaceholder', 'e.g. a / b * 100')}
+              placeholder={t(
+                'argus.metrics.equationPlaceholder',
+                'e.g. a / b * 100'
+              )}
               value={eq.equation}
-              onChange={(e) => updateEquation(eq.id, { equation: e.target.value })}
+              onChange={(e) =>
+                updateEquation(eq.id, { equation: e.target.value })
+              }
               sx={{
                 '& .MuiInputBase-root': {
                   fontSize: '0.8rem',
@@ -356,8 +389,13 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
               }}
             />
 
-            <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', ml: 1 }}>
-              {t('argus.metrics.equationHelp', 'Use query IDs (a, b) and math operators (+, -, *, /)')}
+            <Typography
+              sx={{ fontSize: '0.7rem', color: 'text.disabled', ml: 1 }}
+            >
+              {t(
+                'argus.metrics.equationHelp',
+                'Use query IDs (a, b) and math operators (+, -, *, /)'
+              )}
             </Typography>
 
             <Box sx={{ ml: 'auto', display: 'flex', gap: 0.5 }}>
@@ -370,17 +408,32 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
               >
                 <IconButton
                   size="small"
-                  onClick={() => updateEquation(eq.id, { isHidden: !eq.isHidden })}
-                  sx={{ color: eq.isHidden ? 'text.disabled' : getQueryColor(queries.length + idx) }}
+                  onClick={() =>
+                    updateEquation(eq.id, { isHidden: !eq.isHidden })
+                  }
+                  sx={{
+                    color: eq.isHidden
+                      ? 'text.disabled'
+                      : getQueryColor(queries.length + idx),
+                  }}
                 >
-                  {eq.isHidden ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
+                  {eq.isHidden ? (
+                    <VisibilityOffIcon sx={{ fontSize: 18 }} />
+                  ) : (
+                    <VisibilityIcon sx={{ fontSize: 18 }} />
+                  )}
                 </IconButton>
               </Tooltip>
-              <Tooltip title={t('argus.metrics.removeFormula', 'Remove formula')}>
+              <Tooltip
+                title={t('argus.metrics.removeFormula', 'Remove formula')}
+              >
                 <IconButton
                   size="small"
                   onClick={() => removeEquation(eq.id)}
-                  sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+                  sx={{
+                    color: 'text.disabled',
+                    '&:hover': { color: 'error.main' },
+                  }}
                 >
                   <DeleteIcon sx={{ fontSize: 18 }} />
                 </IconButton>
@@ -390,10 +443,25 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
         ))}
 
         <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-          <Button size="small" startIcon={<AddIcon />} onClick={addQuery} sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}>
+          <Button
+            size="small"
+            startIcon={<AddIcon />}
+            onClick={addQuery}
+            sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600 }}
+          >
             {t('argus.metrics.addQuery', 'Add Query')}
           </Button>
-          <Button size="small" startIcon={<CalculateIcon />} onClick={addEquation} sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 600, color: 'text.secondary' }}>
+          <Button
+            size="small"
+            startIcon={<CalculateIcon />}
+            onClick={addEquation}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              color: 'text.secondary',
+            }}
+          >
             {t('argus.metrics.addEquation', 'Add Equation')}
           </Button>
         </Box>
@@ -413,26 +481,45 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
         <SingleSelectFilterChip
           label={t('argus.metrics.chartType', 'Chart Type:')}
           value={chartConfig.type}
-          onChange={(val) => setChartConfig({ ...chartConfig, type: val as any })}
+          onChange={(val) =>
+            setChartConfig({ ...chartConfig, type: val as any })
+          }
           options={[
             { value: 'line', label: t('argus.metrics.line', 'Line') },
-            { value: 'stacked-line', label: t('argus.metrics.stackedLine', 'Stacked Line') },
+            {
+              value: 'stacked-line',
+              label: t('argus.metrics.stackedLine', 'Stacked Line'),
+            },
             { value: 'area', label: t('argus.metrics.area', 'Area') },
-            { value: 'stacked-area', label: t('argus.metrics.stackedArea', 'Stacked Area') },
+            {
+              value: 'stacked-area',
+              label: t('argus.metrics.stackedArea', 'Stacked Area'),
+            },
             { value: 'bar', label: t('argus.metrics.bar', 'Bar') },
-            { value: 'stacked-bar', label: t('argus.metrics.stackedBar', 'Stacked Bar') },
+            {
+              value: 'stacked-bar',
+              label: t('argus.metrics.stackedBar', 'Stacked Bar'),
+            },
             { value: 'pie', label: t('argus.metrics.pie', 'Pie') },
-            { value: 'doughnut', label: t('argus.metrics.doughnut', 'Doughnut') },
+            {
+              value: 'doughnut',
+              label: t('argus.metrics.doughnut', 'Doughnut'),
+            },
             { value: 'scatter', label: t('argus.metrics.scatter', 'Scatter') },
           ]}
         />
         <SingleSelectFilterChip
           label={t('argus.metrics.yAxis', 'Y-Axis:')}
           value={chartConfig.yAxisType}
-          onChange={(val) => setChartConfig({ ...chartConfig, yAxisType: val as any })}
+          onChange={(val) =>
+            setChartConfig({ ...chartConfig, yAxisType: val as any })
+          }
           options={[
             { value: 'linear', label: t('argus.metrics.linear', 'Linear') },
-            { value: 'logarithmic', label: t('argus.metrics.logarithmic', 'Logarithmic') },
+            {
+              value: 'logarithmic',
+              label: t('argus.metrics.logarithmic', 'Logarithmic'),
+            },
           ]}
         />
         <SingleSelectFilterChip
@@ -443,7 +530,12 @@ export const MetricsQueryBuilder: React.FC<MetricsQueryBuilderProps> = ({
         />
         <PillSwitch
           checked={chartConfig.showLegend}
-          onChange={() => setChartConfig({ ...chartConfig, showLegend: !chartConfig.showLegend })}
+          onChange={() =>
+            setChartConfig({
+              ...chartConfig,
+              showLegend: !chartConfig.showLegend,
+            })
+          }
           label={t('argus.metrics.showLegend', '범례 표시')}
           size="small"
         />

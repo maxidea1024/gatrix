@@ -75,9 +75,15 @@ export const SourceMapsSettings: React.FC<SourceMapsSettingsProps> = ({
                 const release = prompt(t('argus.settings.enterRelease'));
                 if (!release) return;
                 try {
-                  await argusService.uploadSourcemaps(projectId, release, files);
+                  await argusService.uploadSourcemaps(
+                    projectId,
+                    release,
+                    files
+                  );
                   enqueueSnackbar(
-                    t('argus.settings.smUploadSuccess', { count: files.length }),
+                    t('argus.settings.smUploadSuccess', {
+                      count: files.length,
+                    }),
                     { variant: 'success' }
                   );
                   setSourcemaps(

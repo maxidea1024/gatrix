@@ -553,7 +553,9 @@ export const IssueTrackersSettings: React.FC<IssueTrackersSettingsProps> = ({
               }}
             >
               {trackers.map((trk) => {
-                const prov = TRACKER_PROVIDERS.find((p) => p.id === trk.provider);
+                const prov = TRACKER_PROVIDERS.find(
+                  (p) => p.id === trk.provider
+                );
                 return (
                   <ConnectedItem
                     key={trk.id}

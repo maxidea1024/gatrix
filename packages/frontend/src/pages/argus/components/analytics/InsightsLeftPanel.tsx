@@ -124,15 +124,15 @@ export const InsightsLeftPanel: React.FC<InsightsLeftPanelProps> = ({
   const events = useInsightsStore((s) => s.events);
   const setEvents = useInsightsStore((s) => s.setEvents);
   const breakdownProperties = useInsightsStore((s) => s.breakdownProperties);
-  const setBreakdownProperties = useInsightsStore((s) => s.setBreakdownProperties);
+  const setBreakdownProperties = useInsightsStore(
+    (s) => s.setBreakdownProperties
+  );
   const formulas = useInsightsStore((s) => s.formulas);
   const setFormulas = useInsightsStore((s) => s.setFormulas);
 
   // ── Shared Event Catalog ──
-  const {
-    availableEvents,
-    refetch: refetchEvents,
-  } = useSharedEventCatalog(projectId);
+  const { availableEvents, refetch: refetchEvents } =
+    useSharedEventCatalog(projectId);
 
   const AGGREGATIONS = [
     {
@@ -187,7 +187,9 @@ export const InsightsLeftPanel: React.FC<InsightsLeftPanelProps> = ({
 
   // Quick lexicon editor state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   const { localizeEventName, localizeEventDescription } = useLocalizedLexicon();

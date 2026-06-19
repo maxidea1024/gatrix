@@ -291,7 +291,10 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
         {/* 1. Available Providers - Only show those not globally configured */}
         {availableProviders.length > 0 && (
           <SettingsCard
-            title={t('argus.settings.availableProviders', 'Available Providers')}
+            title={t(
+              'argus.settings.availableProviders',
+              'Available Providers'
+            )}
             desc={t(
               'argus.settings.availableProvidersDesc',
               'Connect external repository providers.'
@@ -331,7 +334,9 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
             const isConfigured = configInfo?.configured;
             if (!isConfigured) return null;
 
-            const provRepos = integrations.filter((i) => i.provider === prov.id);
+            const provRepos = integrations.filter(
+              (i) => i.provider === prov.id
+            );
             const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
 
             return (
@@ -477,13 +482,19 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
                             {t('argus.settings.repository', 'Repository')}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
-                            {t('argus.settings.defaultBranch', 'Default Branch')}
+                            {t(
+                              'argus.settings.defaultBranch',
+                              'Default Branch'
+                            )}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
                             {t('argus.settings.status', 'Status')}
                           </TableCell>
                           <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
-                            {t('argus.settings.connectedDate', 'Connected Date')}
+                            {t(
+                              'argus.settings.connectedDate',
+                              'Connected Date'
+                            )}
                           </TableCell>
                           <TableCell
                             align="right"

@@ -69,7 +69,8 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   const globalFilters = useGlobalAnalyticsFilter((s) => s.filters);
 
   // ── Shared Event Catalog ──
-  const { availableEvents, refetch: refetchEvents } = useSharedEventCatalog(projectId);
+  const { availableEvents, refetch: refetchEvents } =
+    useSharedEventCatalog(projectId);
 
   // ── Transient State ──
   const [flowData, setFlowData] = useState<{
@@ -92,7 +93,9 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
 
   // ── Quick lexicon editor state ──
   const [quickEditOpen, setQuickEditOpen] = useState(false);
-  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(null);
+  const [quickEditAnchor, setQuickEditAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [quickEditEventName, setQuickEditEventName] = useState('');
 
   // ── Run Query ──
@@ -290,7 +293,10 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
               size="title"
             />
           }
-          subtitle={t('argus.analytics.flowsSubtitle', '사용자 이동 경로를 시각화하고 분석합니다.')}
+          subtitle={t(
+            'argus.analytics.flowsSubtitle',
+            '사용자 이동 경로를 시각화하고 분석합니다.'
+          )}
         />
       )}
       <Box

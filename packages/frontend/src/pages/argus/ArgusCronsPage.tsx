@@ -491,153 +491,157 @@ const ArgusCronsPage: React.FC = () => {
             }}
           >
             <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  {t('argus.crons.monitor', 'Monitor')}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t('argus.crons.status', 'Status')}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t('argus.crons.schedule', 'Schedule')}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t('argus.crons.lastCheckin', 'Last Check-in')}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t('argus.crons.nextExpected', 'Next Expected')}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    fontWeight: 700,
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t('argus.crons.environment', 'Env')}
-                </TableCell>
-                <TableCell width={40} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filtered.map((monitor) => {
-                const s = monitor.last_status || monitor.status || 'active';
-                const statusCfg = STATUS_CONFIG[s] || STATUS_CONFIG.active;
-                return (
-                  <TableRow
-                    key={monitor.id}
-                    hover
-                    onClick={() => handleOpenDetail(monitor)}
+              <TableHead>
+                <TableRow>
+                  <TableCell
                     sx={{
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s ease',
-                      '&:hover': {
-                        backgroundColor: 'action.hover',
-                      },
-                      '&:last-child td': { borderBottom: 0 },
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: 0.5,
                     }}
                   >
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    {t('argus.crons.monitor', 'Monitor')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('argus.crons.status', 'Status')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('argus.crons.schedule', 'Schedule')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('argus.crons.lastCheckin', 'Last Check-in')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('argus.crons.nextExpected', 'Next Expected')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('argus.crons.environment', 'Env')}
+                  </TableCell>
+                  <TableCell width={40} />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filtered.map((monitor) => {
+                  const s = monitor.last_status || monitor.status || 'active';
+                  const statusCfg = STATUS_CONFIG[s] || STATUS_CONFIG.active;
+                  return (
+                    <TableRow
+                      key={monitor.id}
+                      hover
+                      onClick={() => handleOpenDetail(monitor)}
+                      sx={{
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s ease',
+                        '&:hover': {
+                          backgroundColor: 'action.hover',
+                        },
+                        '&:last-child td': { borderBottom: 0 },
+                      }}
+                    >
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography
+                            sx={{ fontSize: '0.82rem', fontWeight: 600 }}
+                          >
+                            {monitor.name}
+                          </Typography>
+                          <Typography
+                            sx={{ fontSize: '0.65rem', color: 'text.disabled' }}
+                          >
+                            {monitor.slug}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          icon={statusCfg.icon}
+                          label={statusCfg.label}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            backgroundColor: alpha(statusCfg.color, 0.1),
+                            color: statusCfg.color,
+                            border: 'none',
+                            '& .MuiChip-icon': { color: statusCfg.color },
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
                         <Typography
-                          sx={{ fontSize: '0.82rem', fontWeight: 600 }}
+                          sx={{ fontSize: '0.75rem', color: 'text.secondary' }}
                         >
-                          {monitor.name}
+                          {monitor.schedule_value}
                         </Typography>
-                        <Typography
-                          sx={{ fontSize: '0.65rem', color: 'text.disabled' }}
+                      </TableCell>
+                      <TableCell>
+                        <Typography sx={{ fontSize: '0.75rem' }}>
+                          {formatRelativeTime(monitor.last_checkin_at, t)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography sx={{ fontSize: '0.75rem' }}>
+                          {formatRelativeTime(monitor.next_checkin_at, t)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={t(
+                            `common.environment.${monitor.environment}`,
+                            monitor.environment
+                          )}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: '0.6rem',
+                            fontWeight: 600,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleDelete(e, monitor.id)}
                         >
-                          {monitor.slug}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        icon={statusCfg.icon}
-                        label={statusCfg.label}
-                        size="small"
-                        sx={{
-                          height: 22,
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          backgroundColor: alpha(statusCfg.color, 0.1),
-                          color: statusCfg.color,
-                          border: 'none',
-                          '& .MuiChip-icon': { color: statusCfg.color },
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        sx={{ fontSize: '0.75rem', color: 'text.secondary' }}
-                      >
-                        {monitor.schedule_value}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography sx={{ fontSize: '0.75rem' }}>
-                        {formatRelativeTime(monitor.last_checkin_at, t)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography sx={{ fontSize: '0.75rem' }}>
-                        {formatRelativeTime(monitor.next_checkin_at, t)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={t(
-                          `common.environment.${monitor.environment}`,
-                          monitor.environment
-                        )}
-                        size="small"
-                        sx={{ height: 18, fontSize: '0.6rem', fontWeight: 600 }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => handleDelete(e, monitor.id)}
-                      >
-                        <DeleteIcon sx={{ fontSize: 16 }} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
+                          <DeleteIcon sx={{ fontSize: 16 }} />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
             </Table>
           </Paper>
         )}

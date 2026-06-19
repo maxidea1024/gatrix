@@ -270,126 +270,138 @@ const ArgusUptimePage: React.FC = () => {
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {filtered.map((monitor) => {
-            const statusCfg = STATUS_CONFIG[monitor.status] || STATUS_CONFIG.up;
-            const uptimePercent = parseFloat(monitor.uptime_percent) || 100;
-            return (
-              <Paper
-                key={monitor.id}
-                elevation={0}
-                sx={{
-                  p: 2,
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderLeft: `4px solid ${statusCfg.color}`,
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  '&:hover': {
-                    borderColor: alpha(statusCfg.color, 0.4),
-                    backgroundColor: isDark
-                      ? 'rgba(255,255,255,0.02)'
-                      : 'rgba(0,0,0,0.01)',
-                  },
-                }}
-              >
-                <Box
-                  sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}
+              const statusCfg =
+                STATUS_CONFIG[monitor.status] || STATUS_CONFIG.up;
+              const uptimePercent = parseFloat(monitor.uptime_percent) || 100;
+              return (
+                <Paper
+                  key={monitor.id}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                    borderLeft: `4px solid ${statusCfg.color}`,
+                    borderRadius: 2,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                    '&:hover': {
+                      borderColor: alpha(statusCfg.color, 0.4),
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.02)'
+                        : 'rgba(0,0,0,0.01)',
+                    },
+                  }}
                 >
-                  {/* Status + Name */}
                   <Box
-                    sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 2,
+                      mb: 1,
+                    }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Chip
-                        icon={statusCfg.icon}
-                        label={statusCfg.label}
-                        size="small"
+                    {/* Status + Name */}
+                    <Box
+                      sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+                    >
+                      <Box
+                        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                      >
+                        <Chip
+                          icon={statusCfg.icon}
+                          label={statusCfg.label}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.68rem',
+                            fontWeight: 700,
+                            backgroundColor: alpha(statusCfg.color, 0.1),
+                            color: statusCfg.color,
+                            '& .MuiChip-icon': { color: statusCfg.color },
+                          }}
+                        />
+                        <Typography
+                          sx={{ fontSize: '0.88rem', fontWeight: 700 }}
+                        >
+                          {monitor.name}
+                        </Typography>
+                      </Box>
+                      <Typography
                         sx={{
-                          height: 22,
-                          fontSize: '0.68rem',
-                          fontWeight: 700,
-                          backgroundColor: alpha(statusCfg.color, 0.1),
-                          color: statusCfg.color,
-                          '& .MuiChip-icon': { color: statusCfg.color },
+                          fontSize: '0.72rem',
+                          color: 'text.disabled',
+                          mt: 0.25,
                         }}
-                      />
-                      <Typography sx={{ fontSize: '0.88rem', fontWeight: 700 }}>
-                        {monitor.name}
+                      >
+                        {monitor.method} {monitor.url}
                       </Typography>
                     </Box>
-                    <Typography
-                      sx={{
-                        fontSize: '0.72rem',
-                        color: 'text.disabled',
-                        mt: 0.25,
-                      }}
-                    >
-                      {monitor.method} {monitor.url}
-                    </Typography>
-                  </Box>
 
-                  {/* Metrics */}
-                  <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography
-                        sx={{
-                          fontSize: '1.1rem',
-                          fontWeight: 700,
-                          color:
-                            uptimePercent >= 99.9
-                              ? '#4caf50'
-                              : uptimePercent >= 99
-                                ? '#ff9800'
-                                : '#f44336',
-                        }}
+                    {/* Metrics */}
+                    <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography
+                          sx={{
+                            fontSize: '1.1rem',
+                            fontWeight: 700,
+                            color:
+                              uptimePercent >= 99.9
+                                ? '#4caf50'
+                                : uptimePercent >= 99
+                                  ? '#ff9800'
+                                  : '#f44336',
+                          }}
+                        >
+                          {uptimePercent.toFixed(2)}%
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontSize: '0.6rem',
+                            color: 'text.disabled',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {t('argus.uptime.uptime', 'Uptime')}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography
+                          sx={{ fontSize: '1.1rem', fontWeight: 700 }}
+                        >
+                          {monitor.avg_response_ms > 0
+                            ? `${monitor.avg_response_ms}ms`
+                            : '-'}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontSize: '0.6rem',
+                            color: 'text.disabled',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {t('argus.uptime.avgResponse', 'Avg Response')}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={t(
+                          `common.environment.${monitor.environment}`,
+                          monitor.environment
+                        )}
+                        size="small"
+                        sx={{ height: 18, fontSize: '0.6rem', fontWeight: 600 }}
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleDelete(e, monitor.id)}
                       >
-                        {uptimePercent.toFixed(2)}%
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '0.6rem',
-                          color: 'text.disabled',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('argus.uptime.uptime', 'Uptime')}
-                      </Typography>
+                        <DeleteIcon sx={{ fontSize: 16 }} />
+                      </IconButton>
                     </Box>
-                    <Box sx={{ textAlign: 'center' }}>
-                      <Typography sx={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                        {monitor.avg_response_ms > 0
-                          ? `${monitor.avg_response_ms}ms`
-                          : '-'}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: '0.6rem',
-                          color: 'text.disabled',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {t('argus.uptime.avgResponse', 'Avg Response')}
-                      </Typography>
-                    </Box>
-                    <Chip
-                      label={t(
-                        `common.environment.${monitor.environment}`,
-                        monitor.environment
-                      )}
-                      size="small"
-                      sx={{ height: 18, fontSize: '0.6rem', fontWeight: 600 }}
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={(e) => handleDelete(e, monitor.id)}
-                    >
-                      <DeleteIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
                   </Box>
-                </Box>
-              </Paper>
-            );
-          })}
-        </Box>
+                </Paper>
+              );
+            })}
+          </Box>
         )}
       </PageContentLoader>
 

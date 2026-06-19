@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import {
   Box,
@@ -61,7 +56,10 @@ import SaveAnalyticsQueryDialog from './components/analytics/SaveAnalyticsQueryD
 import AddToDashboardDialog from './components/analytics/AddToDashboardDialog';
 import SavedQueriesSidePanel from './components/analytics/SavedQueriesSidePanel';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
-import { OverviewLeftPanel, type SummaryData } from './components/analytics/OverviewLeftPanel';
+import {
+  OverviewLeftPanel,
+  type SummaryData,
+} from './components/analytics/OverviewLeftPanel';
 import { OverviewMainContent } from './components/analytics/OverviewMainContent';
 
 /* ─── Sub-pages (static imports — ArgusAnalyticsPage is already router-split) ─── */
@@ -623,7 +621,9 @@ const ArgusAnalyticsPage: React.FC = () => {
             )}
             {/* Saved Queries toggle button — only for analysis tabs */}
             {activeTab !== 'overview' && (
-              <Tooltip title={t('argus.analytics.savedQueries', 'Saved Queries')}>
+              <Tooltip
+                title={t('argus.analytics.savedQueries', 'Saved Queries')}
+              >
                 <IconButton
                   size="small"
                   onClick={() => setSavedQueriesOpen((prev) => !prev)}
@@ -635,7 +635,8 @@ const ArgusAnalyticsPage: React.FC = () => {
                       ? (t) => alpha(t.palette.primary.main, 0.1)
                       : 'transparent',
                     '&:hover': {
-                      backgroundColor: (t) => alpha(t.palette.primary.main, 0.15),
+                      backgroundColor: (t) =>
+                        alpha(t.palette.primary.main, 0.15),
                     },
                   }}
                 >
@@ -676,7 +677,6 @@ const ArgusAnalyticsPage: React.FC = () => {
       />
 
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-
         {/* Overview: always rendered */}
         <Box
           sx={{

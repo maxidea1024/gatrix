@@ -25,7 +25,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
-import { ArgusIssueDetail, ArgusErrorEvent, ArgusIssueTracker } from '@/services/argusService';
+import {
+  ArgusIssueDetail,
+  ArgusErrorEvent,
+  ArgusIssueTracker,
+} from '@/services/argusService';
 import { useIssueTrackers } from '@/hooks/useIssueTrackers';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { LEVEL_COLORS, PRIORITY_CONFIG } from '@/utils/argusHelpers';
@@ -131,10 +135,14 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           `${t('argus.detail.issueCreated', 'Issue Created')}: ${result.key || ''}`,
           { variant: 'success' }
         );
-        if (result.url) window.open(result.url, '_blank', 'noopener,noreferrer');
+        if (result.url)
+          window.open(result.url, '_blank', 'noopener,noreferrer');
       }
     } catch {
-      enqueueSnackbar(t('argus.detail.issueCreateFailed', 'Failed to create issue'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.detail.issueCreateFailed', 'Failed to create issue'),
+        { variant: 'error' }
+      );
     }
   };
 
@@ -490,8 +498,14 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
             <Box>
               <MenuItem disabled sx={{ fontSize: '0.8rem' }}>
                 <ListItemText
-                  primary={t('argus.detail.noTrackers', 'No issue trackers connected')}
-                  primaryTypographyProps={{ fontSize: '0.78rem', color: 'text.disabled' }}
+                  primary={t(
+                    'argus.detail.noTrackers',
+                    'No issue trackers connected'
+                  )}
+                  primaryTypographyProps={{
+                    fontSize: '0.78rem',
+                    color: 'text.disabled',
+                  }}
                 />
               </MenuItem>
               <MenuItem
@@ -505,8 +519,14 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                   <SettingsIcon fontSize="small" sx={{ fontSize: 14 }} />
                 </ListItemIcon>
                 <ListItemText
-                  primary={t('argus.detail.noTrackersAction', 'Connect a Tracker')}
-                  primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 500 }}
+                  primary={t(
+                    'argus.detail.noTrackersAction',
+                    'Connect a Tracker'
+                  )}
+                  primaryTypographyProps={{
+                    fontSize: '0.78rem',
+                    fontWeight: 500,
+                  }}
                 />
               </MenuItem>
             </Box>
@@ -525,7 +545,10 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
                   <ListItemText
                     primary={tracker.name}
                     secondary={tracker.provider}
-                    primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 500 }}
+                    primaryTypographyProps={{
+                      fontSize: '0.78rem',
+                      fontWeight: 500,
+                    }}
                     secondaryTypographyProps={{ fontSize: '0.65rem' }}
                   />
                   <OpenInNewIcon sx={{ fontSize: 12, opacity: 0.4, ml: 1 }} />

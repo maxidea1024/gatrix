@@ -310,7 +310,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
   const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
+    null
+  );
 
   const lastProcessedUrlQueryIdRef = useRef<string | undefined>(undefined);
 
@@ -336,7 +338,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
     equations: string;
     chartConfig: string;
   };
-  const [savedSnapshot, setSavedSnapshot] = useState<MetricsSnapshot | null>(null);
+  const [savedSnapshot, setSavedSnapshot] = useState<MetricsSnapshot | null>(
+    null
+  );
 
   const takeSnapshot = useCallback(() => {
     setSavedSnapshot({
@@ -998,7 +1002,9 @@ const ArgusMetricsExplorerPage: React.FC = () => {
         )}
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Tooltip title={t('argus.metrics.savedQueries', 'Saved Dashboards')}>
+            <Tooltip
+              title={t('argus.metrics.savedQueries', 'Saved Dashboards')}
+            >
               <IconButton
                 size="small"
                 onClick={() => setSavedPanelOpen(true)}

@@ -140,7 +140,10 @@ const ArgusOnboardingBanner: React.FC<ArgusOnboardingBannerProps> = ({
                     letterSpacing: '-0.01em',
                   }}
                 >
-                  {t('argus.onboarding.title', 'Complete your Argus setup to start monitoring')}
+                  {t(
+                    'argus.onboarding.title',
+                    'Complete your Argus setup to start monitoring'
+                  )}
                 </Typography>
                 <Box
                   sx={{
@@ -221,8 +224,8 @@ const ArgusOnboardingBanner: React.FC<ArgusOnboardingBannerProps> = ({
                   background: step.done
                     ? alpha(theme.palette.success.main, isDark ? 0.05 : 0.03)
                     : isDark
-                    ? alpha(theme.palette.background.default, 0.4)
-                    : theme.palette.background.default,
+                      ? alpha(theme.palette.background.default, 0.4)
+                      : theme.palette.background.default,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 1.5,
@@ -255,7 +258,9 @@ const ArgusOnboardingBanner: React.FC<ArgusOnboardingBannerProps> = ({
                       backgroundColor: step.done
                         ? alpha(theme.palette.success.main, 0.1)
                         : alpha(theme.palette.primary.main, 0.08),
-                      color: step.done ? theme.palette.success.main : theme.palette.primary.main,
+                      color: step.done
+                        ? theme.palette.success.main
+                        : theme.palette.primary.main,
                       transition: 'all 0.2s ease',
                       flexShrink: 0,
                     }}
@@ -282,7 +287,13 @@ const ArgusOnboardingBanner: React.FC<ArgusOnboardingBannerProps> = ({
                     </Typography>
                   </Box>
                   {step.done ? (
-                    <CheckIcon sx={{ fontSize: 18, color: theme.palette.success.main, flexShrink: 0 }} />
+                    <CheckIcon
+                      sx={{
+                        fontSize: 18,
+                        color: theme.palette.success.main,
+                        flexShrink: 0,
+                      }}
+                    />
                   ) : (
                     <UncheckedIcon
                       sx={{

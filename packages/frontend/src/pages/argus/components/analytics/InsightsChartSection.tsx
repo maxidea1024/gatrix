@@ -1,10 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, useTheme, alpha } from '@mui/material';
 import {
   LineChart,
   Line,
@@ -71,7 +66,9 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
   const chartType = useInsightsStore((s) => s.chartType);
   const breakdownProperties = useInsightsStore((s) => s.breakdownProperties);
 
-  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(new Set());
+  const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
+    new Set()
+  );
 
   // Reset hidden keys when series changes
   React.useEffect(() => {
@@ -316,7 +313,10 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
                 ? `${s.event} - ${formatBreakdownLabel(s.breakdown_value, breakdownProperties)}`
                 : s.event;
               const values = s.data.map((d: any) => d.value);
-              const total = values.reduce((acc: number, v: number) => acc + v, 0);
+              const total = values.reduce(
+                (acc: number, v: number) => acc + v,
+                0
+              );
               const avg = values.length > 0 ? total / values.length : 0;
               const min = values.length > 0 ? Math.min(...values) : 0;
               const max = values.length > 0 ? Math.max(...values) : 0;
@@ -431,7 +431,10 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
             {validFormulaResults.map((r, idx) => {
               const label = r.formula;
               const values = r.result.data.map((d: any) => d.value);
-              const total = values.reduce((acc: number, v: number) => acc + v, 0);
+              const total = values.reduce(
+                (acc: number, v: number) => acc + v,
+                0
+              );
               const avg = values.length > 0 ? total / values.length : 0;
               const min = values.length > 0 ? Math.min(...values) : 0;
               const max = values.length > 0 ? Math.max(...values) : 0;
@@ -568,7 +571,8 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
               data={data}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
               onMouseDown={(e) =>
-                e && setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
+                e &&
+                setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
               }
               onMouseMove={(e) =>
                 e &&
@@ -670,7 +674,8 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
               data={data}
               margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
               onMouseDown={(e) =>
-                e && setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
+                e &&
+                setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
               }
               onMouseMove={(e) =>
                 e &&

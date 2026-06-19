@@ -1,11 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  useTheme,
-  alpha,
-  Tooltip,
-} from '@mui/material';
+import { Box, Typography, useTheme, alpha, Tooltip } from '@mui/material';
 import {
   People as PeopleIcon,
   TrendingUp as TrendingUpIcon,
@@ -77,7 +71,8 @@ export const OverviewLeftPanel: React.FC<OverviewLeftPanelProps> = ({
   const dauChange = useMemo(() => {
     if (!summary || summary.dau_yesterday === 0) return 0;
     return Math.round(
-      ((summary.dau_today - summary.dau_yesterday) / summary.dau_yesterday) * 100
+      ((summary.dau_today - summary.dau_yesterday) / summary.dau_yesterday) *
+        100
     );
   }, [summary]);
 

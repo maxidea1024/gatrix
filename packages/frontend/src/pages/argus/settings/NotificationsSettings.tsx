@@ -248,7 +248,9 @@ export const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
                 prov={prov}
                 isDark={isDark}
                 t={t}
-                count={notifChannels.filter((c) => c.provider === prov.id).length}
+                count={
+                  notifChannels.filter((c) => c.provider === prov.id).length
+                }
                 onAdd={() => {
                   setAddNotifDialog(prov.id);
                 }}
@@ -345,7 +347,9 @@ export const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
 
         {/* ═══ ADD NOTIFICATION WIZARD ═══ */}
         {(() => {
-          const np = NOTIFICATION_PROVIDERS.find((p) => p.id === addNotifDialog);
+          const np = NOTIFICATION_PROVIDERS.find(
+            (p) => p.id === addNotifDialog
+          );
           if (!np) return null;
           const wizardCfg: WizardProviderConfig = {
             id: np.id,

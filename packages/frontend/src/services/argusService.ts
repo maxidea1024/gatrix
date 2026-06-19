@@ -1056,7 +1056,6 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
-
   /** Pre-save connection test for notification channels */
   async testNotificationChannelPreSave(
     projectId: number | string,

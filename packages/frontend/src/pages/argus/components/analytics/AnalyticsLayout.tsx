@@ -52,7 +52,8 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
   // Use external values if provided, else fall back to internal
   const panelWidth = externalPanelWidth ?? internalPanelWidth;
   const isPanelDragging = externalDragging ?? internalIsDragging;
-  const handlePanelSplitterMouseDown = externalResizeHandler ?? internalHandleMouseDown;
+  const handlePanelSplitterMouseDown =
+    externalResizeHandler ?? internalHandleMouseDown;
 
   return (
     <Box

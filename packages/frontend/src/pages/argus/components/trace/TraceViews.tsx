@@ -2,11 +2,15 @@ import React from 'react';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
-import ArgusVolumeChart, { VolumeChartType } from '@/components/argus/ArgusVolumeChart';
+import ArgusVolumeChart, {
+  VolumeChartType,
+} from '@/components/argus/ArgusVolumeChart';
 import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import SegmentedTabs from '@/components/common/SegmentedTabs';
 import { SpansTab, TracesTab } from '../TraceExplorerTabs';
-import AggregatePanel, { AggChartType } from '@/components/argus/AggregatePanel';
+import AggregatePanel, {
+  AggChartType,
+} from '@/components/argus/AggregatePanel';
 import { FacetGroup } from '@/components/argus/FacetSidebar';
 
 interface TraceViewsProps {
@@ -116,7 +120,9 @@ export const TraceViews: React.FC<TraceViewsProps> = ({
               const startDate = new Date(buckets[si]);
               let endDate = new Date(buckets[ei]);
               if (buckets.length > 1) {
-                const gap = new Date(buckets[1]).getTime() - new Date(buckets[0]).getTime();
+                const gap =
+                  new Date(buckets[1]).getTime() -
+                  new Date(buckets[0]).getTime();
                 endDate = new Date(endDate.getTime() + gap);
               } else {
                 endDate = new Date(endDate.getTime() + 3600000);
@@ -157,7 +163,15 @@ export const TraceViews: React.FC<TraceViewsProps> = ({
           overflow: 'hidden',
         }}
       >
-        <Box sx={{ display: activeTab === 0 ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <Box
+          sx={{
+            display: activeTab === 0 ? 'flex' : 'none',
+            flex: 1,
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}
+        >
           <SpansTab
             spans={spans}
             loading={loading}
@@ -173,7 +187,15 @@ export const TraceViews: React.FC<TraceViewsProps> = ({
           />
         </Box>
 
-        <Box sx={{ display: activeTab === 1 ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <Box
+          sx={{
+            display: activeTab === 1 ? 'flex' : 'none',
+            flex: 1,
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}
+        >
           <TracesTab
             traceSamples={traceSamples}
             loading={loading}
@@ -183,7 +205,15 @@ export const TraceViews: React.FC<TraceViewsProps> = ({
           />
         </Box>
 
-        <Box sx={{ display: activeTab === 2 ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+        <Box
+          sx={{
+            display: activeTab === 2 ? 'flex' : 'none',
+            flex: 1,
+            flexDirection: 'column',
+            overflow: 'hidden',
+            minHeight: 0,
+          }}
+        >
           <Box
             sx={{
               flex: 1,
@@ -227,8 +257,15 @@ export const TraceViews: React.FC<TraceViewsProps> = ({
           {aggGroupBys.length < 5 ? (
             <Box
               onClick={() => {
-                const defaults = ['op', 'status', 'domain', 'action', 'service'];
-                const next = defaults.find((d) => !aggGroupBys.includes(d)) || 'op';
+                const defaults = [
+                  'op',
+                  'status',
+                  'domain',
+                  'action',
+                  'service',
+                ];
+                const next =
+                  defaults.find((d) => !aggGroupBys.includes(d)) || 'op';
                 const newKeys = [...aggGroupBys, next];
                 setUrlState({ groupBy: newKeys.join(',') });
                 fetchAggregates(newKeys);
