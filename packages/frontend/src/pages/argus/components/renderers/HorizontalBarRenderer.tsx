@@ -10,11 +10,7 @@ import {
   Tooltip,
   Cell,
 } from 'recharts';
-import {
-  type VizOptions,
-  CHART_COLORS,
-  formatValue,
-} from './widgetTypes';
+import { type VizOptions, CHART_COLORS, formatValue } from './widgetTypes';
 
 interface HorizontalBarRendererProps {
   data: any[];
@@ -55,7 +51,8 @@ const HorizontalBarRenderer: React.FC<HorizontalBarRendererProps> = ({
   const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
 
   const getColor = (index: number, name: string) => {
-    if (vizOptions?.series_colors?.[name]) return vizOptions.series_colors[name];
+    if (vizOptions?.series_colors?.[name])
+      return vizOptions.series_colors[name];
     return CHART_COLORS[index % CHART_COLORS.length];
   };
 

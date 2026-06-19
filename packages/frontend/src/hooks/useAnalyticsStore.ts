@@ -465,9 +465,7 @@ export function serializeAnalyticsQuery(
 ): Record<string, any> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { resetStore, ...data } = Object.fromEntries(
-    Object.entries(storeState).filter(
-      ([, v]) => typeof v !== 'function'
-    )
+    Object.entries(storeState).filter(([, v]) => typeof v !== 'function')
   );
   return { analytics_sub_type: tab, ...data };
 }
@@ -494,9 +492,11 @@ export function restoreInsightsQuery(
   const data = deserializeAnalyticsQuery(config);
   if (data.dateRange) store.setDateRange(data.dateRange);
   if (data.events) store.setEvents(data.events);
-  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.breakdownProperties)
+    store.setBreakdownProperties(data.breakdownProperties);
   if (data.chartType) store.setChartType(data.chartType);
-  if (data.comparePeriod !== undefined) store.setComparePeriod(data.comparePeriod);
+  if (data.comparePeriod !== undefined)
+    store.setComparePeriod(data.comparePeriod);
   if (data.formulas) store.setFormulas(data.formulas);
 }
 
@@ -509,11 +509,13 @@ export function restoreFunnelsQuery(
   if (data.steps) store.setSteps(data.steps);
   if (data.viewMode) store.setViewMode(data.viewMode);
   if (data.chartLayout) store.setChartLayout(data.chartLayout);
-  if (data.conversionWindow !== undefined) store.setConversionWindow(data.conversionWindow);
+  if (data.conversionWindow !== undefined)
+    store.setConversionWindow(data.conversionWindow);
   if (data.ordering) store.setOrdering(data.ordering);
   if (data.counting) store.setCounting(data.counting);
   if (data.holdConstant) store.setHoldConstant(data.holdConstant);
-  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.breakdownProperties)
+    store.setBreakdownProperties(data.breakdownProperties);
   if (data.exclusionSteps) store.setExclusionSteps(data.exclusionSteps);
   if (data.segments) store.setSegments(data.segments);
   if (data.compareMode !== undefined) store.setCompareMode(data.compareMode);
@@ -530,9 +532,11 @@ export function restoreRetentionQuery(
   if (data.retentionType) store.setRetentionType(data.retentionType);
   if (data.criteria) store.setCriteria(data.criteria);
   if (data.measurement) store.setMeasurement(data.measurement);
-  if (data.measurementProperty !== undefined) store.setMeasurementProperty(data.measurementProperty);
+  if (data.measurementProperty !== undefined)
+    store.setMeasurementProperty(data.measurementProperty);
   if (data.minFrequency !== undefined) store.setMinFrequency(data.minFrequency);
-  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.breakdownProperties)
+    store.setBreakdownProperties(data.breakdownProperties);
   if (data.viewMode) store.setViewMode(data.viewMode);
 }
 
@@ -544,14 +548,16 @@ export function restoreFlowsQuery(
   if (data.dateRange) store.setDateRange(data.dateRange);
   if (data.anchorEventA !== undefined) store.setAnchorEventA(data.anchorEventA);
   if (data.anchorEventB !== undefined) store.setAnchorEventB(data.anchorEventB);
-  if (data.showSecondAnchor !== undefined) store.setShowSecondAnchor(data.showSecondAnchor);
+  if (data.showSecondAnchor !== undefined)
+    store.setShowSecondAnchor(data.showSecondAnchor);
   if (data.direction) store.setDirection(data.direction);
   if (data.stepsBefore !== undefined) store.setStepsBefore(data.stepsBefore);
   if (data.stepsAfter !== undefined) store.setStepsAfter(data.stepsAfter);
   if (data.depth !== undefined) store.setDepth(data.depth);
   if (data.viewMode) store.setViewMode(data.viewMode);
   if (data.excludeEvents) store.setExcludeEvents(data.excludeEvents);
-  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.breakdownProperties)
+    store.setBreakdownProperties(data.breakdownProperties);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -582,4 +588,3 @@ export const useAnalyticsSaveState = create<AnalyticsSaveState>()((set) => ({
   clearSaveState: () =>
     set({ currentQueryId: null, currentQueryName: '', isDirty: false }),
 }));
-

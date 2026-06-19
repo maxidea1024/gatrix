@@ -107,11 +107,15 @@ const ArgusDashboardsPage: React.FC = () => {
 
   // Delete confirmation
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [deletingDashboard, setDeletingDashboard] = useState<DashboardData | null>(null);
+  const [deletingDashboard, setDeletingDashboard] =
+    useState<DashboardData | null>(null);
 
   // Card context menu
-  const [cardMenuAnchor, setCardMenuAnchor] = useState<HTMLElement | null>(null);
-  const [cardMenuDashboard, setCardMenuDashboard] = useState<DashboardData | null>(null);
+  const [cardMenuAnchor, setCardMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
+  const [cardMenuDashboard, setCardMenuDashboard] =
+    useState<DashboardData | null>(null);
 
   // Templates collapse (default expanded)
   const [templatesExpanded, setTemplatesExpanded] = useState(true);
@@ -122,7 +126,8 @@ const ArgusDashboardsPage: React.FC = () => {
 
   // Share dialog
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [sharingDashboard, setSharingDashboard] = useState<DashboardData | null>(null);
+  const [sharingDashboard, setSharingDashboard] =
+    useState<DashboardData | null>(null);
 
   // Widget types catalog is now inside WidgetEditorDrawer
 
@@ -146,7 +151,9 @@ const ArgusDashboardsPage: React.FC = () => {
   // Auto-load dashboard from URL param
   useEffect(() => {
     if (urlDashboardId && dashboards.length > 0) {
-      const found = dashboards.find((d: any) => String(d.id) === urlDashboardId);
+      const found = dashboards.find(
+        (d: any) => String(d.id) === urlDashboardId
+      );
       if (found) {
         argusService.getDashboard(projectId, (found as any).id).then((full) => {
           if (full) setActiveDashboard(full);
@@ -176,7 +183,12 @@ const ArgusDashboardsPage: React.FC = () => {
             );
 
             // Analytics widgets return { series: [...] } instead of flat rows
-            if (w.query.analytics_type && raw && !Array.isArray(raw) && raw.series) {
+            if (
+              w.query.analytics_type &&
+              raw &&
+              !Array.isArray(raw) &&
+              raw.series
+            ) {
               // Transform series into flat chart-friendly rows
               const flatData: any[] = [];
               for (const s of raw.series) {
@@ -190,7 +202,22 @@ const ArgusDashboardsPage: React.FC = () => {
                   }
                 }
               }
-              results[w.id] = flatData.length > 0 ? flatData : [{ count: raw.series.reduce((s: number, sr: any) => s + (sr.data?.reduce((a: number, p: any) => a + Number(p.value), 0) || 0), 0) }];
+              results[w.id] =
+                flatData.length > 0
+                  ? flatData
+                  : [
+                      {
+                        count: raw.series.reduce(
+                          (s: number, sr: any) =>
+                            s +
+                            (sr.data?.reduce(
+                              (a: number, p: any) => a + Number(p.value),
+                              0
+                            ) || 0),
+                          0
+                        ),
+                      },
+                    ];
             } else {
               results[w.id] = Array.isArray(raw) ? raw : [];
             }
@@ -239,11 +266,17 @@ const ArgusDashboardsPage: React.FC = () => {
         setNewTitle('');
         setNewDesc('');
         setSelectedPreset('');
-        enqueueSnackbar(t('argus.dashboards.createSuccess', 'Dashboard created'), { variant: 'success' });
+        enqueueSnackbar(
+          t('argus.dashboards.createSuccess', 'Dashboard created'),
+          { variant: 'success' }
+        );
       }
     } catch (err) {
       console.error(err);
-      enqueueSnackbar(t('argus.dashboards.createFailed', 'Failed to create dashboard'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.dashboards.createFailed', 'Failed to create dashboard'),
+        { variant: 'error' }
+      );
     }
   };
 
@@ -255,10 +288,16 @@ const ArgusDashboardsPage: React.FC = () => {
         setActiveDashboard(null);
         navigate('/argus/dashboards');
       }
-      enqueueSnackbar(t('argus.dashboards.deleteSuccess', 'Dashboard deleted'), { variant: 'success' });
+      enqueueSnackbar(
+        t('argus.dashboards.deleteSuccess', 'Dashboard deleted'),
+        { variant: 'success' }
+      );
     } catch (err) {
       console.error(err);
-      enqueueSnackbar(t('argus.dashboards.deleteFailed', 'Failed to delete dashboard'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.dashboards.deleteFailed', 'Failed to delete dashboard'),
+        { variant: 'error' }
+      );
     }
   };
 
@@ -269,10 +308,15 @@ const ArgusDashboardsPage: React.FC = () => {
         widgets_config: activeDashboard.widgets_config,
       });
       setIsEditing(false);
-      enqueueSnackbar(t('argus.dashboards.saveSuccess', 'Dashboard saved'), { variant: 'success' });
+      enqueueSnackbar(t('argus.dashboards.saveSuccess', 'Dashboard saved'), {
+        variant: 'success',
+      });
     } catch (err) {
       console.error(err);
-      enqueueSnackbar(t('argus.dashboards.saveFailed', 'Failed to save dashboard'), { variant: 'error' });
+      enqueueSnackbar(
+        t('argus.dashboards.saveFailed', 'Failed to save dashboard'),
+        { variant: 'error' }
+      );
     }
   };
 
@@ -382,7 +426,10 @@ const ArgusDashboardsPage: React.FC = () => {
           .sort((a: any, b: any) => {
             if ((b.is_favorite || 0) !== (a.is_favorite || 0))
               return (b.is_favorite || 0) - (a.is_favorite || 0);
-            return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+            return (
+              new Date(b.updated_at).getTime() -
+              new Date(a.updated_at).getTime()
+            );
           })
       );
     } catch (err) {
@@ -465,26 +512,53 @@ const ArgusDashboardsPage: React.FC = () => {
                     >
                       {/* Header: title + star + more */}
                       <CardContent sx={{ pb: 0, pt: 1.5, px: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                          }}
+                        >
                           <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography variant="subtitle2" fontWeight={700} sx={{ fontSize: '0.85rem' }} noWrap>
+                            <Typography
+                              variant="subtitle2"
+                              fontWeight={700}
+                              sx={{ fontSize: '0.85rem' }}
+                              noWrap
+                            >
                               {db.title}
                             </Typography>
                             <Typography
                               variant="caption"
-                              sx={{ color: 'text.secondary', fontSize: '0.7rem', display: 'block' }}
+                              sx={{
+                                color: 'text.secondary',
+                                fontSize: '0.7rem',
+                                display: 'block',
+                              }}
                               noWrap
                             >
                               {db.description ||
-                                t('argus.dashboards.noDescription', 'No description')}
+                                t(
+                                  'argus.dashboards.noDescription',
+                                  'No description'
+                                )}
                             </Typography>
                           </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', ml: 0.5, flexShrink: 0 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              ml: 0.5,
+                              flexShrink: 0,
+                            }}
+                          >
                             <IconButton
                               size="small"
                               onClick={(e) => handleToggleFavorite(db, e)}
                               sx={{
-                                color: db.is_favorite ? '#ffc107' : 'text.disabled',
+                                color: db.is_favorite
+                                  ? '#ffc107'
+                                  : 'text.disabled',
                                 '&:hover': { color: '#ffc107' },
                               }}
                             >
@@ -513,49 +587,110 @@ const ArgusDashboardsPage: React.FC = () => {
                       </CardContent>
 
                       {/* Footer: mini preview + widget count */}
-                      <Box sx={{ px: 2, pb: 1.5, pt: 0.5, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                      <Box
+                        sx={{
+                          px: 2,
+                          pb: 1.5,
+                          pt: 0.5,
+                          flex: 1,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'flex-end',
+                        }}
+                      >
                         {(db.widgets_config || []).length > 0 ? (
                           <Box
                             sx={{
                               height: 56,
                               borderRadius: 1,
-                              backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                              backgroundColor: isDark
+                                ? 'rgba(255,255,255,0.02)'
+                                : 'rgba(0,0,0,0.02)',
                               border: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                               position: 'relative',
                               overflow: 'hidden',
                             }}
                           >
-                            {(db.widgets_config || []).slice(0, 12).map((w: WidgetConfig) => {
-                              const ICON_MAP: Record<string, React.ReactNode> = {
-                                line: <LineChartIcon sx={{ fontSize: 8, color: 'text.disabled' }} />,
-                                bar: <BarChartIcon sx={{ fontSize: 8, color: 'text.disabled' }} />,
-                                pie: <PieChartIcon sx={{ fontSize: 8, color: 'text.disabled' }} />,
-                                number: <NumberIcon sx={{ fontSize: 8, color: 'text.disabled' }} />,
-                                table: <TableIcon sx={{ fontSize: 8, color: 'text.disabled' }} />,
-                                area: <AreaChartIcon sx={{ fontSize: 8, color: 'text.disabled' }} />,
-                              };
-                              return (
-                                <Box
-                                  key={w.id}
-                                  sx={{
-                                    position: 'absolute',
-                                    left: `${(w.layout.x / 12) * 100}%`,
-                                    top: `${Math.min((w.layout.y / 8) * 100, 80)}%`,
-                                    width: `${(w.layout.w / 12) * 100}%`,
-                                    height: `${Math.min((w.layout.h / 8) * 100, 50)}%`,
-                                    minHeight: 8,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: 0.5,
-                                    backgroundColor: isDark ? 'rgba(124,77,255,0.08)' : 'rgba(124,77,255,0.06)',
-                                    border: `0.5px solid ${alpha('#7c4dff', 0.15)}`,
-                                  }}
-                                >
-                                  {ICON_MAP[w.type] || null}
-                                </Box>
-                              );
-                            })}
+                            {(db.widgets_config || [])
+                              .slice(0, 12)
+                              .map((w: WidgetConfig) => {
+                                const ICON_MAP: Record<
+                                  string,
+                                  React.ReactNode
+                                > = {
+                                  line: (
+                                    <LineChartIcon
+                                      sx={{
+                                        fontSize: 8,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  ),
+                                  bar: (
+                                    <BarChartIcon
+                                      sx={{
+                                        fontSize: 8,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  ),
+                                  pie: (
+                                    <PieChartIcon
+                                      sx={{
+                                        fontSize: 8,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  ),
+                                  number: (
+                                    <NumberIcon
+                                      sx={{
+                                        fontSize: 8,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  ),
+                                  table: (
+                                    <TableIcon
+                                      sx={{
+                                        fontSize: 8,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  ),
+                                  area: (
+                                    <AreaChartIcon
+                                      sx={{
+                                        fontSize: 8,
+                                        color: 'text.disabled',
+                                      }}
+                                    />
+                                  ),
+                                };
+                                return (
+                                  <Box
+                                    key={w.id}
+                                    sx={{
+                                      position: 'absolute',
+                                      left: `${(w.layout.x / 12) * 100}%`,
+                                      top: `${Math.min((w.layout.y / 8) * 100, 80)}%`,
+                                      width: `${(w.layout.w / 12) * 100}%`,
+                                      height: `${Math.min((w.layout.h / 8) * 100, 50)}%`,
+                                      minHeight: 8,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      borderRadius: 0.5,
+                                      backgroundColor: isDark
+                                        ? 'rgba(124,77,255,0.08)'
+                                        : 'rgba(124,77,255,0.06)',
+                                      border: `0.5px solid ${alpha('#7c4dff', 0.15)}`,
+                                    }}
+                                  >
+                                    {ICON_MAP[w.type] || null}
+                                  </Box>
+                                );
+                              })}
                           </Box>
                         ) : (
                           <Box
@@ -566,7 +701,6 @@ const ArgusDashboardsPage: React.FC = () => {
                             }}
                           />
                         )}
-
                       </Box>
                     </Card>
                   </Grid>
@@ -578,21 +712,28 @@ const ArgusDashboardsPage: React.FC = () => {
             <Menu
               anchorEl={cardMenuAnchor}
               open={Boolean(cardMenuAnchor)}
-              onClose={() => { setCardMenuAnchor(null); setCardMenuDashboard(null); }}
+              onClose={() => {
+                setCardMenuAnchor(null);
+                setCardMenuDashboard(null);
+              }}
               PaperProps={{ sx: { minWidth: 160, borderRadius: '8px' } }}
             >
               <MenuItem
                 onClick={() => {
                   if (cardMenuDashboard) {
                     setActiveDashboard(cardMenuDashboard);
-                    navigate(`/argus/dashboards/${(cardMenuDashboard as any).id}`);
+                    navigate(
+                      `/argus/dashboards/${(cardMenuDashboard as any).id}`
+                    );
                   }
                   setCardMenuAnchor(null);
                   setCardMenuDashboard(null);
                 }}
                 sx={{ fontSize: '0.8rem' }}
               >
-                <ListItemIcon><EditIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+                <ListItemIcon>
+                  <EditIcon sx={{ fontSize: 16 }} />
+                </ListItemIcon>
                 <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
                   {t('argus.dashboards.editDashboard', 'Edit Dashboard')}
                 </ListItemText>
@@ -606,7 +747,9 @@ const ArgusDashboardsPage: React.FC = () => {
                 }}
                 sx={{ fontSize: '0.8rem' }}
               >
-                <ListItemIcon><ShareIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+                <ListItemIcon>
+                  <ShareIcon sx={{ fontSize: 16 }} />
+                </ListItemIcon>
                 <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
                   {t('argus.dashboards.sharing.title', 'Sharing Settings')}
                 </ListItemText>
@@ -621,7 +764,9 @@ const ArgusDashboardsPage: React.FC = () => {
                 }}
                 sx={{ fontSize: '0.8rem', color: 'error.main' }}
               >
-                <ListItemIcon><DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} /></ListItemIcon>
+                <ListItemIcon>
+                  <DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                </ListItemIcon>
                 <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
                   {t('argus.dashboards.deleteDashboard', 'Delete Dashboard')}
                 </ListItemText>
@@ -631,7 +776,10 @@ const ArgusDashboardsPage: React.FC = () => {
             {/* Delete Confirmation Dialog */}
             <Dialog
               open={deleteConfirmOpen}
-              onClose={() => { setDeleteConfirmOpen(false); setDeletingDashboard(null); }}
+              onClose={() => {
+                setDeleteConfirmOpen(false);
+                setDeletingDashboard(null);
+              }}
               PaperProps={{ sx: { borderRadius: 2 } }}
             >
               <DialogTitle sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
@@ -639,14 +787,21 @@ const ArgusDashboardsPage: React.FC = () => {
               </DialogTitle>
               <DialogContent>
                 <DialogContentText sx={{ fontSize: '0.85rem' }}>
-                  {t('argus.dashboards.confirmDeleteMessage', 'Are you sure you want to delete "{{name}}"? This action cannot be undone.', {
-                    name: deletingDashboard?.title || '',
-                  })}
+                  {t(
+                    'argus.dashboards.confirmDeleteMessage',
+                    'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
+                    {
+                      name: deletingDashboard?.title || '',
+                    }
+                  )}
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
                 <Button
-                  onClick={() => { setDeleteConfirmOpen(false); setDeletingDashboard(null); }}
+                  onClick={() => {
+                    setDeleteConfirmOpen(false);
+                    setDeletingDashboard(null);
+                  }}
                   sx={{ textTransform: 'none' }}
                 >
                   {t('common.cancel', 'Cancel')}
@@ -673,8 +828,12 @@ const ArgusDashboardsPage: React.FC = () => {
               <Box sx={{ mt: 4 }}>
                 <Button
                   size="small"
-                  startIcon={<PresetIcon sx={{ fontSize: 16, color: '#ff9800' }} />}
-                  endIcon={templatesExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  startIcon={
+                    <PresetIcon sx={{ fontSize: 16, color: '#ff9800' }} />
+                  }
+                  endIcon={
+                    templatesExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+                  }
                   onClick={() => setTemplatesExpanded(!templatesExpanded)}
                   sx={{
                     textTransform: 'none',
@@ -704,8 +863,18 @@ const ArgusDashboardsPage: React.FC = () => {
                             },
                           }}
                           onClick={() => {
-                            setNewTitle(t(`argus.dashboards.preset.${p.id}.title`, p.title));
-                            setNewDesc(t(`argus.dashboards.preset.${p.id}.description`, p.description));
+                            setNewTitle(
+                              t(
+                                `argus.dashboards.preset.${p.id}.title`,
+                                p.title
+                              )
+                            );
+                            setNewDesc(
+                              t(
+                                `argus.dashboards.preset.${p.id}.description`,
+                                p.description
+                              )
+                            );
                             setSelectedPreset(p.id);
                             setCreateOpen(true);
                           }}
@@ -716,7 +885,10 @@ const ArgusDashboardsPage: React.FC = () => {
                               fontWeight={700}
                               sx={{ mb: 0.5, fontSize: '0.88rem' }}
                             >
-                              {t(`argus.dashboards.preset.${p.id}.title`, p.title)}
+                              {t(
+                                `argus.dashboards.preset.${p.id}.title`,
+                                p.title
+                              )}
                             </Typography>
                             <Typography
                               variant="caption"
@@ -727,10 +899,17 @@ const ArgusDashboardsPage: React.FC = () => {
                                 mb: 1,
                               }}
                             >
-                              {t(`argus.dashboards.preset.${p.id}.description`, p.description)}
+                              {t(
+                                `argus.dashboards.preset.${p.id}.description`,
+                                p.description
+                              )}
                             </Typography>
                             <Chip
-                              label={t('argus.dashboards.widgetCount', '{{count}} widgets', { count: p.widgetCount })}
+                              label={t(
+                                'argus.dashboards.widgetCount',
+                                '{{count}} widgets',
+                                { count: p.widgetCount }
+                              )}
                               size="small"
                               sx={{
                                 height: 20,
@@ -829,7 +1008,10 @@ const ArgusDashboardsPage: React.FC = () => {
           />
         }
         subtitle={activeDashboard.description}
-        onBack={() => { setActiveDashboard(null); navigate('/argus/dashboards'); }}
+        onBack={() => {
+          setActiveDashboard(null);
+          navigate('/argus/dashboards');
+        }}
         actions={
           <Box sx={{ display: 'flex', gap: 1 }}>
             {isEditing ? (
@@ -891,68 +1073,65 @@ const ArgusDashboardsPage: React.FC = () => {
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Catalog sidebar in edit mode */}
         {isEditing && (
-          <WidgetCatalog
-            onSelect={handleAddWidgetWithType}
-            isDark={isDark}
-          />
+          <WidgetCatalog onSelect={handleAddWidgetWithType} isDark={isDark} />
         )}
 
         {/* Main Grid */}
         <Box sx={{ flex: 1, overflow: 'auto' }}>
-      {activeDashboard.widgets_config.length > 0 ? (
-        <ResponsiveGridLayout
-          className="layout"
-          layouts={{ lg: gridLayout }}
-          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-          cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-          rowHeight={60}
-          isDraggable={isEditing}
-          isResizable={isEditing}
-          onLayoutChange={handleLayoutChange}
-          draggableHandle=".drag-handle"
-          containerPadding={[0, 0]}
-          margin={[12, 12]}
-        >
-          {activeDashboard.widgets_config.map((widget) => (
-            <div key={widget.id}>
-              <WidgetCard
-                widget={widget}
-                data={widgetData[widget.id] || []}
-                loading={!!widgetLoading[widget.id]}
-                isDark={isDark}
-                isEditing={isEditing}
-                onEdit={() => {
-                  setEditingWidget({ ...widget });
-                  setWidgetEditorOpen(true);
+          {activeDashboard.widgets_config.length > 0 ? (
+            <ResponsiveGridLayout
+              className="layout"
+              layouts={{ lg: gridLayout }}
+              breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+              cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+              rowHeight={60}
+              isDraggable={isEditing}
+              isResizable={isEditing}
+              onLayoutChange={handleLayoutChange}
+              draggableHandle=".drag-handle"
+              containerPadding={[0, 0]}
+              margin={[12, 12]}
+            >
+              {activeDashboard.widgets_config.map((widget) => (
+                <div key={widget.id}>
+                  <WidgetCard
+                    widget={widget}
+                    data={widgetData[widget.id] || []}
+                    loading={!!widgetLoading[widget.id]}
+                    isDark={isDark}
+                    isEditing={isEditing}
+                    onEdit={() => {
+                      setEditingWidget({ ...widget });
+                      setWidgetEditorOpen(true);
+                    }}
+                    onDelete={() => handleDeleteWidget(widget.id)}
+                    onDuplicate={() => handleDuplicateWidget(widget)}
+                  />
+                </div>
+              ))}
+            </ResponsiveGridLayout>
+          ) : (
+            <EmptyPlaceholder
+              icon={<WidgetIcon sx={{ fontSize: 48 }} />}
+              message={t(
+                'argus.dashboards.noWidgets',
+                'This dashboard has no widgets yet.'
+              )}
+              minHeight={300}
+            >
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={() => {
+                  setIsEditing(true);
+                  handleAddWidget();
                 }}
-                onDelete={() => handleDeleteWidget(widget.id)}
-                onDuplicate={() => handleDuplicateWidget(widget)}
-              />
-            </div>
-          ))}
-        </ResponsiveGridLayout>
-      ) : (
-        <EmptyPlaceholder
-          icon={<WidgetIcon sx={{ fontSize: 48 }} />}
-          message={t(
-            'argus.dashboards.noWidgets',
-            'This dashboard has no widgets yet.'
+                sx={{ textTransform: 'none', mt: 2 }}
+              >
+                {t('argus.dashboards.addWidget', 'Add Widget')}
+              </Button>
+            </EmptyPlaceholder>
           )}
-          minHeight={300}
-        >
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setIsEditing(true);
-              handleAddWidget();
-            }}
-            sx={{ textTransform: 'none', mt: 2 }}
-          >
-            {t('argus.dashboards.addWidget', 'Add Widget')}
-          </Button>
-        </EmptyPlaceholder>
-      )}
         </Box>
       </Box>
 
@@ -964,14 +1143,19 @@ const ArgusDashboardsPage: React.FC = () => {
         onSave={handleSaveWidget}
         isDark={isDark}
         previewData={editingWidget ? widgetData[editingWidget.id] || [] : []}
-        previewLoading={editingWidget ? !!widgetLoading[editingWidget.id] : false}
+        previewLoading={
+          editingWidget ? !!widgetLoading[editingWidget.id] : false
+        }
       />
 
       {/* Dashboard Share Dialog */}
       {sharingDashboard && (
         <DashboardShareDialog
           open={shareDialogOpen}
-          onClose={() => { setShareDialogOpen(false); setSharingDashboard(null); }}
+          onClose={() => {
+            setShareDialogOpen(false);
+            setSharingDashboard(null);
+          }}
           projectId={projectId}
           dashboard={sharingDashboard as any}
           onUpdated={() => {

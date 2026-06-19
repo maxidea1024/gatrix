@@ -1,10 +1,6 @@
 import React, { useMemo } from 'react';
 import { Box, Typography, alpha } from '@mui/material';
-import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
-} from 'recharts';
+import { ResponsiveContainer, AreaChart, Area } from 'recharts';
 import {
   type VizOptions,
   CHART_COLORS,
@@ -30,15 +26,30 @@ const StatRenderer: React.FC<StatRendererProps> = ({
 
   // Extract primary value
   const { value, label, sparklineData, changePercent } = useMemo(() => {
-    if (!data || data.length === 0) return { value: 0, label: '', sparklineData: [], changePercent: undefined };
+    if (!data || data.length === 0)
+      return {
+        value: 0,
+        label: '',
+        sparklineData: [],
+        changePercent: undefined,
+      };
 
     const first = data[0];
     const keys = Object.keys(first);
-    const numKey = keys.find((k) => typeof first[k] === 'number' || (first[k] !== null && first[k] !== '' && typeof first[k] !== 'boolean' && !isNaN(Number(first[k]))));
-    const labelKey = keys.find((k) => k !== numKey && typeof first[k] === 'string');
+    const numKey = keys.find(
+      (k) =>
+        typeof first[k] === 'number' ||
+        (first[k] !== null &&
+          first[k] !== '' &&
+          typeof first[k] !== 'boolean' &&
+          !isNaN(Number(first[k])))
+    );
+    const labelKey = keys.find(
+      (k) => k !== numKey && typeof first[k] === 'string'
+    );
 
     const primaryValue = numKey ? Number(first[numKey]) : 0;
-    const primaryLabel = labelKey ? String(first[labelKey]) : (numKey || '');
+    const primaryLabel = labelKey ? String(first[labelKey]) : numKey || '';
 
     // If data has multiple rows, use for sparkline
     let spark: { value: number }[] = [];
@@ -56,7 +67,12 @@ const StatRenderer: React.FC<StatRendererProps> = ({
       }
     }
 
-    return { value: primaryValue, label: primaryLabel, sparklineData: spark, changePercent: change };
+    return {
+      value: primaryValue,
+      label: primaryLabel,
+      sparklineData: spark,
+      changePercent: change,
+    };
   }, [data, showChange]);
 
   const formattedValue = formatValue(value, vizOptions);

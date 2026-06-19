@@ -71,28 +71,33 @@ const TextRenderer: React.FC<TextRendererProps> = ({
  * Handles: **bold**, *italic*, `code`, links, headers, line breaks.
  */
 function simpleMarkdown(text: string): string {
-  return text
-    // Escape HTML
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    // Headers
-    .replace(/^### (.+)$/gm, '<strong style="font-size:1.1em">$1</strong>')
-    .replace(/^## (.+)$/gm, '<strong style="font-size:1.2em">$1</strong>')
-    .replace(/^# (.+)$/gm, '<strong style="font-size:1.4em">$1</strong>')
-    // Bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Italic
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Inline code
-    .replace(/`(.+?)`/g, '<code style="background:rgba(124,77,255,0.08);padding:1px 4px;border-radius:3px;font-size:0.9em">$1</code>')
-    // Links
-    .replace(
-      /\[(.+?)\]\((.+?)\)/g,
-      '<a href="$2" target="_blank" rel="noopener" style="color:#7c4dff">$1</a>'
-    )
-    // Line breaks
-    .replace(/\n/g, '<br />');
+  return (
+    text
+      // Escape HTML
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      // Headers
+      .replace(/^### (.+)$/gm, '<strong style="font-size:1.1em">$1</strong>')
+      .replace(/^## (.+)$/gm, '<strong style="font-size:1.2em">$1</strong>')
+      .replace(/^# (.+)$/gm, '<strong style="font-size:1.4em">$1</strong>')
+      // Bold
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // Inline code
+      .replace(
+        /`(.+?)`/g,
+        '<code style="background:rgba(124,77,255,0.08);padding:1px 4px;border-radius:3px;font-size:0.9em">$1</code>'
+      )
+      // Links
+      .replace(
+        /\[(.+?)\]\((.+?)\)/g,
+        '<a href="$2" target="_blank" rel="noopener" style="color:#7c4dff">$1</a>'
+      )
+      // Line breaks
+      .replace(/\n/g, '<br />')
+  );
 }
 
 export default TextRenderer;

@@ -146,7 +146,6 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
     effectiveType === 'stacked-area' ||
     effectiveType === 'stacked-line';
 
-
   const chartData = useMemo(() => {
     if (isPieOrDoughnut) {
       const labelsList = finalDatasets.map((ds) => ds.label);
@@ -232,7 +231,6 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
     theme.palette.primary.main,
     isPieOrDoughnut,
   ]);
-
 
   const options = useMemo(
     () => ({
@@ -376,7 +374,6 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
       chartData,
     ]
   );
-
 
   const plugins = useMemo(() => {
     if (isPieOrDoughnut) return [];

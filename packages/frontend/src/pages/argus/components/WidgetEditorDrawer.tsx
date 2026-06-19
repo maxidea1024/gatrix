@@ -38,7 +38,11 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import WidgetRenderer from './renderers/WidgetRenderer';
-import type { WidgetConfig, WidgetType, VizOptions } from './renderers/widgetTypes';
+import type {
+  WidgetConfig,
+  WidgetType,
+  VizOptions,
+} from './renderers/widgetTypes';
 
 // ─── Widget Type Catalog Data ───
 
@@ -62,50 +66,148 @@ const WIDGET_TYPE_CATALOG: CatalogGroup[] = [
     groupKey: 'argus.dashboards.catalog.timeSeries',
     defaultLabel: 'Time Series / Trends',
     items: [
-      { value: 'time-series', labelKey: 'argus.dashboards.widgetType.timeSeries', defaultLabel: 'Time Series', descKey: 'argus.dashboards.widgetType.timeSeriesDesc', defaultDesc: 'Line, bar, or area chart over time', icon: <LineChartIcon sx={{ fontSize: 18 }} /> },
+      {
+        value: 'time-series',
+        labelKey: 'argus.dashboards.widgetType.timeSeries',
+        defaultLabel: 'Time Series',
+        descKey: 'argus.dashboards.widgetType.timeSeriesDesc',
+        defaultDesc: 'Line, bar, or area chart over time',
+        icon: <LineChartIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
     groupKey: 'argus.dashboards.catalog.stats',
     defaultLabel: 'Stats / Single Value',
     items: [
-      { value: 'stat', labelKey: 'argus.dashboards.widgetType.stat', defaultLabel: 'Stat', descKey: 'argus.dashboards.widgetType.statDesc', defaultDesc: 'Big number with sparkline', icon: <NumberIcon sx={{ fontSize: 18 }} /> },
-      { value: 'gauge', labelKey: 'argus.dashboards.widgetType.gauge', defaultLabel: 'Gauge', descKey: 'argus.dashboards.widgetType.gaugeDesc', defaultDesc: 'Radial gauge', icon: <GaugeIcon sx={{ fontSize: 18 }} /> },
-      { value: 'bar-gauge', labelKey: 'argus.dashboards.widgetType.barGauge', defaultLabel: 'Bar Gauge', descKey: 'argus.dashboards.widgetType.barGaugeDesc', defaultDesc: 'Horizontal bar gauge', icon: <BarGaugeIcon sx={{ fontSize: 18 }} /> },
+      {
+        value: 'stat',
+        labelKey: 'argus.dashboards.widgetType.stat',
+        defaultLabel: 'Stat',
+        descKey: 'argus.dashboards.widgetType.statDesc',
+        defaultDesc: 'Big number with sparkline',
+        icon: <NumberIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'gauge',
+        labelKey: 'argus.dashboards.widgetType.gauge',
+        defaultLabel: 'Gauge',
+        descKey: 'argus.dashboards.widgetType.gaugeDesc',
+        defaultDesc: 'Radial gauge',
+        icon: <GaugeIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'bar-gauge',
+        labelKey: 'argus.dashboards.widgetType.barGauge',
+        defaultLabel: 'Bar Gauge',
+        descKey: 'argus.dashboards.widgetType.barGaugeDesc',
+        defaultDesc: 'Horizontal bar gauge',
+        icon: <BarGaugeIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
     groupKey: 'argus.dashboards.catalog.distribution',
     defaultLabel: 'Distribution / Comparison',
     items: [
-      { value: 'pie', labelKey: 'argus.dashboards.widgetType.pie', defaultLabel: 'Pie / Donut', descKey: 'argus.dashboards.widgetType.pieDesc', defaultDesc: 'Proportional distribution', icon: <PieChartIcon sx={{ fontSize: 18 }} /> },
-      { value: 'horizontal-bar', labelKey: 'argus.dashboards.widgetType.horizontalBar', defaultLabel: 'Horizontal Bar', descKey: 'argus.dashboards.widgetType.horizontalBarDesc', defaultDesc: 'Category comparison', icon: <BarChartIcon sx={{ fontSize: 18 }} /> },
-      { value: 'histogram', labelKey: 'argus.dashboards.widgetType.histogram', defaultLabel: 'Histogram', descKey: 'argus.dashboards.widgetType.histogramDesc', defaultDesc: 'Frequency distribution', icon: <HistogramIcon sx={{ fontSize: 18 }} /> },
-      { value: 'scatter', labelKey: 'argus.dashboards.widgetType.scatter', defaultLabel: 'Scatter', descKey: 'argus.dashboards.widgetType.scatterDesc', defaultDesc: 'Correlation between two values', icon: <ScatterIcon sx={{ fontSize: 18 }} /> },
+      {
+        value: 'pie',
+        labelKey: 'argus.dashboards.widgetType.pie',
+        defaultLabel: 'Pie / Donut',
+        descKey: 'argus.dashboards.widgetType.pieDesc',
+        defaultDesc: 'Proportional distribution',
+        icon: <PieChartIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'horizontal-bar',
+        labelKey: 'argus.dashboards.widgetType.horizontalBar',
+        defaultLabel: 'Horizontal Bar',
+        descKey: 'argus.dashboards.widgetType.horizontalBarDesc',
+        defaultDesc: 'Category comparison',
+        icon: <BarChartIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'histogram',
+        labelKey: 'argus.dashboards.widgetType.histogram',
+        defaultLabel: 'Histogram',
+        descKey: 'argus.dashboards.widgetType.histogramDesc',
+        defaultDesc: 'Frequency distribution',
+        icon: <HistogramIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'scatter',
+        labelKey: 'argus.dashboards.widgetType.scatter',
+        defaultLabel: 'Scatter',
+        descKey: 'argus.dashboards.widgetType.scatterDesc',
+        defaultDesc: 'Correlation between two values',
+        icon: <ScatterIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
     groupKey: 'argus.dashboards.catalog.data',
     defaultLabel: 'Data / Lists',
     items: [
-      { value: 'table', labelKey: 'argus.dashboards.widgetType.table', defaultLabel: 'Table', descKey: 'argus.dashboards.widgetType.tableDesc', defaultDesc: 'Sortable, paginated table', icon: <TableIcon sx={{ fontSize: 18 }} /> },
-      { value: 'top-list', labelKey: 'argus.dashboards.widgetType.topList', defaultLabel: 'Top List', descKey: 'argus.dashboards.widgetType.topListDesc', defaultDesc: 'Ranked list with bars', icon: <ListIcon sx={{ fontSize: 18 }} /> },
-      { value: 'event-stream', labelKey: 'argus.dashboards.widgetType.eventStream', defaultLabel: 'Event Stream', descKey: 'argus.dashboards.widgetType.eventStreamDesc', defaultDesc: 'Log/event viewer with pagination', icon: <EventStreamIcon sx={{ fontSize: 18 }} /> },
+      {
+        value: 'table',
+        labelKey: 'argus.dashboards.widgetType.table',
+        defaultLabel: 'Table',
+        descKey: 'argus.dashboards.widgetType.tableDesc',
+        defaultDesc: 'Sortable, paginated table',
+        icon: <TableIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'top-list',
+        labelKey: 'argus.dashboards.widgetType.topList',
+        defaultLabel: 'Top List',
+        descKey: 'argus.dashboards.widgetType.topListDesc',
+        defaultDesc: 'Ranked list with bars',
+        icon: <ListIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'event-stream',
+        labelKey: 'argus.dashboards.widgetType.eventStream',
+        defaultLabel: 'Event Stream',
+        descKey: 'argus.dashboards.widgetType.eventStreamDesc',
+        defaultDesc: 'Log/event viewer with pagination',
+        icon: <EventStreamIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
     groupKey: 'argus.dashboards.catalog.geo',
     defaultLabel: 'Geographic',
     items: [
-      { value: 'geo-map', labelKey: 'argus.dashboards.widgetType.geoMap', defaultLabel: 'Geo Map', descKey: 'argus.dashboards.widgetType.geoMapDesc', defaultDesc: 'Country-level map visualization', icon: <MapIcon sx={{ fontSize: 18 }} /> },
+      {
+        value: 'geo-map',
+        labelKey: 'argus.dashboards.widgetType.geoMap',
+        defaultLabel: 'Geo Map',
+        descKey: 'argus.dashboards.widgetType.geoMapDesc',
+        defaultDesc: 'Country-level map visualization',
+        icon: <MapIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
   {
     groupKey: 'argus.dashboards.catalog.special',
     defaultLabel: 'Special',
     items: [
-      { value: 'heatmap', labelKey: 'argus.dashboards.widgetType.heatmap', defaultLabel: 'Heatmap', descKey: 'argus.dashboards.widgetType.heatmapDesc', defaultDesc: '2D color matrix', icon: <HeatmapIcon sx={{ fontSize: 18 }} /> },
-      { value: 'text', labelKey: 'argus.dashboards.widgetType.text', defaultLabel: 'Text', descKey: 'argus.dashboards.widgetType.textDesc', defaultDesc: 'Markdown text note', icon: <TextIcon sx={{ fontSize: 18 }} /> },
+      {
+        value: 'heatmap',
+        labelKey: 'argus.dashboards.widgetType.heatmap',
+        defaultLabel: 'Heatmap',
+        descKey: 'argus.dashboards.widgetType.heatmapDesc',
+        defaultDesc: '2D color matrix',
+        icon: <HeatmapIcon sx={{ fontSize: 18 }} />,
+      },
+      {
+        value: 'text',
+        labelKey: 'argus.dashboards.widgetType.text',
+        defaultLabel: 'Text',
+        descKey: 'argus.dashboards.widgetType.textDesc',
+        defaultDesc: 'Markdown text note',
+        icon: <TextIcon sx={{ fontSize: 18 }} />,
+      },
     ],
   },
 ];
@@ -151,15 +253,12 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
   }, [widget, open]);
 
   // Update field helper
-  const updateWidget = useCallback(
-    (patch: Partial<WidgetConfig>) => {
-      setEditingWidget((prev) => {
-        if (!prev) return prev;
-        return { ...prev, ...patch };
-      });
-    },
-    []
-  );
+  const updateWidget = useCallback((patch: Partial<WidgetConfig>) => {
+    setEditingWidget((prev) => {
+      if (!prev) return prev;
+      return { ...prev, ...patch };
+    });
+  }, []);
 
   const updateQuery = useCallback(
     (patch: Partial<WidgetConfig['query']>) => {
@@ -221,7 +320,11 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
               : t('argus.dashboards.editWidget', 'Edit Widget')}
           </Typography>
           <Typography
-            sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}
+            sx={{
+              fontSize: '0.78rem',
+              color: 'text.secondary',
+              fontWeight: 500,
+            }}
           >
             — {editingWidget.title}
           </Typography>
@@ -329,15 +432,23 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
             <Select
               value={editingWidget.query.dataset || 'errors'}
               label={t('argus.dashboards.editor.dataset', 'Dataset')}
-              onChange={(e) =>
-                updateQuery({ dataset: e.target.value as any })
-              }
+              onChange={(e) => updateQuery({ dataset: e.target.value as any })}
             >
-              <MenuItem value="errors">{t('argus.dashboards.dataset.errors', 'Errors')}</MenuItem>
-              <MenuItem value="transactions">{t('argus.dashboards.dataset.transactions', 'Transactions')}</MenuItem>
-              <MenuItem value="spans">{t('argus.dashboards.dataset.spans', 'Spans')}</MenuItem>
-              <MenuItem value="logs">{t('argus.dashboards.dataset.logs', 'Logs')}</MenuItem>
-              <MenuItem value="metrics">{t('argus.dashboards.dataset.metrics', 'Metrics')}</MenuItem>
+              <MenuItem value="errors">
+                {t('argus.dashboards.dataset.errors', 'Errors')}
+              </MenuItem>
+              <MenuItem value="transactions">
+                {t('argus.dashboards.dataset.transactions', 'Transactions')}
+              </MenuItem>
+              <MenuItem value="spans">
+                {t('argus.dashboards.dataset.spans', 'Spans')}
+              </MenuItem>
+              <MenuItem value="logs">
+                {t('argus.dashboards.dataset.logs', 'Logs')}
+              </MenuItem>
+              <MenuItem value="metrics">
+                {t('argus.dashboards.dataset.metrics', 'Metrics')}
+              </MenuItem>
             </Select>
           </FormControl>
 
@@ -370,10 +481,7 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
           <TextField
             fullWidth
             size="small"
-            label={t(
-              'argus.dashboards.groupBy',
-              'Group By (comma separated)'
-            )}
+            label={t('argus.dashboards.groupBy', 'Group By (comma separated)')}
             value={(editingWidget.query.groupBy || []).join(', ')}
             onChange={(e) =>
               updateQuery({
@@ -417,15 +525,11 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
           {/* Period + Limit */}
           <Box sx={{ display: 'flex', gap: 2 }}>
             <FormControl size="small" sx={{ flex: 1 }}>
-              <InputLabel>
-                {t('argus.dashboards.period', 'Period')}
-              </InputLabel>
+              <InputLabel>{t('argus.dashboards.period', 'Period')}</InputLabel>
               <Select
                 value={editingWidget.query.period || '24h'}
                 label={t('argus.dashboards.period', 'Period')}
-                onChange={(e) =>
-                  updateQuery({ period: e.target.value })
-                }
+                onChange={(e) => updateQuery({ period: e.target.value })}
               >
                 <MenuItem value="1h">1h</MenuItem>
                 <MenuItem value="6h">6h</MenuItem>
@@ -441,9 +545,7 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
               type="number"
               label={t('argus.dashboards.limit', 'Limit')}
               value={editingWidget.query.limit || 20}
-              onChange={(e) =>
-                updateQuery({ limit: Number(e.target.value) })
-              }
+              onChange={(e) => updateQuery({ limit: Number(e.target.value) })}
               sx={{ width: 80 }}
             />
           </Box>
@@ -483,7 +585,9 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
             {t('argus.dashboards.vizType', 'Visualization Type')}
           </Typography>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
+          <Box
+            sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}
+          >
             {WIDGET_TYPE_CATALOG.map((group) => (
               <Box key={group.groupKey}>
                 <Typography
@@ -554,48 +658,59 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
                 {t('argus.dashboards.editor.chartStyle', 'Chart Style')}
               </Typography>
               <Box sx={{ display: 'flex', gap: 0.5, mb: 2 }}>
-                {(['line', 'bar', 'area', 'stacked-bar', 'stacked-area'] as const).map(
-                  (style) => {
-                    const styleLabels: Record<string, string> = {
-                      line: t('argus.dashboards.chartStyle.line', 'Line'),
-                      bar: t('argus.dashboards.chartStyle.bar', 'Bar'),
-                      area: t('argus.dashboards.chartStyle.area', 'Area'),
-                      'stacked-bar': t('argus.dashboards.chartStyle.stackedBar', 'Stacked Bar'),
-                      'stacked-area': t('argus.dashboards.chartStyle.stackedArea', 'Stacked Area'),
-                    };
-                    const isSelected = (editingWidget.chart_style || 'line') === style;
-                    return (
-                      <Chip
-                        key={style}
-                        label={styleLabels[style] || style}
-                        size="small"
-                        clickable
-                        onClick={() => updateWidget({ chart_style: style })}
-                        sx={{
-                          fontSize: '0.65rem',
-                          fontWeight: isSelected ? 700 : 500,
-                          height: 24,
-                          backgroundColor: isSelected
-                            ? alpha('#7c4dff', 0.12)
-                            : 'transparent',
-                          color: isSelected ? '#7c4dff' : 'text.secondary',
-                          border: isSelected
-                            ? `1px solid ${alpha('#7c4dff', 0.4)}`
-                            : `1px solid ${borderColor}`,
-                        }}
-                      />
-                    );
-                  }
-                )}
+                {(
+                  [
+                    'line',
+                    'bar',
+                    'area',
+                    'stacked-bar',
+                    'stacked-area',
+                  ] as const
+                ).map((style) => {
+                  const styleLabels: Record<string, string> = {
+                    line: t('argus.dashboards.chartStyle.line', 'Line'),
+                    bar: t('argus.dashboards.chartStyle.bar', 'Bar'),
+                    area: t('argus.dashboards.chartStyle.area', 'Area'),
+                    'stacked-bar': t(
+                      'argus.dashboards.chartStyle.stackedBar',
+                      'Stacked Bar'
+                    ),
+                    'stacked-area': t(
+                      'argus.dashboards.chartStyle.stackedArea',
+                      'Stacked Area'
+                    ),
+                  };
+                  const isSelected =
+                    (editingWidget.chart_style || 'line') === style;
+                  return (
+                    <Chip
+                      key={style}
+                      label={styleLabels[style] || style}
+                      size="small"
+                      clickable
+                      onClick={() => updateWidget({ chart_style: style })}
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontWeight: isSelected ? 700 : 500,
+                        height: 24,
+                        backgroundColor: isSelected
+                          ? alpha('#7c4dff', 0.12)
+                          : 'transparent',
+                        color: isSelected ? '#7c4dff' : 'text.secondary',
+                        border: isSelected
+                          ? `1px solid ${alpha('#7c4dff', 0.4)}`
+                          : `1px solid ${borderColor}`,
+                      }}
+                    />
+                  );
+                })}
               </Box>
             </>
           )}
 
           {/* Unit */}
           <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-            <InputLabel>
-              {t('argus.dashboards.style.unit', 'Unit')}
-            </InputLabel>
+            <InputLabel>{t('argus.dashboards.style.unit', 'Unit')}</InputLabel>
             <Select
               value={editingWidget.viz_options?.unit || 'none'}
               label={t('argus.dashboards.style.unit', 'Unit')}
@@ -647,7 +762,9 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
                     ...editingWidget.viz_options,
                     legend: {
                       ...editingWidget.viz_options?.legend,
-                      show: !(editingWidget.viz_options?.legend?.show !== false),
+                      show: !(
+                        editingWidget.viz_options?.legend?.show !== false
+                      ),
                     },
                   },
                 })
@@ -688,7 +805,10 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
               size="small"
               multiline
               rows={6}
-              label={t('argus.dashboards.style.markdownContent', 'Markdown Content')}
+              label={t(
+                'argus.dashboards.style.markdownContent',
+                'Markdown Content'
+              )}
               value={editingWidget.viz_options?.markdown_content || ''}
               onChange={(e) =>
                 updateWidget({
@@ -698,7 +818,10 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
                   },
                 })
               }
-              placeholder={t('argus.dashboards.style.markdownPlaceholder', '# Heading\n\nWrite your markdown here...')}
+              placeholder={t(
+                'argus.dashboards.style.markdownPlaceholder',
+                '# Heading\n\nWrite your markdown here...'
+              )}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   fontFamily: 'monospace',

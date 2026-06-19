@@ -677,13 +677,16 @@ export const QueryAQLEditor = forwardRef<
       }
 
       // Validate aggregate chips — delete if required args are missing
-      if (chip?.type === 'aggregate' && chip.aggregateFunc && !skipDeleteOnCloseRef.current) {
+      if (
+        chip?.type === 'aggregate' &&
+        chip.aggregateFunc &&
+        !skipDeleteOnCloseRef.current
+      ) {
         const aggDef = config.aggregates?.find(
           (a) => a.name === chip.aggregateFunc
         );
         const needsArgs = aggDef && aggDef.args.some((a) => a.required);
-        const hasArgs =
-          chip.aggregateArgs && chip.aggregateArgs.length > 0;
+        const hasArgs = chip.aggregateArgs && chip.aggregateArgs.length > 0;
         if (needsArgs && !hasArgs) {
           deleteChip(editingToken.chipId);
           setEditingToken(null);

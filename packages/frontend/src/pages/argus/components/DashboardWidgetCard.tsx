@@ -59,8 +59,6 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
 
-
-
   return (
     <Paper
       elevation={0}
@@ -131,7 +129,9 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
               }}
               sx={{ fontSize: '0.8rem' }}
             >
-              <ListItemIcon><EditIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+              <ListItemIcon>
+                <EditIcon sx={{ fontSize: 16 }} />
+              </ListItemIcon>
               <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
                 {t('common.edit', 'Edit')}
               </ListItemText>
@@ -144,7 +144,9 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
             }}
             sx={{ fontSize: '0.8rem' }}
           >
-            <ListItemIcon><DuplicateIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+            <ListItemIcon>
+              <DuplicateIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('common.duplicate', 'Duplicate')}
             </ListItemText>
@@ -159,7 +161,9 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
                 }}
                 sx={{ fontSize: '0.8rem', color: 'error.main' }}
               >
-                <ListItemIcon><DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} /></ListItemIcon>
+                <ListItemIcon>
+                  <DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} />
+                </ListItemIcon>
                 <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
                   {t('common.delete', 'Delete')}
                 </ListItemText>

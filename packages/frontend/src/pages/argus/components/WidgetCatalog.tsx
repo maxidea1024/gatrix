@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  alpha,
-  useTheme,
-  Tooltip,
-} from '@mui/material';
+import { Box, Typography, alpha, useTheme, Tooltip } from '@mui/material';
 import {
   ShowChart as LineChartIcon,
   BarChart as BarChartIcon,
@@ -46,50 +40,120 @@ const CATALOG_SECTIONS: CatalogSection[] = [
     titleKey: 'argus.dashboards.catalog.timeSeries',
     defaultTitle: 'Time Series',
     entries: [
-      { type: 'time-series', labelKey: 'argus.dashboards.widgetType.timeSeries', defaultLabel: 'Time Series', icon: <LineChartIcon /> },
+      {
+        type: 'time-series',
+        labelKey: 'argus.dashboards.widgetType.timeSeries',
+        defaultLabel: 'Time Series',
+        icon: <LineChartIcon />,
+      },
     ],
   },
   {
     titleKey: 'argus.dashboards.catalog.stats',
     defaultTitle: 'Stats',
     entries: [
-      { type: 'stat', labelKey: 'argus.dashboards.widgetType.stat', defaultLabel: 'Stat', icon: <NumberIcon /> },
-      { type: 'gauge', labelKey: 'argus.dashboards.widgetType.gauge', defaultLabel: 'Gauge', icon: <GaugeIcon /> },
-      { type: 'bar-gauge', labelKey: 'argus.dashboards.widgetType.barGauge', defaultLabel: 'Bar Gauge', icon: <BarGaugeIcon /> },
+      {
+        type: 'stat',
+        labelKey: 'argus.dashboards.widgetType.stat',
+        defaultLabel: 'Stat',
+        icon: <NumberIcon />,
+      },
+      {
+        type: 'gauge',
+        labelKey: 'argus.dashboards.widgetType.gauge',
+        defaultLabel: 'Gauge',
+        icon: <GaugeIcon />,
+      },
+      {
+        type: 'bar-gauge',
+        labelKey: 'argus.dashboards.widgetType.barGauge',
+        defaultLabel: 'Bar Gauge',
+        icon: <BarGaugeIcon />,
+      },
     ],
   },
   {
     titleKey: 'argus.dashboards.catalog.distribution',
     defaultTitle: 'Distribution',
     entries: [
-      { type: 'pie', labelKey: 'argus.dashboards.widgetType.pie', defaultLabel: 'Pie', icon: <PieChartIcon /> },
-      { type: 'horizontal-bar', labelKey: 'argus.dashboards.widgetType.horizontalBar', defaultLabel: 'H. Bar', icon: <BarChartIcon /> },
-      { type: 'histogram', labelKey: 'argus.dashboards.widgetType.histogram', defaultLabel: 'Histogram', icon: <HistogramIcon /> },
-      { type: 'scatter', labelKey: 'argus.dashboards.widgetType.scatter', defaultLabel: 'Scatter', icon: <ScatterIcon /> },
+      {
+        type: 'pie',
+        labelKey: 'argus.dashboards.widgetType.pie',
+        defaultLabel: 'Pie',
+        icon: <PieChartIcon />,
+      },
+      {
+        type: 'horizontal-bar',
+        labelKey: 'argus.dashboards.widgetType.horizontalBar',
+        defaultLabel: 'H. Bar',
+        icon: <BarChartIcon />,
+      },
+      {
+        type: 'histogram',
+        labelKey: 'argus.dashboards.widgetType.histogram',
+        defaultLabel: 'Histogram',
+        icon: <HistogramIcon />,
+      },
+      {
+        type: 'scatter',
+        labelKey: 'argus.dashboards.widgetType.scatter',
+        defaultLabel: 'Scatter',
+        icon: <ScatterIcon />,
+      },
     ],
   },
   {
     titleKey: 'argus.dashboards.catalog.data',
     defaultTitle: 'Data',
     entries: [
-      { type: 'table', labelKey: 'argus.dashboards.widgetType.table', defaultLabel: 'Table', icon: <TableIcon /> },
-      { type: 'top-list', labelKey: 'argus.dashboards.widgetType.topList', defaultLabel: 'Top List', icon: <ListIcon /> },
-      { type: 'event-stream', labelKey: 'argus.dashboards.widgetType.eventStream', defaultLabel: 'Events', icon: <EventStreamIcon /> },
+      {
+        type: 'table',
+        labelKey: 'argus.dashboards.widgetType.table',
+        defaultLabel: 'Table',
+        icon: <TableIcon />,
+      },
+      {
+        type: 'top-list',
+        labelKey: 'argus.dashboards.widgetType.topList',
+        defaultLabel: 'Top List',
+        icon: <ListIcon />,
+      },
+      {
+        type: 'event-stream',
+        labelKey: 'argus.dashboards.widgetType.eventStream',
+        defaultLabel: 'Events',
+        icon: <EventStreamIcon />,
+      },
     ],
   },
   {
     titleKey: 'argus.dashboards.catalog.geo',
     defaultTitle: 'Geo',
     entries: [
-      { type: 'geo-map', labelKey: 'argus.dashboards.widgetType.geoMap', defaultLabel: 'Geo Map', icon: <MapIcon /> },
+      {
+        type: 'geo-map',
+        labelKey: 'argus.dashboards.widgetType.geoMap',
+        defaultLabel: 'Geo Map',
+        icon: <MapIcon />,
+      },
     ],
   },
   {
     titleKey: 'argus.dashboards.catalog.special',
     defaultTitle: 'Special',
     entries: [
-      { type: 'heatmap', labelKey: 'argus.dashboards.widgetType.heatmap', defaultLabel: 'Heatmap', icon: <HeatmapIcon /> },
-      { type: 'text', labelKey: 'argus.dashboards.widgetType.text', defaultLabel: 'Text', icon: <TextIcon /> },
+      {
+        type: 'heatmap',
+        labelKey: 'argus.dashboards.widgetType.heatmap',
+        defaultLabel: 'Heatmap',
+        icon: <HeatmapIcon />,
+      },
+      {
+        type: 'text',
+        labelKey: 'argus.dashboards.widgetType.text',
+        defaultLabel: 'Text',
+        icon: <TextIcon />,
+      },
     ],
   },
 ];

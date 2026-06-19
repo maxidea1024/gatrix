@@ -50,7 +50,12 @@ const GaugeRenderer: React.FC<GaugeRendererProps> = ({
         vizOptions?.thresholds,
         CHART_COLORS[i % CHART_COLORS.length]
       );
-      return { value, label, percent: Math.min(Math.max(percent, 0), 100), color };
+      return {
+        value,
+        label,
+        percent: Math.min(Math.max(percent, 0), 100),
+        color,
+      };
     });
   }, [data, min, max, mode, vizOptions?.thresholds]);
 
@@ -73,7 +78,9 @@ const GaugeRenderer: React.FC<GaugeRendererProps> = ({
           position: 'relative',
         }}
       >
-        <Box sx={{ width: '80%', height: '80%', maxWidth: 200, maxHeight: 200 }}>
+        <Box
+          sx={{ width: '80%', height: '80%', maxWidth: 200, maxHeight: 200 }}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <RadialBarChart
               cx="50%"

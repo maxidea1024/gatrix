@@ -10,11 +10,7 @@ import {
   Tooltip,
   ZAxis,
 } from 'recharts';
-import {
-  type VizOptions,
-  CHART_COLORS,
-  formatValue,
-} from './widgetTypes';
+import { type VizOptions, CHART_COLORS, formatValue } from './widgetTypes';
 
 interface ScatterRendererProps {
   data: any[];
@@ -72,13 +68,8 @@ const ScatterRenderer: React.FC<ScatterRendererProps> = ({
   return (
     <Box sx={{ width: '100%', height: '100%', minHeight: 0 }}>
       <ResponsiveContainer width="100%" height="100%">
-        <ScatterChart
-          margin={{ top: 8, right: 8, left: -12, bottom: 0 }}
-        >
-          <CartesianGrid
-            stroke={gridColor}
-            strokeDasharray="3 3"
-          />
+        <ScatterChart margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
+          <CartesianGrid stroke={gridColor} strokeDasharray="3 3" />
           <XAxis
             type="number"
             dataKey="x"
@@ -120,12 +111,7 @@ const ScatterRenderer: React.FC<ScatterRendererProps> = ({
             }
           />
           {sizeKey && (
-            <ZAxis
-              type="number"
-              dataKey="z"
-              range={[20, 200]}
-              name={sizeKey}
-            />
+            <ZAxis type="number" dataKey="z" range={[20, 200]} name={sizeKey} />
           )}
           <Tooltip
             contentStyle={tooltipStyle}

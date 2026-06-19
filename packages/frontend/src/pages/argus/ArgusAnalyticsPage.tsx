@@ -1110,11 +1110,22 @@ const ArgusAnalyticsPage: React.FC = () => {
   });
 
   // Save / Load state
-  const { currentQueryId, currentQueryName, isDirty, setCurrentQuery, setDirty, clearSaveState } = useAnalyticsSaveState();
+  const {
+    currentQueryId,
+    currentQueryName,
+    isDirty,
+    setCurrentQuery,
+    setDirty,
+    clearSaveState,
+  } = useAnalyticsSaveState();
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const [saveDialogMode, setSaveDialogMode] = useState<'create' | 'save_as'>('create');
+  const [saveDialogMode, setSaveDialogMode] = useState<'create' | 'save_as'>(
+    'create'
+  );
   const [dashboardDialogOpen, setDashboardDialogOpen] = useState(false);
-  const [saveMenuAnchor, setSaveMenuAnchor] = useState<HTMLElement | null>(null);
+  const [saveMenuAnchor, setSaveMenuAnchor] = useState<HTMLElement | null>(
+    null
+  );
   const [saveMenuOpen, setSaveMenuOpen] = useState(false);
   const saveButtonRef = React.useRef<HTMLButtonElement>(null);
   const [sidePanelRefresh, setSidePanelRefresh] = useState(0);
@@ -1126,77 +1137,122 @@ const ArgusAnalyticsPage: React.FC = () => {
 
   const getActiveStoreState = useCallback(() => {
     switch (activeTab) {
-      case 'insights': return useInsightsStore.getState();
-      case 'funnels': return useFunnelsStore.getState();
-      case 'retention': return useRetentionStore.getState();
-      case 'flows': return useFlowsStore.getState();
-      default: return {};
+      case 'insights':
+        return useInsightsStore.getState();
+      case 'funnels':
+        return useFunnelsStore.getState();
+      case 'retention':
+        return useRetentionStore.getState();
+      case 'flows':
+        return useFlowsStore.getState();
+      default:
+        return {};
     }
   }, [activeTab]);
 
-  const handleSaveQuery = useCallback(async (name: string, description: string) => {
-    if (!activeQueryType) return;
-    const storeState = getActiveStoreState();
-    const queryConfig = serializeAnalyticsQuery(activeTab as any, storeState);
+  const handleSaveQuery = useCallback(
+    async (name: string, description: string) => {
+      if (!activeQueryType) return;
+      const storeState = getActiveStoreState();
+      const queryConfig = serializeAnalyticsQuery(activeTab as any, storeState);
 
-    if (saveDialogMode === 'create' && currentQueryId) {
-      // Update existing
-      await argusService.updateSavedQuery(currentProject?.id || '1', currentQueryId, {
-        name,
-        description,
-        query_config: queryConfig,
-      });
-      setCurrentQuery(currentQueryId, name);
-    } else {
-      // Create new
-      const result = await argusService.createSavedQuery(currentProject?.id || '1', {
-        name,
-        description,
-        query_config: queryConfig,
-        query_type: activeQueryType,
-      });
-      setCurrentQuery(result.id, name);
-    }
-    setSaveDialogOpen(false);
-    setSidePanelRefresh((p) => p + 1);
-  }, [activeQueryType, activeTab, currentQueryId, getActiveStoreState, saveDialogMode, currentProject?.id, setCurrentQuery]);
+      if (saveDialogMode === 'create' && currentQueryId) {
+        // Update existing
+        await argusService.updateSavedQuery(
+          currentProject?.id || '1',
+          currentQueryId,
+          {
+            name,
+            description,
+            query_config: queryConfig,
+          }
+        );
+        setCurrentQuery(currentQueryId, name);
+      } else {
+        // Create new
+        const result = await argusService.createSavedQuery(
+          currentProject?.id || '1',
+          {
+            name,
+            description,
+            query_config: queryConfig,
+            query_type: activeQueryType,
+          }
+        );
+        setCurrentQuery(result.id, name);
+      }
+      setSaveDialogOpen(false);
+      setSidePanelRefresh((p) => p + 1);
+    },
+    [
+      activeQueryType,
+      activeTab,
+      currentQueryId,
+      getActiveStoreState,
+      saveDialogMode,
+      currentProject?.id,
+      setCurrentQuery,
+    ]
+  );
 
   const handleOverwriteSave = useCallback(async () => {
     if (!currentQueryId || !activeQueryType) return;
     const storeState = getActiveStoreState();
     const queryConfig = serializeAnalyticsQuery(activeTab as any, storeState);
-    await argusService.updateSavedQuery(currentProject?.id || '1', currentQueryId, {
-      query_config: queryConfig,
-    });
+    await argusService.updateSavedQuery(
+      currentProject?.id || '1',
+      currentQueryId,
+      {
+        query_config: queryConfig,
+      }
+    );
     setDirty(false);
     setSidePanelRefresh((p) => p + 1);
-  }, [currentQueryId, activeQueryType, activeTab, getActiveStoreState, currentProject?.id, setDirty]);
+  }, [
+    currentQueryId,
+    activeQueryType,
+    activeTab,
+    getActiveStoreState,
+    currentProject?.id,
+    setDirty,
+  ]);
 
-  const handleLoadQuery = useCallback((query: ArgusSavedQuery) => {
-    const config = query.query_config;
-    switch (activeTab) {
-      case 'insights':
-        restoreInsightsQuery(config, useInsightsStore.getState());
-        break;
-      case 'funnels':
-        restoreFunnelsQuery(config, useFunnelsStore.getState());
-        break;
-      case 'retention':
-        restoreRetentionQuery(config, useRetentionStore.getState());
-        break;
-      case 'flows':
-        restoreFlowsQuery(config, useFlowsStore.getState());
-        break;
-    }
-    setCurrentQuery(query.id, query.name);
-  }, [activeTab, setCurrentQuery]);
+  const handleLoadQuery = useCallback(
+    (query: ArgusSavedQuery) => {
+      const config = query.query_config;
+      switch (activeTab) {
+        case 'insights':
+          restoreInsightsQuery(config, useInsightsStore.getState());
+          break;
+        case 'funnels':
+          restoreFunnelsQuery(config, useFunnelsStore.getState());
+          break;
+        case 'retention':
+          restoreRetentionQuery(config, useRetentionStore.getState());
+          break;
+        case 'flows':
+          restoreFlowsQuery(config, useFlowsStore.getState());
+          break;
+      }
+      setCurrentQuery(query.id, query.name);
+    },
+    [activeTab, setCurrentQuery]
+  );
 
   const handleNewQuery = useCallback(() => {
     switch (activeTab) {
-      case 'insights': useInsightsStore.getState().resetStore(); break;
-      case 'funnels': useFunnelsStore.getState().resetStore(); break;
-      case 'retention': useRetentionStore.getState().resetStore(); break;
-      case 'flows': useFlowsStore.getState().resetStore(); break;
+      case 'insights':
+        useInsightsStore.getState().resetStore();
+        break;
+      case 'funnels':
+        useFunnelsStore.getState().resetStore();
+        break;
+      case 'retention':
+        useRetentionStore.getState().resetStore();
+        break;
+      case 'flows':
+        useFlowsStore.getState().resetStore();
+        break;
     }
     clearSaveState();
   }, [activeTab, clearSaveState]);
@@ -1283,7 +1339,9 @@ const ArgusAnalyticsPage: React.FC = () => {
                     {currentQueryName}
                   </Box>
                 }
-                onDelete={() => { clearSaveState(); }}
+                onDelete={() => {
+                  clearSaveState();
+                }}
                 sx={{
                   height: 26,
                   fontSize: '0.75rem',
@@ -1451,7 +1509,10 @@ const ArgusAnalyticsPage: React.FC = () => {
       <Menu
         anchorEl={saveMenuAnchor}
         open={saveMenuOpen}
-        onClose={() => { setSaveMenuOpen(false); setSaveMenuAnchor(null); }}
+        onClose={() => {
+          setSaveMenuOpen(false);
+          setSaveMenuAnchor(null);
+        }}
         slotProps={{ paper: { sx: { minWidth: 180, borderRadius: '8px' } } }}
       >
         {currentQueryId && (
@@ -1463,7 +1524,9 @@ const ArgusAnalyticsPage: React.FC = () => {
             }}
             sx={{ fontSize: '0.8rem' }}
           >
-            <ListItemIcon><SaveIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+            <ListItemIcon>
+              <SaveIcon sx={{ fontSize: 16 }} />
+            </ListItemIcon>
             <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
               {t('argus.analytics.save', 'Save')}
             </ListItemText>
@@ -1478,7 +1541,9 @@ const ArgusAnalyticsPage: React.FC = () => {
           }}
           sx={{ fontSize: '0.8rem' }}
         >
-          <ListItemIcon><SaveAsIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+          <ListItemIcon>
+            <SaveAsIcon sx={{ fontSize: 16 }} />
+          </ListItemIcon>
           <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
             {currentQueryId
               ? t('argus.analytics.saveAs', 'Save As')
@@ -1493,7 +1558,9 @@ const ArgusAnalyticsPage: React.FC = () => {
           }}
           sx={{ fontSize: '0.8rem' }}
         >
-          <ListItemIcon><DashboardIcon sx={{ fontSize: 16 }} /></ListItemIcon>
+          <ListItemIcon>
+            <DashboardIcon sx={{ fontSize: 16 }} />
+          </ListItemIcon>
           <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
             {t('argus.analytics.addToDashboard', 'Add to Dashboard')}
           </ListItemText>
@@ -1516,7 +1583,10 @@ const ArgusAnalyticsPage: React.FC = () => {
           onClose={() => setDashboardDialogOpen(false)}
           projectId={currentProject?.id || '1'}
           analyticsType={activeTab as any}
-          analyticsConfig={serializeAnalyticsQuery(activeTab as any, getActiveStoreState())}
+          analyticsConfig={serializeAnalyticsQuery(
+            activeTab as any,
+            getActiveStoreState()
+          )}
           defaultTitle={currentQueryName || `${activeTab} query`}
         />
       )}

@@ -98,7 +98,10 @@ const SaveAnalyticsQueryDialog: React.FC<SaveAnalyticsQueryDialogProps> = ({
           size="small"
           multiline
           rows={2}
-          label={t('argus.analytics.queryDescription', 'Description (optional)')}
+          label={t(
+            'argus.analytics.queryDescription',
+            'Description (optional)'
+          )}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           slotProps={{

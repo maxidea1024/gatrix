@@ -164,11 +164,19 @@ const DashboardShareDialog: React.FC<DashboardShareDialogProps> = ({
         {/* Owner */}
         {dashboard.owner_user_id && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ mb: 0.5, display: 'block' }}
+            >
               {t('argus.dashboards.sharing.owner')}
             </Typography>
             <Chip
-              avatar={<Avatar sx={{ width: 24, height: 24, fontSize: 12 }}>{dashboard.owner_user_id[0]?.toUpperCase()}</Avatar>}
+              avatar={
+                <Avatar sx={{ width: 24, height: 24, fontSize: 12 }}>
+                  {dashboard.owner_user_id[0]?.toUpperCase()}
+                </Avatar>
+              }
               label={dashboard.owner_user_id}
               size="small"
               variant="outlined"
@@ -212,7 +220,10 @@ const DashboardShareDialog: React.FC<DashboardShareDialogProps> = ({
                 p: 1,
                 borderRadius: 2,
                 border: `1px solid ${visibility === opt.value ? theme.palette.primary.main : 'transparent'}`,
-                bgcolor: visibility === opt.value ? alpha(theme.palette.primary.main, 0.04) : 'transparent',
+                bgcolor:
+                  visibility === opt.value
+                    ? alpha(theme.palette.primary.main, 0.04)
+                    : 'transparent',
                 '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02) },
               }}
             />
@@ -234,7 +245,11 @@ const DashboardShareDialog: React.FC<DashboardShareDialogProps> = ({
             onChange={(e) => setNewUser(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddUser()}
             InputProps={{
-              startAdornment: <PersonAddIcon sx={{ mr: 1, color: 'text.disabled', fontSize: 18 }} />,
+              startAdornment: (
+                <PersonAddIcon
+                  sx={{ mr: 1, color: 'text.disabled', fontSize: 18 }}
+                />
+              ),
             }}
           />
           <Button
@@ -254,7 +269,11 @@ const DashboardShareDialog: React.FC<DashboardShareDialogProps> = ({
                 label={user}
                 size="small"
                 onDelete={() => handleRemoveUser(user)}
-                avatar={<Avatar sx={{ width: 20, height: 20, fontSize: 10 }}>{user[0]?.toUpperCase()}</Avatar>}
+                avatar={
+                  <Avatar sx={{ width: 20, height: 20, fontSize: 10 }}>
+                    {user[0]?.toUpperCase()}
+                  </Avatar>
+                }
               />
             ))}
           </Box>

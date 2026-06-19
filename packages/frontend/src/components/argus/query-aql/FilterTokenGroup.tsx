@@ -310,7 +310,8 @@ export const FilterTokenGroup = forwardRef<
             <FunctionsIcon sx={{ fontSize: 13, opacity: 0.8 }} />
             {chip.aggregateFunc}
           </Box>
-          {chip.aggregateArgs && chip.aggregateArgs.length > 0 || editingPart === 'aggregateArg' ? (
+          {(chip.aggregateArgs && chip.aggregateArgs.length > 0) ||
+          editingPart === 'aggregateArg' ? (
             <>
               <Box
                 component="span"
@@ -342,13 +343,16 @@ export const FilterTokenGroup = forwardRef<
                   onPartClick(chip.id, 'aggregateArg', e.currentTarget)
                 }
               >
-                {chip.aggregateArgs && chip.aggregateArgs.length > 0
-                  ? chip.aggregateArgs.join(', ')
-                  : (
-                    <Typography component="span" sx={{ opacity: 0.4, fontSize: '0.8rem' }}>
-                      ...
-                    </Typography>
-                  )}
+                {chip.aggregateArgs && chip.aggregateArgs.length > 0 ? (
+                  chip.aggregateArgs.join(', ')
+                ) : (
+                  <Typography
+                    component="span"
+                    sx={{ opacity: 0.4, fontSize: '0.8rem' }}
+                  >
+                    ...
+                  </Typography>
+                )}
               </Box>
               <Box
                 component="span"

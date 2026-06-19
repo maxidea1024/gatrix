@@ -49,9 +49,7 @@ const HeatmapRenderer: React.FC<HeatmapRendererProps> = ({
       const yk =
         keys.find(
           (k) =>
-            k !== vk &&
-            k !== xk &&
-            (k === 'y' || k === 'day' || k === 'row')
+            k !== vk && k !== xk && (k === 'y' || k === 'day' || k === 'row')
         ) || keys[0];
 
       if (!vk || !xk || !yk)

@@ -61,11 +61,7 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
   const normalizedType = normalizeWidgetType(widget.type);
   if (normalizedType === 'text') {
     return (
-      <TextRenderer
-        widget={widget}
-        isDark={isDark}
-        vizOptions={vizOptions}
-      />
+      <TextRenderer widget={widget} isDark={isDark} vizOptions={vizOptions} />
     );
   }
 
@@ -96,11 +92,7 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
 
     case 'stat':
       return (
-        <StatRenderer
-          data={data}
-          isDark={isDark}
-          vizOptions={vizOptions}
-        />
+        <StatRenderer data={data} isDark={isDark} vizOptions={vizOptions} />
       );
 
     case 'gauge':
@@ -116,11 +108,7 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
 
     case 'pie':
       return (
-        <PieRenderer
-          data={data}
-          isDark={isDark}
-          vizOptions={vizOptions}
-        />
+        <PieRenderer data={data} isDark={isDark} vizOptions={vizOptions} />
       );
 
     case 'horizontal-bar':
@@ -136,20 +124,12 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
 
     case 'table':
       return (
-        <TableRenderer
-          data={data}
-          isDark={isDark}
-          vizOptions={vizOptions}
-        />
+        <TableRenderer data={data} isDark={isDark} vizOptions={vizOptions} />
       );
 
     case 'heatmap':
       return (
-        <HeatmapRenderer
-          data={data}
-          isDark={isDark}
-          vizOptions={vizOptions}
-        />
+        <HeatmapRenderer data={data} isDark={isDark} vizOptions={vizOptions} />
       );
 
     case 'histogram':
@@ -163,20 +143,12 @@ const WidgetRenderer: React.FC<WidgetRendererProps> = ({
 
     case 'scatter':
       return (
-        <ScatterRenderer
-          data={data}
-          isDark={isDark}
-          vizOptions={vizOptions}
-        />
+        <ScatterRenderer data={data} isDark={isDark} vizOptions={vizOptions} />
       );
 
     case 'geo-map':
       return (
-        <GeoMapRenderer
-          data={data}
-          isDark={isDark}
-          vizOptions={vizOptions}
-        />
+        <GeoMapRenderer data={data} isDark={isDark} vizOptions={vizOptions} />
       );
 
     case 'event-stream':

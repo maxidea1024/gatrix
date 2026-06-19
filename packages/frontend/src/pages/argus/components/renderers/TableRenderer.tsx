@@ -55,7 +55,9 @@ const TableRenderer: React.FC<TableRendererProps> = ({
           displayName: config?.display_name || key,
           width: config?.width,
           sortable: config?.sortable !== false,
-          align: config?.align || (typeof data[0][key] === 'number' ? 'right' : 'left'),
+          align:
+            config?.align ||
+            (typeof data[0][key] === 'number' ? 'right' : 'left'),
         };
       })
       .filter(Boolean) as {

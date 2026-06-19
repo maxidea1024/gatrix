@@ -16,18 +16,39 @@ interface DashboardPreset {
 }
 
 type WidgetType =
-  | 'time-series' | 'stat' | 'gauge' | 'bar-gauge'
-  | 'pie' | 'horizontal-bar' | 'table' | 'top-list'
-  | 'heatmap' | 'histogram' | 'scatter' | 'geo-map'
-  | 'event-stream' | 'text' | 'treemap' | 'status-timeline'
+  | 'time-series'
+  | 'stat'
+  | 'gauge'
+  | 'bar-gauge'
+  | 'pie'
+  | 'horizontal-bar'
+  | 'table'
+  | 'top-list'
+  | 'heatmap'
+  | 'histogram'
+  | 'scatter'
+  | 'geo-map'
+  | 'event-stream'
+  | 'text'
+  | 'treemap'
+  | 'status-timeline'
   // Legacy types (accepted, normalized on frontend)
-  | 'line' | 'bar' | 'area' | 'number';
+  | 'line'
+  | 'bar'
+  | 'area'
+  | 'number';
 
 interface WidgetConfig {
   id: string;
   title: string;
   description?: string;
-  category?: 'discover' | 'insights' | 'funnels' | 'retention' | 'flows' | 'text';
+  category?:
+    | 'discover'
+    | 'insights'
+    | 'funnels'
+    | 'retention'
+    | 'flows'
+    | 'text';
   type: WidgetType;
   chart_style?: 'line' | 'bar' | 'area' | 'stacked-bar' | 'stacked-area';
   query: {
@@ -243,7 +264,11 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
         title: 'Avg Duration',
         type: 'stat',
         viz_options: { unit: 'ms' },
-        query: { fields: ['avg(duration)'], period: '14d', dataset: 'transactions' },
+        query: {
+          fields: ['avg(duration)'],
+          period: '14d',
+          dataset: 'transactions',
+        },
         layout: { x: 3, y: 0, w: 3, h: 2 },
       },
       {
@@ -251,7 +276,11 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
         title: 'P95 Latency',
         type: 'stat',
         viz_options: { unit: 'ms' },
-        query: { fields: ['p95(duration)'], period: '14d', dataset: 'transactions' },
+        query: {
+          fields: ['p95(duration)'],
+          period: '14d',
+          dataset: 'transactions',
+        },
         layout: { x: 6, y: 0, w: 3, h: 2 },
       },
       {
@@ -259,7 +288,12 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
         title: 'Throughput',
         type: 'time-series',
         chart_style: 'area',
-        query: { fields: ['count()'], groupBy: ['timestamp'], period: '14d', dataset: 'transactions' },
+        query: {
+          fields: ['count()'],
+          groupBy: ['timestamp'],
+          period: '14d',
+          dataset: 'transactions',
+        },
         layout: { x: 0, y: 2, w: 12, h: 4 },
       },
     ],
@@ -352,7 +386,9 @@ const DASHBOARD_PRESETS: DashboardPreset[] = [
         title: 'Error Rate',
         type: 'gauge',
         query: {
-          fields: ['avg(CASE WHEN level IN (\'error\', \'fatal\') THEN 1 ELSE 0 END)'],
+          fields: [
+            "avg(CASE WHEN level IN ('error', 'fatal') THEN 1 ELSE 0 END)",
+          ],
           period: '14d',
           dataset: 'logs',
         },
@@ -537,7 +573,12 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           visibility: 'project',
         });
         return reply.code(201).send({
-          data: { id: insertId, title: finalTitle, description: finalDescription, widgets_config: widgets },
+          data: {
+            id: insertId,
+            title: finalTitle,
+            description: finalDescription,
+            widgets_config: widgets,
+          },
         });
       } catch (error) {
         logger.error('Failed to create dashboard', {
@@ -605,8 +646,14 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           return reply.code(404).send({ error: 'Dashboard not found' });
         }
         const currentUser = request.headers['x-user-name'] as string;
-        if (dashboard.owner_user_id && currentUser && dashboard.owner_user_id !== currentUser) {
-          return reply.code(403).send({ error: 'Only the owner can delete this dashboard' });
+        if (
+          dashboard.owner_user_id &&
+          currentUser &&
+          dashboard.owner_user_id !== currentUser
+        ) {
+          return reply
+            .code(403)
+            .send({ error: 'Only the owner can delete this dashboard' });
         }
 
         await db('g_argus_dashboards')
@@ -645,12 +692,21 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           return reply.code(404).send({ error: 'Dashboard not found' });
         }
         const currentUser = request.headers['x-user-name'] as string;
-        if (dashboard.owner_user_id && currentUser && dashboard.owner_user_id !== currentUser) {
-          return reply.code(403).send({ error: 'Only the owner can change sharing settings' });
+        if (
+          dashboard.owner_user_id &&
+          currentUser &&
+          dashboard.owner_user_id !== currentUser
+        ) {
+          return reply
+            .code(403)
+            .send({ error: 'Only the owner can change sharing settings' });
         }
 
         // Validate visibility value
-        if (visibility !== undefined && !['personal', 'team', 'project'].includes(visibility)) {
+        if (
+          visibility !== undefined &&
+          !['personal', 'team', 'project'].includes(visibility)
+        ) {
           return reply.code(400).send({ error: 'Invalid visibility value' });
         }
 
@@ -721,7 +777,11 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           };
           const route = analyticsRouteMap[query.analytics_type];
           if (!route) {
-            return reply.code(400).send({ error: `Unknown analytics_type: ${query.analytics_type}` });
+            return reply
+              .code(400)
+              .send({
+                error: `Unknown analytics_type: ${query.analytics_type}`,
+              });
           }
 
           // Inject period/start/end from widget query into analytics config
@@ -756,7 +816,9 @@ export default async function dashboardRoutes(app: FastifyInstance) {
               statusCode: internalResponse.statusCode,
               body: String(internalResponse.body).slice(0, 200),
             });
-            return reply.code(502).send({ error: 'Invalid analytics response' });
+            return reply
+              .code(502)
+              .send({ error: 'Invalid analytics response' });
           }
           return reply.code(internalResponse.statusCode).send(parsed);
         }
@@ -777,7 +839,13 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         const bucket = getBucketingConfig(period, start, end);
 
         // Validate dataset and get allowed columns from schema
-        const VALID_DATASETS = new Set(['errors', 'transactions', 'spans', 'logs', 'metrics']);
+        const VALID_DATASETS = new Set([
+          'errors',
+          'transactions',
+          'spans',
+          'logs',
+          'metrics',
+        ]);
         const safeDataset = VALID_DATASETS.has(dataset) ? dataset : 'errors';
         const ds = getDataset(safeDataset);
         const allowedColumns = new Set(
@@ -787,55 +855,65 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         );
         const allowedAggregates = new Set([
           ...ds.aggregates,
-          'count', 'uniq', 'min', 'max', 'avg', 'sum',
-          'p50', 'p75', 'p95', 'p99',
+          'count',
+          'uniq',
+          'min',
+          'max',
+          'avg',
+          'sum',
+          'p50',
+          'p75',
+          'p95',
+          'p99',
         ]);
         const tableName = ds.table;
 
         // Build SELECT with whitelist validation (matching discover.ts pattern)
         const selectAliases: string[] = [];
-        const selectParts = fields.map((f) => {
-          const aggMatch = f.match(/^(\w+)\((\w*)\)$/);
-          if (aggMatch) {
-            const [, fn, col] = aggMatch;
-            const safeFn = fn.toLowerCase();
-            if (!allowedAggregates.has(safeFn)) {
-              // Skip disallowed aggregates — fall back to count
-              selectAliases.push('count');
-              return 'count() AS count';
-            }
-            if (col && col !== '*' && !allowedColumns.has(col)) {
-              // Column not in schema — skip
-              selectAliases.push('count');
-              return 'count() AS count';
-            }
-            if (safeFn === 'count' && !col) {
-              selectAliases.push('count');
-              return 'count() AS count';
-            }
-            if (safeFn === 'uniq') {
-              const alias = `uniq_${col || 'all'}`;
+        const selectParts = fields
+          .map((f) => {
+            const aggMatch = f.match(/^(\w+)\((\w*)\)$/);
+            if (aggMatch) {
+              const [, fn, col] = aggMatch;
+              const safeFn = fn.toLowerCase();
+              if (!allowedAggregates.has(safeFn)) {
+                // Skip disallowed aggregates — fall back to count
+                selectAliases.push('count');
+                return 'count() AS count';
+              }
+              if (col && col !== '*' && !allowedColumns.has(col)) {
+                // Column not in schema — skip
+                selectAliases.push('count');
+                return 'count() AS count';
+              }
+              if (safeFn === 'count' && !col) {
+                selectAliases.push('count');
+                return 'count() AS count';
+              }
+              if (safeFn === 'uniq') {
+                const alias = `uniq_${col || 'all'}`;
+                selectAliases.push(alias);
+                return `uniq(${col || '*'}) AS ${alias}`;
+              }
+              if (['p50', 'p75', 'p95', 'p99'].includes(safeFn)) {
+                const pct = parseInt(safeFn.replace('p', ''), 10);
+                const alias = `${safeFn}_${col || 'timestamp'}`;
+                selectAliases.push(alias);
+                return `quantile(${pct / 100})(${col || 'timestamp'}) AS ${alias}`;
+              }
+              const alias = `${safeFn}_${col || 'all'}`;
               selectAliases.push(alias);
-              return `uniq(${col || '*'}) AS ${alias}`;
+              return `${safeFn}(${col || '*'}) AS ${alias}`;
             }
-            if (['p50', 'p75', 'p95', 'p99'].includes(safeFn)) {
-              const pct = parseInt(safeFn.replace('p', ''), 10);
-              const alias = `${safeFn}_${col || 'timestamp'}`;
-              selectAliases.push(alias);
-              return `quantile(${pct / 100})(${col || 'timestamp'}) AS ${alias}`;
+            // Plain column — validate against allowedColumns
+            if (allowedColumns.has(f)) {
+              selectAliases.push(f);
+              return f;
             }
-            const alias = `${safeFn}_${col || 'all'}`;
-            selectAliases.push(alias);
-            return `${safeFn}(${col || '*'}) AS ${alias}`;
-          }
-          // Plain column — validate against allowedColumns
-          if (allowedColumns.has(f)) {
-            selectAliases.push(f);
-            return f;
-          }
-          // Disallowed plain field — skip silently
-          return null;
-        }).filter((s): s is string => s !== null);
+            // Disallowed plain field — skip silently
+            return null;
+          })
+          .filter((s): s is string => s !== null);
 
         if (selectParts.length === 0) {
           selectParts.push('count() AS count');
@@ -847,8 +925,9 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         let orderByClause = '';
 
         if (groupBy && groupBy.length > 0) {
-          const safeCols = groupBy
-            .filter((c) => c !== 'timestamp' && allowedColumns.has(c));
+          const safeCols = groupBy.filter(
+            (c) => c !== 'timestamp' && allowedColumns.has(c)
+          );
           if (groupBy.includes('timestamp')) {
             selectParts.push(`${bucket.selectExpr} AS hour`);
             selectAliases.push('hour');
@@ -863,7 +942,11 @@ export default async function dashboardRoutes(app: FastifyInstance) {
           const orderMatch = orderBy.match(/^(-?)(\w+)$/);
           if (orderMatch) {
             const [, descPrefix, col] = orderMatch;
-            if (allowedColumns.has(col) || selectAliases.includes(col) || col === 'hour') {
+            if (
+              allowedColumns.has(col) ||
+              selectAliases.includes(col) ||
+              col === 'hour'
+            ) {
               orderByClause = ` ORDER BY ${col} ${descPrefix === '-' ? 'DESC' : 'ASC'}`;
             }
           }
@@ -893,17 +976,27 @@ export default async function dashboardRoutes(app: FastifyInstance) {
         // Parse conditions safely using parseSearchToSQL (same as discover.ts)
         if (conditions && conditions.trim()) {
           try {
-            const { where } = parseSearchToSQL(safeDataset, conditions, queryParams);
+            const { where } = parseSearchToSQL(
+              safeDataset,
+              conditions,
+              queryParams
+            );
             if (where) sql += ` AND (${where})`;
           } catch (parseError) {
             logger.warn('Widget query conditions parse failed', {
               conditions,
-              error: parseError instanceof Error ? parseError.message : String(parseError),
+              error:
+                parseError instanceof Error
+                  ? parseError.message
+                  : String(parseError),
             });
             // Return error to user rather than silently ignoring bad conditions
             return reply.code(400).send({
               error: 'Invalid query conditions',
-              detail: parseError instanceof Error ? parseError.message : 'Parse failed',
+              detail:
+                parseError instanceof Error
+                  ? parseError.message
+                  : 'Parse failed',
             });
           }
         }
@@ -920,7 +1013,8 @@ export default async function dashboardRoutes(app: FastifyInstance) {
 
         return reply.send({ data: result.data || [] });
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         logger.error('Widget query failed', {
           projectId,
           sql: sql || undefined,

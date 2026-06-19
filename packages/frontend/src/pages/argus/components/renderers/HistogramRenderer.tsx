@@ -9,11 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
-import {
-  type VizOptions,
-  CHART_COLORS,
-  formatValue,
-} from './widgetTypes';
+import { type VizOptions, CHART_COLORS, formatValue } from './widgetTypes';
 
 interface HistogramRendererProps {
   data: any[];

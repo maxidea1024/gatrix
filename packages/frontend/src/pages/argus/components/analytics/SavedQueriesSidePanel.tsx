@@ -251,10 +251,7 @@ const SavedQueriesSidePanel: React.FC<SavedQueriesSidePanelProps> = ({
                         : 'transparent'
                     }`,
                     '&.Mui-selected': {
-                      backgroundColor: alpha(
-                        theme.palette.primary.main,
-                        0.06
-                      ),
+                      backgroundColor: alpha(theme.palette.primary.main, 0.06),
                     },
                     '&:hover .query-actions': { opacity: 1 },
                   }}
@@ -296,18 +293,12 @@ const SavedQueriesSidePanel: React.FC<SavedQueriesSidePanelProps> = ({
                     <IconButton
                       size="small"
                       onClick={(e) =>
-                        handleToggleFavorite(
-                          query.id,
-                          !query.is_favorite,
-                          e
-                        )
+                        handleToggleFavorite(query.id, !query.is_favorite, e)
                       }
                       sx={{ p: 0.25 }}
                     >
                       {query.is_favorite ? (
-                        <StarIcon
-                          sx={{ fontSize: 14, color: '#f59e0b' }}
-                        />
+                        <StarIcon sx={{ fontSize: 14, color: '#f59e0b' }} />
                       ) : (
                         <StarBorderIcon
                           sx={{ fontSize: 14, color: 'text.disabled' }}

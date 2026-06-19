@@ -15,11 +15,7 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import {
-  type VizOptions,
-  CHART_COLORS,
-  formatValue,
-} from './widgetTypes';
+import { type VizOptions, CHART_COLORS, formatValue } from './widgetTypes';
 
 interface TimeSeriesRendererProps {
   data: any[];
@@ -46,7 +42,9 @@ function detectKeys(data: any[]): { labelKey: string; valueKeys: string[] } {
   if (!labelKey) labelKey = keys[0];
 
   const valueKeys = keys.filter(
-    (k) => k !== labelKey && (typeof data[0][k] === 'number' || !isNaN(Number(data[0][k])))
+    (k) =>
+      k !== labelKey &&
+      (typeof data[0][k] === 'number' || !isNaN(Number(data[0][k])))
   );
 
   return { labelKey, valueKeys };
@@ -127,7 +125,13 @@ const TimeSeriesRenderer: React.FC<TimeSeriesRendererProps> = ({
     axisLine: false,
     tickLine: false,
     label: axisConfig?.x_label
-      ? { value: axisConfig.x_label, fontSize: 10, fill: textColor, position: 'insideBottomRight' as const, offset: -4 }
+      ? {
+          value: axisConfig.x_label,
+          fontSize: 10,
+          fill: textColor,
+          position: 'insideBottomRight' as const,
+          offset: -4,
+        }
       : undefined,
   };
 
@@ -139,7 +143,13 @@ const TimeSeriesRenderer: React.FC<TimeSeriesRendererProps> = ({
     domain: yDomain,
     scale: (axisConfig?.y_scale as any) || 'auto',
     label: axisConfig?.y_label
-      ? { value: axisConfig.y_label, fontSize: 10, fill: textColor, angle: -90, position: 'insideLeft' as const }
+      ? {
+          value: axisConfig.y_label,
+          fontSize: 10,
+          fill: textColor,
+          angle: -90,
+          position: 'insideLeft' as const,
+        }
       : undefined,
   };
 
@@ -175,9 +185,11 @@ const TimeSeriesRenderer: React.FC<TimeSeriesRendererProps> = ({
 
   const renderSeries = () => {
     const effectiveStyle =
-      chartStyle === 'stacked-bar' ? 'bar' :
-      chartStyle === 'stacked-area' ? 'area' :
-      chartStyle;
+      chartStyle === 'stacked-bar'
+        ? 'bar'
+        : chartStyle === 'stacked-area'
+          ? 'area'
+          : chartStyle;
 
     return valueKeys.map((key, i) => {
       const color = getSeriesColor(key, i);

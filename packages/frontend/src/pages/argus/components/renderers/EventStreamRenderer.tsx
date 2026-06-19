@@ -228,9 +228,7 @@ const EventStreamRenderer: React.FC<EventStreamRendererProps> = ({
                       sx={{ fontSize: 14, color: 'text.disabled' }}
                     />
                   ) : (
-                    <ExpandIcon
-                      sx={{ fontSize: 14, color: 'text.disabled' }}
-                    />
+                    <ExpandIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
                   )}
                 </Box>
 
@@ -282,7 +280,9 @@ const EventStreamRenderer: React.FC<EventStreamRendererProps> = ({
                         <Typography
                           sx={{
                             fontSize: '0.68rem',
-                            color: isMessage ? 'text.primary' : 'text.secondary',
+                            color: isMessage
+                              ? 'text.primary'
+                              : 'text.secondary',
                             fontWeight: isMessage ? 500 : 400,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -337,7 +337,9 @@ const EventStreamRenderer: React.FC<EventStreamRendererProps> = ({
                             color: 'text.secondary',
                             wordBreak: 'break-all',
                             fontFamily:
-                              typeof value === 'number' ? 'monospace' : 'inherit',
+                              typeof value === 'number'
+                                ? 'monospace'
+                                : 'inherit',
                           }}
                         >
                           {String(value ?? '')}
@@ -365,11 +367,15 @@ const EventStreamRenderer: React.FC<EventStreamRendererProps> = ({
         }}
       >
         <Typography sx={{ fontSize: '0.62rem', color: 'text.disabled' }}>
-          {t('argus.dashboards.eventStream.showing', 'Showing {{start}}–{{end}} of {{total}}', {
-            start: page * pageSize + 1,
-            end: Math.min((page + 1) * pageSize, data.length),
-            total: totalCount ?? data.length,
-          })}
+          {t(
+            'argus.dashboards.eventStream.showing',
+            'Showing {{start}}–{{end}} of {{total}}',
+            {
+              start: page * pageSize + 1,
+              end: Math.min((page + 1) * pageSize, data.length),
+              total: totalCount ?? data.length,
+            }
+          )}
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

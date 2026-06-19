@@ -110,10 +110,7 @@ const AddToDashboardDialog: React.FC<AddToDashboardDialogProps> = ({
       }
 
       // Get current dashboard to append widget
-      const dashboard = await argusService.getDashboard(
-        projectId,
-        dashboardId
-      );
+      const dashboard = await argusService.getDashboard(projectId, dashboardId);
       const existingWidgets: WidgetConfig[] =
         typeof dashboard.widgets_config === 'string'
           ? JSON.parse(dashboard.widgets_config)
@@ -294,7 +291,9 @@ const AddToDashboardDialog: React.FC<AddToDashboardDialogProps> = ({
                     },
                   }}
                 >
-                  <DashboardIcon sx={{ fontSize: 18, color: 'text.disabled' }} />
+                  <DashboardIcon
+                    sx={{ fontSize: 18, color: 'text.disabled' }}
+                  />
                   <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
                       variant="body2"

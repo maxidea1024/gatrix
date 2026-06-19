@@ -29,9 +29,12 @@ const PieRenderer: React.FC<PieRendererProps> = ({
       return { chartData: [], labelKey: '', numKey: '', total: 0 };
 
     const keys = Object.keys(data[0]);
-    const nk = keys.find((k) => typeof data[0][k] === 'number' || !isNaN(Number(data[0][k])));
+    const nk = keys.find(
+      (k) => typeof data[0][k] === 'number' || !isNaN(Number(data[0][k]))
+    );
     const lk = keys.find((k) => k !== nk);
-    if (!nk || !lk) return { chartData: [], labelKey: '', numKey: '', total: 0 };
+    if (!nk || !lk)
+      return { chartData: [], labelKey: '', numKey: '', total: 0 };
 
     const cd = data.slice(0, 12).map((row) => ({
       name: String(row[lk]),
@@ -45,7 +48,8 @@ const PieRenderer: React.FC<PieRendererProps> = ({
   if (chartData.length === 0) return null;
 
   const getColor = (index: number, name: string) => {
-    if (vizOptions?.series_colors?.[name]) return vizOptions.series_colors[name];
+    if (vizOptions?.series_colors?.[name])
+      return vizOptions.series_colors[name];
     return CHART_COLORS[index % CHART_COLORS.length];
   };
 
@@ -74,10 +78,7 @@ const PieRenderer: React.FC<PieRendererProps> = ({
             stroke="none"
           >
             {chartData.map((entry, i) => (
-              <Cell
-                key={entry.name}
-                fill={getColor(i, entry.name)}
-              />
+              <Cell key={entry.name} fill={getColor(i, entry.name)} />
             ))}
           </Pie>
           <Tooltip
@@ -92,8 +93,12 @@ const PieRenderer: React.FC<PieRendererProps> = ({
               wrapperStyle={{ fontSize: '0.68rem', paddingTop: 0 }}
               iconType="circle"
               iconSize={8}
-              layout={legendConfig?.position === 'right' ? 'vertical' : 'horizontal'}
-              verticalAlign={legendConfig?.position === 'right' ? 'middle' : 'bottom'}
+              layout={
+                legendConfig?.position === 'right' ? 'vertical' : 'horizontal'
+              }
+              verticalAlign={
+                legendConfig?.position === 'right' ? 'middle' : 'bottom'
+              }
               align={legendConfig?.position === 'right' ? 'right' : 'center'}
             />
           )}

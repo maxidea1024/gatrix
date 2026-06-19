@@ -29,16 +29,26 @@ const GeoMapRenderer: React.FC<GeoMapRendererProps> = ({
 
   const { items, maxVal, minVal, countryField, valueField } = useMemo(() => {
     if (!data || data.length === 0)
-      return { items: [], maxVal: 0, minVal: 0, countryField: '', valueField: '' };
+      return {
+        items: [],
+        maxVal: 0,
+        minVal: 0,
+        countryField: '',
+        valueField: '',
+      };
 
     const keys = Object.keys(data[0]);
     // Auto-detect country & value fields
     const cf =
       geoOpts?.country_field ||
       keys.find((k) =>
-        ['country_code', 'country', 'geo_country', 'geo.country', 'region'].includes(
-          k.toLowerCase()
-        )
+        [
+          'country_code',
+          'country',
+          'geo_country',
+          'geo.country',
+          'region',
+        ].includes(k.toLowerCase())
       ) ||
       keys.find((k) => typeof data[0][k] === 'string') ||
       keys[0];
@@ -53,7 +63,13 @@ const GeoMapRenderer: React.FC<GeoMapRendererProps> = ({
       keys[1];
 
     if (!cf || !vf)
-      return { items: [], maxVal: 0, minVal: 0, countryField: '', valueField: '' };
+      return {
+        items: [],
+        maxVal: 0,
+        minVal: 0,
+        countryField: '',
+        valueField: '',
+      };
 
     let max = -Infinity;
     let min = Infinity;
@@ -63,7 +79,10 @@ const GeoMapRenderer: React.FC<GeoMapRendererProps> = ({
       if (v < min) min = v;
       const rawCode = String(row[cf]).toUpperCase();
       // Normalize alpha-3 to alpha-2 if needed
-      const code = rawCode.length === 3 ? (ALPHA3_TO_ALPHA2[rawCode] || rawCode.slice(0, 2)) : rawCode;
+      const code =
+        rawCode.length === 3
+          ? ALPHA3_TO_ALPHA2[rawCode] || rawCode.slice(0, 2)
+          : rawCode;
       return {
         country: code,
         value: v,
@@ -180,7 +199,13 @@ const GeoMapRenderer: React.FC<GeoMapRendererProps> = ({
                 }}
               >
                 {/* Country flag emoji (from code) */}
-                <Typography sx={{ fontSize: '0.85rem', minWidth: 22, textAlign: 'center' }}>
+                <Typography
+                  sx={{
+                    fontSize: '0.85rem',
+                    minWidth: 22,
+                    textAlign: 'center',
+                  }}
+                >
                   {countryCodeToFlag(item.country)}
                 </Typography>
 
@@ -314,16 +339,56 @@ const COUNTRY_NAMES: Record<string, string> = {
 
 /** Common ISO 3166-1 alpha-3 → alpha-2 mapping */
 const ALPHA3_TO_ALPHA2: Record<string, string> = {
-  USA: 'US', GBR: 'GB', DEU: 'DE', FRA: 'FR', JPN: 'JP',
-  KOR: 'KR', CHN: 'CN', IND: 'IN', BRA: 'BR', CAN: 'CA',
-  AUS: 'AU', RUS: 'RU', ITA: 'IT', ESP: 'ES', NLD: 'NL',
-  SWE: 'SE', POL: 'PL', TUR: 'TR', MEX: 'MX', IDN: 'ID',
-  THA: 'TH', VNM: 'VN', PHL: 'PH', SGP: 'SG', MYS: 'MY',
-  TWN: 'TW', HKG: 'HK', ISR: 'IL', ARE: 'AE', SAU: 'SA',
-  ZAF: 'ZA', NGA: 'NG', EGY: 'EG', ARG: 'AR', CHL: 'CL',
-  COL: 'CO', PER: 'PE', UKR: 'UA', CZE: 'CZ', ROU: 'RO',
-  HUN: 'HU', AUT: 'AT', CHE: 'CH', BEL: 'BE', DNK: 'DK',
-  FIN: 'FI', NOR: 'NO', IRL: 'IE', PRT: 'PT', NZL: 'NZ',
+  USA: 'US',
+  GBR: 'GB',
+  DEU: 'DE',
+  FRA: 'FR',
+  JPN: 'JP',
+  KOR: 'KR',
+  CHN: 'CN',
+  IND: 'IN',
+  BRA: 'BR',
+  CAN: 'CA',
+  AUS: 'AU',
+  RUS: 'RU',
+  ITA: 'IT',
+  ESP: 'ES',
+  NLD: 'NL',
+  SWE: 'SE',
+  POL: 'PL',
+  TUR: 'TR',
+  MEX: 'MX',
+  IDN: 'ID',
+  THA: 'TH',
+  VNM: 'VN',
+  PHL: 'PH',
+  SGP: 'SG',
+  MYS: 'MY',
+  TWN: 'TW',
+  HKG: 'HK',
+  ISR: 'IL',
+  ARE: 'AE',
+  SAU: 'SA',
+  ZAF: 'ZA',
+  NGA: 'NG',
+  EGY: 'EG',
+  ARG: 'AR',
+  CHL: 'CL',
+  COL: 'CO',
+  PER: 'PE',
+  UKR: 'UA',
+  CZE: 'CZ',
+  ROU: 'RO',
+  HUN: 'HU',
+  AUT: 'AT',
+  CHE: 'CH',
+  BEL: 'BE',
+  DNK: 'DK',
+  FIN: 'FI',
+  NOR: 'NO',
+  IRL: 'IE',
+  PRT: 'PT',
+  NZL: 'NZ',
   GRC: 'GR',
 };
 

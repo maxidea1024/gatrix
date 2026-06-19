@@ -2216,7 +2216,10 @@ class ArgusService {
   async updateDashboardSharing(
     projectId: number | string,
     dashboardId: number,
-    data: { visibility?: 'personal' | 'team' | 'project'; shared_with?: string[] }
+    data: {
+      visibility?: 'personal' | 'team' | 'project';
+      shared_with?: string[];
+    }
   ): Promise<void> {
     await argusApi.patch(
       `${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}/sharing`,

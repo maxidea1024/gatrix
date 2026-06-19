@@ -205,7 +205,13 @@ export interface WidgetConfig {
   id: string;
   title: string;
   description?: string;
-  category?: 'discover' | 'insights' | 'funnels' | 'retention' | 'flows' | 'text';
+  category?:
+    | 'discover'
+    | 'insights'
+    | 'funnels'
+    | 'retention'
+    | 'flows'
+    | 'text';
   type: WidgetType | string; // string for legacy compatibility
   chart_style?: 'line' | 'bar' | 'area' | 'stacked-bar' | 'stacked-area';
   query: WidgetQuery;
@@ -299,9 +305,12 @@ export function formatValue(
       else formatted = `${num.toFixed(decimals ?? 0)}ms`;
       break;
     case 'bytes':
-      if (num >= 1073741824) formatted = `${(num / 1073741824).toFixed(decimals ?? 2)} GB`;
-      else if (num >= 1048576) formatted = `${(num / 1048576).toFixed(decimals ?? 2)} MB`;
-      else if (num >= 1024) formatted = `${(num / 1024).toFixed(decimals ?? 2)} KB`;
+      if (num >= 1073741824)
+        formatted = `${(num / 1073741824).toFixed(decimals ?? 2)} GB`;
+      else if (num >= 1048576)
+        formatted = `${(num / 1048576).toFixed(decimals ?? 2)} MB`;
+      else if (num >= 1024)
+        formatted = `${(num / 1024).toFixed(decimals ?? 2)} KB`;
       else formatted = `${num.toFixed(decimals ?? 0)} B`;
       break;
     case 'short':
