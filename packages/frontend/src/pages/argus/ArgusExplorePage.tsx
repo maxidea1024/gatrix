@@ -533,24 +533,7 @@ const ArgusExplorePage: React.FC = () => {
               onSelect={handleSortSelect}
             />
 
-            {/* + New */}
-            <Button
-              size="small"
-              variant="contained"
-              startIcon={<AddIcon sx={{ fontSize: 14 }} />}
-              endIcon={<ExpandMoreIcon sx={{ fontSize: 14 }} />}
-              onClick={(e) => setNewMenuAnchor(e.currentTarget)}
-              sx={{
-                textTransform: 'none',
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                height: 32,
-                borderRadius: '6px',
-                px: 1.5,
-              }}
-            >
-              {t('argus.explore.newQuery')}
-            </Button>
+
             <Menu
               anchorEl={newMenuAnchor}
               open={Boolean(newMenuAnchor)}
