@@ -470,11 +470,13 @@ export const QueryAQLEditor = forwardRef<
         ];
       }
       // Aggregate chips: field (func name), aggregateArg (field arg), operator, value
-      if (
+      // Include aggregateArg when args exist OR when actively editing arg slot
+      const hasAggArgs =
         chip.type === 'aggregate' &&
-        chip.aggregateArgs &&
-        chip.aggregateArgs.length > 0
-      ) {
+        ((chip.aggregateArgs && chip.aggregateArgs.length > 0) ||
+          (editingToken?.chipId === chip.id &&
+            editingToken?.part === 'aggregateArg'));
+      if (hasAggArgs) {
         return [
           { chipId: chip.id, part: 'field' },
           { chipId: chip.id, part: 'aggregateArg' },
@@ -488,7 +490,7 @@ export const QueryAQLEditor = forwardRef<
         { chipId: chip.id, part: 'value' },
       ];
     });
-  }, [chips]);
+  }, [chips, editingToken]);
 
   // ─── Chip operations ──────────────────────────────────────────────
 
@@ -602,10 +604,49 @@ export const QueryAQLEditor = forwardRef<
         }
       }
 
+      // Aggregate function change → chain to aggregateArg if new func needs args
+      if (chip?.type === 'aggregate' && updates.aggregateFunc) {
+        const newDef = config.aggregates?.find(
+          (a) => a.name === updates.aggregateFunc
+        );
+        const needsArgs = newDef && newDef.args.some((a) => a.required);
+        const willHaveArgs =
+          updates.aggregateArgs && updates.aggregateArgs.length > 0;
+
+        if (needsArgs && !willHaveArgs) {
+          // Switch to aggregateArg selection step
+          updateChip(chipId, { ...updates, aggregateArgs: [] });
+          skipEditCloseRef.current = true;
+          setEditingToken((prev) =>
+            prev ? { ...prev, part: 'aggregateArg' as EditingPart } : null
+          );
+          // After render: update anchor to the aggregateArg DOM element
+          requestAnimationFrame(() => {
+            const groupHandle = tokenGroupRefs.current.get(chipId);
+            const argEl = groupHandle?.getPartEl('aggregateArg');
+            if (argEl) {
+              setEditingToken((prev) =>
+                prev ? { ...prev, anchorEl: argEl } : null
+              );
+            }
+          });
+          return;
+        }
+      }
+
+      // Aggregate arg update: mark to skip stale-state deletion in handleEditClose
+      if (
+        chip?.type === 'aggregate' &&
+        updates.aggregateArgs &&
+        updates.aggregateArgs.length > 0
+      ) {
+        skipDeleteOnCloseRef.current = true;
+      }
+
       // Normal (non-composing) update
       updateChip(chipId, updates);
     },
-    [updateChip, chips]
+    [updateChip, chips, config.aggregates]
   );
 
   /** Close token editing dropdown */
@@ -634,6 +675,24 @@ export const QueryAQLEditor = forwardRef<
         requestAnimationFrame(() => inputRef.current?.focus());
         return;
       }
+
+      // Validate aggregate chips — delete if required args are missing
+      if (chip?.type === 'aggregate' && chip.aggregateFunc && !skipDeleteOnCloseRef.current) {
+        const aggDef = config.aggregates?.find(
+          (a) => a.name === chip.aggregateFunc
+        );
+        const needsArgs = aggDef && aggDef.args.some((a) => a.required);
+        const hasArgs =
+          chip.aggregateArgs && chip.aggregateArgs.length > 0;
+        if (needsArgs && !hasArgs) {
+          deleteChip(editingToken.chipId);
+          setEditingToken(null);
+          chipEditingRef.current = false;
+          suppressDropdownRef.current = true;
+          requestAnimationFrame(() => inputRef.current?.focus());
+          return;
+        }
+      }
     }
 
     // Always reset the ref
@@ -643,7 +702,7 @@ export const QueryAQLEditor = forwardRef<
     chipEditingRef.current = false;
     suppressDropdownRef.current = true;
     requestAnimationFrame(() => inputRef.current?.focus());
-  }, [editingToken, chips, deleteChip, updateChip]);
+  }, [editingToken, chips, deleteChip, updateChip, config.aggregates]);
 
   // ─── Inline value editing handlers ──────────────────────────────────
 

@@ -132,6 +132,21 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
     return [];
   }, [datasets, data, type, theme.palette.primary.main]);
 
+  // Derive effective chart type — prefer dataset types over the component-level prop.
+  // If any dataset is stacked-bar, treat the whole chart as stacked-bar, etc.
+  const effectiveType = useMemo(() => {
+    if (finalDatasets.length === 0) return type;
+    const firstDsType = finalDatasets[0].type;
+    if (firstDsType) return firstDsType;
+    return type;
+  }, [finalDatasets, type]);
+
+  const isStacked =
+    effectiveType === 'stacked-bar' ||
+    effectiveType === 'stacked-area' ||
+    effectiveType === 'stacked-line';
+
+
   const chartData = useMemo(() => {
     if (isPieOrDoughnut) {
       const labelsList = finalDatasets.map((ds) => ds.label);
@@ -213,10 +228,11 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
   }, [
     finalLabels,
     finalDatasets,
-    type,
+    effectiveType,
     theme.palette.primary.main,
     isPieOrDoughnut,
   ]);
+
 
   const options = useMemo(
     () => ({
@@ -315,10 +331,7 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
               x: {
                 grid: { display: false },
                 border: { display: false },
-                stacked:
-                  type === 'stacked-bar' ||
-                  type === 'stacked-area' ||
-                  type === 'stacked-line',
+                stacked: isStacked,
                 ticks: {
                   maxRotation: 0,
                   autoSkip: true,
@@ -331,10 +344,8 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
                 type: yAxisType,
                 beginAtZero: true,
                 border: { display: false },
-                stacked:
-                  type === 'stacked-bar' ||
-                  type === 'stacked-area' ||
-                  type === 'stacked-line',
+                stacked: isStacked,
+
                 grid: {
                   color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                   drawBorder: false,
@@ -359,12 +370,13 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
       showLegend,
       legendPosition,
       yAxisType,
-      type,
+      isStacked,
       isPieOrDoughnut,
       onPointClick,
       chartData,
     ]
   );
+
 
   const plugins = useMemo(() => {
     if (isPieOrDoughnut) return [];

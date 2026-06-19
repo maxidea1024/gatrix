@@ -153,7 +153,15 @@ export interface ArgusIssueTagGroup {
   topValues: { value: string; count: number }[];
 }
 
-export type SavedQueryType = 'discover' | 'logs' | 'traces' | 'metrics';
+export type SavedQueryType =
+  | 'discover'
+  | 'logs'
+  | 'traces'
+  | 'metrics'
+  | 'analytics-insights'
+  | 'analytics-funnels'
+  | 'analytics-retention'
+  | 'analytics-flows';
 
 export interface ArgusSavedQuery {
   id: number;
@@ -2179,6 +2187,17 @@ class ArgusService {
     );
   }
 
+  async toggleDashboardFavorite(
+    projectId: number | string,
+    dashboardId: number,
+    isFavorite: boolean
+  ): Promise<void> {
+    await argusApi.patch(
+      `${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}/favorite`,
+      { is_favorite: isFavorite }
+    );
+  }
+
   async queryDashboardWidget(
     projectId: number | string,
     query: any
@@ -2192,6 +2211,17 @@ class ArgusService {
     } catch {
       return [];
     }
+  }
+
+  async updateDashboardSharing(
+    projectId: number | string,
+    dashboardId: number,
+    data: { visibility?: 'personal' | 'team' | 'project'; shared_with?: string[] }
+  ): Promise<void> {
+    await argusApi.patch(
+      `${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}/sharing`,
+      data
+    );
   }
 
   // === Integrations ===

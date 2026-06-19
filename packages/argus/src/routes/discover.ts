@@ -535,7 +535,15 @@ export default async function discoverRoutes(app: FastifyInstance) {
         query_config: Record<string, any>;
         display_type?: string;
         is_global?: boolean;
-        query_type?: 'discover' | 'logs' | 'traces' | 'metrics';
+        query_type?:
+          | 'discover'
+          | 'logs'
+          | 'traces'
+          | 'metrics'
+          | 'analytics-insights'
+          | 'analytics-funnels'
+          | 'analytics-retention'
+          | 'analytics-flows';
       };
       const createdBy = (request.headers['x-user-name'] as string) || 'system';
 

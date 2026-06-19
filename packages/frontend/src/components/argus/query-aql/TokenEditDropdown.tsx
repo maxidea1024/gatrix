@@ -1026,7 +1026,7 @@ function AggregateFieldMenu({
       aggregateArgs: needsArgs
         ? hasCurrentArgs
           ? chip.aggregateArgs
-          : undefined
+          : [] // empty — parent will chain to aggregateArg selection
         : [],
     });
     onClose();

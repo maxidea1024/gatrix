@@ -478,15 +478,15 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.MONITORING_READ,
       },
       {
-        text: 'sidebar.argusFeedback',
-        icon: 'Feedback',
-        path: '/argus/feedback',
-        requiredPermission: P.MONITORING_READ,
-      },
-      {
         text: 'sidebar.argusReleases',
         icon: 'NewReleases',
         path: '/argus/releases',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'sidebar.argusFeedback',
+        icon: 'Feedback',
+        path: '/argus/feedback',
         requiredPermission: P.MONITORING_READ,
       },
       // ── Analytics ──

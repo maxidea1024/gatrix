@@ -1236,6 +1236,10 @@ const AppContent: React.FC = () => {
                                           element={<ArgusDashboardsPage />}
                                         />
                                         <Route
+                                          path="dashboards/:dashboardId"
+                                          element={<ArgusDashboardsPage />}
+                                        />
+                                        <Route
                                           path="logs"
                                           element={
                                             <Navigate

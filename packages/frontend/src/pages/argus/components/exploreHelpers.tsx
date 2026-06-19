@@ -34,10 +34,10 @@ import { formatRelativeTime } from '@/utils/dateFormat';
 
 /* ─── Dataset Config ─── */
 
-export const DATASET_CONFIG: Record<
+export const DATASET_CONFIG: Partial<Record<
   SavedQueryType,
   { label: string; icon: React.ReactNode; color: string; path: string }
-> = {
+>> = {
   traces: {
     label: 'Spans',
     icon: <TracesIcon sx={{ fontSize: 14 }} />,

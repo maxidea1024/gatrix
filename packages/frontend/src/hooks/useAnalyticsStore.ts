@@ -448,3 +448,138 @@ export const useEventCatalogStore = create<EventCatalogState>()((set, get) => ({
   clearCache: () =>
     set({ availableEvents: [], cachedProjectId: null, eventsLoading: false }),
 }));
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Analytics Query Serialize / Restore Utilities
+   ═══════════════════════════════════════════════════════════════════════ */
+
+type AnalyticsTab = 'insights' | 'funnels' | 'retention' | 'flows';
+
+/**
+ * Serialize a Zustand store state into a plain JSON object for saving.
+ * Strips out setter functions and keeps only data fields.
+ */
+export function serializeAnalyticsQuery(
+  tab: AnalyticsTab,
+  storeState: Record<string, any>
+): Record<string, any> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { resetStore, ...data } = Object.fromEntries(
+    Object.entries(storeState).filter(
+      ([, v]) => typeof v !== 'function'
+    )
+  );
+  return { analytics_sub_type: tab, ...data };
+}
+
+/**
+ * Restore a serialized query config into the corresponding store setters.
+ * Returns an object of { setterName: value } pairs to be called by the consumer.
+ */
+export function deserializeAnalyticsQuery(
+  config: Record<string, any>
+): Record<string, any> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { analytics_sub_type, ...data } = config;
+  return data;
+}
+
+/**
+ * Apply a deserialized query config to the corresponding Zustand store.
+ */
+export function restoreInsightsQuery(
+  config: Record<string, any>,
+  store: ReturnType<typeof useInsightsStore.getState>
+) {
+  const data = deserializeAnalyticsQuery(config);
+  if (data.dateRange) store.setDateRange(data.dateRange);
+  if (data.events) store.setEvents(data.events);
+  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.chartType) store.setChartType(data.chartType);
+  if (data.comparePeriod !== undefined) store.setComparePeriod(data.comparePeriod);
+  if (data.formulas) store.setFormulas(data.formulas);
+}
+
+export function restoreFunnelsQuery(
+  config: Record<string, any>,
+  store: ReturnType<typeof useFunnelsStore.getState>
+) {
+  const data = deserializeAnalyticsQuery(config);
+  if (data.dateRange) store.setDateRange(data.dateRange);
+  if (data.steps) store.setSteps(data.steps);
+  if (data.viewMode) store.setViewMode(data.viewMode);
+  if (data.chartLayout) store.setChartLayout(data.chartLayout);
+  if (data.conversionWindow !== undefined) store.setConversionWindow(data.conversionWindow);
+  if (data.ordering) store.setOrdering(data.ordering);
+  if (data.counting) store.setCounting(data.counting);
+  if (data.holdConstant) store.setHoldConstant(data.holdConstant);
+  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.exclusionSteps) store.setExclusionSteps(data.exclusionSteps);
+  if (data.segments) store.setSegments(data.segments);
+  if (data.compareMode !== undefined) store.setCompareMode(data.compareMode);
+}
+
+export function restoreRetentionQuery(
+  config: Record<string, any>,
+  store: ReturnType<typeof useRetentionStore.getState>
+) {
+  const data = deserializeAnalyticsQuery(config);
+  if (data.dateRange) store.setDateRange(data.dateRange);
+  if (data.cohortEvent) store.setCohortEvent(data.cohortEvent);
+  if (data.returnEvent) store.setReturnEvent(data.returnEvent);
+  if (data.retentionType) store.setRetentionType(data.retentionType);
+  if (data.criteria) store.setCriteria(data.criteria);
+  if (data.measurement) store.setMeasurement(data.measurement);
+  if (data.measurementProperty !== undefined) store.setMeasurementProperty(data.measurementProperty);
+  if (data.minFrequency !== undefined) store.setMinFrequency(data.minFrequency);
+  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+  if (data.viewMode) store.setViewMode(data.viewMode);
+}
+
+export function restoreFlowsQuery(
+  config: Record<string, any>,
+  store: ReturnType<typeof useFlowsStore.getState>
+) {
+  const data = deserializeAnalyticsQuery(config);
+  if (data.dateRange) store.setDateRange(data.dateRange);
+  if (data.anchorEventA !== undefined) store.setAnchorEventA(data.anchorEventA);
+  if (data.anchorEventB !== undefined) store.setAnchorEventB(data.anchorEventB);
+  if (data.showSecondAnchor !== undefined) store.setShowSecondAnchor(data.showSecondAnchor);
+  if (data.direction) store.setDirection(data.direction);
+  if (data.stepsBefore !== undefined) store.setStepsBefore(data.stepsBefore);
+  if (data.stepsAfter !== undefined) store.setStepsAfter(data.stepsAfter);
+  if (data.depth !== undefined) store.setDepth(data.depth);
+  if (data.viewMode) store.setViewMode(data.viewMode);
+  if (data.excludeEvents) store.setExcludeEvents(data.excludeEvents);
+  if (data.breakdownProperties) store.setBreakdownProperties(data.breakdownProperties);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Analytics Save State Store (shared across tabs)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+interface AnalyticsSaveState {
+  /** ID of the currently loaded saved query (null = unsaved/new) */
+  currentQueryId: number | null;
+  /** Name of the currently loaded saved query */
+  currentQueryName: string;
+  /** Whether the current query has been modified since last save */
+  isDirty: boolean;
+
+  setCurrentQuery: (id: number | null, name: string) => void;
+  setDirty: (dirty: boolean) => void;
+  clearSaveState: () => void;
+}
+
+export const useAnalyticsSaveState = create<AnalyticsSaveState>()((set) => ({
+  currentQueryId: null,
+  currentQueryName: '',
+  isDirty: false,
+
+  setCurrentQuery: (currentQueryId, currentQueryName) =>
+    set({ currentQueryId, currentQueryName, isDirty: false }),
+  setDirty: (isDirty) => set({ isDirty }),
+  clearSaveState: () =>
+    set({ currentQueryId: null, currentQueryName: '', isDirty: false }),
+}));
+
