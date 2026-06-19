@@ -63,7 +63,7 @@ const FilterChipSelect: React.FC<FilterChipSelectProps> = ({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 0.5,
-            height: 28,
+            height: 32,
             px: 1.2,
             borderRadius: '6px',
             border: '1px solid',
