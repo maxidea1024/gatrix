@@ -302,7 +302,7 @@ const ArgusExplorePage: React.FC = () => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: 'repeat(5, 1fr)',
           gap: 1.5,
           mb: 2,
         }}
