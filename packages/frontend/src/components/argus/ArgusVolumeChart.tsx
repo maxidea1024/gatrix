@@ -59,6 +59,10 @@ export interface ArgusVolumeChartProps {
   skeletonColor?: string;
   /** Bottom margin (default: 2) */
   mb?: number;
+  /** Controlled chart type (overrides localStorage) */
+  chartType?: VolumeChartType;
+  /** Callback when chart type changes (controlled mode) */
+  onChartTypeChange?: (type: VolumeChartType) => void;
 }
 
 const CHART_HEIGHT_NORMAL = 140;
@@ -82,15 +86,22 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
   showLegend = false,
   skeletonColor = '#7c4dff',
   mb = 2,
+  chartType: controlledChartType,
+  onChartTypeChange,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
-  const [chartType, setChartType] = useLocalStorage<VolumeChartType>(
+  const [localChartType, setLocalChartType] = useLocalStorage<VolumeChartType>(
     `${storagePrefix}_chart_type`,
     'bar'
   );
+  const chartType = controlledChartType ?? localChartType;
+  const setChartType = (v: VolumeChartType) => {
+    if (onChartTypeChange) onChartTypeChange(v);
+    else setLocalChartType(v);
+  };
   const [compact, setCompact] = useLocalStorage<boolean>(
     `${storagePrefix}_compact`,
     false

@@ -206,17 +206,6 @@ const AppBarPageHeader: React.FC<{
   subPanelOpen?: boolean;
 }> = ({ showSidebar, isMobile, onDrawerToggle, subPanelOpen }) => {
   const { headerProps } = usePageHeaderContext();
-  const { t } = useTranslation();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const isFromSidebar = (location.state as any)?.fromSidebar === true;
-  const showBackButton = headerProps
-    ? !!headerProps.onBack ||
-      (headerProps.enableAutoBack &&
-        location.key !== 'default' &&
-        !isFromSidebar)
-    : false;
 
   const showRightSection = headerProps
     ? headerProps.tabs || headerProps.actions || headerProps.headerActions
@@ -247,7 +236,7 @@ const AppBarPageHeader: React.FC<{
         </IconButton>
       )}
 
-      {/* PageHeader left: back + icon + title + subtitle */}
+      {/* PageHeader left: icon + title + subtitle */}
       {headerProps && (
         <>
           <Box
@@ -260,43 +249,6 @@ const AppBarPageHeader: React.FC<{
               overflow: 'hidden',
             }}
           >
-            {showBackButton && (
-              <Tooltip
-                title={t('common.goBack', '뒤로 가기')}
-                placement="bottom"
-              >
-                <IconButton
-                  size="small"
-                  onClick={
-                    headerProps.onBack ? headerProps.onBack : () => navigate(-1)
-                  }
-                  sx={{
-                    mr: 0.25,
-                    width: 26,
-                    height: 26,
-                    color: 'text.secondary',
-                    borderRadius: 1.5,
-                    '&:hover': {
-                      color: 'text.primary',
-                      backgroundColor: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? 'rgba(255, 255, 255, 0.08)'
-                          : 'rgba(0, 0, 0, 0.06)',
-                      transform: 'translateX(-1px)',
-                    },
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <ArrowBackIcon
-                    sx={{
-                      fontSize: 18,
-                      strokeWidth: 1,
-                      stroke: 'currentColor',
-                    }}
-                  />
-                </IconButton>
-              </Tooltip>
-            )}
             {headerProps.icon && (
               <Box
                 sx={{

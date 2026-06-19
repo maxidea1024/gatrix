@@ -540,6 +540,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
           | 'logs'
           | 'traces'
           | 'metrics'
+          | 'issues'
           | 'analytics-insights'
           | 'analytics-funnels'
           | 'analytics-retention'
@@ -612,6 +613,54 @@ export default async function discoverRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to update saved query' });
+      }
+    }
+  );
+
+  // Toggle saved query favorite
+  app.patch(
+    '/:projectId/discover/saved/:queryId/favorite',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, queryId } = request.params as {
+        projectId: string;
+        queryId: string;
+      };
+      const { is_favorite } = request.body as { is_favorite: boolean };
+
+      try {
+        await db('g_argus_saved_queries')
+          .where({ id: queryId, project_id: projectId })
+          .update({ is_favorite: is_favorite ? 1 : 0 });
+        return reply.send({ success: true });
+      } catch (error: any) {
+        // Auto-add is_favorite column if it doesn't exist
+        if (
+          String(error?.message || '').includes('is_favorite') &&
+          (error?.code === 'ER_BAD_FIELD_ERROR' ||
+            String(error?.message || '').includes("Unknown column"))
+        ) {
+          try {
+            await db.schema.alterTable('g_argus_saved_queries', (table) => {
+              table.boolean('is_favorite').defaultTo(false);
+            });
+            await db('g_argus_saved_queries')
+              .where({ id: queryId, project_id: projectId })
+              .update({ is_favorite: is_favorite ? 1 : 0 });
+            return reply.send({ success: true });
+          } catch (retryError) {
+            logger.error('Failed to add is_favorite column', {
+              error: retryError instanceof Error ? retryError.message : String(retryError),
+            });
+          }
+        }
+        logger.error('Failed to toggle saved query favorite', {
+          projectId,
+          queryId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply
+          .code(500)
+          .send({ error: 'Failed to toggle favorite' });
       }
     }
   );

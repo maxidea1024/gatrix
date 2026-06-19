@@ -31,7 +31,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import PageContentLoader from '@/components/common/PageContentLoader';
+
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { formatCompactNumber } from '@/utils/numberFormat';
@@ -43,6 +43,7 @@ import { Chart as ChartJS, ArcElement } from 'chart.js';
 import { Pie, Doughnut, Bar as BarChart } from 'react-chartjs-2';
 import TreemapChart from './TreemapChart';
 
+
 ChartJS.register(ArcElement);
 
 interface AggData {
@@ -50,6 +51,16 @@ interface AggData {
   topValues: { group_value: string; count: number }[];
   timeSeries: { bucket: string; group_value: string; count: number }[];
 }
+
+export type AggChartType =
+  | 'bar'
+  | 'line'
+  | 'area'
+  | 'treemap'
+  | 'pie'
+  | 'scatter'
+  | 'doughnut'
+  | 'horizontalBar';
 
 export interface AggregatePanelProps {
   aggData: AggData | null;
@@ -68,6 +79,10 @@ export interface AggregatePanelProps {
   showRemove?: boolean;
   /** Called when this panel is removed */
   onRemovePanel?: () => void;
+  /** Controlled chart type (overrides localStorage) */
+  chartType?: AggChartType;
+  /** Callback when chart type changes (controlled mode) */
+  onChartTypeChange?: (type: AggChartType) => void;
 }
 
 const CHART_COLORS = [
@@ -92,21 +107,22 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
   discoveredFacetKeys = [],
   showRemove = false,
   onRemovePanel,
+  chartType: controlledChartType,
+  onChartTypeChange,
 }) => {
   const theme = useTheme();
   const { t, i18n } = useTranslation();
   const [tableCollapsed, setTableCollapsed] = React.useState(false);
   const [menuAnchor, setMenuAnchor] = React.useState<null | HTMLElement>(null);
-  const [chartType, setChartType] = useLocalStorage<
-    | 'bar'
-    | 'line'
-    | 'area'
-    | 'treemap'
-    | 'pie'
-    | 'scatter'
-    | 'doughnut'
-    | 'horizontalBar'
-  >(`${storagePrefix}_chart_type`, 'bar');
+  const [localChartType, setLocalChartType] = useLocalStorage<AggChartType>(
+    `${storagePrefix}_chart_type`,
+    'bar'
+  );
+  const chartType = controlledChartType ?? localChartType;
+  const setChartType = (v: AggChartType) => {
+    if (onChartTypeChange) onChartTypeChange(v);
+    else setLocalChartType(v);
+  };
 
   const pieData = React.useMemo(() => {
     if (!aggData?.topValues) return { labels: [], datasets: [] };
@@ -290,7 +306,7 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
   return (
     <Box
       sx={{
-        flex: 1,
+        flex: 'none',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -471,8 +487,7 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
         )}
       </Box>
 
-      <PageContentLoader
-        loading={aggLoading}
+      <Box
         sx={{
           flex: 1,
           display: 'flex',
@@ -638,9 +653,9 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
                           chartType === 'pie' ||
                           chartType === 'doughnut' ||
                           chartType === 'horizontalBar'
-                            ? 180
-                            : 150,
-                        minHeight: 150,
+                            ? 250
+                            : 220,
+                        minHeight: 180,
                         position: 'relative',
                         overflow: 'hidden',
                       }}
@@ -701,7 +716,7 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
                         <InteractiveTimeSeriesChart
                           labels={labels}
                           datasets={datasets}
-                          height={tableCollapsed ? '100%' : 150}
+                          height={220}
                           showLegend
                         />
                       )}
@@ -912,7 +927,7 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
             )}
           </Box>
         )}
-      </PageContentLoader>
+      </Box>
     </Box>
   );
 };

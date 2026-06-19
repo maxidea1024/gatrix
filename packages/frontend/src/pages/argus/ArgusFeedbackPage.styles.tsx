@@ -5,7 +5,7 @@ import { Box, Chip, Tabs } from '@mui/material';
 export const PageContainer = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
-  height: 'calc(100vh - 120px)',
+  height: 'calc(100vh - 96px)',
 });
 
 /** Split-panel inbox container */

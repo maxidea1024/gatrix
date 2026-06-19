@@ -31,6 +31,7 @@ export const DEEP_LINK_KEYS = [
   'view',
   'substatus',
   'assigned_to',
+  'queryId',
 ];
 
 // ─── Types ───

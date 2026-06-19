@@ -5,14 +5,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-  Button,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Button, IconButton, useTheme } from '@mui/material';
 import {
   Timeline as TraceIcon,
   Bookmark as BookmarkIcon,
@@ -20,8 +13,12 @@ import {
   Save as SaveIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
+import PageHeader from '@/components/common/PageHeader';
+import EditablePageTitle from '@/components/common/EditablePageTitle';
+import ExploreActions from '@/components/argus/ExploreActions';
 import ArgusFilterBar, {
   ArgusFilterState,
   defaultArgusFilterState,
@@ -32,40 +29,33 @@ import {
   QueryAQLEditorHandle,
 } from '@/components/argus/query-aql/QueryAQLEditor';
 import { normalizeQuery } from '@/components/argus/query-aql';
+import { TRACES_CONFIG } from '@/components/argus/query-aql/fields';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
 import SpanDetailPanel from '@/components/argus/SpanDetailDrawer';
-import SegmentedTabs from '@/components/common/SegmentedTabs';
-import PageHeader from '@/components/common/PageHeader';
-import EditablePageTitle from '@/components/common/EditablePageTitle';
-import ExploreActions from '@/components/argus/ExploreActions';
+import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
+import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
-import { TRACES_CONFIG } from '@/components/argus/query-aql/fields';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { getOpColor } from './components/traceExplorerHelpers';
-import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
-import AggregatePanel from '@/components/argus/AggregatePanel';
-import { SpansTab, TracesTab } from './components/TraceExplorerTabs';
 import {
   SaveQueryDialog as TraceSaveQueryDialog,
   SavedQueriesPanel,
 } from './components/TraceExplorerDialogs';
-import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
-import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
+
+import { TraceViews } from './components/trace/TraceViews';
 
 const ArgusTraceExplorerPage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const location = useLocation();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
 
   // ─── URL-driven state ───
-  const URL_PARAMS = useMemo(
+   const URL_PARAMS = useMemo(
     () => ({
       period: {
         key: 'period',
@@ -79,6 +69,8 @@ const ArgusTraceExplorerPage: React.FC = () => {
       groupBy: { key: 'groupBy', default: 'op' },
       orderBy: { key: 'orderBy', default: '-duration' },
       queryId: { key: 'queryId', default: '' },
+      volumeChartType: { key: 'vct', default: 'bar' },
+      aggChartTypes: { key: 'act', default: 'bar' },
     }),
     []
   );
@@ -135,9 +127,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   // ─── Data State ───
   const [spans, setSpans] = useState<any[]>([]);
   const [traceSamples, setTraceSamples] = useState<any[]>([]);
-  const [volume, setVolume] = useState<
-    { bucket: string; op: string; count: number }[]
-  >([]);
+  const [volume, setVolume] = useState<{ bucket: string; op: string; count: number }[]>([]);
   const [loading, setLoading] = useState(false);
   const [tags, setTags] = useState<{
     op: any[];
@@ -162,7 +152,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     });
     const sorted = [...bucketSet].sort();
 
-    // Top 10 ops by total count
     const opTotals = new Map<string, number>();
     volume.forEach((p) => {
       if (p.op)
@@ -173,11 +162,8 @@ const ArgusTraceExplorerPage: React.FC = () => {
       .slice(0, 10)
       .map(([op]) => op);
 
-    // Build lookup
     const lookup = new Map<string, number>();
-    volume.forEach((p) =>
-      lookup.set(`${p.bucket}::${p.op}`, Number(p.count) || 0)
-    );
+    volume.forEach((p) => lookup.set(`${p.bucket}::${p.op}`, Number(p.count) || 0));
 
     const labels = sorted.map((b) => {
       try {
@@ -197,6 +183,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
     return { volumeLabels: labels, volumeDatasets: datasets };
   }, [volume]);
+
   // Aggregates (multi-group)
   const [aggDataMap, setAggDataMap] = useState<
     Record<
@@ -212,9 +199,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   // Span detail drawer
   const [selectedSpan, setSelectedSpan] = useState<any | null>(null);
-  const [selectedSpanIndex, setSelectedSpanIndex] = useState<number | null>(
-    null
-  );
+  const [selectedSpanIndex, setSelectedSpanIndex] = useState<number | null>(null);
 
   // Facet sidebar
   const MIN_FACET_WIDTH = 180;
@@ -232,9 +217,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [facetWidth, setFacetWidth] = useState(() => {
     try {
       const saved = parseInt(localStorage.getItem(FACET_WIDTH_KEY) || '', 10);
-      return !isNaN(saved) &&
-        saved >= MIN_FACET_WIDTH &&
-        saved <= MAX_FACET_WIDTH
+      return !isNaN(saved) && saved >= MIN_FACET_WIDTH && saved <= MAX_FACET_WIDTH
         ? saved
         : DEFAULT_FACET_WIDTH;
     } catch {
@@ -258,12 +241,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
       const onMouseMove = (ev: MouseEvent) => {
         const delta = ev.clientX - startX;
-        setFacetWidth(
-          Math.min(
-            MAX_FACET_WIDTH,
-            Math.max(MIN_FACET_WIDTH, startWidth + delta)
-          )
-        );
+        setFacetWidth(Math.min(MAX_FACET_WIDTH, Math.max(MIN_FACET_WIDTH, startWidth + delta)));
       };
       const onMouseUp = () => {
         setIsFacetDragging(false);
@@ -299,9 +277,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [detailWidth, setDetailWidth] = useState(() => {
     try {
       const saved = parseInt(localStorage.getItem(DETAIL_WIDTH_KEY) || '', 10);
-      return !isNaN(saved) &&
-        saved >= MIN_DETAIL_WIDTH &&
-        saved <= MAX_DETAIL_WIDTH
+      return !isNaN(saved) && saved >= MIN_DETAIL_WIDTH && saved <= MAX_DETAIL_WIDTH
         ? saved
         : DEFAULT_DETAIL_WIDTH;
     } catch {
@@ -324,14 +300,8 @@ const ArgusTraceExplorerPage: React.FC = () => {
       const startWidth = detailWidth;
 
       const onMouseMove = (ev: MouseEvent) => {
-        // Dragging left = wider detail panel (inverted delta)
         const delta = startX - ev.clientX;
-        setDetailWidth(
-          Math.min(
-            MAX_DETAIL_WIDTH,
-            Math.max(MIN_DETAIL_WIDTH, startWidth + delta)
-          )
-        );
+        setDetailWidth(Math.min(MAX_DETAIL_WIDTH, Math.max(MIN_DETAIL_WIDTH, startWidth + delta)));
       };
       const onMouseUp = () => {
         setIsDetailDragging(false);
@@ -369,65 +339,75 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const [savedPanelOpen, setSavedPanelOpen] = useState(false);
   const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
   const [saveDialogMode, setSaveDialogMode] = useState<'new' | 'saveAs'>('new');
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
-    null
-  );
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
 
-  // Sync URL queryId to state
   useEffect(() => {
     if (urlState.queryId && savedQueries.length > 0) {
       const qId = parseInt(urlState.queryId, 10);
       const matched = savedQueries.find((q) => q.id === qId);
       if (matched && currentQueryId !== qId) {
+        const cfg = typeof matched.query_config === 'string'
+          ? JSON.parse(matched.query_config)
+          : matched.query_config;
         setCurrentQueryId(matched.id);
         setQueryName(matched.name);
-        // Initialize snapshot so isDirty starts as false
+        if (cfg.search !== undefined) {
+          setSearch(cfg.search);
+          setUrlState({ q: cfg.search });
+        }
+        if (cfg.groupBy) setUrlState({ groupBy: cfg.groupBy });
+        if (cfg.period) setUrlState({ period: cfg.period });
+        if (cfg.tab !== undefined) setUrlState({ tab: String(cfg.tab) });
+        if (cfg.orderBy) setUrlState({ orderBy: cfg.orderBy });
+        if (cfg.volumeChartType) setUrlState({ volumeChartType: cfg.volumeChartType });
+        if (cfg.aggChartTypes) setUrlState({ aggChartTypes: cfg.aggChartTypes });
         setSavedSnapshot({
-          search,
-          groupBy: urlState.groupBy,
-          orderBy,
+          search: cfg.search || '',
+          groupBy: cfg.groupBy || 'op',
+          orderBy: cfg.orderBy || orderBy,
+          tab: cfg.tab !== undefined ? String(cfg.tab) : '0',
+          volumeChartType: cfg.volumeChartType || 'bar',
+          aggChartTypes: cfg.aggChartTypes || 'bar',
         });
       }
     }
-  }, [
-    urlState.queryId,
-    savedQueries,
-    currentQueryId,
-    search,
-    urlState.groupBy,
-    orderBy,
-  ]);
+  }, [urlState.queryId, savedQueries, currentQueryId]);
 
-  // ─── Dirty state tracking ───
+  // Dirty state tracking
   type TraceSnapshot = {
     search: string;
     groupBy: string;
     orderBy: string;
+    tab: string;
+    volumeChartType: string;
+    aggChartTypes: string;
   };
-  const [savedSnapshot, setSavedSnapshot] = useState<TraceSnapshot | null>(
-    null
-  );
+  const [savedSnapshot, setSavedSnapshot] = useState<TraceSnapshot | null>(null);
 
   const takeSnapshot = useCallback(() => {
     setSavedSnapshot({
       search,
       groupBy: urlState.groupBy,
       orderBy,
+      tab: urlState.tab,
+      volumeChartType: urlState.volumeChartType,
+      aggChartTypes: urlState.aggChartTypes,
     });
-  }, [search, urlState.groupBy, orderBy]);
+  }, [search, urlState.groupBy, orderBy, urlState.tab, urlState.volumeChartType, urlState.aggChartTypes]);
 
   const isDirty = useMemo(() => {
-    if (!savedSnapshot) {
-      return !urlState.queryId;
-    }
+    if (!savedSnapshot) return !urlState.queryId;
     const normalizedSearch = normalizeQuery(search);
     const normalizedSnapshot = normalizeQuery(savedSnapshot.search);
     return (
       normalizedSearch !== normalizedSnapshot ||
       urlState.groupBy !== savedSnapshot.groupBy ||
-      orderBy !== savedSnapshot.orderBy
+      orderBy !== savedSnapshot.orderBy ||
+      urlState.tab !== savedSnapshot.tab ||
+      urlState.volumeChartType !== savedSnapshot.volumeChartType ||
+      urlState.aggChartTypes !== savedSnapshot.aggChartTypes
     );
-  }, [search, urlState.groupBy, orderBy, savedSnapshot]);
+  }, [search, urlState.groupBy, orderBy, urlState.tab, urlState.volumeChartType, urlState.aggChartTypes, savedSnapshot, urlState.queryId]);
 
   const currentPeriod = useMemo(() => {
     if (filters.dateRange.type === 'preset' && filters.dateRange.preset)
@@ -471,7 +451,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     return facets;
   }, [tags]);
 
-  // Dynamically discovered tag facets from span tags Map
   const discoveredFacets = useMemo<FacetGroup[]>(() => {
     if (!tags.discovered) return [];
     return Object.entries(tags.discovered)
@@ -486,7 +465,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
       }));
   }, [tags.discovered]);
 
-  // Facet values for AQL editor autocomplete (initialFacets)
   const mappedFacets = useMemo(() => {
     const result: Record<string, { value: string; count: number }[]> = {};
     if (tags.op?.length) {
@@ -507,7 +485,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         count: Number(v.count) || 0,
       }));
     }
-    // Discovered tag facets (e.g. server.region, http.method)
     for (const df of discoveredFacets) {
       if (!result[df.key]) {
         result[df.key] = df.values;
@@ -614,7 +591,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         start: apiParams.start,
         end: apiParams.end,
       });
-      // Map 'hour' alias from backend to 'bucket' for chart
       const mapped = (data || []).map((d: any) => ({
         bucket: d.hour || d.bucket,
         op: d.op || '',
@@ -644,24 +620,18 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       if (fieldKey === 'op' && tags.op) return tags.op.map((x) => x.value);
-      if (fieldKey === 'status' && tags.status)
-        return tags.status.map((x) => x.value);
-      if (fieldKey === 'domain' && tags.domain)
-        return tags.domain.map((x) => x.value);
+      if (fieldKey === 'status' && tags.status) return tags.status.map((x) => x.value);
+      if (fieldKey === 'domain' && tags.domain) return tags.domain.map((x) => x.value);
 
       if (fieldKey === 'environment') {
         try {
-          const opts = await argusService.getFilterOptions(
-            projectId,
-            currentPeriod
-          );
+          const opts = await argusService.getFilterOptions(projectId, currentPeriod);
           return opts.environments || [];
         } catch {
           return [];
         }
       }
 
-      // Discovered tag keys — return values from pre-fetched tags
       if (tags.discovered?.[fieldKey]) {
         return tags.discovered[fieldKey].map((v: any) => v.value);
       }
@@ -699,30 +669,25 @@ const ArgusTraceExplorerPage: React.FC = () => {
     [projectId, filters, currentPeriod, aggGroupBys]
   );
 
-  // Fetch data for the currently active tab only
   const fetchTabData = useCallback(() => {
     if (activeTab === 0) fetchSpans();
     else if (activeTab === 1) fetchTraceSamples();
     else if (activeTab === 2) fetchAggregates();
   }, [activeTab, fetchSpans, fetchTraceSamples, fetchAggregates]);
 
-  // Keep a ref so the main effect can call the latest fetchTabData without depending on it
   const fetchTabDataRef = useRef(fetchTabData);
   fetchTabDataRef.current = fetchTabData;
 
-  // Fetch shared data (volume, tags) — does NOT depend on activeTab
   const fetchCommon = useCallback(() => {
     fetchVolume();
     fetchTags();
   }, [fetchVolume, fetchTags]);
 
-  // Full refetch (for manual refresh button)
   const fetchAll = useCallback(() => {
     fetchTabData();
     fetchCommon();
   }, [fetchTabData, fetchCommon]);
 
-  // Main data load: re-fetch when filters/search/period change
   const initialLoadRef = useRef(true);
   useEffect(() => {
     fetchTabDataRef.current();
@@ -736,7 +701,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     }
   }, [fetchCommon, projectId]);
 
-  // Tab-only switch: fetch just the new tab's data without re-fetching volume/tags
   const prevTabRef = useRef(activeTab);
   useEffect(() => {
     if (prevTabRef.current !== activeTab) {
@@ -757,10 +721,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const handleFilterChange = useCallback(
     (newFilters: ArgusFilterState) => {
       setFilters(newFilters);
-      if (
-        newFilters.dateRange.type === 'preset' &&
-        newFilters.dateRange.preset
-      ) {
+      if (newFilters.dateRange.type === 'preset' && newFilters.dateRange.preset) {
         setUrlState({
           period: newFilters.dateRange.preset,
           start: '',
@@ -799,13 +760,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     [orderCol, orderDir, setUrlState]
   );
 
-  // handleGroupByChange is now inline per-panel (see render section)
-
-  const handleRunAgg = useCallback(() => {
-    fetchAggregates();
-  }, [fetchAggregates]);
-
-  // groupByOptions for trace aggregates
   const traceGroupByOptions = useMemo(
     () => [
       { value: 'op', label: 'Operation' },
@@ -823,11 +777,13 @@ const ArgusTraceExplorerPage: React.FC = () => {
       period: currentPeriod,
       tab: activeTab,
       groupBy: aggGroupBys.join(','),
+      orderBy,
+      volumeChartType: urlState.volumeChartType,
+      aggChartTypes: urlState.aggChartTypes,
     }),
-    [search, currentPeriod, activeTab, aggGroupBys]
+    [search, currentPeriod, activeTab, aggGroupBys, orderBy, urlState.volumeChartType, urlState.aggChartTypes]
   );
 
-  // Save: update existing or prompt name for new
   const handleSave = useCallback(async () => {
     if (currentQueryId) {
       try {
@@ -836,10 +792,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
           query_config: buildQueryConfig(),
           display_type: 'table',
         });
-        const updated = await argusService.listSavedQueries(
-          projectId,
-          'traces'
-        );
+        const updated = await argusService.listSavedQueries(projectId, 'traces');
         setSavedQueries(updated);
         takeSnapshot();
       } catch (err) {
@@ -865,10 +818,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
             setCurrentQueryId(res.id);
             setUrlState({ queryId: String(res.id) });
           }
-          const updated = await argusService.listSavedQueries(
-            projectId,
-            'traces'
-          );
+          const updated = await argusService.listSavedQueries(projectId, 'traces');
           setSavedQueries(updated);
           takeSnapshot();
         } catch (err) {
@@ -891,14 +841,12 @@ const ArgusTraceExplorerPage: React.FC = () => {
     savedQueries,
   ]);
 
-  // Save As: always open name dialog
   const handleSaveAs = useCallback(() => {
     setSaveName(queryName === defaultQueryName ? '' : queryName);
     setSaveDialogMode('saveAs');
     setSaveDialogOpen(true);
   }, [queryName, defaultQueryName]);
 
-  // Dialog save callback
   const handleDialogSave = useCallback(
     async (name: string, existingQueryId: number | null) => {
       try {
@@ -924,10 +872,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
             setUrlState({ queryId: String(res.id) });
           }
         }
-        const updated = await argusService.listSavedQueries(
-          projectId,
-          'traces'
-        );
+        const updated = await argusService.listSavedQueries(projectId, 'traces');
         setSavedQueries(updated);
 
         takeSnapshot();
@@ -943,18 +888,13 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const handleRename = useCallback(
     async (newName: string) => {
       setQueryName(newName);
-      const effectiveId =
-        currentQueryId ||
-        (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
+      const effectiveId = currentQueryId || (urlState.queryId ? parseInt(urlState.queryId, 10) : null);
       if (effectiveId) {
         try {
           await argusService.updateSavedQuery(projectId, effectiveId, {
             name: newName,
           });
-          const updated = await argusService.listSavedQueries(
-            projectId,
-            'traces'
-          );
+          const updated = await argusService.listSavedQueries(projectId, 'traces');
           setSavedQueries(updated);
         } catch (err) {
           console.error('Failed to rename query:', err);
@@ -986,10 +926,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
 
   const handleLoadSavedQuery = useCallback(
     (sq: ArgusSavedQuery) => {
-      const cfg =
-        typeof sq.query_config === 'string'
-          ? JSON.parse(sq.query_config)
-          : sq.query_config;
+      const cfg = typeof sq.query_config === 'string' ? JSON.parse(sq.query_config) : sq.query_config;
       if (cfg.search !== undefined) {
         setSearch(cfg.search);
         setUrlState({ q: cfg.search });
@@ -1005,6 +942,9 @@ const ArgusTraceExplorerPage: React.FC = () => {
         search: cfg.search || '',
         groupBy: cfg.groupBy || 'op',
         orderBy: cfg.orderBy || '-duration',
+        tab: cfg.tab !== undefined ? String(cfg.tab) : '0',
+        volumeChartType: cfg.volumeChartType || 'bar',
+        aggChartTypes: cfg.aggChartTypes || 'bar',
       });
     },
     [setUrlState]
@@ -1034,9 +974,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const handleFacetFilter = useCallback((key: string, value: string) => {
     const ref = dslEditorRef.current;
     if (!ref) return;
-    // Discovered facets pass their raw key (e.g. "server.region"); QueryParser
-    // auto-maps unknown keys to tags['key'] via Map column fallback.
-    // Strip any legacy prefixes that may still be present.
     const cleanKey = key.replace(/^(tags\.|discovered\.|attr\.)/, '');
     const current = ref.getFieldValues(cleanKey);
     if (current.includes(value)) {
@@ -1049,7 +986,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
     }
   }, []);
 
-  /* ═══ RENDER ═══ */
   return (
     <Box
       sx={{
@@ -1084,23 +1020,15 @@ const ArgusTraceExplorerPage: React.FC = () => {
         }
         titleUpdateTrigger={queryName}
         actionsUpdateTrigger={`${isDirty}-${currentQueryId}`}
-        subtitle={t(
-          'argus.traces.subtitle',
-          'Search and analyze spans across all traces'
-        )}
+        subtitle={t('argus.traces.subtitle', 'Search and analyze spans across all traces')}
         actions={
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <SafeTooltip
-              title={t('argus.traces.savedQueries', 'Saved Queries')}
-            >
+            <SafeTooltip title={t('argus.traces.savedQueries', 'Saved Queries')}>
               <IconButton
                 size="small"
                 onClick={() => setSavedPanelOpen(true)}
                 sx={{
-                  color:
-                    savedQueries.length > 0
-                      ? theme.palette.primary.main
-                      : 'text.secondary',
+                  color: savedQueries.length > 0 ? theme.palette.primary.main : 'text.secondary',
                 }}
               >
                 {savedQueries.length > 0 ? (
@@ -1134,9 +1062,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 textTransform: 'none',
                 fontSize: '0.75rem',
                 fontWeight: 600,
-                borderColor: isDark
-                  ? 'rgba(255,255,255,0.12)'
-                  : 'rgba(0,0,0,0.12)',
+                borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
                 borderRadius: '6px',
               }}
             >
@@ -1159,27 +1085,14 @@ const ArgusTraceExplorerPage: React.FC = () => {
         loading={loading}
         hideFilters={['browser', 'os']}
         extraControls={
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>
             <QueryAQLEditor
               ref={dslEditorRef}
               config={TRACES_CONFIG}
               initialQuery={search}
-              placeholder={t(
-                'argus.traces.searchPlaceholder',
-                'Search spans by description, op, or tag...'
-              )}
+              placeholder={t('argus.traces.searchPlaceholder', 'Search spans by description, op, or tag...')}
               onSearch={handleSearchSubmit}
-              onChange={(q) => {
-                setUrlState({ q });
-              }}
+              onChange={(q) => setUrlState({ q })}
               fetchFieldValues={fetchFieldValues}
               initialFacets={mappedFacets}
             />
@@ -1187,7 +1100,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         }
       />
 
-      {/* ── Body: Sidebar + Content ── */}
       <Box
         sx={{
           display: 'flex',
@@ -1199,7 +1111,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
           backgroundColor: 'background.paper',
         }}
       >
-        {/* Left: Facets */}
         <FacetSidebar
           facets={spanFacets}
           discoveredFacets={discoveredFacets}
@@ -1242,183 +1153,47 @@ const ArgusTraceExplorerPage: React.FC = () => {
           />
         )}
 
-        {/* Center: Main content */}
-        <Box
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
+        <TraceViews
+          volumeDatasets={volumeDatasets}
+          volumeLabels={volumeLabels}
+          loading={loading}
+          volume={volume}
+          handleZoom={handleZoom}
+          activeTab={activeTab}
+          handleTabChange={handleTabChange}
+          spans={spans}
+          orderCol={orderCol}
+          orderDir={orderDir}
+          handleColumnSort={handleColumnSort}
+          handleSelectSpan={handleSelectSpan}
+          selectedSpanIndex={selectedSpanIndex}
+          addSearchTag={addSearchTag}
+          spansHasMore={spansHasMore}
+          loadingMore={loadingMore}
+          handleLoadMoreSpans={handleLoadMoreSpans}
+          traceSamples={traceSamples}
+          tracesHasMore={tracesHasMore}
+          handleLoadMoreTraces={handleLoadMoreTraces}
+          aggGroupBys={aggGroupBys}
+          aggDataMap={aggDataMap}
+          aggLoading={aggLoading}
+          traceGroupByOptions={traceGroupByOptions}
+          spanFacets={spanFacets}
+          setUrlState={setUrlState}
+          fetchAggregates={fetchAggregates}
+          volumeChartType={urlState.volumeChartType as any}
+          onVolumeChartTypeChange={(type) => setUrlState({ volumeChartType: type })}
+          aggChartTypes={(urlState.aggChartTypes || 'bar').split(',') as any[]}
+          onAggChartTypeChange={(index, type) => {
+            const types = (urlState.aggChartTypes || 'bar').split(',');
+            while (types.length <= index) types.push('bar');
+            types[index] = type;
+            setUrlState({ aggChartTypes: types.join(',') });
           }}
-        >
-          {/* Volume Chart */}
-          <Box sx={{ px: 2, pt: 2 }}>
-            <ArgusVolumeChart
-              datasets={volumeDatasets}
-              labels={volumeLabels}
-              loading={loading}
-              title="count(spans)"
-              onZoom={(startIdx, endIdx) => {
-                const buckets = [
-                  ...new Set(volume.map((v) => v.bucket)),
-                ].sort();
-                const si = Math.min(startIdx, endIdx);
-                const ei = Math.max(startIdx, endIdx);
-                if (buckets[si] && buckets[ei]) {
-                  const startDate = new Date(buckets[si]);
-                  let endDate = new Date(buckets[ei]);
-                  if (buckets.length > 1) {
-                    const gap =
-                      new Date(buckets[1]).getTime() -
-                      new Date(buckets[0]).getTime();
-                    endDate = new Date(endDate.getTime() + gap);
-                  } else {
-                    endDate = new Date(endDate.getTime() + 3600000);
-                  }
-                  handleZoom(startDate.toISOString(), endDate.toISOString());
-                }
-              }}
-              storagePrefix="argus_traces_volume"
-              showLegend={volumeDatasets.length > 1}
-              mb={1}
-            />
-          </Box>
+        />
 
-          {/* Tabs */}
-          <Box sx={{ px: 2, mb: 1 }}>
-            <SegmentedTabs
-              items={[
-                { key: '0', label: t('argus.traces.spansTab', 'Spans') },
-                { key: '1', label: t('argus.traces.tracesTab', 'Traces') },
-                {
-                  key: '2',
-                  label: t('argus.traces.aggregatesTab', 'Aggregates'),
-                },
-              ]}
-              value={String(activeTab)}
-              onChange={handleTabChange}
-            />
-          </Box>
-
-          {/* Tab Content */}
-          <Box
-            sx={{
-              px: 2,
-              pb: 2,
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-            }}
-          >
-            {activeTab === 0 && (
-              <SpansTab
-                spans={spans}
-                loading={loading}
-                orderCol={orderCol}
-                orderDir={orderDir}
-                onColumnSort={handleColumnSort}
-                onSelectSpan={handleSelectSpan}
-                selectedSpanIndex={selectedSpanIndex}
-                onFilterTag={addSearchTag}
-                hasMore={spansHasMore}
-                loadingMore={loadingMore}
-                onLoadMore={handleLoadMoreSpans}
-              />
-            )}
-
-            {activeTab === 1 && (
-              <TracesTab
-                traceSamples={traceSamples}
-                loading={loading}
-                hasMore={tracesHasMore}
-                loadingMore={loadingMore}
-                onLoadMore={handleLoadMoreTraces}
-              />
-            )}
-
-            {activeTab === 2 && (
-              <Box
-                sx={{
-                  flex: 1,
-                  minHeight: 0,
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-              >
-                {aggGroupBys.map((gKey, gIdx) => (
-                  <AggregatePanel
-                    key={gKey}
-                    aggData={aggDataMap[gKey] || null}
-                    aggGroupBy={gKey}
-                    aggLoading={aggLoading}
-                    isDark={isDark}
-                    groupByOptions={traceGroupByOptions}
-                    storagePrefix={`argus_traces_agg_${gIdx}`}
-                    discoveredFacetKeys={spanFacets.map((f) => f.label)}
-                    onGroupByChange={(val) => {
-                      const newKeys = [...aggGroupBys];
-                      newKeys[gIdx] = val;
-                      const deduped = [...new Set(newKeys)];
-                      setUrlState({ groupBy: deduped.join(',') });
-                      fetchAggregates(deduped);
-                    }}
-                    onAddFilter={(key, val) => {
-                      addSearchTag(key, val);
-                    }}
-                    showRemove={aggGroupBys.length > 1}
-                    onRemovePanel={() => {
-                      const newKeys = aggGroupBys.filter((_, i) => i !== gIdx);
-                      setUrlState({ groupBy: newKeys.join(',') });
-                      fetchAggregates(newKeys);
-                    }}
-                  />
-                ))}
-                {aggGroupBys.length < 3 && (
-                  <Box
-                    onClick={() => {
-                      const defaults = [
-                        'op',
-                        'status',
-                        'domain',
-                        'action',
-                        'service',
-                      ];
-                      const next =
-                        defaults.find((d) => !aggGroupBys.includes(d)) || 'op';
-                      const newKeys = [...aggGroupBys, next];
-                      setUrlState({ groupBy: newKeys.join(',') });
-                      fetchAggregates(newKeys);
-                    }}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      py: 0.75,
-                      cursor: 'pointer',
-                      borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                      color: 'text.disabled',
-                      fontSize: '0.72rem',
-                      fontWeight: 600,
-                      transition: 'color 0.15s',
-                      '&:hover': { color: 'primary.main' },
-                    }}
-                  >
-                    + Add group
-                  </Box>
-                )}
-              </Box>
-            )}
-          </Box>
-        </Box>
-
-        {/* Right: Span Detail Drawer (resizable) */}
         {selectedSpan && activeTab === 0 && (
           <>
-            {/* Splitter handle */}
             <Box
               onMouseDown={handleDetailSplitterMouseDown}
               sx={{
@@ -1449,13 +1224,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 },
               }}
             />
-            <Box
-              sx={{
-                width: detailWidth,
-                flexShrink: 0,
-                overflow: 'auto',
-              }}
-            >
+            <Box sx={{ width: detailWidth, flexShrink: 0, overflow: 'auto' }}>
               <SpanDetailPanel
                 span={selectedSpan}
                 onClose={() => {
@@ -1471,7 +1240,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         )}
       </Box>
 
-      {/* Save / Save As Dialog */}
       <SaveQueryDialog
         open={saveDialogOpen}
         onClose={() => setSaveDialogOpen(false)}
@@ -1483,7 +1251,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         currentQueryId={currentQueryId}
       />
 
-      {/* Delete Confirm Dialog */}
       <DeleteQueryConfirmDialog
         open={!!deleteTarget}
         queryName={deleteTarget?.name || ''}
@@ -1491,7 +1258,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         onConfirm={confirmDelete}
       />
 
-      {/* Saved Queries Panel */}
       <SavedQueriesPanel
         open={savedPanelOpen}
         onClose={() => setSavedPanelOpen(false)}

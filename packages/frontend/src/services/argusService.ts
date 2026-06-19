@@ -158,6 +158,7 @@ export type SavedQueryType =
   | 'logs'
   | 'traces'
   | 'metrics'
+  | 'issues'
   | 'analytics-insights'
   | 'analytics-funnels'
   | 'analytics-retention'
@@ -1055,98 +1056,6 @@ class ArgusService {
     return response.data?.data || response.data;
   }
 
-  // --- Issue Trackers ---
-
-  async listIssueTrackers(
-    projectId: number | string
-  ): Promise<ArgusIssueTracker[]> {
-    const response = await argusApi.get(
-      `${ARGUS_BASE}/${projectId}/issue-trackers`
-    );
-    return response.data?.data || response.data || [];
-  }
-
-  async createIssueTracker(
-    projectId: number | string,
-    data: {
-      provider: string;
-      name: string;
-      api_url: string;
-      api_token: string;
-      config?: Record<string, any>;
-    }
-  ): Promise<{ id: number }> {
-    const response = await argusApi.post(
-      `${ARGUS_BASE}/${projectId}/issue-trackers`,
-      data
-    );
-    return response.data?.data || response.data;
-  }
-
-  async createExternalIssue(
-    projectId: number | string,
-    trackerId: number,
-    data: { title: string; description?: string; labels?: string[] }
-  ): Promise<{ url: string; key: string }> {
-    const response = await argusApi.post(
-      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}/create-issue`,
-      data
-    );
-    return response.data?.data || response.data;
-  }
-
-  async updateIssueTracker(
-    projectId: number | string,
-    trackerId: number,
-    data: Partial<{
-      name: string;
-      api_url: string;
-      api_token: string;
-      config: Record<string, any>;
-      enabled: boolean;
-    }>
-  ): Promise<void> {
-    await argusApi.put(
-      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}`,
-      data
-    );
-  }
-
-  async deleteIssueTracker(
-    projectId: number | string,
-    trackerId: number
-  ): Promise<void> {
-    await argusApi.delete(
-      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}`
-    );
-  }
-
-  async testIssueTracker(
-    projectId: number | string,
-    trackerId: number
-  ): Promise<{ ok: boolean; message: string }> {
-    const response = await argusApi.post(
-      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}/test`
-    );
-    return response.data?.data || response.data;
-  }
-
-  /** Pre-save connection test — uses raw form data, no DB record needed */
-  async testTrackerConnectionPreSave(
-    projectId: number | string,
-    data: {
-      provider: string;
-      api_url: string;
-      api_token: string;
-      config?: Record<string, any>;
-    }
-  ): Promise<{ ok: boolean; message: string }> {
-    const response = await argusApi.post(
-      `${ARGUS_BASE}/${projectId}/issue-trackers/test-connection`,
-      data
-    );
-    return response.data?.data || response.data;
-  }
 
   /** Pre-save connection test for notification channels */
   async testNotificationChannelPreSave(
@@ -2113,6 +2022,17 @@ class ArgusService {
     );
   }
 
+  async toggleSavedQueryFavorite(
+    projectId: number | string,
+    queryId: number,
+    isFavorite: boolean
+  ): Promise<void> {
+    await argusApi.patch(
+      `${ARGUS_BASE}/${projectId}/discover/saved/${queryId}/favorite`,
+      { is_favorite: isFavorite }
+    );
+  }
+
   async deleteSavedQuery(
     projectId: number | string,
     queryId: number
@@ -3002,6 +2922,103 @@ class ArgusService {
     await argusApi.delete(
       `${ARGUS_BASE}/projects/${projectId}/lexicon/properties/${encodeURIComponent(propertyName)}`
     );
+  }
+
+  // === Issue Trackers ===
+
+  async listIssueTrackers(
+    projectId: number | string
+  ): Promise<ArgusIssueTracker[]> {
+    const response = await argusApi.get(
+      `${ARGUS_BASE}/${projectId}/issue-trackers`
+    );
+    return response.data?.data || [];
+  }
+
+  async createIssueTracker(
+    projectId: number | string,
+    data: {
+      provider: ArgusIssueTracker['provider'];
+      name: string;
+      api_url: string;
+      api_token: string;
+      config?: Record<string, any>;
+    }
+  ): Promise<{ id: number }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/${projectId}/issue-trackers`,
+      data
+    );
+    return response.data?.data || response.data;
+  }
+
+  async updateIssueTracker(
+    projectId: number | string,
+    trackerId: number | string,
+    data: {
+      name?: string;
+      api_url?: string;
+      api_token?: string;
+      config?: Record<string, any>;
+      enabled?: boolean;
+    }
+  ): Promise<void> {
+    await argusApi.put(
+      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}`,
+      data
+    );
+  }
+
+  async deleteIssueTracker(
+    projectId: number | string,
+    trackerId: number | string
+  ): Promise<void> {
+    await argusApi.delete(
+      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}`
+    );
+  }
+
+  async testIssueTracker(
+    projectId: number | string,
+    trackerId: number | string
+  ): Promise<{ ok: boolean; message: string }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}/test`
+    );
+    return response.data?.data || response.data;
+  }
+
+  async testTrackerConnection(
+    projectId: number | string,
+    data: {
+      provider: string;
+      api_url: string;
+      api_token: string;
+      config?: Record<string, any>;
+    }
+  ): Promise<{ ok: boolean; message: string }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/${projectId}/issue-trackers/test-connection`,
+      data
+    );
+    return response.data?.data || response.data;
+  }
+
+  async createExternalIssue(
+    projectId: number | string,
+    trackerId: number | string,
+    payload: {
+      title: string;
+      description?: string;
+      priority?: string;
+      url?: string;
+    }
+  ): Promise<{ url: string; key: string }> {
+    const response = await argusApi.post(
+      `${ARGUS_BASE}/${projectId}/issue-trackers/${trackerId}/create-issue`,
+      payload
+    );
+    return response.data?.data || response.data;
   }
 }
 

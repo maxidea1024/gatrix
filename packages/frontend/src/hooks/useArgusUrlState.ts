@@ -69,7 +69,8 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
         let fallback = def.default;
         if (def.storageKey) {
           const stored = localStorage.getItem(def.storageKey);
-          if (stored) fallback = stored;
+          // Ignore 'custom' — it's meaningless without start/end
+          if (stored && stored !== 'custom') fallback = stored;
         }
         result[name] =
           def.type === 'array' ? fallback.split(',').filter(Boolean) : fallback;
@@ -131,7 +132,8 @@ export function useArgusUrlState<T extends Record<string, ParamDef>>(
             }
 
             // Persist to localStorage if configured
-            if (def.storageKey && serialized) {
+            // Never persist 'custom' — it requires start/end which aren't stored
+            if (def.storageKey && serialized && serialized !== 'custom') {
               localStorage.setItem(def.storageKey, serialized);
             }
           }

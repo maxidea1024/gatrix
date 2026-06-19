@@ -1,6 +1,11 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
+import { Box, Typography, Paper, Chip, useTheme, alpha, Skeleton } from '@mui/material';
+import {
+  StatsRowSkeleton,
+  ListSkeleton,
+  TableSkeleton,
+} from '@/components/argus/ArgusSkeletons';
 import {
   Speed as SpeedIcon,
   Schedule as ScheduleIcon,
@@ -184,7 +189,11 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
     <PageContentLoader
       loading={detailLoading}
       skeleton={
-        <>
+        <Box>
+          {/* Summary Cards Skeleton */}
+          <StatsRowSkeleton count={4} />
+
+          {/* Charts Row Skeleton */}
           <Box
             sx={{
               display: 'grid',
@@ -196,29 +205,98 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
             <Paper
               elevation={0}
               sx={{
-                p: 2,
-                border: '1px solid rgba(255,255,255,0.06)',
+                p: 2.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 borderRadius: 2,
               }}
             >
-              <ArgusChartSkeleton type="line" height={260} color="#ff9800" />
+              <Skeleton variant="text" width={100} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <ArgusChartSkeleton height={260} />
             </Paper>
             <Paper
               elevation={0}
               sx={{
-                p: 2,
-                border: '1px solid rgba(255,255,255,0.06)',
+                p: 2.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 borderRadius: 2,
               }}
             >
-              <ArgusChartSkeleton
-                type="bar"
-                height={220}
-                color={theme.palette.info.main}
-              />
+              <Skeleton variant="text" width={120} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <ArgusChartSkeleton height={220} />
             </Paper>
           </Box>
-        </>
+
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Insights Skeleton */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                borderRadius: 2,
+              }}
+            >
+              <Skeleton variant="text" width={150} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <Skeleton variant="rounded" height={60} sx={{ borderRadius: 1.5 }} />
+            </Paper>
+
+            {/* Related Issues Skeleton */}
+            <Paper
+              elevation={0}
+              sx={{
+                p: 2.5,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                borderRadius: 2,
+              }}
+            >
+              <Skeleton variant="text" width={120} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+              <ListSkeleton rows={3} />
+            </Paper>
+
+            {/* Slowest Spans & Recent Traces Skeleton */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                gap: 2,
+              }}
+            >
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2.5,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                  borderRadius: 2,
+                }}
+              >
+                <Skeleton variant="text" width={110} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                  {[1, 2, 3].map((i) => (
+                    <Box key={i}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                        <Skeleton variant="text" width="40%" height={14} sx={{ borderRadius: 0.5 }} />
+                        <Skeleton variant="text" width="15%" height={14} sx={{ borderRadius: 0.5 }} />
+                      </Box>
+                      <Skeleton variant="rectangular" height={8} sx={{ borderRadius: 1 }} />
+                    </Box>
+                  ))}
+                </Box>
+              </Paper>
+
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2.5,
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                  borderRadius: 2,
+                }}
+              >
+                <Skeleton variant="text" width={110} height={18} sx={{ mb: 2, borderRadius: 0.5 }} />
+                <TableSkeleton rows={4} cols={3} />
+              </Paper>
+            </Box>
+          </Box>
+        </Box>
       }
     >
       {/* Summary Cards */}
@@ -314,15 +392,11 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
             {t('argus.performance.latencyTrend')}
           </Typography>
           <Box sx={{ height: 260 }}>
-            {detailLoading ? (
-              <ArgusChartSkeleton type="line" height={260} color="#ff9800" />
-            ) : (
-              <Line
-                data={trendChartData}
-                options={chartOpts}
-                plugins={[getCrosshairPlugin(isDark)]}
-              />
-            )}
+            <Line
+              data={trendChartData}
+              options={chartOpts}
+              plugins={[getCrosshairPlugin(isDark)]}
+            />
           </Box>
         </DetailPaper>
         <DetailPaper elevation={0} isDark={isDark}>
@@ -330,15 +404,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
             {t('argus.performance.durationDistribution')}
           </Typography>
           <Box sx={{ height: 220 }}>
-            {detailLoading ? (
-              <ArgusChartSkeleton
-                type="bar"
-                height={220}
-                color={theme.palette.info.main}
-              />
-            ) : (
-              <Bar data={histogramData} options={barOpts} />
-            )}
+            <Bar data={histogramData} options={barOpts} />
           </Box>
         </DetailPaper>
       </Box>

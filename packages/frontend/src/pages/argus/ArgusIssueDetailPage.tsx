@@ -23,7 +23,7 @@ import {
   Code as StackTraceIcon,
   Article as LogIcon,
 } from '@mui/icons-material';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { ArgusErrorEvent } from '@/services/argusService';
@@ -55,7 +55,6 @@ const MAX_SPLIT_WIDTH = 800;
 const ArgusIssueDetailPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
   const { projectId, issueId } = useParams<{
@@ -259,10 +258,6 @@ const ArgusIssueDetailPage: React.FC = () => {
     (evt: ArgusErrorEvent | null) => setCurrentEvent(evt),
     []
   );
-  const handleBack = useMemo(
-    () => (location.state?.allowBack ? () => navigate(-1) : undefined),
-    [location.state?.allowBack, navigate]
-  );
 
   // ─── RENDER ───
   return (
@@ -288,7 +283,7 @@ const ArgusIssueDetailPage: React.FC = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100vh - 120px)',
+            height: 'calc(100vh - 96px)',
             mt: -0.5,
           }}
         >
@@ -302,7 +297,6 @@ const ArgusIssueDetailPage: React.FC = () => {
             onStatusChange={handleStatusChange}
             onPriorityChange={handlePriorityChange}
             onAssigneeClick={handleAssigneeOpen}
-            onBack={handleBack}
             isSubscribed={isSubscribed}
             isBookmarked={isBookmarked}
             onSubscribe={handleSubscribe}

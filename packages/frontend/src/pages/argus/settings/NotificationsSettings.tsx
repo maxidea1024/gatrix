@@ -11,7 +11,6 @@ import {
   SettingsCard,
   ProviderCard,
   ConnectedItem,
-  Spinner,
 } from './components/SettingsShared';
 import {
   ProviderWizardModal,
@@ -19,6 +18,7 @@ import {
   WizardFieldDef,
 } from '../components/ProviderWizardModal';
 import argusService from '@/services/argusService';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const NOTIFICATION_PROVIDERS = [
   {
@@ -191,12 +191,14 @@ interface NotificationsSettingsProps {
   projectId: string;
   isDark: boolean;
   t: any;
+  onChange?: () => void;
 }
 
 export const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
   projectId,
   isDark,
   t,
+  onChange,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -213,6 +215,7 @@ export const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
       if (typeof svc.listNotificationChannels === 'function') {
         const d = await svc.listNotificationChannels(projectId);
         setNotifChannels(d);
+        onChange?.();
       }
       setNotifLoaded(true);
     } catch {
@@ -225,37 +228,11 @@ export const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
   }, [projectId]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <SettingsCard
-        title={t('argus.settings.availableNotifications')}
-        desc={t('argus.settings.notificationsDesc')}
-        isDark={isDark}
-      >
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: 2,
-          }}
-        >
-          {NOTIFICATION_PROVIDERS.map((prov) => (
-            <ProviderCard
-              key={prov.id}
-              prov={prov}
-              isDark={isDark}
-              t={t}
-              count={notifChannels.filter((c) => c.provider === prov.id).length}
-              onAdd={() => {
-                setAddNotifDialog(prov.id);
-              }}
-            />
-          ))}
-        </Box>
-      </SettingsCard>
-      {notifLoaded && notifChannels.length > 0 && (
+    <PageContentLoader loading={!notifLoaded}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <SettingsCard
-          title={t('argus.settings.configuredChannels')}
-          desc={t('argus.settings.configuredChannelsDesc')}
+          title={t('argus.settings.availableNotifications')}
+          desc={t('argus.settings.notificationsDesc')}
           isDark={isDark}
         >
           <Box
@@ -265,200 +242,227 @@ export const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
               gap: 2,
             }}
           >
-            {notifChannels.map((ch: any) => {
-              const prov = NOTIFICATION_PROVIDERS.find(
-                (p) => p.id === ch.provider
-              );
-              return (
-                <ConnectedItem
-                  key={ch.id}
-                  isDark={isDark}
-                  color={prov?.color || '#666'}
-                  icon={
-                    prov?.icon || <NotificationsIcon sx={{ fontSize: 18 }} />
-                  }
-                  title={ch.name}
-                  chipLabel={prov?.name || ch.provider}
-                  subtitle={
-                    ch.webhook_url ||
-                    ch.config?.webhook_url ||
-                    ch.recipients ||
-                    ch.config?.recipients ||
-                    ''
-                  }
-                  active={ch.enabled}
-                  t={t}
-                  onEdit={() => setEditingNotifChannel(ch)}
-                  onToggle={async () => {
-                    try {
-                      await (argusService as any).updateNotificationChannel?.(
-                        projectId,
-                        ch.id,
-                        { enabled: !ch.enabled }
-                      );
-                      await loadNotificationChannels();
-                    } catch {
-                      /* */
-                    }
-                  }}
-                  onTest={async () => {
-                    try {
-                      const r = await (
-                        argusService as any
-                      ).testNotificationChannel?.(projectId, ch.id);
-                      enqueueSnackbar(
-                        r?.ok ? r.message : t('argus.settings.testFailed'),
-                        { variant: r?.ok ? 'success' : 'error' }
-                      );
-                    } catch {
-                      enqueueSnackbar(t('argus.settings.testFailed'), {
-                        variant: 'error',
-                      });
-                    }
-                  }}
-                  onDelete={async () => {
-                    try {
-                      await (argusService as any).deleteNotificationChannel?.(
-                        projectId,
-                        ch.id
-                      );
-                      setNotifChannels((p) =>
-                        p.filter((i: any) => i.id !== ch.id)
-                      );
-                      enqueueSnackbar(t('common.deleted'), {
-                        variant: 'success',
-                      });
-                    } catch {
-                      /* */
-                    }
-                  }}
-                />
-              );
-            })}
+            {NOTIFICATION_PROVIDERS.map((prov) => (
+              <ProviderCard
+                key={prov.id}
+                prov={prov}
+                isDark={isDark}
+                t={t}
+                count={notifChannels.filter((c) => c.provider === prov.id).length}
+                onAdd={() => {
+                  setAddNotifDialog(prov.id);
+                }}
+              />
+            ))}
           </Box>
         </SettingsCard>
-      )}
-      {!notifLoaded && <Spinner />}
+        {notifLoaded && notifChannels.length > 0 && (
+          <SettingsCard
+            title={t('argus.settings.configuredChannels')}
+            desc={t('argus.settings.configuredChannelsDesc')}
+            isDark={isDark}
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: 2,
+              }}
+            >
+              {notifChannels.map((ch: any) => {
+                const prov = NOTIFICATION_PROVIDERS.find(
+                  (p) => p.id === ch.provider
+                );
+                return (
+                  <ConnectedItem
+                    key={ch.id}
+                    isDark={isDark}
+                    color={prov?.color || '#666'}
+                    icon={
+                      prov?.icon || <NotificationsIcon sx={{ fontSize: 18 }} />
+                    }
+                    title={ch.name}
+                    chipLabel={prov?.name || ch.provider}
+                    subtitle={
+                      ch.webhook_url ||
+                      ch.config?.webhook_url ||
+                      ch.recipients ||
+                      ch.config?.recipients ||
+                      ''
+                    }
+                    active={ch.enabled}
+                    t={t}
+                    onEdit={() => setEditingNotifChannel(ch)}
+                    onToggle={async () => {
+                      try {
+                        await (argusService as any).updateNotificationChannel?.(
+                          projectId,
+                          ch.id,
+                          { enabled: !ch.enabled }
+                        );
+                        await loadNotificationChannels();
+                      } catch {
+                        /* */
+                      }
+                    }}
+                    onTest={async () => {
+                      try {
+                        const r = await (
+                          argusService as any
+                        ).testNotificationChannel?.(projectId, ch.id);
+                        enqueueSnackbar(
+                          r?.ok ? r.message : t('argus.settings.testFailed'),
+                          { variant: r?.ok ? 'success' : 'error' }
+                        );
+                      } catch {
+                        enqueueSnackbar(t('argus.settings.testFailed'), {
+                          variant: 'error',
+                        });
+                      }
+                    }}
+                    onDelete={async () => {
+                      try {
+                        await (argusService as any).deleteNotificationChannel?.(
+                          projectId,
+                          ch.id
+                        );
+                        setNotifChannels((p) =>
+                          p.filter((i: any) => i.id !== ch.id)
+                        );
+                        enqueueSnackbar(t('common.deleted'), {
+                          variant: 'success',
+                        });
+                      } catch {
+                        /* */
+                      }
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </SettingsCard>
+        )}
 
-      {/* ═══ ADD NOTIFICATION WIZARD ═══ */}
-      {(() => {
-        const np = NOTIFICATION_PROVIDERS.find((p) => p.id === addNotifDialog);
-        if (!np) return null;
-        const wizardCfg: WizardProviderConfig = {
-          id: np.id,
-          name: np.name,
-          color: np.color,
-          gradient: np.gradient,
-          accentColor: np.accentColor,
-          icon: np.icon,
-          descKey: np.descKey,
-          guideUrl: np.guideUrl,
-          guideButtonKey: np.guideButtonKey,
-          guideDescKey: np.guideDescKey,
-        };
-        const wizardFields: WizardFieldDef[] = np.fields.map((f) => ({
-          ...f,
-          required: f.key === 'name',
-        }));
-        return (
-          <ProviderWizardModal
-            open={!!addNotifDialog}
-            onClose={() => {
-              setAddNotifDialog(null);
-            }}
-            provider={wizardCfg}
-            fields={wizardFields}
-            wizardTitleKey="argus.settings.providerWizard.addNotification"
-            onTestConnection={async (data) => {
-              return await (
-                argusService as any
-              ).testNotificationChannelPreSave?.(projectId, {
-                provider: addNotifDialog!,
-                config: data,
-              });
-            }}
-            onSubmit={async (data) => {
-              await (argusService as any).createNotificationChannel?.(
-                projectId,
-                {
-                  provider: addNotifDialog,
-                  name: data.name?.trim() || '',
-                  webhook_url: data.webhook_url?.trim(),
-                  channel: data.channel?.trim(),
-                  recipients: data.recipients?.trim(),
-                  secret: data.secret?.trim(),
-                  api_token: data.api_token?.trim(),
-                  severity: data.severity?.trim(),
+        {/* ═══ ADD NOTIFICATION WIZARD ═══ */}
+        {(() => {
+          const np = NOTIFICATION_PROVIDERS.find((p) => p.id === addNotifDialog);
+          if (!np) return null;
+          const wizardCfg: WizardProviderConfig = {
+            id: np.id,
+            name: np.name,
+            color: np.color,
+            gradient: np.gradient,
+            accentColor: np.accentColor,
+            icon: np.icon,
+            descKey: np.descKey,
+            guideUrl: np.guideUrl,
+            guideButtonKey: np.guideButtonKey,
+            guideDescKey: np.guideDescKey,
+          };
+          const wizardFields: WizardFieldDef[] = np.fields.map((f) => ({
+            ...f,
+            required: f.key === 'name',
+          }));
+          return (
+            <ProviderWizardModal
+              open={!!addNotifDialog}
+              onClose={() => {
+                setAddNotifDialog(null);
+              }}
+              provider={wizardCfg}
+              fields={wizardFields}
+              wizardTitleKey="argus.settings.providerWizard.addNotification"
+              onTestConnection={async (data) => {
+                return await (
+                  argusService as any
+                ).testNotificationChannelPreSave?.(projectId, {
+                  provider: addNotifDialog!,
                   config: data,
-                }
-              );
-              await loadNotificationChannels();
-              setAddNotifDialog(null);
-            }}
-          />
-        );
-      })()}
+                });
+              }}
+              onSubmit={async (data) => {
+                await (argusService as any).createNotificationChannel?.(
+                  projectId,
+                  {
+                    provider: addNotifDialog,
+                    name: data.name?.trim() || '',
+                    webhook_url: data.webhook_url?.trim(),
+                    channel: data.channel?.trim(),
+                    recipients: data.recipients?.trim(),
+                    secret: data.secret?.trim(),
+                    api_token: data.api_token?.trim(),
+                    severity: data.severity?.trim(),
+                    config: data,
+                  }
+                );
+                await loadNotificationChannels();
+                setAddNotifDialog(null);
+              }}
+            />
+          );
+        })()}
 
-      {/* ═══ EDIT NOTIFICATION WIZARD ═══ */}
-      {(() => {
-        if (!editingNotifChannel) return null;
-        const np = NOTIFICATION_PROVIDERS.find(
-          (p) => p.id === editingNotifChannel.provider
-        );
-        if (!np) return null;
-        const wizardCfg: WizardProviderConfig = {
-          id: np.id,
-          name: np.name,
-          color: np.color,
-          gradient: np.gradient,
-          accentColor: np.accentColor,
-          icon: np.icon,
-          descKey: np.descKey,
-          guideUrl: np.guideUrl,
-          guideButtonKey: np.guideButtonKey,
-          guideDescKey: np.guideDescKey,
-        };
-        const wizardFields: WizardFieldDef[] = np.fields.map((f) => ({
-          ...f,
-          required: f.key === 'name',
-        }));
-        return (
-          <ProviderWizardModal
-            open={!!editingNotifChannel}
-            onClose={() => {
-              setEditingNotifChannel(null);
-            }}
-            provider={wizardCfg}
-            fields={wizardFields}
-            wizardTitleKey="argus.settings.providerWizard.editNotification"
-            initialData={{
-              name: editingNotifChannel.name || '',
-              ...(editingNotifChannel.config || {}),
-            }}
-            onTestConnection={async (data) => {
-              return await (
-                argusService as any
-              ).testNotificationChannelPreSave?.(projectId, {
-                provider: editingNotifChannel.provider,
-                config: data,
-              });
-            }}
-            onSubmit={async (data) => {
-              await (argusService as any).updateNotificationChannel?.(
-                projectId,
-                editingNotifChannel.id,
-                {
-                  name: data.name?.trim() || '',
+        {/* ═══ EDIT NOTIFICATION WIZARD ═══ */}
+        {(() => {
+          if (!editingNotifChannel) return null;
+          const np = NOTIFICATION_PROVIDERS.find(
+            (p) => p.id === editingNotifChannel.provider
+          );
+          if (!np) return null;
+          const wizardCfg: WizardProviderConfig = {
+            id: np.id,
+            name: np.name,
+            color: np.color,
+            gradient: np.gradient,
+            accentColor: np.accentColor,
+            icon: np.icon,
+            descKey: np.descKey,
+            guideUrl: np.guideUrl,
+            guideButtonKey: np.guideButtonKey,
+            guideDescKey: np.guideDescKey,
+          };
+          const wizardFields: WizardFieldDef[] = np.fields.map((f) => ({
+            ...f,
+            required: f.key === 'name',
+          }));
+          return (
+            <ProviderWizardModal
+              open={!!editingNotifChannel}
+              onClose={() => {
+                setEditingNotifChannel(null);
+              }}
+              provider={wizardCfg}
+              fields={wizardFields}
+              wizardTitleKey="argus.settings.providerWizard.editNotification"
+              initialData={{
+                name: editingNotifChannel.name || '',
+                ...(editingNotifChannel.config || {}),
+              }}
+              onTestConnection={async (data) => {
+                return await (
+                  argusService as any
+                ).testNotificationChannelPreSave?.(projectId, {
+                  provider: editingNotifChannel.provider,
                   config: data,
-                }
-              );
-              await loadNotificationChannels();
-              setEditingNotifChannel(null);
-            }}
-          />
-        );
-      })()}
-    </Box>
+                });
+              }}
+              onSubmit={async (data) => {
+                await (argusService as any).updateNotificationChannel?.(
+                  projectId,
+                  editingNotifChannel.id,
+                  {
+                    name: data.name?.trim() || '',
+                    config: data,
+                  }
+                );
+                await loadNotificationChannels();
+                setEditingNotifChannel(null);
+              }}
+            />
+          );
+        })()}
+      </Box>
+    </PageContentLoader>
   );
 };
 

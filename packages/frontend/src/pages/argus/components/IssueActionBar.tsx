@@ -8,6 +8,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  CircularProgress,
 } from '@mui/material';
 import {
   ErrorOutline as ErrorIcon,
@@ -17,9 +18,15 @@ import {
   Archive as ArchiveIcon,
   NewReleases as NextReleaseIcon,
   Verified as CurrentReleaseIcon,
+  BugReport as TrackerIcon,
+  OpenInNew as OpenInNewIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { ArgusIssueDetail, ArgusErrorEvent } from '@/services/argusService';
+import { useSnackbar } from 'notistack';
+import { useNavigate } from 'react-router-dom';
+import { ArgusIssueDetail, ArgusErrorEvent, ArgusIssueTracker } from '@/services/argusService';
+import { useIssueTrackers } from '@/hooks/useIssueTrackers';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { LEVEL_COLORS, PRIORITY_CONFIG } from '@/utils/argusHelpers';
 import { CopyButton } from '@/components/common/CopyButton';
@@ -53,7 +60,6 @@ export interface IssueActionBarProps {
   onPriorityChange: (priority: string) => Promise<void>;
   onAssigneeClick: (e: React.MouseEvent<HTMLElement>) => void;
 
-  onBack?: () => void;
   /** Subscription / Bookmark */
   isSubscribed: boolean;
   isBookmarked: boolean;
@@ -76,7 +82,6 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
   onPriorityChange,
   onAssigneeClick,
 
-  onBack,
   isSubscribed,
   isBookmarked,
   onSubscribe,
@@ -88,6 +93,8 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(
     null
@@ -95,6 +102,41 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
   const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
     null
   );
+
+  // --- Tracker Send ---
+  const {
+    trackers,
+    isLoading: trackersLoading,
+    sendingTrackerId,
+    sendToTracker,
+  } = useIssueTrackers(projectId);
+
+  const [trackerMenuAnchor, setTrackerMenuAnchor] =
+    useState<null | HTMLElement>(null);
+
+  const handleTrackerMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
+    setTrackerMenuAnchor(e.currentTarget);
+  };
+
+  const handleSendToTracker = async (tracker: ArgusIssueTracker) => {
+    setTrackerMenuAnchor(null);
+    try {
+      const result = await sendToTracker(tracker.id, {
+        title: issue.title,
+        description: issue.culprit || '',
+        url: window.location.href,
+      });
+      if (result) {
+        enqueueSnackbar(
+          `${t('argus.detail.issueCreated', 'Issue Created')}: ${result.key || ''}`,
+          { variant: 'success' }
+        );
+        if (result.url) window.open(result.url, '_blank', 'noopener,noreferrer');
+      }
+    } catch {
+      enqueueSnackbar(t('argus.detail.issueCreateFailed', 'Failed to create issue'), { variant: 'error' });
+    }
+  };
 
   const levelColor = LEVEL_COLORS[issue.level || 'error'] || LEVEL_COLORS.error;
 
@@ -133,8 +175,6 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           </Box>
         }
         subtitle={issue.culprit}
-        enableAutoBack
-        onBack={onBack}
         actions={
           <Box
             sx={{
@@ -413,6 +453,85 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               {cfg.label}
             </MenuItem>
           ))}
+        </Menu>
+
+        {/* 트래커로 보내기 */}
+        <ActionChip
+          icon={
+            sendingTrackerId !== null ? (
+              <CircularProgress size={12} color="inherit" />
+            ) : (
+              <TrackerIcon sx={{ fontSize: '14px !important' }} />
+            )
+          }
+          label={t('argus.detail.sendToTracker', 'Send to Tracker')}
+          onClick={handleTrackerMenuOpen}
+          disabled={sendingTrackerId !== null}
+        />
+        <Menu
+          anchorEl={trackerMenuAnchor}
+          open={Boolean(trackerMenuAnchor)}
+          onClose={() => setTrackerMenuAnchor(null)}
+          slotProps={{
+            paper: {
+              sx: {
+                borderRadius: 2,
+                minWidth: 200,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.14)',
+              },
+            },
+          }}
+        >
+          {trackersLoading ? (
+            <MenuItem disabled sx={{ justifyContent: 'center' }}>
+              <CircularProgress size={16} />
+            </MenuItem>
+          ) : trackers.length === 0 ? (
+            <Box>
+              <MenuItem disabled sx={{ fontSize: '0.8rem' }}>
+                <ListItemText
+                  primary={t('argus.detail.noTrackers', 'No issue trackers connected')}
+                  primaryTypographyProps={{ fontSize: '0.78rem', color: 'text.disabled' }}
+                />
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setTrackerMenuAnchor(null);
+                  navigate('/argus/settings#issue-trackers');
+                }}
+                sx={{ fontSize: '0.8rem' }}
+              >
+                <ListItemIcon>
+                  <SettingsIcon fontSize="small" sx={{ fontSize: 14 }} />
+                </ListItemIcon>
+                <ListItemText
+                  primary={t('argus.detail.noTrackersAction', 'Connect a Tracker')}
+                  primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 500 }}
+                />
+              </MenuItem>
+            </Box>
+          ) : (
+            trackers
+              .filter((tr) => tr.enabled)
+              .map((tracker) => (
+                <MenuItem
+                  key={tracker.id}
+                  onClick={() => handleSendToTracker(tracker)}
+                  sx={{ fontSize: '0.8rem', py: 1 }}
+                >
+                  <ListItemIcon>
+                    <TrackerIcon fontSize="small" sx={{ fontSize: 14 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={tracker.name}
+                    secondary={tracker.provider}
+                    primaryTypographyProps={{ fontSize: '0.78rem', fontWeight: 500 }}
+                    secondaryTypographyProps={{ fontSize: '0.65rem' }}
+                  />
+                  <OpenInNewIcon sx={{ fontSize: 12, opacity: 0.4, ml: 1 }} />
+                </MenuItem>
+              ))
+          )}
         </Menu>
 
         {/* Right side items */}

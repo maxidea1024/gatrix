@@ -23,9 +23,10 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
-import { SettingsCard, Spinner } from './components/SettingsShared';
+import { SettingsCard } from './components/SettingsShared';
 import ChipSelect from '@/components/common/ChipSelect';
 import argusService, { ArgusOwnershipRule } from '@/services/argusService';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface OwnershipSettingsProps {
   projectId: string;
@@ -96,7 +97,8 @@ export const OwnershipSettings: React.FC<OwnershipSettingsProps> = ({
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <PageContentLoader loading={!ruleLoaded}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Paper
         elevation={0}
         sx={{
@@ -486,9 +488,7 @@ export const OwnershipSettings: React.FC<OwnershipSettingsProps> = ({
         </Paper>
 
         {/* Rules List */}
-        {!ruleLoaded ? (
-          <Spinner />
-        ) : rules.length === 0 ? (
+        {rules.length === 0 ? (
           <Box sx={{ py: 6, textAlign: 'center' }}>
             <Box
               sx={{
@@ -778,7 +778,8 @@ export const OwnershipSettings: React.FC<OwnershipSettingsProps> = ({
         )}
       </SettingsCard>
     </Box>
-  );
+  </PageContentLoader>
+);
 };
 
 export default OwnershipSettings;

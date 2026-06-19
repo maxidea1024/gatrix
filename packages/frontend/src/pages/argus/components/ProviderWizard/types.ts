@@ -8,8 +8,13 @@ export interface WizardFieldDef {
   type?: string; // 'text' | 'password' | 'select'
   options?: { value: string; label: string }[];
   hint?: string;
+  /** i18n 키. t(helpTextKey, fallback)으로 도움말 표시 */
+  helpTextKey?: string;
+  /** helpTextKey와 함께 표시할 외부 문서 링크 */
+  helpUrl?: string;
   required?: boolean;
 }
+
 
 export interface WizardProviderConfig {
   id: string;

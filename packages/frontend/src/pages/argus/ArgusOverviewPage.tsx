@@ -4,11 +4,11 @@ import {
   Typography,
   Paper,
   Chip,
-  IconButton,
   useTheme,
   alpha,
   Skeleton,
   Tooltip,
+  Button,
 } from '@mui/material';
 import {
   BugReport as BugReportIcon,
@@ -22,14 +22,16 @@ import {
   DevicesOther as DevicesIcon,
   Cloud as EnvIcon,
   NewReleases as ReleaseIcon,
+  HelpOutline as HelpIcon,
 } from '@mui/icons-material';
 import ArgusIcon from '@/components/icons/ArgusIcon';
+import ArgusOnboardingBanner from './components/ArgusOnboardingBanner';
 import {
   getCrosshairPlugin,
   getDragSelectPlugin,
 } from '../../utils/chartPlugins';
 import { formatCompactNumber } from '../../utils/numberFormat';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Chart as ChartJS,
@@ -49,7 +51,6 @@ import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import ArgusFilterBar, {
   ArgusFilterState,
   defaultArgusFilterState,
-  argusFilterStateToApiParams,
 } from '@/components/argus/ArgusFilterBar';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
@@ -57,6 +58,7 @@ import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   ChangeIndicator,
   DistributionCard,
@@ -90,7 +92,6 @@ const DAY_KEYS = [
 const ArgusOverviewPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
@@ -120,6 +121,39 @@ const ArgusOverviewPage: React.FC = () => {
   }, [urlState.period]);
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
+
+  // --- Onboarding state ---
+  const DISMISS_KEY = `argus-onboarding-dismissed-${projectId}`;
+  const [bannerDismissed, setBannerDismissed] = useState(() =>
+    localStorage.getItem(DISMISS_KEY) === '1'
+  );
+  const [trackerCount, setTrackerCount] = useState(0);
+  const [notifCount, setNotifCount] = useState(0);
+  const [hasSdk, setHasSdk] = useState(false);
+  const [onboardingLoaded, setOnboardingLoaded] = useState(false);
+
+  useEffect(() => {
+    Promise.all([
+      argusService.listIssueTrackers(projectId).catch(() => []),
+      argusService.listNotificationChannels(projectId).catch(() => []),
+      argusService.getProject(projectId).catch(() => null),
+    ]).then(([trackers, channels, proj]) => {
+      setTrackerCount((trackers as any[]).length);
+      setNotifCount((channels as any[]).length);
+      setHasSdk(((proj as any)?.active_dsn_count ?? 0) > 0);
+      setOnboardingLoaded(true);
+    });
+  }, [projectId]);
+
+  const handleDismissBanner = () => {
+    localStorage.setItem(DISMISS_KEY, '1');
+    setBannerDismissed(true);
+  };
+
+  const handleRestoreBanner = () => {
+    localStorage.setItem(DISMISS_KEY, '0');
+    setBannerDismissed(false);
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -385,8 +419,44 @@ const ArgusOverviewPage: React.FC = () => {
         onChange={handleFilterChange}
         onRefresh={fetchData}
         loading={loading}
-        extraControls={<Box sx={{ flex: 1 }} />}
+        extraControls={
+          <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+            {bannerDismissed && onboardingLoaded && trackerCount === 0 && (
+              <Button
+                size="small"
+                variant="text"
+                startIcon={<HelpIcon sx={{ fontSize: 16 }} />}
+                onClick={handleRestoreBanner}
+                sx={{
+                  color: 'primary.main',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  py: 0.5,
+                  px: 1.5,
+                  borderRadius: 1.5,
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.08),
+                  },
+                }}
+              >
+                {t('argus.onboarding.showGuide', 'Show Onboarding Guide')}
+              </Button>
+            )}
+          </Box>
+        }
       />
+
+      <PageContentLoader loading={loading}>
+      {/* Onboarding Banner — 트래커 미연동 시 표시 */}
+      {!bannerDismissed && onboardingLoaded && trackerCount === 0 && (
+        <ArgusOnboardingBanner
+          projectId={String(projectId)}
+          hasSdk={hasSdk}
+          trackerCount={trackerCount}
+          notifCount={notifCount}
+          onDismiss={handleDismissBanner}
+        />
+      )}
 
       {/* Stat Cards — with change indicators */}
       <Box
@@ -1177,6 +1247,7 @@ const ArgusOverviewPage: React.FC = () => {
           )}
         </Paper>
       </Box>
+      </PageContentLoader>
     </Box>
   );
 };

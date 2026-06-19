@@ -134,6 +134,8 @@ export const FieldsStep: React.FC<FieldsStepProps> = ({
               type={f.type}
               placeholder={f.placeholder}
               hint={f.hint}
+              helpTextKey={f.helpTextKey}
+              helpUrl={f.helpUrl}
               required={
                 f.required !== false && (f.key === 'name' || !!f.required)
               }

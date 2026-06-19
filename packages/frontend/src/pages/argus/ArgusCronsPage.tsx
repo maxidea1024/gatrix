@@ -19,7 +19,6 @@ import {
   useTheme,
   TextField,
   InputAdornment,
-  Skeleton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -52,6 +51,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageHeader from '@/components/common/PageHeader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService from '@/services/argusService';
 import {
   CronsDetailDrawer,
@@ -466,50 +466,31 @@ const ArgusCronsPage: React.FC = () => {
       </Box>
 
       {/* Monitor Table */}
-      {loading ? (
-        <Paper
-          elevation={0}
-          sx={{
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-            borderRadius: 2,
-            overflow: 'hidden',
-          }}
-        >
-          <Box sx={{ p: 2 }}>
-            {[...Array(4)].map((_, i) => (
-              <Skeleton
-                key={i}
-                variant="rectangular"
-                height={48}
-                sx={{ mb: 1, borderRadius: 1 }}
-              />
-            ))}
-          </Box>
-        </Paper>
-      ) : filtered.length === 0 ? (
-        <EmptyPlaceholder
-          icon={<ScheduleIcon />}
-          message={t('argus.crons.noMonitors', 'No cron monitors found')}
-          description={t(
-            'argus.crons.emptyDescription',
-            'Create a new monitor to track your background jobs and scheduled tasks.'
-          )}
-          onAddClick={() => {
-            setFormErrors({ name: false, schedule_value: false });
-            setCreateDialogOpen(true);
-          }}
-          addButtonLabel={t('argus.crons.createMonitor', 'Create Monitor')}
-        />
-      ) : (
-        <Paper
-          elevation={0}
-          sx={{
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-            borderRadius: 2,
-            overflow: 'hidden',
-          }}
-        >
-          <Table size="small">
+      <PageContentLoader loading={loading}>
+        {filtered.length === 0 ? (
+          <EmptyPlaceholder
+            icon={<ScheduleIcon />}
+            message={t('argus.crons.noMonitors', 'No cron monitors found')}
+            description={t(
+              'argus.crons.emptyDescription',
+              'Create a new monitor to track your background jobs and scheduled tasks.'
+            )}
+            onAddClick={() => {
+              setFormErrors({ name: false, schedule_value: false });
+              setCreateDialogOpen(true);
+            }}
+            addButtonLabel={t('argus.crons.createMonitor', 'Create Monitor')}
+          />
+        ) : (
+          <Paper
+            elevation={0}
+            sx={{
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+              borderRadius: 2,
+              overflow: 'hidden',
+            }}
+          >
+            <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell
@@ -657,9 +638,10 @@ const ArgusCronsPage: React.FC = () => {
                 );
               })}
             </TableBody>
-          </Table>
-        </Paper>
-      )}
+            </Table>
+          </Paper>
+        )}
+      </PageContentLoader>
 
       {/* Create Monitor Dialog */}
       <Dialog

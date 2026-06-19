@@ -19,10 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import {
-  StatsRowSkeleton,
-  TableSkeleton,
-} from '@/components/argus/ArgusSkeletons';
+
 import { ArgusTransaction } from '@/services/argusService';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
@@ -65,12 +62,6 @@ const PerformanceTransactionTable: React.FC<
   return (
     <PageContentLoader
       loading={loading}
-      skeleton={
-        <>
-          <StatsRowSkeleton count={5} />
-          <TableSkeleton rows={10} cols={6} />
-        </>
-      }
     >
       {/* Performance Summary Stats */}
       {transactions.length > 0 && (

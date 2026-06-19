@@ -17,7 +17,6 @@ import {
   useTheme,
   TextField,
   InputAdornment,
-  Skeleton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -46,6 +45,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import PageHeader from '@/components/common/PageHeader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService from '@/services/argusService';
 
 interface UptimeMonitor {
@@ -262,24 +262,14 @@ const ArgusUptimePage: React.FC = () => {
       </Box>
 
       {/* Monitor Cards */}
-      {loading ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          {[...Array(3)].map((_, i) => (
-            <Skeleton
-              key={i}
-              variant="rectangular"
-              height={100}
-              sx={{ borderRadius: 2 }}
-            />
-          ))}
-        </Box>
-      ) : filtered.length === 0 ? (
-        <EmptyPlaceholder
-          message={t('argus.uptime.noMonitors', 'No uptime monitors found')}
-        />
-      ) : (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          {filtered.map((monitor) => {
+      <PageContentLoader loading={loading}>
+        {filtered.length === 0 ? (
+          <EmptyPlaceholder
+            message={t('argus.uptime.noMonitors', 'No uptime monitors found')}
+          />
+        ) : (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {filtered.map((monitor) => {
             const statusCfg = STATUS_CONFIG[monitor.status] || STATUS_CONFIG.up;
             const uptimePercent = parseFloat(monitor.uptime_percent) || 100;
             return (
@@ -400,7 +390,8 @@ const ArgusUptimePage: React.FC = () => {
             );
           })}
         </Box>
-      )}
+        )}
+      </PageContentLoader>
 
       {/* Create Monitor Dialog */}
       <Dialog

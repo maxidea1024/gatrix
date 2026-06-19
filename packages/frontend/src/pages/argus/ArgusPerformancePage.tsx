@@ -279,7 +279,6 @@ const ArgusPerformancePage: React.FC = () => {
         subtitle={
           viewMode === 'list' ? t('argus.performance.subtitle') : undefined
         }
-        onBack={viewMode !== 'list' ? handleBack : undefined}
       />
 
       {/* Filter Bar + Sort */}

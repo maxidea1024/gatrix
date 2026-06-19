@@ -432,8 +432,9 @@ export const VolumeChart: React.FC<{
   data: { bucket: string; level: string; count: number }[];
   isDark: boolean;
   period: string;
+  loading?: boolean;
   onZoom?: (start: string, end: string) => void;
-}> = ({ data, onZoom }) => {
+}> = ({ data, loading = false, onZoom }) => {
   const { t, i18n } = useTranslation();
 
   const { sortedBuckets, chartLabels, chartDatasets } = useMemo(() => {
@@ -546,6 +547,7 @@ export const VolumeChart: React.FC<{
     <ArgusVolumeChart
       datasets={chartDatasets}
       labels={chartLabels}
+      loading={loading}
       emptyMessage={t('argus.discover.noEventData')}
       title={t('argus.discover.volumeTitle', 'count(events)')}
       onZoom={onZoom ? handleZoom : undefined}

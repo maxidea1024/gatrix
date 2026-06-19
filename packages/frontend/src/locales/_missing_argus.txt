@@ -1,4 +1,4 @@
-﻿argus.dashboards.create=Create Dashboard
+argus.dashboards.create=Create Dashboard
 argus.dashboards.custom=Custom Dashboards
 argus.dashboards.empty=No custom dashboards yet. Create one or use a template above.
 argus.discover.exportCsv=Export CSV
@@ -71,3 +71,5 @@ argus.traces.saveQuery=Save Trace Query
 argus.traces.statusValues=Status
 argus.traces.subtitle=Search and analyze spans across all traces
 argus.traces.totalDuration=TOTAL DURATION
+argus.traces.addGroup=Add group
+argus.traces.maxGroups=Maximum groups reached (5/5)

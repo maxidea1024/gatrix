@@ -894,42 +894,11 @@ const ArgusFeedbackPage: React.FC = () => {
             paths={[{ label: t('argus.feedback.title') }]}
           />
         }
+        subtitle={t('argus.feedback.subtitle', '사용자 피드백을 수집, 분류 및 관리합니다.')}
         actions={
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {!loading && total > 0 && (
-              <TotalCountChip label={formatCompactNumber(total)} size="small" />
-            )}
-            <Button
-              size="small"
-              startIcon={
-                statsCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />
-              }
-              onClick={() => setStatsCollapsed(!statsCollapsed)}
-              sx={{
-                textTransform: 'none',
-                fontSize: '0.72rem',
-                color: 'text.secondary',
-              }}
-            >
-              {statsCollapsed
-                ? t('argus.feedback.showStats')
-                : t('argus.feedback.hideStats')}
-            </Button>
-            <Tooltip title={t('argus.feedback.spamFilter')}>
-              <Button
-                size="small"
-                startIcon={<FilterListIcon />}
-                onClick={() => setSpamFilterOpen(true)}
-                sx={{
-                  textTransform: 'none',
-                  fontSize: '0.72rem',
-                  color: 'text.secondary',
-                }}
-              >
-                {t('argus.feedback.spamFilter')}
-              </Button>
-            </Tooltip>
-          </Box>
+          !loading && total > 0 ? (
+            <TotalCountChip label={formatCompactNumber(total)} size="small" />
+          ) : undefined
         }
       />
 
@@ -975,6 +944,38 @@ const ArgusFeedbackPage: React.FC = () => {
                 onClose={handleSortClose}
                 onSelect={handleSortSelect}
               />
+              <Button
+                size="small"
+                startIcon={
+                  statsCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />
+                }
+                onClick={() => setStatsCollapsed(!statsCollapsed)}
+                sx={{
+                  textTransform: 'none',
+                  fontSize: '0.72rem',
+                  color: 'text.secondary',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {statsCollapsed
+                  ? t('argus.feedback.showStats')
+                  : t('argus.feedback.hideStats')}
+              </Button>
+              <Tooltip title={t('argus.feedback.spamFilter')}>
+                <Button
+                  size="small"
+                  startIcon={<FilterListIcon />}
+                  onClick={() => setSpamFilterOpen(true)}
+                  sx={{
+                    textTransform: 'none',
+                    fontSize: '0.72rem',
+                    color: 'text.secondary',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t('argus.feedback.spamFilter')}
+                </Button>
+              </Tooltip>
             </>
           }
         />

@@ -452,6 +452,7 @@ const ArgusDashboardsPage: React.FC = () => {
               paths={[{ label: t('argus.dashboards.title', 'Dashboards') }]}
             />
           }
+          subtitle={t('argus.dashboards.subtitle', '커스텀 대시보드를 생성하고 관리합니다.')}
           actions={
             <Button
               variant="contained"
@@ -1008,10 +1009,6 @@ const ArgusDashboardsPage: React.FC = () => {
           />
         }
         subtitle={activeDashboard.description}
-        onBack={() => {
-          setActiveDashboard(null);
-          navigate('/argus/dashboards');
-        }}
         actions={
           <Box sx={{ display: 'flex', gap: 1 }}>
             {isEditing ? (

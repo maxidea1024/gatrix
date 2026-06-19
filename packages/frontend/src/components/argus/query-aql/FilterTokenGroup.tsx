@@ -273,15 +273,7 @@ export const FilterTokenGroup = forwardRef<
           : isDark
             ? 'rgba(255, 255, 255, 0.04)'
             : 'rgba(0, 0, 0, 0.02)',
-        border: `1px solid ${
-          isAggregateChip
-            ? isDark
-              ? 'rgba(0, 188, 212, 0.25)'
-              : 'rgba(0, 151, 167, 0.20)'
-            : isDark
-              ? 'rgba(255, 255, 255, 0.08)'
-              : 'rgba(0, 0, 0, 0.08)'
-        }`,
+        border: 'none',
         borderRadius: '6px',
         pl: 0.5,
         pr: 0.25,

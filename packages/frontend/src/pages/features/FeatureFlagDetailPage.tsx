@@ -2217,7 +2217,6 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Box>
         }
         subtitle={flag.description || undefined}
-        onBack={() => navigate('/feature-flags')}
         actions={
           <SegmentedTabs
             value={String(tabValue)}

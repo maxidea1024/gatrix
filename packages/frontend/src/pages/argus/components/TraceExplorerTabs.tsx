@@ -24,8 +24,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import SafeTooltip from '@/components/common/SafeTooltip';
-import PageContentLoader from '@/components/common/PageContentLoader';
-import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
+
 import { CopyButton } from '@/components/common/CopyButton';
 import { formatWith } from '@/utils/dateFormat';
 import { getOpColor, formatDuration } from './traceExplorerHelpers';
@@ -200,9 +199,7 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
 
     return (
       <TablePaper elevation={0} isDark={isDark}>
-        <PageContentLoader
-          loading={loading}
-          skeleton={<TableSkeleton />}
+        <Box
           sx={{
             flex: 1,
             display: 'flex',
@@ -504,7 +501,7 @@ export const SpansTab: React.FC<SpansTabProps> = React.memo(
               </Typography>
             </Box>
           ) : null}
-        </PageContentLoader>
+        </Box>
       </TablePaper>
     );
   }
@@ -536,9 +533,7 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
 
     return (
       <TablePaper elevation={0} isDark={isDark}>
-        <PageContentLoader
-          loading={loading}
-          skeleton={<TableSkeleton />}
+        <Box
           sx={{
             flex: 1,
             display: 'flex',
@@ -734,7 +729,7 @@ export const TracesTab: React.FC<TracesTabProps> = React.memo(
               </Typography>
             </Box>
           ) : null}
-        </PageContentLoader>
+        </Box>
       </TablePaper>
     );
   }

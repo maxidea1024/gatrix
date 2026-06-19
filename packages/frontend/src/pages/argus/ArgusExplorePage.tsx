@@ -29,11 +29,10 @@ import {
   Add as AddIcon,
   Bookmark as BookmarkIcon,
   BookmarkBorder as BookmarkBorderIcon,
-  FilterList as FilterIcon,
   ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import PageHeader from '@/components/common/PageHeader';
@@ -49,7 +48,6 @@ import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialo
 import {
   DATASET_CONFIG,
   QueryCard,
-  CardSkeleton,
   type SortOption,
 } from './components/exploreHelpers';
 
@@ -59,7 +57,6 @@ const ArgusExplorePage: React.FC = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
@@ -167,9 +164,7 @@ const ArgusExplorePage: React.FC = () => {
       prev.map((q) => (q.id === id ? { ...q, is_favorite: favorite } : q))
     );
     try {
-      await argusService.updateSavedQuery(projectId, id, {
-        is_favorite: favorite,
-      });
+      await argusService.toggleSavedQueryFavorite(projectId, id, favorite);
     } catch (err) {
       console.error('Failed to toggle favorite', err);
       // Revert on failure
@@ -198,19 +193,54 @@ const ArgusExplorePage: React.FC = () => {
   const handleQueryClick = (query: ArgusSavedQuery) => {
     const config = DATASET_CONFIG[query.query_type];
     if (!config) return;
+    const cfg = typeof query.query_config === 'string'
+      ? JSON.parse(query.query_config)
+      : query.query_config || {};
     const params = new URLSearchParams();
     if (query.id) params.set('queryId', String(query.id));
-    if (query.query_config?.conditions)
-      params.set('q', query.query_config.conditions);
-    if (query.query_config?.period)
-      params.set('period', query.query_config.period);
+
+    if (query.query_type === 'issues') {
+      // Issues page uses its own param names
+      if (cfg.search) params.set('search', cfg.search);
+      if (cfg.status) params.set('status', cfg.status);
+      if (cfg.level) params.set('level', cfg.level);
+      if (cfg.sort) params.set('sort', cfg.sort);
+      if (cfg.substatus) params.set('substatus', cfg.substatus);
+      if (cfg.assignedTo) params.set('assigned_to', cfg.assignedTo);
+    } else {
+      if (cfg.search) params.set('q', cfg.search);
+      else if (cfg.conditions) params.set('q', cfg.conditions);
+      if (cfg.period) params.set('period', cfg.period);
+      if (cfg.groupBy) params.set('groupBy', cfg.groupBy);
+      if (cfg.tab !== undefined) params.set('tab', String(cfg.tab));
+      if (cfg.orderBy) params.set('orderBy', cfg.orderBy);
+      if (cfg.volumeChartType) params.set('vct', cfg.volumeChartType);
+      if (cfg.aggChartTypes) params.set('act', cfg.aggChartTypes);
+    }
     const qs = params.toString();
     navigate(`${config.path}${qs ? `?${qs}` : ''}`, {
       state: { queryName: query.name },
     });
   };
 
-  const handleDuplicateClick = (query: ArgusSavedQuery) => {
+  const handleDuplicateInPlace = async (query: ArgusSavedQuery) => {
+    try {
+      await argusService.createSavedQuery(projectId, {
+        name: `${query.name}-Copy`,
+        description: query.description || undefined,
+        query_type: query.query_type,
+        query_config: query.query_config,
+        display_type: query.display_type,
+      });
+      // Refresh list
+      const updated = await argusService.listSavedQueries(projectId);
+      setQueries(updated);
+    } catch (err) {
+      console.error('Failed to duplicate query', err);
+    }
+  };
+
+  const handleDuplicateAndEdit = (query: ArgusSavedQuery) => {
     setDuplicateTarget(query);
     setDuplicateName(`${query.name}-Copy`);
   };
@@ -267,40 +297,49 @@ const ArgusExplorePage: React.FC = () => {
         subtitle={t('argus.explore.subtitle')}
       />
 
-      {/* Quick Actions — "New" cards */}
-      <Box sx={{ display: 'flex', gap: 1.5, mb: 3, flexWrap: 'wrap' }}>
-        {(
-          Object.entries(DATASET_CONFIG) as [
-            SavedQueryType,
-            (typeof DATASET_CONFIG)[SavedQueryType],
-          ][]
-        ).map(([type, cfg]) => (
-          <Paper
-            key={type}
-            elevation={0}
-            onClick={() => navigate(cfg.path)}
-            sx={{
-              flex: '1 1 160px',
-              minWidth: 160,
-              maxWidth: 280,
-              p: 2,
-              borderRadius: 2,
-              cursor: 'pointer',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-              transition: 'all 0.2s',
-              '&:hover': {
-                borderColor: cfg.color,
-                backgroundColor: alpha(cfg.color, 0.04),
-                transform: 'translateY(-1px)',
-                boxShadow: `0 4px 12px ${alpha(cfg.color, 0.1)}`,
-              },
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+      {/* ── Quick Actions Row ── */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 1.5,
+          mb: 2,
+        }}
+      >
+          {(
+            Object.entries(DATASET_CONFIG) as [
+              SavedQueryType,
+              (typeof DATASET_CONFIG)[SavedQueryType],
+            ][]
+          ).map(([type, cfg]) => (
+            <Box
+              key={type}
+              onClick={() => navigate(cfg.path)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.2,
+                p: 1.5,
+                borderRadius: 2,
+                cursor: 'pointer',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.015)'
+                  : '#fff',
+                transition: 'all 0.2s',
+                '&:hover': {
+                  borderColor: cfg.color,
+                  backgroundColor: alpha(cfg.color, 0.04),
+                  transform: 'translateY(-1px)',
+                  boxShadow: `0 4px 12px ${alpha(cfg.color, 0.1)}`,
+                },
+              }}
+            >
               <Box
                 sx={{
                   width: 32,
                   height: 32,
+                  minWidth: 32,
                   borderRadius: '8px',
                   backgroundColor: alpha(cfg.color, 0.12),
                   display: 'flex',
@@ -313,268 +352,306 @@ const ArgusExplorePage: React.FC = () => {
                   sx: { fontSize: 18, color: cfg.color },
                 })}
               </Box>
-              <Typography sx={{ fontSize: '0.85rem', fontWeight: 700 }}>
-                {t(
-                  `argus.explore.new${type.charAt(0).toUpperCase() + type.slice(1)}`
-                )}
-              </Typography>
-            </Box>
-            <Typography
-              sx={{
-                fontSize: '0.72rem',
-                color: 'text.disabled',
-                lineHeight: 1.4,
-              }}
-            >
-              {type === 'traces' && t('argus.explore.tracesDesc')}
-              {type === 'logs' && t('argus.explore.logsDesc')}
-              {type === 'metrics' && t('argus.explore.metricsDesc')}
-              {type === 'discover' && t('argus.explore.discoverDesc')}
-            </Typography>
-          </Paper>
-        ))}
-      </Box>
-
-      {/* Saved Queries Section */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-        <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1rem' }}>
-          {t('argus.explore.savedQueries')}
-        </Typography>
-        <Chip
-          label={filteredQueries.length}
-          size="small"
-          sx={{
-            height: 20,
-            fontSize: '0.68rem',
-            fontWeight: 700,
-            borderRadius: '10px',
-          }}
-        />
-        <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
-          {/* Search */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              px: 1,
-              py: 0.3,
-              borderRadius: '6px',
-              border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-              backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
-              minWidth: 260,
-            }}
-          >
-            <SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-            <Box
-              component="input"
-              value={search}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setSearch(e.target.value)
-              }
-              placeholder={t('argus.explore.searchQueries')}
-              style={{
-                flex: 1,
-                border: 'none',
-                outline: 'none',
-                backgroundColor: 'transparent',
-                color: 'inherit',
-                fontSize: '0.75rem',
-                padding: '4px',
-                fontFamily: 'inherit',
-              }}
-            />
-            {search && (
-              <IconButton
-                size="small"
-                onClick={() => setSearch('')}
-                sx={{ p: 0.2 }}
-              >
-                <CloseIcon sx={{ fontSize: 12 }} />
-              </IconButton>
-            )}
-          </Box>
-
-          {/* Favorites Only Filter */}
-          <Tooltip title={t('argus.explore.favoritesOnly')}>
-            <IconButton
-              size="small"
-              onClick={() => setFavoritesOnly(!favoritesOnly)}
-              sx={{
-                width: 28,
-                height: 28,
-                backgroundColor: favoritesOnly
-                  ? alpha(theme.palette.warning.main, 0.1)
-                  : 'transparent',
-                color: favoritesOnly
-                  ? theme.palette.warning.main
-                  : 'text.disabled',
-                border: `1px solid ${favoritesOnly ? alpha(theme.palette.warning.main, 0.3) : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                borderRadius: '6px',
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.warning.main, 0.15),
-                },
-              }}
-            >
-              {favoritesOnly ? (
-                <BookmarkIcon sx={{ fontSize: 16 }} />
-              ) : (
-                <BookmarkBorderIcon sx={{ fontSize: 16 }} />
-              )}
-            </IconButton>
-          </Tooltip>
-
-          {/* Type Filter */}
-          <MultiSelectFilterChip
-            label={t('argus.explore.allTypes')}
-            options={(
-              Object.entries(DATASET_CONFIG) as [
-                SavedQueryType,
-                (typeof DATASET_CONFIG)[SavedQueryType],
-              ][]
-            ).map(([type, cfg]) => ({
-              value: type,
-              label: t(
-                `argus.explore.type${type.charAt(0).toUpperCase() + type.slice(1)}`,
-                cfg.label
-              ),
-            }))}
-            selected={filterTypes}
-            onChange={setFilterTypes}
-            emptyMeansAll
-          />
-
-          {/* Sort */}
-          <FilterChipSelect
-            label={t('argus.issues.sort')}
-            value={sort}
-            options={[
-              { value: 'newest', label: t('argus.explore.sortNewest') },
-              { value: 'oldest', label: t('argus.explore.sortOldest') },
-              { value: 'name', label: t('argus.explore.sortName') },
-            ]}
-            anchorEl={sortAnchor}
-            onOpen={handleSortOpen}
-            onClose={handleSortClose}
-            onSelect={handleSortSelect}
-          />
-
-          {/* + New */}
-          <Button
-            size="small"
-            variant="contained"
-            startIcon={<AddIcon sx={{ fontSize: 14 }} />}
-            endIcon={<ExpandMoreIcon sx={{ fontSize: 14 }} />}
-            onClick={(e) => setNewMenuAnchor(e.currentTarget)}
-            sx={{
-              textTransform: 'none',
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              height: 30,
-              borderRadius: '6px',
-              px: 1.5,
-            }}
-          >
-            {t('argus.explore.newQuery')}
-          </Button>
-          <Menu
-            anchorEl={newMenuAnchor}
-            open={Boolean(newMenuAnchor)}
-            onClose={() => setNewMenuAnchor(null)}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            slotProps={{
-              paper: { sx: { minWidth: 200, borderRadius: '8px', mt: 0.5 } },
-            }}
-          >
-            {(
-              Object.entries(DATASET_CONFIG) as [
-                SavedQueryType,
-                (typeof DATASET_CONFIG)[SavedQueryType],
-              ][]
-            ).map(([type, cfg]) => (
-              <MenuItem
-                key={type}
-                onClick={() => handleNewQuery(type)}
-                sx={{ fontSize: '0.8rem' }}
-              >
-                <ListItemIcon sx={{ color: cfg.color }}>
-                  {React.cloneElement(cfg.icon as React.ReactElement, {
-                    sx: { fontSize: 16, color: cfg.color },
-                  })}
-                </ListItemIcon>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  sx={{
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
                   {t(
                     `argus.explore.new${type.charAt(0).toUpperCase() + type.slice(1)}`
                   )}
-                </ListItemText>
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: '0.65rem',
+                    color: 'text.disabled',
+                    lineHeight: 1.3,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {type === 'traces' && t('argus.explore.tracesDesc')}
+                  {type === 'logs' && t('argus.explore.logsDesc')}
+                  {type === 'metrics' && t('argus.explore.metricsDesc')}
+                  {type === 'discover' && t('argus.explore.discoverDesc')}
+                  {type === 'issues' && t('argus.explore.issuesDesc')}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
       </Box>
 
-      {/* Saved Queries — Card Grid */}
-      <PageContentLoader
-        loading={loading}
-        skeleton={<CardSkeleton isDark={isDark} />}
+      {/* ── Saved Queries Panel ── */}
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 2.5,
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          overflow: 'hidden',
+        }}
       >
-        {filteredQueries.length > 0 ? (
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: 2,
-            }}
+        {/* Filter Toolbar */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            px: 2,
+            py: 1,
+            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+          }}
+        >
+          <Typography
+            sx={{ fontSize: '0.85rem', fontWeight: 700, whiteSpace: 'nowrap' }}
           >
-            {filteredQueries.map((query) => (
-              <QueryCard
-                key={query.id}
-                query={query}
-                isDark={isDark}
-                onDelete={handleDelete}
-                onToggleFavorite={handleToggleFavorite}
-                onRename={handleRename}
-                onClick={handleQueryClick}
-                onDuplicate={handleDuplicateClick}
-              />
-            ))}
-          </Box>
-        ) : (
-          <EmptyPlaceholder
-            icon={
-              <ExploreIcon
-                sx={{
-                  fontSize: 56,
-                  color: alpha(theme.palette.primary.main, 0.15),
+            {t('argus.explore.savedQueries')}
+          </Typography>
+          <Chip
+            label={filteredQueries.length}
+            size="small"
+            sx={{
+              height: 20,
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              borderRadius: '10px',
+            }}
+          />
+          <Box sx={{ ml: 'auto', display: 'flex', gap: 1, alignItems: 'center' }}>
+            {/* Search */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                px: 1,
+                height: 32,
+                borderRadius: '6px',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : '#fff',
+                minWidth: 220,
+              }}
+            >
+              <SearchIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+              <Box
+                component="input"
+                value={search}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearch(e.target.value)
+                }
+                placeholder={t('argus.explore.searchQueries')}
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  backgroundColor: 'transparent',
+                  color: 'inherit',
+                  fontSize: '0.75rem',
+                  padding: '4px',
+                  fontFamily: 'inherit',
                 }}
               />
-            }
-            message={
-              search
-                ? t('argus.explore.noMatchingQueries')
-                : t('argus.explore.noSavedQueries')
-            }
-            description={t('argus.explore.emptyDesc')}
-            minHeight={300}
-          >
+              {search && (
+                <IconButton
+                  size="small"
+                  onClick={() => setSearch('')}
+                  sx={{ p: 0.2 }}
+                >
+                  <CloseIcon sx={{ fontSize: 12 }} />
+                </IconButton>
+              )}
+            </Box>
+
+            {/* Favorites Only Filter */}
+            <Tooltip title={t('argus.explore.favoritesOnly')}>
+              <IconButton
+                size="small"
+                onClick={() => setFavoritesOnly(!favoritesOnly)}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: favoritesOnly
+                    ? alpha(theme.palette.warning.main, 0.1)
+                    : 'transparent',
+                  color: favoritesOnly
+                    ? theme.palette.warning.main
+                    : 'text.disabled',
+                  border: `1px solid ${favoritesOnly ? alpha(theme.palette.warning.main, 0.3) : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  borderRadius: '6px',
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.warning.main, 0.15),
+                  },
+                }}
+              >
+                {favoritesOnly ? (
+                  <BookmarkIcon sx={{ fontSize: 16 }} />
+                ) : (
+                  <BookmarkBorderIcon sx={{ fontSize: 16 }} />
+                )}
+              </IconButton>
+            </Tooltip>
+
+            {/* Type Filter */}
+            <MultiSelectFilterChip
+              label={t('argus.explore.allTypes')}
+              options={(
+                Object.entries(DATASET_CONFIG) as [
+                  SavedQueryType,
+                  (typeof DATASET_CONFIG)[SavedQueryType],
+                ][]
+              ).map(([type, cfg]) => ({
+                value: type,
+                label: t(
+                  `argus.explore.type${type.charAt(0).toUpperCase() + type.slice(1)}`,
+                  cfg.label
+                ),
+              }))}
+              selected={filterTypes}
+              onChange={setFilterTypes}
+              emptyMeansAll
+            />
+
+            {/* Sort */}
+            <FilterChipSelect
+              label={t('argus.issues.sort')}
+              value={sort}
+              options={[
+                { value: 'newest', label: t('argus.explore.sortNewest') },
+                { value: 'oldest', label: t('argus.explore.sortOldest') },
+                { value: 'name', label: t('argus.explore.sortName') },
+              ]}
+              anchorEl={sortAnchor}
+              onOpen={handleSortOpen}
+              onClose={handleSortClose}
+              onSelect={handleSortSelect}
+            />
+
+            {/* + New */}
             <Button
-              variant="contained"
               size="small"
-              startIcon={<AddIcon />}
+              variant="contained"
+              startIcon={<AddIcon sx={{ fontSize: 14 }} />}
+              endIcon={<ExpandMoreIcon sx={{ fontSize: 14 }} />}
               onClick={(e) => setNewMenuAnchor(e.currentTarget)}
               sx={{
                 textTransform: 'none',
-                fontWeight: 600,
-                borderRadius: '8px',
-                mt: 2,
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                height: 32,
+                borderRadius: '6px',
+                px: 1.5,
               }}
             >
-              {t('argus.explore.createFirstQuery')}
+              {t('argus.explore.newQuery')}
             </Button>
-          </EmptyPlaceholder>
-        )}
-      </PageContentLoader>
+            <Menu
+              anchorEl={newMenuAnchor}
+              open={Boolean(newMenuAnchor)}
+              onClose={() => setNewMenuAnchor(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+              slotProps={{
+                paper: { sx: { minWidth: 200, borderRadius: '8px', mt: 0.5 } },
+              }}
+            >
+              {(
+                Object.entries(DATASET_CONFIG) as [
+                  SavedQueryType,
+                  (typeof DATASET_CONFIG)[SavedQueryType],
+                ][]
+              ).map(([type, cfg]) => (
+                <MenuItem
+                  key={type}
+                  onClick={() => handleNewQuery(type)}
+                  sx={{ fontSize: '0.8rem' }}
+                >
+                  <ListItemIcon sx={{ color: cfg.color }}>
+                    {React.cloneElement(cfg.icon as React.ReactElement, {
+                      sx: { fontSize: 16, color: cfg.color },
+                    })}
+                  </ListItemIcon>
+                  <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
+                    {t(
+                      `argus.explore.new${type.charAt(0).toUpperCase() + type.slice(1)}`
+                    )}
+                  </ListItemText>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+        </Box>
+
+        {/* Card Grid */}
+        <Box sx={{ p: 2 }}>
+          <PageContentLoader
+            loading={loading}
+          >
+            {filteredQueries.length > 0 ? (
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: 2,
+                }}
+              >
+                {filteredQueries.map((query) => (
+                  <QueryCard
+                    key={query.id}
+                    query={query}
+                    isDark={isDark}
+                    projectId={projectId}
+                    onDelete={handleDelete}
+                    onToggleFavorite={handleToggleFavorite}
+                    onRename={handleRename}
+                    onClick={handleQueryClick}
+                    onDuplicate={handleDuplicateInPlace}
+                    onDuplicateAndEdit={handleDuplicateAndEdit}
+                  />
+                ))}
+              </Box>
+            ) : (
+              <EmptyPlaceholder
+                icon={
+                  <ExploreIcon
+                    sx={{
+                      fontSize: 48,
+                      color: alpha(theme.palette.primary.main, 0.15),
+                    }}
+                  />
+                }
+                message={
+                  search
+                    ? t('argus.explore.noMatchingQueries')
+                    : t('argus.explore.noSavedQueries')
+                }
+                description={t('argus.explore.emptyDesc')}
+                minHeight={200}
+              >
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={(e) => setNewMenuAnchor(e.currentTarget)}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    mt: 1.5,
+                  }}
+                >
+                  {t('argus.explore.createFirstQuery')}
+                </Button>
+              </EmptyPlaceholder>
+            )}
+          </PageContentLoader>
+        </Box>
+      </Paper>
 
       {/* Duplicate Dialog */}
       <Dialog open={!!duplicateTarget} onClose={() => setDuplicateTarget(null)}>

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -18,12 +18,14 @@ import {
   Terminal as LogsIcon,
   BarChart as MetricsIcon,
   Delete as DeleteIcon,
+  BugReport as BugReportIcon,
   MoreHoriz as MoreIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
   Star as StarIcon,
   StarBorder as StarBorderIcon,
   FileCopy as FileCopyIcon,
+  Edit as EditIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import {
@@ -31,6 +33,7 @@ import {
   type SavedQueryType,
 } from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import argusService from '@/services/argusService';
 
 /* ─── Dataset Config ─── */
 
@@ -64,47 +67,85 @@ export const DATASET_CONFIG: Partial<
     color: '#3b82f6',
     path: '/argus/explore/discover',
   },
+  issues: {
+    label: 'Issues',
+    icon: <BugReportIcon sx={{ fontSize: 14 }} />,
+    color: '#ef4444',
+    path: '/argus/issues',
+  },
 };
 
 /* ─── Sort type ─── */
 
 export type SortOption = 'newest' | 'oldest' | 'name';
 
-/* ─── Mini Sparkline ─── */
+/* ─── Mini Volume Bar ─── */
 
-const MiniSparkline: React.FC<{ color: string; isDark: boolean }> = ({
-  color,
-  isDark,
-}) => {
-  const points = useMemo(() => {
-    const hash = color
-      .split('')
-      .reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
-    const arr: number[] = [];
-    let seed = Math.abs(hash);
-    for (let i = 0; i < 24; i++) {
-      seed = (seed * 16807 + 12345) % 2147483647;
-      arr.push(20 + (seed % 60));
-    }
-    return arr;
-  }, [color]);
-
+const MiniVolumeBar: React.FC<{
+  data: number[] | null;
+  color: string;
+  isDark: boolean;
+}> = ({ data, color, isDark }) => {
   const width = 200;
   const height = 48;
-  const maxVal = Math.max(...points);
-  const minVal = Math.min(...points);
-  const range = maxVal - minVal || 1;
-  const step = width / (points.length - 1);
 
-  const pathData = points
-    .map((v, i) => {
-      const x = i * step;
-      const y = height - 4 - ((v - minVal) / range) * (height - 8);
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
+  // Loading shimmer
+  if (!data) {
+    return (
+      <Box
+        sx={{
+          height,
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: '2px',
+          px: 0.5,
+        }}
+      >
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Box
+            key={i}
+            sx={{
+              flex: 1,
+              height: `${20 + (i % 3) * 15}%`,
+              borderRadius: '2px',
+              backgroundColor: isDark
+                ? 'rgba(255,255,255,0.04)'
+                : 'rgba(0,0,0,0.04)',
+              '@keyframes shimmer': {
+                '0%': { opacity: 0.3 },
+                '50%': { opacity: 0.6 },
+                '100%': { opacity: 0.3 },
+              },
+              animation: `shimmer 1.5s ease-in-out infinite`,
+              animationDelay: `${i * 0.08}s`,
+            }}
+          />
+        ))}
+      </Box>
+    );
+  }
 
-  const areaPath = `${pathData} L${width},${height} L0,${height} Z`;
+  // No data
+  if (data.length === 0) {
+    return (
+      <Box
+        sx={{
+          height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography sx={{ fontSize: '0.6rem', color: 'text.disabled' }}>
+          ···
+        </Typography>
+      </Box>
+    );
+  }
+
+  const maxVal = Math.max(...data, 1);
+  const barCount = data.length;
+  const barW = width / barCount - 2;
 
   return (
     <svg
@@ -113,53 +154,45 @@ const MiniSparkline: React.FC<{ color: string; isDark: boolean }> = ({
       height={height}
       preserveAspectRatio="none"
     >
-      <defs>
-        <linearGradient
-          id={`grad-${color.replace('#', '')}`}
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="1"
-        >
-          <stop
-            offset="0%"
-            stopColor={color}
-            stopOpacity={isDark ? 0.25 : 0.15}
+      {data.map((v, i) => {
+        const barH = Math.max((v / maxVal) * (height - 4), 1);
+        return (
+          <rect
+            key={i}
+            x={i * (barW + 2) + 1}
+            y={height - barH}
+            width={barW}
+            height={barH}
+            rx={1.5}
+            fill={color}
+            opacity={isDark ? 0.4 + (v / maxVal) * 0.6 : 0.25 + (v / maxVal) * 0.55}
           />
-          <stop offset="100%" stopColor={color} stopOpacity={0} />
-        </linearGradient>
-      </defs>
-      <path d={areaPath} fill={`url(#grad-${color.replace('#', '')})`} />
-      <path
-        d={pathData}
-        fill="none"
-        stroke={color}
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
+        );
+      })}
     </svg>
   );
 };
 
-/* ─── Query Card ─── */
-
 export const QueryCard: React.FC<{
   query: ArgusSavedQuery;
   isDark: boolean;
+  projectId: string;
   onDelete: (id: number) => void;
   onToggleFavorite: (id: number, favorite: boolean) => void;
   onRename: (id: number, newName: string) => void;
   onClick: (query: ArgusSavedQuery) => void;
   onDuplicate: (query: ArgusSavedQuery) => void;
+  onDuplicateAndEdit: (query: ArgusSavedQuery) => void;
 }> = ({
   query,
   isDark,
+  projectId,
   onDelete,
   onToggleFavorite,
   onRename,
   onClick,
   onDuplicate,
+  onDuplicateAndEdit,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -169,6 +202,29 @@ export const QueryCard: React.FC<{
   const [editName, setEditName] = useState(query.name);
 
   const periodLabel = query.query_config?.period || '24h';
+
+  // Async volume fetch per card
+  const [volumeData, setVolumeData] = useState<number[] | null>(null);
+  useEffect(() => {
+    const QUERY_TYPE_DATASET: Record<string, string> = {
+      logs: 'logs',
+      traces: 'spans',
+      metrics: 'errors',
+      discover: 'errors',
+    };
+    const dataset = QUERY_TYPE_DATASET[query.query_type] || 'errors';
+    const conditions = query.query_config?.conditions || '';
+    argusService
+      .getDiscoverVolume(projectId, {
+        period: periodLabel,
+        dataset,
+        search: conditions || undefined,
+      })
+      .then((data) => {
+        setVolumeData(data.map((d) => Number(d.count)));
+      })
+      .catch(() => setVolumeData([]));
+  }, [query.id, projectId, periodLabel, query.query_type, query.query_config?.conditions]);
 
   return (
     <Paper
@@ -325,7 +381,22 @@ export const QueryCard: React.FC<{
                 <FileCopyIcon sx={{ fontSize: 16 }} />
               </ListItemIcon>
               <ListItemText primaryTypographyProps={{ fontSize: '0.78rem' }}>
-                {t('argus.explore.duplicateQuery')}
+                {t('argus.explore.duplicateQuery', 'Duplicate')}
+              </ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuAnchor(null);
+                onDuplicateAndEdit(query);
+              }}
+              sx={{ fontSize: '0.78rem' }}
+            >
+              <ListItemIcon>
+                <EditIcon sx={{ fontSize: 16 }} />
+              </ListItemIcon>
+              <ListItemText primaryTypographyProps={{ fontSize: '0.78rem' }}>
+                {t('argus.explore.duplicateAndEdit', 'Duplicate & Edit')}
               </ListItemText>
             </MenuItem>
             <MenuItem
@@ -349,9 +420,9 @@ export const QueryCard: React.FC<{
         </Box>
       </Box>
 
-      {/* Mini Graph */}
+      {/* Volume Chart — real data, async per card */}
       <Box sx={{ px: 2, pb: 1.5, height: 56, overflow: 'hidden' }}>
-        <MiniSparkline color={cfg.color} isDark={isDark} />
+        <MiniVolumeBar data={volumeData} color={cfg.color} isDark={isDark} />
       </Box>
 
       {/* Card Footer */}

@@ -5,17 +5,25 @@ import React, {
   useRef,
   useMemo,
 } from 'react';
-import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
+import { Box, Typography, Paper, Chip, Button, IconButton as MuiIconButton, useTheme, alpha, Tooltip } from '@mui/material';
+import {
+  BugReport as BugReportIcon,
+  Save as SaveIcon,
+  SaveAs as SaveAsIcon,
+  FolderOpen as FolderOpenIcon,
+  Bookmark as BookmarkIcon,
+  BookmarkBorder as BookmarkBorderIcon,
+} from '@mui/icons-material';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
-import { BugReport as BugReportIcon } from '@mui/icons-material';
 import ArgusIcon from '@/components/icons/ArgusIcon';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import argusService, {
   ArgusIssue,
   ArgusIssueListParams,
+  ArgusSavedQuery,
 } from '@/services/argusService';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { rbacService } from '@/services/rbacService';
@@ -49,6 +57,7 @@ import IssueBulkActions from './components/IssueBulkActions';
 import IssueAssigneeMenu from './components/IssueAssigneeMenu';
 import NewIssuesBanner from './components/NewIssuesBanner';
 import { useArgusIssueStore } from '@/hooks/useArgusIssueStore';
+import { SaveQueryDialog, SavedQueriesPanel } from './components/TraceExplorerDialogs';
 import {
   PAGE_SIZE_STORAGE_KEY,
   DEFAULT_PAGE_SIZE,
@@ -170,6 +179,171 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
     return DEFAULT_PAGE_SIZE;
   });
+
+  // ─── Saved Queries ───────────────────────────────────────────────
+  const defaultQueryName = t('argus.issues.untitledQuery', 'Untitled Issue Query');
+  const [currentQueryId, setCurrentQueryId] = useState<number | null>(null);
+  const [queryName, setQueryName] = useState(
+    (location.state as any)?.queryName || defaultQueryName
+  );
+  const [saveName, setSaveName] = useState('');
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveDialogMode, setSaveDialogMode] = useState<'new' | 'saveAs'>('new');
+  const [savedQueries, setSavedQueries] = useState<ArgusSavedQuery[]>([]);
+  const [savedPanelOpen, setSavedPanelOpen] = useState(false);
+
+  // Snapshot for dirty tracking
+  const [savedSnapshot, setSavedSnapshot] = useState<string>('');
+
+  const buildQueryConfig = useCallback(() => ({
+    search: storeSearch,
+    status,
+    level,
+    sort,
+    period: storePeriod || '14d',
+    substatus,
+    assignedTo,
+  }), [storeSearch, status, level, sort, storePeriod, substatus, assignedTo]);
+
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot) return !!currentQueryId; // No snapshot + no saved query = not dirty (initial state)
+    return JSON.stringify(buildQueryConfig()) !== savedSnapshot;
+  }, [savedSnapshot, buildQueryConfig, currentQueryId]);
+
+  // Load saved query from URL queryId param
+  useEffect(() => {
+    const urlQueryId = searchParams.get('queryId');
+    if (urlQueryId && savedQueries.length > 0) {
+      const qId = parseInt(urlQueryId, 10);
+      const matched = savedQueries.find((q) => q.id === qId);
+      if (matched && matched.id !== currentQueryId) {
+        const cfg = typeof matched.query_config === 'string'
+          ? JSON.parse(matched.query_config)
+          : matched.query_config || {};
+        setCurrentQueryId(matched.id);
+        setQueryName(matched.name);
+        if (cfg.search !== undefined) setStoreSearch(cfg.search);
+        if (cfg.status !== undefined) setStatus(cfg.status);
+        if (cfg.level !== undefined) setLevel(cfg.level);
+        if (cfg.sort !== undefined) setSort(cfg.sort);
+        if (cfg.substatus !== undefined) setSubstatus(cfg.substatus);
+        if (cfg.assignedTo !== undefined) setAssignedTo(cfg.assignedTo);
+        setSavedSnapshot(JSON.stringify(cfg));
+        setCurrentPage(1);
+      }
+    }
+  }, [searchParams, savedQueries, currentQueryId]);
+
+  // Fetch saved queries
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const data = await argusService.listSavedQueries(projectId, 'issues');
+        setSavedQueries(data);
+      } catch {
+        /* ignore */
+      }
+    };
+    fetch();
+  }, [projectId]);
+
+  const handleSave = useCallback(async () => {
+    const config = buildQueryConfig();
+    if (currentQueryId) {
+      // Update existing query (no dialog)
+      try {
+        await argusService.updateSavedQuery(projectId, currentQueryId, {
+          name: queryName,
+          query_config: config,
+        });
+        setSavedSnapshot(JSON.stringify(config));
+        enqueueSnackbar(t('argus.issues.querySaved', 'Query saved'), { variant: 'success' });
+        const data = await argusService.listSavedQueries(projectId, 'issues');
+        setSavedQueries(data);
+      } catch {
+        enqueueSnackbar(t('common.error'), { variant: 'error' });
+      }
+    } else {
+      // New query — always open dialog for name input
+      setSaveName('');
+      setSaveDialogMode('new');
+      setSaveDialogOpen(true);
+    }
+  }, [currentQueryId, projectId, buildQueryConfig, queryName, enqueueSnackbar, t]);
+
+  const handleSaveAs = useCallback(() => {
+    setSaveName(queryName === defaultQueryName ? '' : queryName);
+    setSaveDialogMode('saveAs');
+    setSaveDialogOpen(true);
+  }, [queryName, defaultQueryName]);
+
+  const handleSaveDialogConfirm = useCallback(async () => {
+    if (!saveName.trim()) return;
+    const config = buildQueryConfig();
+    try {
+      // Check for existing query with same name → update instead of duplicate
+      const existing = savedQueries.find(
+        (q) => q.name.toLowerCase() === saveName.trim().toLowerCase()
+      );
+      if (existing && saveDialogMode === 'new') {
+        // Update existing query
+        await argusService.updateSavedQuery(projectId, existing.id, {
+          name: saveName.trim(),
+          query_config: config,
+        });
+        setCurrentQueryId(existing.id);
+      } else {
+        // Create new query
+        const result = await argusService.createSavedQuery(projectId, {
+          name: saveName.trim(),
+          query_type: 'issues',
+          query_config: config,
+          display_type: 'table',
+        });
+        setCurrentQueryId(result.id);
+      }
+      setQueryName(saveName.trim());
+      setSavedSnapshot(JSON.stringify(config));
+      setSaveDialogOpen(false);
+      enqueueSnackbar(t('argus.issues.querySaved', 'Query saved'), { variant: 'success' });
+      const data = await argusService.listSavedQueries(projectId, 'issues');
+      setSavedQueries(data);
+    } catch {
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  }, [saveName, projectId, buildQueryConfig, savedQueries, saveDialogMode, enqueueSnackbar, t]);
+
+  const handleLoadSavedQuery = useCallback((sq: ArgusSavedQuery) => {
+    const cfg = typeof sq.query_config === 'string'
+      ? JSON.parse(sq.query_config)
+      : sq.query_config || {};
+    setCurrentQueryId(sq.id);
+    setQueryName(sq.name);
+    if (cfg.search !== undefined) setStoreSearch(cfg.search);
+    if (cfg.status !== undefined) setStatus(cfg.status);
+    if (cfg.level !== undefined) setLevel(cfg.level);
+    if (cfg.sort !== undefined) setSort(cfg.sort);
+    if (cfg.substatus !== undefined) setSubstatus(cfg.substatus);
+    if (cfg.assignedTo !== undefined) setAssignedTo(cfg.assignedTo);
+    setSavedSnapshot(JSON.stringify(cfg));
+    setCurrentPage(1);
+    setSavedPanelOpen(false);
+  }, [setStoreSearch, setStatus, setLevel, setSort, setSubstatus, setAssignedTo, setCurrentPage]);
+
+  const handleDeleteSavedQuery = useCallback(async (id: number) => {
+    try {
+      await argusService.deleteSavedQuery(projectId, id);
+      setSavedQueries((prev) => prev.filter((q) => q.id !== id));
+      if (currentQueryId === id) {
+        setCurrentQueryId(null);
+        setQueryName(defaultQueryName);
+        setSavedSnapshot('');
+      }
+      enqueueSnackbar(t('argus.issues.queryDeleted', 'Query deleted'), { variant: 'success' });
+    } catch {
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    }
+  }, [projectId, currentQueryId, defaultQueryName, enqueueSnackbar, t]);
 
   // ─── Local-only UI State ────────────────────────────────────────
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
@@ -729,26 +903,73 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         title={
           <ArgusBreadcrumbs
             size="title"
-            paths={[{ label: t('argus.issues.title') }]}
+            paths={[{ label: currentQueryId ? queryName : t('argus.issues.title') }]}
           />
         }
         subtitle={t('argus.issues.subtitle')}
+        actionsUpdateTrigger={`${isDirty}-${currentQueryId}-${savedQueries.length}`}
         actions={
-          !loading &&
-          total > 0 && (
-            <Chip
-              label={`${formatCompactNumber(total)} ${t('argus.issues.issuesLabel')}`}
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            {!loading && total > 0 && (
+              <Chip
+                label={`${formatCompactNumber(total)} ${t('argus.issues.issuesLabel')}`}
+                size="small"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  height: 22,
+                  backgroundColor: alpha(theme.palette.error.main, 0.1),
+                  color: theme.palette.error.main,
+                  border: 'none',
+                }}
+              />
+            )}
+            <Tooltip title={t('argus.issues.savedQueries', 'Saved Issue Queries')}>
+              <MuiIconButton
+                size="small"
+                onClick={() => setSavedPanelOpen(true)}
+                sx={{
+                  color: savedQueries.length > 0 ? theme.palette.primary.main : 'text.secondary',
+                }}
+              >
+                {savedQueries.length > 0 ? (
+                  <BookmarkIcon sx={{ fontSize: 20 }} />
+                ) : (
+                  <BookmarkBorderIcon sx={{ fontSize: 20 }} />
+                )}
+              </MuiIconButton>
+            </Tooltip>
+            <Button
               size="small"
+              variant="contained"
+              startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
+              onClick={handleSave}
+              disabled={!isDirty}
               sx={{
-                fontWeight: 700,
+                textTransform: 'none',
                 fontSize: '0.75rem',
-                height: 22,
-                backgroundColor: alpha(theme.palette.error.main, 0.1),
-                color: theme.palette.error.main,
-                border: 'none',
+                fontWeight: 600,
+                borderRadius: '6px',
               }}
-            />
-          )
+            >
+              {t('argus.issues.save', 'Save')}
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<SaveIcon sx={{ fontSize: 15 }} />}
+              onClick={handleSaveAs}
+              sx={{
+                textTransform: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
+                borderRadius: '6px',
+              }}
+            >
+              {t('argus.issues.saveAs', 'Save as...')}
+            </Button>
+          </Box>
         }
       />
 
@@ -1032,6 +1253,24 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         members={members}
         onClose={handleAssigneeMenuClose}
         onAssign={handleAssignIssue}
+      />
+
+      {/* Save Query Dialog */}
+      <SaveQueryDialog
+        open={saveDialogOpen}
+        onClose={() => setSaveDialogOpen(false)}
+        saveName={saveName}
+        onNameChange={setSaveName}
+        onSave={handleSaveDialogConfirm}
+      />
+
+      {/* Saved Queries Panel */}
+      <SavedQueriesPanel
+        open={savedPanelOpen}
+        onClose={() => setSavedPanelOpen(false)}
+        savedQueries={savedQueries}
+        onLoad={handleLoadSavedQuery}
+        onDelete={handleDeleteSavedQuery}
       />
     </Box>
   );

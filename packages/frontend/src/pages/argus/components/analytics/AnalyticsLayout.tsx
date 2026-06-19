@@ -16,6 +16,12 @@ export interface AnalyticsLayoutProps {
   title?: string;
   /** Project ID for global filter property picker */
   projectId?: string;
+  /** Externally controlled panel width (overrides internal resize) */
+  panelWidth?: number;
+  /** Externally controlled resize handler */
+  onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
+  /** Whether external panel is currently being dragged */
+  isPanelDragging?: boolean;
 }
 
 const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
@@ -25,20 +31,28 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
   children,
   title,
   projectId,
+  panelWidth: externalPanelWidth,
+  onPanelResizeMouseDown: externalResizeHandler,
+  isPanelDragging: externalDragging,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
   const {
-    splitWidth: panelWidth,
-    isDragging: isPanelDragging,
-    handleMouseDown: handlePanelSplitterMouseDown,
+    splitWidth: internalPanelWidth,
+    isDragging: internalIsDragging,
+    handleMouseDown: internalHandleMouseDown,
   } = useResizableSplit({
     storageKey: 'argus_analytics_panel_width',
     defaultWidth: 340,
     minWidth: 260,
     maxWidth: 600,
   });
+
+  // Use external values if provided, else fall back to internal
+  const panelWidth = externalPanelWidth ?? internalPanelWidth;
+  const isPanelDragging = externalDragging ?? internalIsDragging;
+  const handlePanelSplitterMouseDown = externalResizeHandler ?? internalHandleMouseDown;
 
   return (
     <Box

@@ -441,20 +441,25 @@ function FieldMenu({
       >
         {filtered.map((f, idx) => {
           const isCurrent = f.key === currentField;
-          const isSelected = idx === selectedIndex || isCurrent;
+          const isKeyboardHighlighted = idx === selectedIndex;
           return (
             <ListItemButton
               key={f.key}
               onClick={() => onSelect(f.key)}
-              selected={isSelected}
+              selected={isKeyboardHighlighted}
               sx={{
                 py: 0.5,
                 px: 1.5,
                 fontSize: '0.8rem',
                 '&.Mui-selected': {
                   backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.06)'
-                    : 'rgba(0,0,0,0.04)',
+                    ? 'rgba(124,138,255,0.15)'
+                    : 'rgba(92,107,192,0.12)',
+                },
+                '&.Mui-selected:hover': {
+                  backgroundColor: isDark
+                    ? 'rgba(124,138,255,0.20)'
+                    : 'rgba(92,107,192,0.16)',
                 },
               }}
             >
@@ -462,7 +467,7 @@ function FieldMenu({
                 primary={f.key}
                 primaryTypographyProps={{
                   fontSize: '0.8rem',
-                  fontWeight: isSelected ? 600 : 400,
+                  fontWeight: isCurrent ? 600 : 400,
                 }}
               />
               {isCurrent && (
@@ -530,19 +535,25 @@ function OperatorMenu({
       sx={{ py: 0.5, outline: 'none' }}
     >
       {options.map(({ op, label }, idx) => {
-        const isSelected = idx === selectedIndex || op === currentOperator;
+        const isCurrent = op === currentOperator;
+        const isKeyboardHighlighted = idx === selectedIndex;
         return (
           <ListItemButton
             key={op}
             onClick={() => onSelect(op)}
-            selected={isSelected}
+            selected={isKeyboardHighlighted}
             sx={{
               py: 0.5,
               px: 1.5,
               '&.Mui-selected': {
                 backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.06)'
-                  : 'rgba(0,0,0,0.04)',
+                  ? 'rgba(124,138,255,0.15)'
+                  : 'rgba(92,107,192,0.12)',
+              },
+              '&.Mui-selected:hover': {
+                backgroundColor: isDark
+                  ? 'rgba(124,138,255,0.20)'
+                  : 'rgba(92,107,192,0.16)',
               },
             }}
           >
@@ -550,10 +561,10 @@ function OperatorMenu({
               primary={label}
               primaryTypographyProps={{
                 fontSize: '0.8rem',
-                fontWeight: isSelected ? 600 : 400,
+                fontWeight: isCurrent ? 600 : 400,
               }}
             />
-            {op === currentOperator && (
+            {isCurrent && (
               <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
             )}
           </ListItemButton>
@@ -657,20 +668,19 @@ function ValueSuggestionList({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 1,
-                // Keyboard highlight: solid outline with slight rounding and a soft glow
-                boxShadow: isHighlighted
-                  ? `0 0 0 1px ${isDark ? '#7c8aff' : '#5c6bc0'}, 0 0 8px ${isDark ? 'rgba(124,138,255,0.4)' : 'rgba(92,107,192,0.3)'}`
-                  : 'none',
-                // Checked items: subtle background
-                backgroundColor: isChecked
+                backgroundColor: isHighlighted
                   ? isDark
-                    ? 'rgba(124,138,255,0.10)'
-                    : 'rgba(92,107,192,0.08)'
-                  : 'transparent',
+                    ? 'rgba(124,138,255,0.15)'
+                    : 'rgba(92,107,192,0.12)'
+                  : isChecked
+                    ? isDark
+                      ? 'rgba(124,138,255,0.10)'
+                      : 'rgba(92,107,192,0.08)'
+                    : 'transparent',
                 '&:hover': {
                   backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.06)'
-                    : 'rgba(0,0,0,0.04)',
+                    ? 'rgba(124,138,255,0.12)'
+                    : 'rgba(92,107,192,0.08)',
                 },
               }}
             >
@@ -828,7 +838,7 @@ function HasFieldSelector({
       >
         {displayItems.map((key, idx) => {
           const isCurrent = key === currentValue;
-          const isSelected = idx === selectedIndex || isCurrent;
+          const isKeyboardHighlighted = idx === selectedIndex;
           const fieldDef = getFieldByKey(key, config);
           const cat = fieldDef?.category ?? 'attribute';
           const badge = HAS_CATEGORY_BADGES[cat];
@@ -836,15 +846,20 @@ function HasFieldSelector({
             <ListItemButton
               key={key}
               onClick={() => onSelect(key)}
-              selected={isSelected}
+              selected={isKeyboardHighlighted}
               sx={{
                 py: 0.5,
                 px: 1.5,
                 gap: 1,
                 '&.Mui-selected': {
                   backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.06)'
-                    : 'rgba(0,0,0,0.04)',
+                    ? 'rgba(124,138,255,0.15)'
+                    : 'rgba(92,107,192,0.12)',
+                },
+                '&.Mui-selected:hover': {
+                  backgroundColor: isDark
+                    ? 'rgba(124,138,255,0.20)'
+                    : 'rgba(92,107,192,0.16)',
                 },
               }}
             >
@@ -874,7 +889,7 @@ function HasFieldSelector({
                 primary={key}
                 primaryTypographyProps={{
                   fontSize: '0.8rem',
-                  fontWeight: isSelected ? 600 : 400,
+                  fontWeight: isCurrent ? 600 : 400,
                 }}
               />
               {isCurrent && (
@@ -940,19 +955,25 @@ function HasToggleMenu({
       sx={{ py: 0.5, outline: 'none' }}
     >
       {options.map(({ key, label }, idx) => {
-        const isCurrent = idx === selectedIndex || key === currentField;
+        const isCurrent = key === currentField;
+        const isKeyboardHighlighted = idx === selectedIndex;
         return (
           <ListItemButton
             key={key}
             onClick={() => onSelect(key)}
-            selected={isCurrent}
+            selected={isKeyboardHighlighted}
             sx={{
               py: 0.5,
               px: 1.5,
               '&.Mui-selected': {
                 backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.06)'
-                  : 'rgba(0,0,0,0.04)',
+                  ? 'rgba(124,138,255,0.15)'
+                  : 'rgba(92,107,192,0.12)',
+              },
+              '&.Mui-selected:hover': {
+                backgroundColor: isDark
+                  ? 'rgba(124,138,255,0.20)'
+                  : 'rgba(92,107,192,0.16)',
               },
             }}
           >
@@ -963,7 +984,7 @@ function HasToggleMenu({
                 fontWeight: isCurrent ? 600 : 400,
               }}
             />
-            {key === currentField && (
+            {isCurrent && (
               <CheckIcon sx={{ fontSize: 14, ml: 1, color: 'primary.main' }} />
             )}
           </ListItemButton>

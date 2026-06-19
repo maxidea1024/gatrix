@@ -5,11 +5,14 @@ import {
   TextField,
   InputAdornment,
   IconButton,
+  Link,
 } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  OpenInNew as OpenInNewIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 export const WizardInput: React.FC<{
   label: string;
@@ -18,6 +21,8 @@ export const WizardInput: React.FC<{
   isDark: boolean;
   type?: string;
   hint?: string;
+  helpTextKey?: string;
+  helpUrl?: string;
   required?: boolean;
   placeholder?: string;
 }> = ({
@@ -27,11 +32,16 @@ export const WizardInput: React.FC<{
   isDark,
   type = 'text',
   hint,
+  helpTextKey,
+  helpUrl,
   required,
   placeholder,
 }) => {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
+  const helpText = helpTextKey ? t(helpTextKey) : undefined;
+
   return (
     <Box sx={{ mb: 2 }}>
       <Typography
@@ -101,6 +111,41 @@ export const WizardInput: React.FC<{
         >
           {hint}
         </Typography>
+      )}
+      {helpText && (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            mt: 0.5,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: '0.7rem',
+              color: 'text.disabled',
+            }}
+          >
+            {helpText}
+          </Typography>
+          {helpUrl && (
+            <Link
+              href={helpUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                color: 'primary.main',
+                opacity: 0.7,
+                '&:hover': { opacity: 1 },
+              }}
+            >
+              <OpenInNewIcon sx={{ fontSize: 11 }} />
+            </Link>
+          )}
+        </Box>
       )}
     </Box>
   );

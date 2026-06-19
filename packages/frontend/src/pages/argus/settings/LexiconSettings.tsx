@@ -55,6 +55,7 @@ import {
   renderLexiconIcon,
   COLOR_PRESETS,
 } from '@/utils/lexiconIcons';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface LexiconSettingsProps {
   projectId: string;
@@ -434,7 +435,8 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <PageContentLoader loading={loading}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Description header */}
       <Box>
         <Typography variant="h6" fontWeight={700} gutterBottom>
@@ -523,11 +525,7 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({
       </Box>
 
       {/* Main Table view */}
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
-        </Box>
-      ) : isEmpty && !searchQuery ? (
+      {isEmpty && !searchQuery ? (
         /* Empty State with Seed CTA */
         <Box
           sx={{
@@ -1442,6 +1440,7 @@ const LexiconSettings: React.FC<LexiconSettingsProps> = ({
         </DialogActions>
       </Dialog>
     </Box>
+    </PageContentLoader>
   );
 };
 

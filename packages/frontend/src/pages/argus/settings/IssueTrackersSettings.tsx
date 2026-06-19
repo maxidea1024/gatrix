@@ -9,7 +9,6 @@ import {
   SettingsCard,
   ProviderCard,
   ConnectedItem,
-  Spinner,
 } from './components/SettingsShared';
 import {
   ProviderWizardModal,
@@ -17,6 +16,8 @@ import {
   WizardFieldDef,
 } from '../components/ProviderWizardModal';
 import argusService, { ArgusIssueTracker } from '@/services/argusService';
+import { TRACKER_HELP_LINKS } from './trackerHelpLinks';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 const TRACKER_PROVIDERS = [
   {
@@ -479,12 +480,14 @@ interface IssueTrackersSettingsProps {
   projectId: string;
   isDark: boolean;
   t: any;
+  onChange?: () => void;
 }
 
 export const IssueTrackersSettings: React.FC<IssueTrackersSettingsProps> = ({
   projectId,
   isDark,
   t,
+  onChange,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -497,6 +500,7 @@ export const IssueTrackersSettings: React.FC<IssueTrackersSettingsProps> = ({
       const list = await argusService.listIssueTrackers(projectId);
       setTrackers(list);
       setTrkLoaded(true);
+      onChange?.();
     } catch {
       setTrkLoaded(true);
     }
@@ -507,37 +511,11 @@ export const IssueTrackersSettings: React.FC<IssueTrackersSettingsProps> = ({
   }, [projectId]);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <SettingsCard
-        title={t('argus.settings.availableTrackers')}
-        desc={t('argus.settings.issueTrackersDesc')}
-        isDark={isDark}
-      >
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: 2,
-          }}
-        >
-          {TRACKER_PROVIDERS.map((prov) => (
-            <ProviderCard
-              key={prov.id}
-              prov={prov}
-              isDark={isDark}
-              t={t}
-              count={trackers.filter((tr) => tr.provider === prov.id).length}
-              onAdd={() => {
-                setAddTrkDialog(prov.id);
-              }}
-            />
-          ))}
-        </Box>
-      </SettingsCard>
-      {trkLoaded && trackers.length > 0 && (
+    <PageContentLoader loading={!trkLoaded}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <SettingsCard
-          title={t('argus.settings.configuredTrackers')}
-          desc={t('argus.settings.configuredTrackersDesc')}
+          title={t('argus.settings.availableTrackers')}
+          desc={t('argus.settings.issueTrackersDesc')}
           isDark={isDark}
         >
           <Box
@@ -547,105 +525,135 @@ export const IssueTrackersSettings: React.FC<IssueTrackersSettingsProps> = ({
               gap: 2,
             }}
           >
-            {trackers.map((trk) => {
-              const prov = TRACKER_PROVIDERS.find((p) => p.id === trk.provider);
-              return (
-                <ConnectedItem
-                  key={trk.id}
-                  isDark={isDark}
-                  color={prov?.color || '#666'}
-                  icon={prov?.icon || <BugIcon sx={{ fontSize: 18 }} />}
-                  title={trk.name}
-                  chipLabel={prov?.name || trk.provider}
-                  subtitle={`${trk.api_url}${trk.config?.project_key ? ` · ${trk.config.project_key}` : ''}${trk.config?.repo ? ` · ${trk.config.repo}` : ''}`}
-                  active={trk.enabled}
-                  t={t}
-                  onToggle={async () => {
-                    await argusService.updateIssueTracker(projectId, trk.id, {
-                      enabled: !trk.enabled,
-                    });
-                    await loadTrackers();
-                  }}
-                  onTest={async () => {
-                    try {
-                      const r = await argusService.testIssueTracker(
-                        projectId,
-                        trk.id
-                      );
-                      enqueueSnackbar(
-                        r.ok ? r.message : `Failed: ${r.message}`,
-                        { variant: r.ok ? 'success' : 'error' }
-                      );
-                    } catch {
-                      enqueueSnackbar(t('argus.settings.testFailed'), {
-                        variant: 'error',
-                      });
-                    }
-                  }}
-                  onDelete={async () => {
-                    await argusService.deleteIssueTracker(projectId, trk.id);
-                    setTrackers((p) => p.filter((i) => i.id !== trk.id));
-                    enqueueSnackbar(t('common.deleted'), {
-                      variant: 'success',
-                    });
-                  }}
-                />
-              );
-            })}
+            {TRACKER_PROVIDERS.map((prov) => (
+              <ProviderCard
+                key={prov.id}
+                prov={prov}
+                isDark={isDark}
+                t={t}
+                count={trackers.filter((tr) => tr.provider === prov.id).length}
+                onAdd={() => {
+                  setAddTrkDialog(prov.id);
+                }}
+              />
+            ))}
           </Box>
         </SettingsCard>
-      )}
-      {!trkLoaded && <Spinner />}
+        {trkLoaded && trackers.length > 0 && (
+          <SettingsCard
+            title={t('argus.settings.configuredTrackers')}
+            desc={t('argus.settings.configuredTrackersDesc')}
+            isDark={isDark}
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: 2,
+              }}
+            >
+              {trackers.map((trk) => {
+                const prov = TRACKER_PROVIDERS.find((p) => p.id === trk.provider);
+                return (
+                  <ConnectedItem
+                    key={trk.id}
+                    isDark={isDark}
+                    color={prov?.color || '#666'}
+                    icon={prov?.icon || <BugIcon sx={{ fontSize: 18 }} />}
+                    title={trk.name}
+                    chipLabel={prov?.name || trk.provider}
+                    subtitle={`${trk.api_url}${trk.config?.project_key ? ` · ${trk.config.project_key}` : ''}${trk.config?.repo ? ` · ${trk.config.repo}` : ''}`}
+                    active={trk.enabled}
+                    t={t}
+                    onToggle={async () => {
+                      await argusService.updateIssueTracker(projectId, trk.id, {
+                        enabled: !trk.enabled,
+                      });
+                      await loadTrackers();
+                    }}
+                    onTest={async () => {
+                      try {
+                        const r = await argusService.testIssueTracker(
+                          projectId,
+                          trk.id
+                        );
+                        enqueueSnackbar(
+                          r.ok ? r.message : `Failed: ${r.message}`,
+                          { variant: r.ok ? 'success' : 'error' }
+                        );
+                      } catch {
+                        enqueueSnackbar(t('argus.settings.testFailed'), {
+                          variant: 'error',
+                        });
+                      }
+                    }}
+                    onDelete={async () => {
+                      await argusService.deleteIssueTracker(projectId, trk.id);
+                      setTrackers((p) => p.filter((i) => i.id !== trk.id));
+                      enqueueSnackbar(t('common.deleted'), {
+                        variant: 'success',
+                      });
+                    }}
+                  />
+                );
+              })}
+            </Box>
+          </SettingsCard>
+        )}
 
-      {/* ═══ ADD TRACKER WIZARD ═══ */}
-      {(() => {
-        const tp = TRACKER_PROVIDERS.find((p) => p.id === addTrkDialog);
-        if (!tp) return null;
-        const wizardCfg: WizardProviderConfig = {
-          id: tp.id,
-          name: tp.name,
-          color: tp.color,
-          gradient: tp.gradient,
-          accentColor: tp.accentColor,
-          icon: tp.icon,
-          descKey: tp.descKey,
-        };
-        const allFields: WizardFieldDef[] = [
-          ...tp.baseFields,
-          ...tp.configFields,
-        ].map((f) => ({
-          ...f,
-          required:
-            f.key === 'name' || f.key === 'api_url' || f.key === 'api_token',
-        }));
-        return (
-          <ProviderWizardModal
-            open={!!addTrkDialog}
-            onClose={() => {
-              setAddTrkDialog(null);
-            }}
-            provider={wizardCfg}
-            fields={allFields}
-            wizardTitleKey="argus.settings.providerWizard.addTracker"
-            onSubmit={async (data) => {
-              const config: Record<string, string> = {};
-              tp.configFields.forEach((f) => {
-                if (data[f.key]) config[f.key] = data[f.key];
-              });
-              await argusService.createIssueTracker(projectId, {
-                provider: addTrkDialog as any,
-                name: data.name?.trim() || '',
-                api_url: data.api_url?.trim() || '',
-                api_token: data.api_token?.trim() || '',
-                config: Object.keys(config).length > 0 ? config : undefined,
-              });
-              await loadTrackers();
-              setAddTrkDialog(null);
-            }}
-          />
-        );
-      })()}
-    </Box>
+        {/* ═══ ADD TRACKER WIZARD ═══ */}
+        {(() => {
+          const tp = TRACKER_PROVIDERS.find((p) => p.id === addTrkDialog);
+          if (!tp) return null;
+          const wizardCfg: WizardProviderConfig = {
+            id: tp.id,
+            name: tp.name,
+            color: tp.color,
+            gradient: tp.gradient,
+            accentColor: tp.accentColor,
+            icon: tp.icon,
+            descKey: tp.descKey,
+          };
+          const providerHelp = TRACKER_HELP_LINKS[tp.id] || {};
+          const allFields: WizardFieldDef[] = [
+            ...tp.baseFields,
+            ...tp.configFields,
+          ].map((f) => ({
+            ...f,
+            required:
+              f.key === 'name' || f.key === 'api_url' || f.key === 'api_token',
+            helpTextKey: providerHelp[f.key]?.helpTextKey,
+            helpUrl: providerHelp[f.key]?.helpUrl,
+          }));
+          return (
+            <ProviderWizardModal
+              open={!!addTrkDialog}
+              onClose={() => {
+                setAddTrkDialog(null);
+              }}
+              provider={wizardCfg}
+              fields={allFields}
+              wizardTitleKey="argus.settings.providerWizard.addTracker"
+              onSubmit={async (data) => {
+                const config: Record<string, string> = {};
+                tp.configFields.forEach((f) => {
+                  if (data[f.key]) config[f.key] = data[f.key];
+                });
+                await argusService.createIssueTracker(projectId, {
+                  provider: addTrkDialog as any,
+                  name: data.name?.trim() || '',
+                  api_url: data.api_url?.trim() || '',
+                  api_token: data.api_token?.trim() || '',
+                  config: Object.keys(config).length > 0 ? config : undefined,
+                });
+                await loadTrackers();
+                setAddTrkDialog(null);
+              }}
+            />
+          );
+        })()}
+      </Box>
+    </PageContentLoader>
   );
 };
 

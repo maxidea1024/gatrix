@@ -2,6 +2,7 @@ import React from 'react';
 import { TextField, Button, InputAdornment } from '@mui/material';
 import { Save as SaveIcon } from '@mui/icons-material';
 import { SettingsCard, FieldBlock, RateBar } from './components/SettingsShared';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface SamplingSettingsProps {
   errorQuota: number;
@@ -50,133 +51,135 @@ export const SamplingSettings: React.FC<SamplingSettingsProps> = ({
   };
 
   return (
-    <SettingsCard
-      title={t('argus.settings.samplingQuotas')}
-      desc={t('argus.settings.samplingDesc')}
-      isDark={isDark}
-      headerAction={
-        <Button
-          variant="contained"
-          size="small"
-          startIcon={<SaveIcon />}
-          onClick={handleSave}
-          disabled={saving || !isDirty}
-          sx={{
-            borderRadius: '8px',
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
-            boxShadow: 'none',
-          }}
+    <PageContentLoader loading={false}>
+      <SettingsCard
+        title={t('argus.settings.samplingQuotas')}
+        desc={t('argus.settings.samplingDesc')}
+        isDark={isDark}
+        headerAction={
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<SaveIcon />}
+            onClick={handleSave}
+            disabled={saving || !isDirty}
+            sx={{
+              borderRadius: '8px',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              boxShadow: 'none',
+            }}
+          >
+            {saving ? t('argus.settings.saving') : t('common.save')}
+          </Button>
+        }
+      >
+        <FieldBlock
+          label={t('argus.settings.errorQuota')}
+          desc={t('argus.settings.errorQuotaDesc')}
         >
-          {saving ? t('argus.settings.saving') : t('common.save')}
-        </Button>
-      }
-    >
-      <FieldBlock
-        label={t('argus.settings.errorQuota')}
-        desc={t('argus.settings.errorQuotaDesc')}
-      >
-        <TextField
-          type="number"
-          value={errorQuota}
-          onChange={(e) => setErrorQuota(Number(e.target.value))}
-          size="small"
-          sx={{ ...inpSx, width: 200 }}
-          InputProps={{
-            endAdornment: <InputAdornment position="end">/day</InputAdornment>,
-          }}
-        />
-      </FieldBlock>
-      <FieldBlock
-        label={t('argus.settings.retentionDays')}
-        desc={t('argus.settings.retentionDesc')}
-      >
-        <TextField
-          type="number"
-          value={retentionDays}
-          onChange={(e) => setRetentionDays(Number(e.target.value))}
-          size="small"
-          sx={{ ...inpSx, width: 160 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                {t('argus.settings.days')}
-              </InputAdornment>
-            ),
-          }}
-        />
-      </FieldBlock>
-      <FieldBlock
-        label={t('argus.settings.txnSampleRate')}
-        desc={t('argus.settings.txnSampleDesc')}
-      >
-        <RateBar value={txnRate} onChange={setTxnRate} isDark={isDark} />
-      </FieldBlock>
-      <FieldBlock
-        label={t('argus.settings.sessionSampleRate')}
-        desc={t('argus.settings.sessionSampleDesc')}
-      >
-        <RateBar
-          value={sessionRate}
-          onChange={setSessionRate}
-          isDark={isDark}
-        />
-      </FieldBlock>
-      <FieldBlock
-        label={t('argus.settings.metricsGroupLimit', 'Metrics Group Limit')}
-        desc={t(
-          'argus.settings.metricsGroupDesc',
-          'Maximum number of series shown in metrics explorer multi-group charts.'
-        )}
-        last
-      >
-        <TextField
-          type="number"
-          value={metricsGroupLimit}
-          onChange={(e) =>
-            setMetricsGroupLimit(Math.max(1, Number(e.target.value)))
-          }
-          size="small"
-          sx={{ ...inpSx, width: 120 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">series</InputAdornment>
-            ),
-          }}
-        />
-      </FieldBlock>
-      <FieldBlock
-        label={t(
-          'argus.settings.analyticsBreakdownLimit',
-          'Analytics Breakdown Limit'
-        )}
-        desc={t(
-          'argus.settings.analyticsBreakdownDesc',
-          'Maximum number of breakdown values displayed in analytics charts. Higher values may reduce chart readability.'
-        )}
-        last
-      >
-        <TextField
-          type="number"
-          value={analyticsBreakdownLimit}
-          onChange={(e) =>
-            setAnalyticsBreakdownLimit(
-              Math.max(1, Math.min(100, Number(e.target.value)))
-            )
-          }
-          size="small"
-          sx={{ ...inpSx, width: 120 }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                {t('argus.analytics.breakdown', 'groups')}
-              </InputAdornment>
-            ),
-          }}
-        />
-      </FieldBlock>
-    </SettingsCard>
+          <TextField
+            type="number"
+            value={errorQuota}
+            onChange={(e) => setErrorQuota(Number(e.target.value))}
+            size="small"
+            sx={{ ...inpSx, width: 200 }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">/day</InputAdornment>,
+            }}
+          />
+        </FieldBlock>
+        <FieldBlock
+          label={t('argus.settings.retentionDays')}
+          desc={t('argus.settings.retentionDesc')}
+        >
+          <TextField
+            type="number"
+            value={retentionDays}
+            onChange={(e) => setRetentionDays(Number(e.target.value))}
+            size="small"
+            sx={{ ...inpSx, width: 160 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  {t('argus.settings.days')}
+                </InputAdornment>
+              ),
+            }}
+          />
+        </FieldBlock>
+        <FieldBlock
+          label={t('argus.settings.txnSampleRate')}
+          desc={t('argus.settings.txnSampleDesc')}
+        >
+          <RateBar value={txnRate} onChange={setTxnRate} isDark={isDark} />
+        </FieldBlock>
+        <FieldBlock
+          label={t('argus.settings.sessionSampleRate')}
+          desc={t('argus.settings.sessionSampleDesc')}
+        >
+          <RateBar
+            value={sessionRate}
+            onChange={setSessionRate}
+            isDark={isDark}
+          />
+        </FieldBlock>
+        <FieldBlock
+          label={t('argus.settings.metricsGroupLimit', 'Metrics Group Limit')}
+          desc={t(
+            'argus.settings.metricsGroupDesc',
+            'Maximum number of series shown in metrics explorer multi-group charts.'
+          )}
+          last
+        >
+          <TextField
+            type="number"
+            value={metricsGroupLimit}
+            onChange={(e) =>
+              setMetricsGroupLimit(Math.max(1, Number(e.target.value)))
+            }
+            size="small"
+            sx={{ ...inpSx, width: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">series</InputAdornment>
+              ),
+            }}
+          />
+        </FieldBlock>
+        <FieldBlock
+          label={t(
+            'argus.settings.analyticsBreakdownLimit',
+            'Analytics Breakdown Limit'
+          )}
+          desc={t(
+            'argus.settings.analyticsBreakdownDesc',
+            'Maximum number of breakdown values displayed in analytics charts. Higher values may reduce chart readability.'
+          )}
+          last
+        >
+          <TextField
+            type="number"
+            value={analyticsBreakdownLimit}
+            onChange={(e) =>
+              setAnalyticsBreakdownLimit(
+                Math.max(1, Math.min(100, Number(e.target.value)))
+              )
+            }
+            size="small"
+            sx={{ ...inpSx, width: 120 }}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  {t('argus.analytics.breakdown', 'groups')}
+                </InputAdornment>
+              ),
+            }}
+          />
+        </FieldBlock>
+      </SettingsCard>
+    </PageContentLoader>
   );
 };
 

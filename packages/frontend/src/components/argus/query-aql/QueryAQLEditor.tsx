@@ -520,11 +520,22 @@ export const QueryAQLEditor = forwardRef<
 
   const deleteChip = useCallback(
     (chipId: string) => {
-      setChips((prev) => prev.filter((c) => c.id !== chipId));
+      setChips((prev) => {
+        const next = prev.filter((c) => c.id !== chipId);
+        // Notify parent so the page re-fetches with updated query
+        requestAnimationFrame(() => {
+          const query = chipsToQuery(next);
+          prevInitialQuery.current = query;
+          lastInternalQueryRef.current = query;
+          onChangeRef.current?.(query);
+          onSearch(query);
+        });
+        return next;
+      });
       setSelectedTokenIdx(-1);
       setEditingToken(null);
     },
-    [setChips]
+    [setChips, onSearch]
   );
 
   /** Handle click on a token part (field/operator/value) */

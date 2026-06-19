@@ -18,9 +18,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  FormControl,
-  Select,
-  MenuItem,
   IconButton,
   Tooltip,
 } from '@mui/material';
@@ -42,7 +39,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
-import { TableSkeleton } from '@/components/argus/ArgusSkeletons';
+
 import ArgusFilterBar, {
   ArgusFilterState,
   defaultArgusFilterState,
@@ -55,20 +52,19 @@ import {
   type QueryAQLEditorHandle,
 } from '@/components/argus/query-aql';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
-import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
+
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import ColumnEditorModal from '@/components/argus/ColumnEditorModal';
 import {
   VolumeChart,
   GroupBySelector,
-  DisplayModeChip,
   DatasetSwitcher,
   PrebuiltQueryCards,
   PaginationControls,
   FALLBACK_COLUMNS,
   DATASET_FALLBACK_COLUMNS,
-  Y_AXIS_OPTIONS,
   type PrebuiltQuery,
   type DiscoverDataset,
 } from './components/discoverHelpers';
@@ -160,7 +156,7 @@ const ArgusDiscoverPage: React.FC = () => {
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasQueried, setHasQueried] = useState(false);
+  const [hasQueried, setHasQueried] = useState(true);
   const [queryOffset, setQueryOffset] = useState(0);
   const QUERY_LIMIT = 50;
 
@@ -175,7 +171,6 @@ const ArgusDiscoverPage: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
     null
   );
-  const lastProcessedUrlQueryIdRef = useRef<string | undefined>(undefined);
 
   const defaultQueryName = t('argus.discover.newQuery', 'New Discover Query');
   const [queryName, setQueryName] = useState(
@@ -440,7 +435,6 @@ const ArgusDiscoverPage: React.FC = () => {
           if (res.id) {
             setCurrentQueryId(res.id);
             setUrlState({ queryId: String(res.id) });
-            lastProcessedUrlQueryIdRef.current = String(res.id);
           }
           const updated = await argusService.listSavedQueries(projectId);
           setSavedQueries(updated);
@@ -491,7 +485,6 @@ const ArgusDiscoverPage: React.FC = () => {
           setCurrentQueryId(existingQueryId);
           setQueryName(name);
           setUrlState({ queryId: String(existingQueryId) });
-          lastProcessedUrlQueryIdRef.current = String(existingQueryId);
         } else {
           // Create new
           const res = await argusService.createSavedQuery(projectId, {
@@ -503,7 +496,6 @@ const ArgusDiscoverPage: React.FC = () => {
             setCurrentQueryId(res.id);
             setQueryName(name);
             setUrlState({ queryId: String(res.id) });
-            lastProcessedUrlQueryIdRef.current = String(res.id);
           }
         }
         const updated = await argusService.listSavedQueries(projectId);
@@ -581,7 +573,6 @@ const ArgusDiscoverPage: React.FC = () => {
       setQueryName(query.name);
       setCurrentQueryId(query.id);
       setSavedPanelOpen(false);
-      lastProcessedUrlQueryIdRef.current = String(query.id);
       // Set snapshot after load so isDirty starts as false
       setSavedSnapshot({
         fields: cfg.fields || ['count()'],
@@ -956,6 +947,7 @@ const ArgusDiscoverPage: React.FC = () => {
         data={volume}
         isDark={isDark}
         period={currentPeriod}
+        loading={loading}
         onZoom={handleChartZoom}
       />
 
@@ -1054,10 +1046,7 @@ const ArgusDiscoverPage: React.FC = () => {
             </Box>
           )}
 
-          <PageContentLoader
-            loading={loading}
-            skeleton={<TableSkeleton rows={8} cols={fields.length || 4} />}
-          >
+          <>
             {results.length > 0 ? (
               <>
                 <Box sx={{ overflowX: 'auto' }}>
@@ -1250,7 +1239,7 @@ const ArgusDiscoverPage: React.FC = () => {
                 </Typography>
               </Box>
             ) : null}
-          </PageContentLoader>
+          </>
         </Paper>
       )}
 

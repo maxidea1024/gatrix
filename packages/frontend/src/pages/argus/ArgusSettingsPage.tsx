@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, Typography, useTheme, alpha } from '@mui/material';
+import { Box, Typography, useTheme, alpha, Tooltip } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -66,6 +66,9 @@ const ArgusSettingsPage: React.FC = () => {
   const [retentionDays, setRetentionDays] = useState(90);
   const [metricsGroupLimit, setMetricsGroupLimit] = useState(10);
   const [analyticsBreakdownLimit, setAnalyticsBreakdownLimit] = useState(20);
+  const [trackerCount, setTrackerCount] = useState<number | null>(null);
+  const [notifCount, setNotifCount] = useState<number | null>(null);
+
   const originalValues = React.useRef({
     name: '',
     platform: '',
@@ -85,6 +88,19 @@ const ArgusSettingsPage: React.FC = () => {
     retentionDays !== originalValues.current.retentionDays ||
     metricsGroupLimit !== originalValues.current.metricsGroupLimit ||
     analyticsBreakdownLimit !== originalValues.current.analyticsBreakdownLimit;
+
+  const fetchCounts = useCallback(async () => {
+    try {
+      const [trackers, channels] = await Promise.all([
+        argusService.listIssueTrackers(projectId).catch(() => []),
+        (argusService as any).listNotificationChannels(projectId).catch(() => []),
+      ]);
+      setTrackerCount(trackers.length);
+      setNotifCount(channels.length);
+    } catch (err) {
+      console.error('Failed to fetch counts:', err);
+    }
+  }, [projectId]);
 
   // ── Fetch ──
   const fetchProject = useCallback(async () => {
@@ -116,6 +132,7 @@ const ArgusSettingsPage: React.FC = () => {
         metricsGroupLimit: mgl,
         analyticsBreakdownLimit: abl,
       };
+      await fetchCounts();
     } catch (err: any) {
       if (err?.response?.status === 404 || err?.status === 404) {
         try {
@@ -131,6 +148,7 @@ const ArgusSettingsPage: React.FC = () => {
           enqueueSnackbar(t('argus.settings.projectCreated'), {
             variant: 'success',
           });
+          await fetchCounts();
         } catch {
           /* */
         }
@@ -138,7 +156,7 @@ const ArgusSettingsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, enqueueSnackbar, t]);
+  }, [projectId, enqueueSnackbar, t, fetchCounts]);
 
   useEffect(() => {
     fetchProject();
@@ -174,6 +192,110 @@ const ArgusSettingsPage: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const renderBadge = (id: SectionId) => {
+    if (id === 'dsn-keys') {
+      const activeCount = project?.active_dsn_count ?? 0;
+      if (activeCount === 0) return null;
+      return (
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '0.7rem',
+            color: 'text.secondary',
+            opacity: 0.8,
+            fontWeight: 500,
+          }}
+        >
+          {activeCount}
+        </Typography>
+      );
+    }
+
+    if (id === 'sdk-setup') {
+      const activeCount = project?.active_dsn_count ?? 0;
+      const isConnected = activeCount > 0;
+      return (
+        <Box
+          sx={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            backgroundColor: isConnected ? 'success.main' : 'text.disabled',
+          }}
+        />
+      );
+    }
+
+    if (id === 'notifications') {
+      if (notifCount === null) return null;
+      return (
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: '0.7rem',
+            color: notifCount > 0 ? 'primary.main' : 'text.secondary',
+            opacity: notifCount > 0 ? 1 : 0.6,
+            fontWeight: 600,
+            px: 0.6,
+            py: 0.1,
+            borderRadius: 1,
+            backgroundColor: notifCount > 0 
+              ? alpha(theme.palette.primary.main, 0.1) 
+              : 'transparent',
+          }}
+        >
+          {notifCount}
+        </Typography>
+      );
+    }
+
+    if (id === 'issue-trackers') {
+      if (trackerCount === null) return null;
+      const connected = trackerCount > 0;
+      return (
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {connected ? (
+            <Typography
+              variant="caption"
+              sx={{
+                fontSize: '0.7rem',
+                color: 'success.main',
+                fontWeight: 600,
+                px: 0.6,
+                py: 0.1,
+                borderRadius: 1,
+                backgroundColor: alpha(theme.palette.success.main, 0.1),
+              }}
+            >
+              {trackerCount}
+            </Typography>
+          ) : (
+            <Tooltip title={t('argus.settings.trackerRequired', 'Connection Required')}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  backgroundColor: alpha(theme.palette.warning.main, 0.15),
+                  color: 'warning.main',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                }}
+              >
+                !
+              </Box>
+            </Tooltip>
+          )}
+        </Box>
+      );
+    }
+
+    return null;
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -226,6 +348,7 @@ const ArgusSettingsPage: React.FC = () => {
                         sx={{
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'space-between',
                           gap: 1.2,
                           px: 1.5,
                           py: 1,
@@ -268,23 +391,27 @@ const ArgusSettingsPage: React.FC = () => {
                             }}
                           />
                         )}
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            opacity: active ? 1 : 0.6,
-                            color: 'inherit',
-                          }}
-                        >
-                          {item.icon}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, minWidth: 0, flex: 1 }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              opacity: active ? 1 : 0.6,
+                              color: 'inherit',
+                            }}
+                          >
+                            {item.icon}
+                          </Box>
+                          <Typography
+                            noWrap
+                            sx={{
+                              fontSize: '0.85rem',
+                              fontWeight: active ? 600 : 400,
+                            }}
+                          >
+                            {t(item.labelKey)}
+                          </Typography>
                         </Box>
-                        <Typography
-                          sx={{
-                            fontSize: '0.85rem',
-                            fontWeight: active ? 600 : 400,
-                          }}
-                        >
-                          {t(item.labelKey)}
-                        </Typography>
+                        {renderBadge(item.id)}
                       </Box>
                     );
                   })}
@@ -386,6 +513,7 @@ const ArgusSettingsPage: React.FC = () => {
                 projectId={projectId}
                 isDark={isDark}
                 t={t}
+                onChange={fetchCounts}
               />
             )}
 
@@ -395,6 +523,7 @@ const ArgusSettingsPage: React.FC = () => {
                 projectId={projectId}
                 isDark={isDark}
                 t={t}
+                onChange={fetchCounts}
               />
             )}
 

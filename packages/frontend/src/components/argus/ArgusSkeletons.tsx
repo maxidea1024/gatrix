@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Skeleton, Paper, useTheme } from '@mui/material';
+import ArgusChartSkeleton from './ArgusChartSkeleton';
 
 /* ─── Chart Skeleton ─── */
 export const ChartSkeleton: React.FC<{ height?: number }> = ({
@@ -23,15 +24,11 @@ export const ChartSkeleton: React.FC<{ height?: number }> = ({
         height={18}
         sx={{ mb: 1, borderRadius: 0.5 }}
       />
-      <Skeleton
-        variant="rectangular"
-        height={height}
-        animation="wave"
-        sx={{ borderRadius: 1 }}
-      />
+      <ArgusChartSkeleton height={height} />
     </Paper>
   );
 };
+
 
 /* ─── Stats Row Skeleton (4 cards) ─── */
 export const StatsRowSkeleton: React.FC<{ count?: number }> = ({

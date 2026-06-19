@@ -29,7 +29,6 @@ ChartJS.register(
   Filler
 );
 import PageContentLoader from '@/components/common/PageContentLoader';
-import { ListSkeleton } from '@/components/argus/ArgusSkeletons';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import argusService, {
   ArgusAlertRule,
@@ -469,7 +468,7 @@ const ArgusAlertRulesPage: React.FC<ArgusAlertRulesPageProps> = ({
         }
       />
 
-      <PageContentLoader loading={loading} skeleton={<ListSkeleton rows={5} />}>
+      <PageContentLoader loading={loading}>
         {rules.length === 0 ? (
           <EmptyPlaceholder
             message={t('argus.alerts.noRules')}

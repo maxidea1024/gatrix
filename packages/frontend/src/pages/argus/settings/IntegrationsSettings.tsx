@@ -28,12 +28,12 @@ import {
   SettingsCard,
   ProviderCard,
   ConfigDialog,
-  Spinner,
   ProviderFieldDef,
   EmptyState,
 } from './components/SettingsShared';
 import { GlobalIntegrationWizardModal } from '../components/GlobalIntegrationWizardModal';
 import argusService, { ArgusIntegration } from '@/services/argusService';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface RepoProviderDef {
   id: string;
@@ -286,364 +286,364 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* 1. Available Providers - Only show those not globally configured */}
-      {availableProviders.length > 0 && (
-        <SettingsCard
-          title={t('argus.settings.availableProviders', 'Available Providers')}
-          desc={t(
-            'argus.settings.availableProvidersDesc',
-            'Connect external repository providers.'
-          )}
-          isDark={isDark}
-        >
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-              gap: 2,
-            }}
+    <PageContentLoader loading={!intLoaded}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {/* 1. Available Providers - Only show those not globally configured */}
+        {availableProviders.length > 0 && (
+          <SettingsCard
+            title={t('argus.settings.availableProviders', 'Available Providers')}
+            desc={t(
+              'argus.settings.availableProvidersDesc',
+              'Connect external repository providers.'
+            )}
+            isDark={isDark}
           >
-            {availableProviders.map((prov) => (
-              <ProviderCard
-                key={prov.id}
-                prov={prov}
-                isDark={isDark}
-                t={t}
-                count={0}
-                onAdd={() => {
-                  setWizardProvider(
-                    prov.id as 'github' | 'gitlab' | 'bitbucket'
-                  );
-                  setWizardOpen(true);
-                }}
-              />
-            ))}
-          </Box>
-        </SettingsCard>
-      )}
-
-      {/* 2. Connected Integrations (Sentry Style) */}
-      {intLoaded &&
-        REPO_PROVIDERS.map((prov) => {
-          const configInfo = globalConfigs[prov.id];
-          const isConfigured = configInfo?.configured;
-          if (!isConfigured) return null;
-
-          const provRepos = integrations.filter((i) => i.provider === prov.id);
-          const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-
-          return (
-            <SettingsCard
-              key={prov.id}
-              title={`${prov.name} ${t('argus.settings.integration', 'Integration')}`}
-              desc={t(
-                'argus.settings.integrationDesc',
-                '{{name}} App is configured. Connect repositories to link commits, PRs, and releases.',
-                { name: prov.name }
-              )}
-              isDark={isDark}
-              headerAction={
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={() => handleOpenAddRepoDialog(prov.id)}
-                    sx={{
-                      textTransform: 'none',
-                      borderRadius: '8px',
-                      fontWeight: 600,
-                      fontSize: '0.78rem',
-                    }}
-                  >
-                    {t(
-                      'argus.settings.addRepositoryConnection',
-                      'Add Repository'
-                    )}
-                  </Button>
-                  <Button
-                    size="small"
-                    color="error"
-                    variant="outlined"
-                    onClick={() => handleDisconnectGlobal(prov.id)}
-                    sx={{
-                      textTransform: 'none',
-                      borderRadius: '8px',
-                      fontSize: '0.78rem',
-                    }}
-                  >
-                    {t('argus.settings.disconnect', 'Disconnect')}
-                  </Button>
-                </Box>
-              }
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: 2,
+              }}
             >
-              {/* Global App installation info box */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  p: 2,
-                  mb: 2.5,
-                  borderRadius: '8px',
-                  border: `1px solid ${bdr}`,
-                  backgroundColor: isDark
-                    ? 'rgba(255,255,255,0.02)'
-                    : 'rgba(0,0,0,0.01)',
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Avatar
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      backgroundColor: alpha(prov.color, 0.1),
-                      color: prov.color,
-                    }}
-                  >
-                    {prov.icon}
-                  </Avatar>
-                  <Box>
-                    <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
-                      {configInfo.name || `${prov.name} App`}
-                    </Typography>
-                    {configInfo.url && (
-                      <Link
-                        href={configInfo.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{
-                          fontSize: '0.75rem',
-                          color: 'text.secondary',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                          '&:hover': { textDecoration: 'underline' },
-                        }}
-                      >
-                        {configInfo.url}
-                      </Link>
-                    )}
-                  </Box>
-                </Box>
-                <Chip
-                  label={t('argus.settings.connectedStatus', 'Connected')}
-                  size="small"
-                  sx={{
-                    height: 22,
-                    fontWeight: 600,
-                    fontSize: '0.72rem',
-                    backgroundColor: alpha('#4caf50', 0.12),
-                    color: '#4caf50',
+              {availableProviders.map((prov) => (
+                <ProviderCard
+                  key={prov.id}
+                  prov={prov}
+                  isDark={isDark}
+                  t={t}
+                  count={0}
+                  onAdd={() => {
+                    setWizardProvider(
+                      prov.id as 'github' | 'gitlab' | 'bitbucket'
+                    );
+                    setWizardOpen(true);
                   }}
                 />
-              </Box>
+              ))}
+            </Box>
+          </SettingsCard>
+        )}
 
-              {/* Repository Table list */}
-              {provRepos.length === 0 ? (
-                <EmptyState
-                  icon={prov.icon}
-                  text={t(
-                    'argus.settings.noConnectedRepos',
-                    'No repositories connected.'
-                  )}
-                  hint={t(
-                    'argus.settings.addRepoHintGlobal',
-                    "Click 'Add Repository' button to select a repository to connect."
-                  )}
-                />
-              ) : (
-                <TableContainer
-                  component={Paper}
-                  elevation={0}
+        {/* 2. Connected Integrations (Sentry Style) */}
+        {intLoaded &&
+          REPO_PROVIDERS.map((prov) => {
+            const configInfo = globalConfigs[prov.id];
+            const isConfigured = configInfo?.configured;
+            if (!isConfigured) return null;
+
+            const provRepos = integrations.filter((i) => i.provider === prov.id);
+            const bdr = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+
+            return (
+              <SettingsCard
+                key={prov.id}
+                title={`${prov.name} ${t('argus.settings.integration', 'Integration')}`}
+                desc={t(
+                  'argus.settings.integrationDesc',
+                  '{{name}} App is configured. Connect repositories to link commits, PRs, and releases.',
+                  { name: prov.name }
+                )}
+                isDark={isDark}
+                headerAction={
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      onClick={() => handleOpenAddRepoDialog(prov.id)}
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '8px',
+                        fontWeight: 600,
+                        fontSize: '0.78rem',
+                      }}
+                    >
+                      {t(
+                        'argus.settings.addRepositoryConnection',
+                        'Add Repository'
+                      )}
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                      onClick={() => handleDisconnectGlobal(prov.id)}
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '8px',
+                        fontSize: '0.78rem',
+                      }}
+                    >
+                      {t('argus.settings.disconnect', 'Disconnect')}
+                    </Button>
+                  </Box>
+                }
+              >
+                {/* Global App installation info box */}
+                <Box
                   sx={{
-                    border: `1px solid ${bdr}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    p: 2,
+                    mb: 2.5,
                     borderRadius: '8px',
-                    overflow: 'hidden',
+                    border: `1px solid ${bdr}`,
+                    backgroundColor: isDark
+                      ? 'rgba(255,255,255,0.02)'
+                      : 'rgba(0,0,0,0.01)',
                   }}
                 >
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow
-                        sx={{
-                          backgroundColor: isDark
-                            ? 'rgba(255,255,255,0.02)'
-                            : 'rgba(0,0,0,0.01)',
-                        }}
-                      >
-                        <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
-                          {t('argus.settings.repository', 'Repository')}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
-                          {t('argus.settings.defaultBranch', 'Default Branch')}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
-                          {t('argus.settings.status', 'Status')}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
-                          {t('argus.settings.connectedDate', 'Connected Date')}
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          sx={{ fontWeight: 600, py: 1.2, pr: 2 }}
-                        >
-                          {t('common.actions', 'Actions')}
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {provRepos.map((intg) => (
-                        <TableRow
-                          key={intg.id}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        backgroundColor: alpha(prov.color, 0.1),
+                        color: prov.color,
+                      }}
+                    >
+                      {prov.icon}
+                    </Avatar>
+                    <Box>
+                      <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>
+                        {configInfo.name || `${prov.name} App`}
+                      </Typography>
+                      {configInfo.url && (
+                        <Link
+                          href={configInfo.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           sx={{
-                            '&:last-child td, &:last-child th': { border: 0 },
+                            fontSize: '0.75rem',
+                            color: 'text.secondary',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                            '&:hover': { textDecoration: 'underline' },
                           }}
                         >
-                          <TableCell sx={{ py: 1.2 }}>
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                              }}
-                            >
-                              <Link
-                                href={intg.repo_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                sx={{
-                                  fontWeight: 600,
-                                  fontSize: '0.85rem',
-                                  textDecoration: 'none',
-                                  color: 'primary.main',
-                                  '&:hover': { textDecoration: 'underline' },
-                                }}
-                              >
-                                {getRepoDisplayName(intg.repo_url)}
-                              </Link>
-                            </Box>
+                          {configInfo.url}
+                        </Link>
+                      )}
+                    </Box>
+                  </Box>
+                  <Chip
+                    label={t('argus.settings.connectedStatus', 'Connected')}
+                    size="small"
+                    sx={{
+                      height: 22,
+                      fontWeight: 600,
+                      fontSize: '0.72rem',
+                      backgroundColor: alpha('#4caf50', 0.12),
+                      color: '#4caf50',
+                    }}
+                  />
+                </Box>
+
+                {/* Repository Table list */}
+                {provRepos.length === 0 ? (
+                  <EmptyState
+                    icon={prov.icon}
+                    text={t(
+                      'argus.settings.noConnectedRepos',
+                      'No repositories connected.'
+                    )}
+                    hint={t(
+                      'argus.settings.addRepoHintGlobal',
+                      "Click 'Add Repository' button to select a repository to connect."
+                    )}
+                  />
+                ) : (
+                  <TableContainer
+                    component={Paper}
+                    elevation={0}
+                    sx={{
+                      border: `1px solid ${bdr}`,
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow
+                          sx={{
+                            backgroundColor: isDark
+                              ? 'rgba(255,255,255,0.02)'
+                              : 'rgba(0,0,0,0.01)',
+                          }}
+                        >
+                          <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
+                            {t('argus.settings.repository', 'Repository')}
                           </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={intg.default_branch}
-                              size="small"
-                              sx={{
-                                height: 18,
-                                fontSize: '0.72rem',
-                                backgroundColor: isDark
-                                  ? 'rgba(255,255,255,0.06)'
-                                  : 'rgba(0,0,0,0.05)',
-                                borderRadius: '4px',
-                              }}
-                            />
+                          <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
+                            {t('argus.settings.defaultBranch', 'Default Branch')}
                           </TableCell>
-                          <TableCell>
-                            <Chip
-                              label={
-                                intg.enabled
-                                  ? t(
-                                      'argus.settings.connectedStatus',
-                                      'Connected'
-                                    )
-                                  : t(
-                                      'argus.settings.disabledStatus',
-                                      'Disabled'
-                                    )
-                              }
-                              size="small"
-                              sx={{
-                                height: 18,
-                                fontSize: '0.72rem',
-                                fontWeight: 600,
-                                backgroundColor: alpha(
-                                  intg.enabled ? '#4caf50' : '#9e9e9e',
-                                  0.12
-                                ),
-                                color: intg.enabled ? '#4caf50' : '#9e9e9e',
-                                border: 'none',
-                              }}
-                            />
+                          <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
+                            {t('argus.settings.status', 'Status')}
+                          </TableCell>
+                          <TableCell sx={{ fontWeight: 600, py: 1.2 }}>
+                            {t('argus.settings.connectedDate', 'Connected Date')}
                           </TableCell>
                           <TableCell
-                            sx={{
-                              fontSize: '0.78rem',
-                              color: 'text.secondary',
-                            }}
+                            align="right"
+                            sx={{ fontWeight: 600, py: 1.2, pr: 2 }}
                           >
-                            {new Date(intg.created_at).toLocaleDateString()}
-                          </TableCell>
-                          <TableCell align="right" sx={{ pr: 1.5 }}>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={async () => {
-                                await argusService.deleteIntegration(
-                                  projectId,
-                                  intg.id
-                                );
-                                setIntegrations((p) =>
-                                  p.filter((i) => i.id !== intg.id)
-                                );
-                                enqueueSnackbar(t('common.deleted'), {
-                                  variant: 'success',
-                                });
-                              }}
-                              sx={{
-                                '&:hover': {
-                                  backgroundColor: isDark
-                                    ? 'rgba(244, 67, 54, 0.12)'
-                                    : 'rgba(211, 47, 47, 0.08)',
-                                },
-                              }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
+                            {t('common.actions', 'Actions')}
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </SettingsCard>
-          );
-        })}
+                      </TableHead>
+                      <TableBody>
+                        {provRepos.map((intg) => (
+                          <TableRow
+                            key={intg.id}
+                            sx={{
+                              '&:last-child td, &:last-child th': { border: 0 },
+                            }}
+                          >
+                            <TableCell sx={{ py: 1.2 }}>
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 1.5,
+                                }}
+                              >
+                                <Link
+                                  href={intg.repo_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  sx={{
+                                    fontWeight: 600,
+                                    fontSize: '0.85rem',
+                                    textDecoration: 'none',
+                                    color: 'primary.main',
+                                    '&:hover': { textDecoration: 'underline' },
+                                  }}
+                                >
+                                  {getRepoDisplayName(intg.repo_url)}
+                                </Link>
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={intg.default_branch}
+                                size="small"
+                                sx={{
+                                  height: 18,
+                                  fontSize: '0.72rem',
+                                  backgroundColor: isDark
+                                    ? 'rgba(255,255,255,0.06)'
+                                    : 'rgba(0,0,0,0.05)',
+                                  borderRadius: '4px',
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Chip
+                                label={
+                                  intg.enabled
+                                    ? t(
+                                        'argus.settings.connectedStatus',
+                                        'Connected'
+                                      )
+                                    : t(
+                                        'argus.settings.disabledStatus',
+                                        'Disabled'
+                                      )
+                                }
+                                size="small"
+                                sx={{
+                                  height: 18,
+                                  fontSize: '0.72rem',
+                                  fontWeight: 600,
+                                  backgroundColor: alpha(
+                                    intg.enabled ? '#4caf50' : '#9e9e9e',
+                                    0.12
+                                  ),
+                                  color: intg.enabled ? '#4caf50' : '#9e9e9e',
+                                  border: 'none',
+                                }}
+                              />
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                fontSize: '0.78rem',
+                                color: 'text.secondary',
+                              }}
+                            >
+                              {new Date(intg.created_at).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell align="right" sx={{ pr: 1.5 }}>
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={async () => {
+                                  await argusService.deleteIntegration(
+                                    projectId,
+                                    intg.id
+                                  );
+                                  setIntegrations((p) =>
+                                    p.filter((i) => i.id !== intg.id)
+                                  );
+                                  enqueueSnackbar(t('common.deleted'), {
+                                    variant: 'success',
+                                  });
+                                }}
+                                sx={{
+                                  '&:hover': {
+                                    backgroundColor: isDark
+                                      ? 'rgba(244, 67, 54, 0.12)'
+                                      : 'rgba(211, 47, 47, 0.08)',
+                                  },
+                                }}
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </SettingsCard>
+            );
+          })}
 
-      {!intLoaded && <Spinner />}
+        {/* ═══ ADD INTEGRATION DIALOG ═══ */}
+        <ConfigDialog
+          open={!!addIntDialog}
+          onClose={() => {
+            setAddIntDialog(null);
+            setFormData({});
+          }}
+          provider={REPO_PROVIDERS.find((p) => p.id === addIntDialog) || null}
+          fields={dynamicFields}
+          formData={formData}
+          setFormData={setFormData}
+          onSubmit={handleAddIntegration}
+          submitDisabled={!formData.repo_url?.trim()}
+          isDark={isDark}
+          t={t}
+          inpSx={inpSx}
+        />
 
-      {/* ═══ ADD INTEGRATION DIALOG ═══ */}
-      <ConfigDialog
-        open={!!addIntDialog}
-        onClose={() => {
-          setAddIntDialog(null);
-          setFormData({});
-        }}
-        provider={REPO_PROVIDERS.find((p) => p.id === addIntDialog) || null}
-        fields={dynamicFields}
-        formData={formData}
-        setFormData={setFormData}
-        onSubmit={handleAddIntegration}
-        submitDisabled={!formData.repo_url?.trim()}
-        isDark={isDark}
-        t={t}
-        inpSx={inpSx}
-      />
-
-      <GlobalIntegrationWizardModal
-        open={wizardOpen}
-        provider={wizardProvider}
-        onClose={() => setWizardOpen(false)}
-        onSuccess={async () => {
-          setWizardOpen(false);
-          await loadIntegrations();
-          enqueueSnackbar(
-            t('argus.settings.appConnected', 'App connected successfully.'),
-            { variant: 'success' }
-          );
-        }}
-      />
-    </Box>
+        <GlobalIntegrationWizardModal
+          open={wizardOpen}
+          provider={wizardProvider}
+          onClose={() => setWizardOpen(false)}
+          onSuccess={async () => {
+            setWizardOpen(false);
+            await loadIntegrations();
+            enqueueSnackbar(
+              t('argus.settings.appConnected', 'App connected successfully.'),
+              { variant: 'success' }
+            );
+          }}
+        />
+      </Box>
+    </PageContentLoader>
   );
 };
 

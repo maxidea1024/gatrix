@@ -33,6 +33,7 @@ import { CopyButton } from '@/components/common/CopyButton';
 import { DsnKeySparkline } from '../components/DsnKeySparkline';
 import argusService, { ArgusProject } from '@/services/argusService';
 import useLocalStorage from '../../../hooks/useLocalStorage';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface DsnKeysSettingsProps {
   project: ArgusProject | null;
@@ -168,7 +169,7 @@ export const DsnKeysSettings: React.FC<DsnKeysSettingsProps> = ({
   };
 
   return (
-    <>
+    <PageContentLoader loading={!project}>
       <SettingsCard
         title={t('argus.settings.dsnKeys')}
         desc={t('argus.settings.dsnKeysDesc')}
@@ -655,7 +656,7 @@ export const DsnKeysSettings: React.FC<DsnKeysSettingsProps> = ({
           })()}
         </DialogActions>
       </Dialog>
-    </>
+    </PageContentLoader>
   );
 };
 
