@@ -123,6 +123,14 @@ interface EvaluationTimeSeriesPointByApp {
   noCount: number;
 }
 
+// Evaluation time series data point grouped by flag
+interface EvaluationTimeSeriesPointByFlag {
+  bucket: string;
+  displayTime: string;
+  flagName: string;
+  evaluations: number;
+}
+
 // Global environment info with org/project
 interface GlobalEnvironment {
   environmentId: string;
@@ -202,6 +210,9 @@ const FeatureNetworkPage: React.FC = () => {
   const [evaluationTimeSeriesByApp, setEvaluationTimeSeriesByApp] = useState<
     EvaluationTimeSeriesPointByApp[]
   >([]);
+  const [evaluationTimeSeriesByFlag, setEvaluationTimeSeriesByFlag] = useState<
+    EvaluationTimeSeriesPointByFlag[]
+  >([]);
   const [applications, setApplications] = useState<string[]>([]);
   const [initialEnvLoad, setInitialEnvLoad] = useState(true);
   const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>(
@@ -229,19 +240,28 @@ const FeatureNetworkPage: React.FC = () => {
   // Reset pagination when data changes
   useEffect(() => { setTrafficPage(0); }, [trafficData]);
   useEffect(() => { setEvalPage(0); }, [evaluationTimeSeriesByApp]);
+
   const [appsLoaded, setAppsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const tabParam = searchParams.get('tab');
     return tabParam === '1' ? 1 : 0;
   });
-  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env'>(
+  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env' | 'flag'>(
     () => {
       const groupParam = searchParams.get('groupBy');
       if (groupParam === 'env') return 'env';
       if (groupParam === 'app') return 'app';
+      if (groupParam === 'flag') return 'flag';
       return 'all';
     }
   );
+
+  // Reset grouping to 'all' if 'flag' is active and user switches to API Requests tab
+  useEffect(() => {
+    if (activeTab === 0 && chartGroupBy === 'flag') {
+      setChartGroupBy('all');
+    }
+  }, [activeTab, chartGroupBy]);
 
   // Fetch global environments on mount
   useEffect(() => {
@@ -354,6 +374,7 @@ const FeatureNetworkPage: React.FC = () => {
         setEvaluations(null);
         setEvaluationTimeSeries([]);
         setEvaluationTimeSeriesByApp([]);
+        setEvaluationTimeSeriesByFlag([]);
         return;
       }
 
@@ -388,6 +409,7 @@ const FeatureNetworkPage: React.FC = () => {
         evaluationsRes,
         evalTimeSeriesRes,
         evalTimeSeriesByAppRes,
+        evalTimeSeriesByFlagRes,
       ] = await Promise.all([
         api.get<{ traffic: TrafficDataPoint[] }>(
           `${GLOBAL_API_PATH}/traffic?${params}`
@@ -410,6 +432,9 @@ const FeatureNetworkPage: React.FC = () => {
         api.get<{ timeseries: EvaluationTimeSeriesPointByApp[] }>(
           `${GLOBAL_API_PATH}/evaluations/timeseries/by-app?${evalParams}`
         ),
+        api.get<{ timeseries: EvaluationTimeSeriesPointByFlag[] }>(
+          `${GLOBAL_API_PATH}/evaluations/timeseries/by-flag?${evalParams}`
+        ),
       ]);
 
       setTrafficData(trafficRes.data?.traffic || []);
@@ -419,6 +444,9 @@ const FeatureNetworkPage: React.FC = () => {
       setEvaluationTimeSeries(evalTimeSeriesRes.data?.timeseries || []);
       setEvaluationTimeSeriesByApp(
         evalTimeSeriesByAppRes.data?.timeseries || []
+      );
+      setEvaluationTimeSeriesByFlag(
+        evalTimeSeriesByFlagRes.data?.timeseries || []
       );
     } catch (error) {
       console.error('Failed to fetch network traffic data:', error);
@@ -656,6 +684,42 @@ const FeatureNetworkPage: React.FC = () => {
       );
     } else if (chartGroupBy === 'app') {
       return buildGroupedEvalDatasets('appName', (k) => k);
+    } else if (chartGroupBy === 'flag') {
+      if (evaluationTimeSeriesByFlag.length === 0) return [];
+      const groupTotals = new Map<string, number>();
+      evaluationTimeSeriesByFlag.forEach((d) => {
+        const key = d.flagName;
+        groupTotals.set(key, (groupTotals.get(key) || 0) + d.evaluations);
+      });
+      const sorted = [...groupTotals.entries()].sort((a, b) => b[1] - a[1]);
+      const topKeys = new Set(sorted.slice(0, MAX_SERIES).map(([k]) => k));
+
+      const groupAgg = new Map<string, Map<string, number>>();
+      const otherAgg = new Map<string, number>();
+      evaluationTimeSeriesByFlag.forEach((d) => {
+        const key = d.flagName;
+        if (topKeys.has(key)) {
+          if (!groupAgg.has(key)) groupAgg.set(key, new Map());
+          const m = groupAgg.get(key)!;
+          m.set(d.displayTime, (m.get(d.displayTime) || 0) + d.evaluations);
+        } else {
+          otherAgg.set(d.displayTime, (otherAgg.get(d.displayTime) || 0) + d.evaluations);
+        }
+      });
+
+      const datasets: ChartDataset[] = [...groupAgg.entries()].map(([key, agg], i) => ({
+        label: key,
+        data: chartTimeLabels.map((t) => agg.get(t) || 0),
+        color: seriesColors[i % seriesColors.length],
+      }));
+      if (otherAgg.size > 0) {
+        datasets.push({
+          label: 'Other',
+          data: chartTimeLabels.map((t) => otherAgg.get(t) || 0),
+          color: '#9e9e9e',
+        });
+      }
+      return datasets;
     } else {
       const aggregated = new Map<string, number>();
       evaluationTimeSeriesByApp.forEach((d) => {
@@ -667,7 +731,7 @@ const FeatureNetworkPage: React.FC = () => {
         color: seriesColors[0],
       }];
     }
-  }, [evaluationTimeSeriesByApp, chartTimeLabels, seriesColors, chartGroupBy, envFullPathMap, envNameMap]);
+  }, [evaluationTimeSeriesByApp, evaluationTimeSeriesByFlag, chartTimeLabels, seriesColors, chartGroupBy, envFullPathMap, envNameMap]);
 
   // API Request tab summary cards
   const apiSummaryCards = useMemo(
@@ -792,6 +856,39 @@ const FeatureNetworkPage: React.FC = () => {
           hideWhenEmpty
         />
 
+        {/* Chart Grouping Selector */}
+        <ToggleButtonGroup
+          size="small"
+          value={chartGroupBy}
+          exclusive
+          onChange={(_, value) => value && setChartGroupBy(value)}
+          sx={{
+            height: '32px',
+            '& .MuiToggleButton-root': {
+              py: 0,
+              px: 1.5,
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              textTransform: 'none',
+            },
+          }}
+        >
+          <ToggleButton value="all">
+            {t('network.groupByAll')}
+          </ToggleButton>
+          <ToggleButton value="app">
+            {t('network.groupByApp')}
+          </ToggleButton>
+          <ToggleButton value="env">
+            {t('network.groupByEnv')}
+          </ToggleButton>
+          {activeTab === 1 && (
+            <ToggleButton value="flag">
+              {t('network.groupByFlag')}
+            </ToggleButton>
+          )}
+        </ToggleButtonGroup>
+
         {/* Time Range */}
         <Box sx={{ ml: 'auto' }}>
           <DateRangeSelector
@@ -870,31 +967,7 @@ const FeatureNetworkPage: React.FC = () => {
                 ))}
               </Box>
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  mb: 1,
-                }}
-              >
-                <ToggleButtonGroup
-                  size="small"
-                  value={chartGroupBy}
-                  exclusive
-                  onChange={(_, value) => value && setChartGroupBy(value)}
-                >
-                  <ToggleButton value="all">
-                    {t('network.groupByAll')}
-                  </ToggleButton>
-                  <ToggleButton value="app">
-                    {t('network.groupByApp')}
-                  </ToggleButton>
-                  <ToggleButton value="env">
-                    {t('network.groupByEnv')}
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </Box>
+
               <ArgusVolumeChart
                 labels={chartTimeLabels}
                 datasets={apiChartDatasets}
@@ -927,7 +1000,7 @@ const FeatureNetworkPage: React.FC = () => {
                 <Collapse in={showTable}>
                   <Card variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
                     <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                      <TableContainer sx={{ maxHeight: 400 }}>
+                      <TableContainer sx={{ maxHeight: 'calc(100vh - 480px)', minHeight: 300 }}>
                     <Table
                       size="small"
                       stickyHeader
@@ -1089,31 +1162,7 @@ const FeatureNetworkPage: React.FC = () => {
                 ))}
               </Box>
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  mb: 1,
-                }}
-              >
-                <ToggleButtonGroup
-                  size="small"
-                  value={chartGroupBy}
-                  exclusive
-                  onChange={(_, value) => value && setChartGroupBy(value)}
-                >
-                  <ToggleButton value="all">
-                    {t('network.groupByAll')}
-                  </ToggleButton>
-                  <ToggleButton value="app">
-                    {t('network.groupByApp')}
-                  </ToggleButton>
-                  <ToggleButton value="env">
-                    {t('network.groupByEnv')}
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </Box>
+
               <ArgusVolumeChart
                 labels={chartTimeLabels}
                 datasets={evalChartDatasets}
@@ -1146,7 +1195,7 @@ const FeatureNetworkPage: React.FC = () => {
                 <Collapse in={showEvalTable}>
                   <Card variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
                     <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                      <TableContainer sx={{ maxHeight: 400 }}>
+                      <TableContainer sx={{ maxHeight: 'calc(100vh - 480px)', minHeight: 300 }}>
                     <Table
                       size="small"
                       stickyHeader

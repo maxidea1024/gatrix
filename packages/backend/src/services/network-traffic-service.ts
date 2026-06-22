@@ -500,6 +500,52 @@ class NetworkTrafficService {
       noCount: Number(row.noCount) || 0,
     }));
   }
+
+  /**
+   * Get flag evaluation time series data grouped by time bucket AND flagName
+   */
+  async getFlagEvaluationTimeSeriesByFlag(params: {
+    environments?: string[];
+    appNames?: string[];
+    startDate: Date;
+    endDate: Date;
+  }): Promise<
+    {
+      bucket: string;
+      displayTime: string;
+      flagName: string;
+      evaluations: number;
+    }[]
+  > {
+    let query = db('g_feature_metrics')
+      .select(
+        'metricsBucket as bucket',
+        db.raw("DATE_FORMAT(metricsBucket, '%m/%d %H:00') as displayTime"),
+        'flagName',
+        db.raw('COALESCE(SUM(yesCount + noCount), 0) as evaluations')
+      )
+      .where('metricsBucket', '>=', params.startDate)
+      .where('metricsBucket', '<=', params.endDate);
+
+    if (params.environments && params.environments.length > 0) {
+      query = query.whereIn('environmentId', params.environments);
+    }
+
+    if (params.appNames && params.appNames.length > 0) {
+      query = query.whereIn('appName', params.appNames);
+    }
+
+    const rows = await query
+      .groupBy('metricsBucket', 'flagName')
+      .orderBy('metricsBucket', 'asc');
+
+    return rows.map((row: any) => ({
+      bucket: row.bucket,
+      displayTime: row.displayTime,
+      flagName: row.flagName,
+      evaluations: Number(row.evaluations) || 0,
+    }));
+  }
 }
 
 export const networkTrafficService = new NetworkTrafficService();

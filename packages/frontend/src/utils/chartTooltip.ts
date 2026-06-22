@@ -168,10 +168,12 @@ export function externalTooltipHandler(context: any): void {
   const tH = el.offsetHeight;
 
   let left = tooltip.caretX + 12;
-  let top = tooltip.caretY - tH / 2;
+  let top = tooltip.caretY - tH - 8; // Place above the caret
 
   // Flip left if overflowing right
   if (left + tW > pW - 4) left = tooltip.caretX - tW - 12;
+  // If not enough space above, place below
+  if (top < 4) top = tooltip.caretY + 12;
   // Clamp vertical
   if (top + tH > pH - 4) top = pH - tH - 4;
   if (top < 4) top = 4;

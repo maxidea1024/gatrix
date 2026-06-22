@@ -203,4 +203,29 @@ router.get(
   })
 );
 
+// Get flag evaluation time series by flag (from g_feature_metrics)
+router.get(
+  '/evaluations/timeseries/by-flag',
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { environments, appNames, startDate, endDate } = req.query;
+
+    const end = endDate ? new Date(endDate as string) : new Date();
+    const start = startDate
+      ? new Date(startDate as string)
+      : new Date(end.getTime() - 24 * 60 * 60 * 1000);
+
+    const timeseries =
+      await networkTrafficService.getFlagEvaluationTimeSeriesByFlag({
+        environments: environments
+          ? (environments as string).split(',')
+          : undefined,
+        appNames: appNames ? (appNames as string).split(',') : undefined,
+        startDate: start,
+        endDate: end,
+      });
+
+    res.json({ success: true, data: { timeseries } });
+  })
+);
+
 export default router;

@@ -849,6 +849,37 @@ const UnknownFlagsPage: React.FC = () => {
                 </IconButton>
               </Tooltip>
             </Box>
+
+            {/* Standalone Chart Grouping Selector */}
+            <ToggleButtonGroup
+              size="small"
+              value={chartGroupBy}
+              exclusive
+              onChange={(_, value) => value && setChartGroupBy(value)}
+              sx={{
+                height: '36px',
+                '& .MuiToggleButton-root': {
+                  py: 0,
+                  px: 1.5,
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  textTransform: 'none',
+                },
+              }}
+            >
+              <ToggleButton value="all">
+                {t('network.groupByAll')}
+              </ToggleButton>
+              <ToggleButton value="flag">
+                {t('featureFlags.flagName')}
+              </ToggleButton>
+              <ToggleButton value="env">
+                {t('common.environment')}
+              </ToggleButton>
+              <ToggleButton value="app">
+                {t('featureFlags.appName')}
+              </ToggleButton>
+            </ToggleButtonGroup>
           </Box>
 
           <DateRangeSelector
@@ -859,35 +890,7 @@ const UnknownFlagsPage: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Volume Chart with grouping */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          mb: 1,
-        }}
-      >
-        <ToggleButtonGroup
-          size="small"
-          value={chartGroupBy}
-          exclusive
-          onChange={(_, value) => value && setChartGroupBy(value)}
-        >
-          <ToggleButton value="all">
-            {t('network.groupByAll')}
-          </ToggleButton>
-          <ToggleButton value="flag">
-            {t('featureFlags.flagName')}
-          </ToggleButton>
-          <ToggleButton value="env">
-            {t('common.environment')}
-          </ToggleButton>
-          <ToggleButton value="app">
-            {t('featureFlags.appName')}
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
+
       <ArgusVolumeChart
         labels={chartLabels}
         datasets={chartDatasets}
