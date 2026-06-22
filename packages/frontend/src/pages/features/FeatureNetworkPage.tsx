@@ -226,17 +226,45 @@ const FeatureNetworkPage: React.FC = () => {
     const appsParam = searchParams.get('apps');
     return appsParam ? appsParam.split(',') : [];
   });
-  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
-    type: 'preset',
-    preset: searchParams.get('range') || '7d',
-  }));
+  const [dateRange, setDateRange] = useState<DateRangeValue>(() => {
+    const rangeParam = searchParams.get('range');
+    const startParam = searchParams.get('start');
+    const endParam = searchParams.get('end');
+    if (startParam && endParam) {
+      return { type: 'custom', start: new Date(startParam), end: new Date(endParam) };
+    }
+    if (rangeParam) {
+      return { type: 'preset', preset: rangeParam };
+    }
+    return { type: 'preset', preset: '7d' };
+  });
   const [showTable, setShowTable] = useState(true);
   const [showEvalTable, setShowEvalTable] = useState(true);
 
   // Pagination state for detail tables
   const [trafficPage, setTrafficPage] = useState(0);
   const [evalPage, setEvalPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
+
+  const [trafficRowsPerPage, setTrafficRowsPerPage] = useState<number>(() => {
+    const saved = localStorage.getItem('featureNetworkTrafficPageSize');
+    const parsed = saved ? parseInt(saved, 10) : 10;
+    return [5, 10, 15, 20, 25, 50, 100].includes(parsed) ? parsed : 10;
+  });
+  const [evalRowsPerPage, setEvalRowsPerPage] = useState<number>(() => {
+    const saved = localStorage.getItem('featureNetworkEvalPageSize');
+    const parsed = saved ? parseInt(saved, 10) : 10;
+    return [5, 10, 15, 20, 25, 50, 100].includes(parsed) ? parsed : 10;
+  });
+
+  const handleTrafficRowsPerPageChange = (size: number) => {
+    setTrafficRowsPerPage(size);
+    localStorage.setItem('featureNetworkTrafficPageSize', String(size));
+  };
+
+  const handleEvalRowsPerPageChange = (size: number) => {
+    setEvalRowsPerPage(size);
+    localStorage.setItem('featureNetworkEvalPageSize', String(size));
+  };
 
   // Reset pagination when data changes
   useEffect(() => {
@@ -304,10 +332,13 @@ const FeatureNetworkPage: React.FC = () => {
     if (selectedApps.length > 0 && selectedApps.length < applications.length) {
       params.set('apps', selectedApps.join(','));
     }
-    const preset =
-      dateRange.type === 'preset' ? dateRange.preset || '24h' : 'custom';
-    if (preset !== '24h') {
-      params.set('range', preset);
+    if (dateRange.type === 'custom' && dateRange.start && dateRange.end) {
+      params.set('start', dateRange.start.toISOString());
+      params.set('end', dateRange.end.toISOString());
+    } else if (dateRange.type === 'preset' && dateRange.preset) {
+      if (dateRange.preset !== '24h') {
+        params.set('range', dateRange.preset);
+      }
     }
     if (activeTab !== 0) {
       params.set('tab', String(activeTab));
@@ -1086,8 +1117,8 @@ const FeatureNetworkPage: React.FC = () => {
                                 .slice()
                                 .reverse()
                                 .slice(
-                                  trafficPage * rowsPerPage,
-                                  trafficPage * rowsPerPage + rowsPerPage
+                                  trafficPage * trafficRowsPerPage,
+                                  trafficPage * trafficRowsPerPage + trafficRowsPerPage
                                 )
                                 .map((row, index) => (
                                   <TableRow key={index} hover>
@@ -1142,11 +1173,11 @@ const FeatureNetworkPage: React.FC = () => {
                       </TableContainer>
                       <SimplePagination
                         page={trafficPage}
-                        rowsPerPage={rowsPerPage}
+                        rowsPerPage={trafficRowsPerPage}
                         count={trafficData.length}
                         onPageChange={(_, newPage) => setTrafficPage(newPage)}
                         onRowsPerPageChange={(e) => {
-                          setRowsPerPage(Number(e.target.value));
+                          handleTrafficRowsPerPageChange(Number(e.target.value));
                           setTrafficPage(0);
                         }}
                       />
@@ -1287,8 +1318,8 @@ const FeatureNetworkPage: React.FC = () => {
                                 .slice()
                                 .reverse()
                                 .slice(
-                                  evalPage * rowsPerPage,
-                                  evalPage * rowsPerPage + rowsPerPage
+                                  evalPage * evalRowsPerPage,
+                                  evalPage * evalRowsPerPage + evalRowsPerPage
                                 )
                                 .map((row, index) => (
                                   <TableRow key={index} hover>
@@ -1335,11 +1366,11 @@ const FeatureNetworkPage: React.FC = () => {
                       </TableContainer>
                       <SimplePagination
                         page={evalPage}
-                        rowsPerPage={rowsPerPage}
+                        rowsPerPage={evalRowsPerPage}
                         count={evaluationTimeSeriesByApp.length}
                         onPageChange={(_, newPage) => setEvalPage(newPage)}
                         onRowsPerPageChange={(e) => {
-                          setRowsPerPage(Number(e.target.value));
+                          handleEvalRowsPerPageChange(Number(e.target.value));
                           setEvalPage(0);
                         }}
                       />

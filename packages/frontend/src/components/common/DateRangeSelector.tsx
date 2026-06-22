@@ -621,11 +621,6 @@ export default DateRangeSelector;
 
 // ==================== Utility Functions ====================
 
-/**
- * Convert a DateRangeValue to API query params.
- * For preset: returns { period: '24h' }
- * For custom: returns { period: 'custom', start: ISO, end: ISO }
- */
 export function dateRangeToApiParams(value: DateRangeValue): {
   period?: string;
   start?: string;
@@ -635,10 +630,12 @@ export function dateRangeToApiParams(value: DateRangeValue): {
     return { period: value.preset || '24h' };
   }
   if (value.type === 'custom' && value.start && value.end) {
+    const startObj = typeof value.start === 'string' ? new Date(value.start) : value.start;
+    const endObj = typeof value.end === 'string' ? new Date(value.end) : value.end;
     return {
       period: 'custom',
-      start: value.start.toISOString(),
-      end: value.end.toISOString(),
+      start: startObj.toISOString(),
+      end: endObj.toISOString(),
     };
   }
   return { period: '24h' };
@@ -669,7 +666,9 @@ export function dateRangeToDatePair(value: DateRangeValue): {
   end: Date;
 } {
   if (value.type === 'custom' && value.start && value.end) {
-    return { start: value.start, end: value.end };
+    const startObj = typeof value.start === 'string' ? new Date(value.start) : value.start;
+    const endObj = typeof value.end === 'string' ? new Date(value.end) : value.end;
+    return { start: startObj, end: endObj };
   }
   const preset = value.preset || '24h';
   const tz = getStoredTimezone();
