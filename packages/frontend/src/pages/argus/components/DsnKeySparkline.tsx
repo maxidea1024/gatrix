@@ -160,21 +160,8 @@ export const DsnKeySparkline: React.FC<DsnKeySparklineProps> = ({
     plugins: {
       legend: { display: false },
       tooltip: {
-        enabled: true,
         mode: 'index' as const,
         intersect: false,
-        backgroundColor: isDark ? '#1e1e2e' : '#fff',
-        titleColor: isDark ? '#ccc' : '#333',
-        bodyColor: isDark ? '#aaa' : '#555',
-        borderColor: isDark ? '#333' : '#ddd',
-        borderWidth: 1,
-        padding: 8,
-        bodyFont: { size: 11 },
-        titleFont: { size: 11, weight: 'bold' as const },
-        displayColors: true,
-        boxWidth: 8,
-        boxHeight: 8,
-        usePointStyle: true,
       },
     },
     scales: {

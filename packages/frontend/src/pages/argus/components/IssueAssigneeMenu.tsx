@@ -11,6 +11,7 @@ import { Person as PersonIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusIssue } from '@/services/argusService';
 import { stringToColor, getInitials } from '@/utils/argusHelpers';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface IssueAssigneeMenuProps {
   /** The current anchor state (element + issue), or null if closed */
@@ -33,6 +34,13 @@ const IssueAssigneeMenu: React.FC<IssueAssigneeMenuProps> = ({
   onAssign,
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const isMe = (member: { userId: string; name?: string; email?: string }) =>
+    user &&
+    (member.email === user.email ||
+      member.name === user.name ||
+      member.userId === String(user.id));
 
   return (
     <Menu
@@ -62,6 +70,9 @@ const IssueAssigneeMenu: React.FC<IssueAssigneeMenuProps> = ({
       <Divider />
       {members.map((member) => {
         const displayName = member.name || member.email || member.userId;
+        const label = isMe(member)
+          ? t('argus.issues.assigneeMe', { name: displayName })
+          : displayName;
         return (
           <MenuItem
             key={member.userId}
@@ -80,8 +91,11 @@ const IssueAssigneeMenu: React.FC<IssueAssigneeMenuProps> = ({
               {getInitials(displayName)}
             </Avatar>
             <ListItemText
-              primary={displayName}
-              primaryTypographyProps={{ fontSize: '0.82rem' }}
+              primary={label}
+              primaryTypographyProps={{
+                fontSize: '0.82rem',
+                fontWeight: isMe(member) ? 700 : 400,
+              }}
             />
           </MenuItem>
         );

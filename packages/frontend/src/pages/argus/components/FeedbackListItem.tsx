@@ -5,6 +5,7 @@ import {
   Image as ImageIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import HighlightText from '@/components/common/HighlightText';
 import { ArgusFeedbackItem } from '@/services/argusService';
@@ -35,6 +36,7 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
   onToggleCheck,
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const displayName =
     item.name || item.email?.split('@')[0] || t('argus.feedback.anonymous');
 
@@ -167,7 +169,13 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
           )}
           {item.assigned_to && (
             <Chip
-              label={item.assigned_to}
+              label={
+                user &&
+                (item.assigned_to === user.name ||
+                  item.assigned_to === user.email)
+                  ? t('argus.issues.assigneeMe', { name: item.assigned_to })
+                  : item.assigned_to
+              }
               size="small"
               sx={{
                 height: 16,

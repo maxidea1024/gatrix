@@ -54,7 +54,11 @@ export function parseTransaction(name: string): {
 export function formatHour(hourStr: string): string {
   try {
     const d = new Date(hourStr);
-    return `${String(d.getHours()).padStart(2, '0')}:00`;
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${mm}/${dd} ${hh}:${mi}`;
   } catch {
     return hourStr;
   }

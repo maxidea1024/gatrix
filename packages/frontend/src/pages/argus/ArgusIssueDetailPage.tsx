@@ -31,6 +31,7 @@ import { useIssueDetailData, useTraceData } from '@/hooks/useIssueDetailData';
 import { useIssueActions } from '@/hooks/useIssueActions';
 import { useResizableSplit } from '@/hooks/useResizableSplit';
 import { LEVEL_COLORS, stringToColor, getInitials } from '@/utils/argusHelpers';
+import { useAuth } from '@/contexts/AuthContext';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import EventNavigator from '@/components/argus/EventNavigator';
 import EventDistributionChart from '@/components/argus/EventDistributionChart';
@@ -56,6 +57,7 @@ const ArgusIssueDetailPage: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const isDark = theme.palette.mode === 'dark';
   const { projectId, issueId } = useParams<{
     projectId: string;
@@ -716,6 +718,14 @@ const ArgusIssueDetailPage: React.FC = () => {
             <Divider />
             {members.map((member) => {
               const displayName = member.name || member.email || member.userId;
+              const memberIsMe =
+                user &&
+                (member.email === user.email ||
+                  member.name === user.name ||
+                  member.userId === String(user.id));
+              const label = memberIsMe
+                ? t('argus.issues.assigneeMe', { name: displayName })
+                : displayName;
               return (
                 <MenuItem
                   key={member.userId}
@@ -734,8 +744,11 @@ const ArgusIssueDetailPage: React.FC = () => {
                     {getInitials(displayName)}
                   </Avatar>
                   <ListItemText
-                    primary={displayName}
-                    primaryTypographyProps={{ fontSize: '0.82rem' }}
+                    primary={label}
+                    primaryTypographyProps={{
+                      fontSize: '0.82rem',
+                      fontWeight: memberIsMe ? 700 : 400,
+                    }}
                   />
                 </MenuItem>
               );

@@ -734,3 +734,61 @@ export function normalizeQuery(
   if (!query.trim()) return '';
   return chipsToQuery(queryToChips(query, aggregateNames));
 }
+
+// ─── Magic keyword resolution ────────────────────────────────────────────────
+
+export interface SearchResolveContext {
+  /** Current user's display name (stored in assigned_to) */
+  userName?: string;
+}
+
+/**
+ * Resolve magic keywords in an AQL query string for backend consumption.
+ *
+ * Roundtrips through chip parsing to correctly handle all edge cases:
+ * multi-value, negation, quoting, and special characters in user names.
+ *
+ * Currently resolved:
+ * - `assigned:me`   → `assigned:"<userName>"`
+ * - `assigned:none` → `assigned:""` (matches unassigned / empty string)
+ */
+export function resolveSearchMagicValues(
+  query: string,
+  ctx: SearchResolveContext,
+  aggregateNames?: Set<string>
+): string {
+  if (!query.trim()) return '';
+
+  const chips = queryToChips(query, aggregateNames);
+  let changed = false;
+
+  const resolveValue = (v: string): string => {
+    if (v === 'me') {
+      changed = true;
+      return ctx.userName || '';
+    }
+    if (v === 'none') {
+      changed = true;
+      return '';
+    }
+    return v;
+  };
+
+  const resolved = chips.map((chip) => {
+    if (chip.type !== 'filter' || chip.field !== 'assigned') return chip;
+
+    const newValue = resolveValue(chip.value || '');
+    const newValues = chip.values?.map(resolveValue);
+
+    if (!changed) return chip;
+    return {
+      ...chip,
+      value: newValue,
+      values: newValues,
+      // Force quoting for resolved values (user names may contain spaces)
+      quoted: true,
+    };
+  });
+
+  return changed ? chipsToQuery(resolved) : query;
+}

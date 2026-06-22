@@ -85,6 +85,8 @@ const ArgusSessionHealthPage: React.FC = () => {
         default: '14d',
         storageKey: 'argus-session-period',
       },
+      start: { key: 'start', default: '' },
+      end: { key: 'end', default: '' },
     }),
     []
   );
@@ -96,16 +98,43 @@ const ArgusSessionHealthPage: React.FC = () => {
   const [displayMode, setDisplayMode] = useState<DisplayMode>('sessions');
   const [hideHealthy, setHideHealthy] = useState(false);
 
-  const [filters, setFilters] = useState<ArgusFilterState>(() =>
-    defaultArgusFilterState(urlState.period)
-  );
+  const [filters, setFilters] = useState<ArgusFilterState>(() => {
+    if (urlState.period === 'custom' && urlState.start && urlState.end) {
+      return {
+        ...defaultArgusFilterState(),
+        dateRange: {
+          type: 'custom' as const,
+          start: new Date(urlState.start),
+          end: new Date(urlState.end),
+        },
+      };
+    }
+    return defaultArgusFilterState(urlState.period);
+  });
 
+  const isInitialMount = React.useRef(true);
   useEffect(() => {
-    setFilters((prev) => ({
-      ...prev,
-      dateRange: { type: 'preset', preset: urlState.period },
-    }));
-  }, [urlState.period]);
+    // Skip the first render — useState initializer already set the correct value
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (urlState.period === 'custom' && urlState.start && urlState.end) {
+      setFilters((prev) => ({
+        ...prev,
+        dateRange: {
+          type: 'custom',
+          start: new Date(urlState.start),
+          end: new Date(urlState.end),
+        },
+      }));
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        dateRange: { type: 'preset', preset: urlState.period },
+      }));
+    }
+  }, [urlState.period, urlState.start, urlState.end]);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -147,7 +176,17 @@ const ArgusSessionHealthPage: React.FC = () => {
         newFilters.dateRange.type === 'preset' &&
         newFilters.dateRange.preset
       ) {
-        setUrlState({ period: newFilters.dateRange.preset });
+        setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
+      } else if (
+        newFilters.dateRange.type === 'custom' &&
+        newFilters.dateRange.start &&
+        newFilters.dateRange.end
+      ) {
+        setUrlState({
+          period: 'custom',
+          start: newFilters.dateRange.start.toISOString(),
+          end: newFilters.dateRange.end.toISOString(),
+        });
       }
     },
     [setUrlState]
@@ -156,6 +195,13 @@ const ArgusSessionHealthPage: React.FC = () => {
   const handleToggleHideHealthy = useCallback(() => {
     setHideHealthy((prev) => !prev);
   }, []);
+
+  const handleZoom = useCallback(
+    (start: string, end: string) => {
+      setUrlState({ period: 'custom', start, end });
+    },
+    [setUrlState]
+  );
 
   const s = data?.summary;
   const pp = data?.previous_period;
@@ -202,7 +248,7 @@ const ArgusSessionHealthPage: React.FC = () => {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 500 },
-      plugins: { legend: { display: false }, tooltip: { enabled: true } },
+      plugins: { legend: { display: false } },
     }),
     []
   );
@@ -590,6 +636,7 @@ const ArgusSessionHealthPage: React.FC = () => {
           projectId={projectId}
           hideHealthy={hideHealthy}
           onToggleHideHealthy={handleToggleHideHealthy}
+          onZoom={handleZoom}
         />
 
         {/* Top Crash Issues */}

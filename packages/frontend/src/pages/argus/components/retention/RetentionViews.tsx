@@ -63,7 +63,11 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
   const isDark = theme.palette.mode === 'dark';
   const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
   const periodPrefix =
-    retentionType === 'day' ? 'D' : retentionType === 'week' ? 'W' : 'M';
+    retentionType === 'day'
+      ? 'Day '
+      : retentionType === 'week'
+        ? 'Week '
+        : 'Month ';
 
   const [hiddenSeriesKeys, setHiddenSeriesKeys] = useState<Set<string>>(
     new Set()
@@ -230,7 +234,7 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
           >
             <LineChart
               data={breakdownCurveData}
-              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -319,7 +323,7 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
         >
           <LineChart
             data={curveData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -420,7 +424,7 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
           >
             <BarChart
               data={breakdownCurveData}
-              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -503,7 +507,7 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
         >
           <BarChart
             data={curveData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
           >
             <CartesianGrid
               strokeDasharray="3 3"
@@ -1070,10 +1074,10 @@ export const RetentionViews: React.FC<RetentionViewsProps> = ({
 /* ─── Helpers ─── */
 
 function getHeatColor(pct: number): string {
-  if (pct >= 80) return '#059669';
-  if (pct >= 60) return '#10b981';
-  if (pct >= 40) return '#34d399';
-  if (pct >= 20) return '#6ee7b7';
-  if (pct >= 10) return '#a7f3d0';
-  return '#d1fae5';
+  if (pct >= 80) return '#047857';
+  if (pct >= 60) return '#059669';
+  if (pct >= 40) return '#10b981';
+  if (pct >= 20) return '#34d399';
+  if (pct >= 10) return '#6ee7b7';
+  return '#a7f3d0';
 }

@@ -34,6 +34,9 @@ ChartJS.register(
   Filler
 );
 
+// Must run AFTER ChartJS.register so that defaults.plugins.tooltip exists
+import '../../utils/chartTooltip';
+
 export interface ChartDataset {
   id?: string;
   label: string;
@@ -254,9 +257,9 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
             color: isDark ? '#ccc' : '#555',
             font: { size: 11, family: 'monospace' },
             usePointStyle: true,
-            pointStyleWidth: 6,
-            boxWidth: 6,
-            boxHeight: 6,
+            pointStyle: 'circle',
+            boxWidth: 7,
+            boxHeight: 7,
             padding: 12,
           },
           onHover: (event: any, legendItem: any) => {
@@ -308,19 +311,6 @@ const InteractiveTimeSeriesChart: React.FC<InteractiveTimeSeriesChartProps> = ({
         tooltip: {
           mode: isPieOrDoughnut ? ('nearest' as const) : ('index' as const),
           intersect: isPieOrDoughnut,
-          backgroundColor: isDark
-            ? 'rgba(30,30,40,0.95)'
-            : 'rgba(255,255,255,0.95)',
-          titleColor: isDark ? '#fff' : '#1a1a2e',
-          bodyColor: isDark ? '#ccc' : '#555',
-          borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-          borderWidth: 1,
-          padding: 10,
-          cornerRadius: 8,
-          displayColors: true,
-          usePointStyle: true,
-          boxWidth: 8,
-          boxHeight: 8,
         },
       },
       ...(!isPieOrDoughnut

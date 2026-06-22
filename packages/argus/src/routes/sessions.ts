@@ -17,30 +17,49 @@ export default async function sessionsRoutes(app: FastifyInstance) {
     '/sessions/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h' } = request.query as { period?: string };
+      const {
+        period = '24h',
+        start,
+        end,
+      } = request.query as { period?: string; start?: string; end?: string };
 
       try {
-        // Compute previous period range
-        const ms: Record<string, number> = {
-          '1h': 3_600_000,
-          '6h': 21_600_000,
-          '24h': 86_400_000,
-          '7d': 604_800_000,
-          '30d': 2_592_000_000,
-        };
-        const periodMs = ms[period] || 86_400_000;
-        const now = Date.now();
-        const prevRange = {
-          start: new Date(now - 2 * periodMs).toISOString(),
-          end: new Date(now - periodMs).toISOString(),
-        };
+        // Determine the timeRange for optic queries
+        const isCustom = start && end;
+        const timeRange = isCustom ? { start, end } : { period };
+
+        // Compute previous period range for comparison
+        let prevRange: { start: string; end: string };
+        if (isCustom) {
+          const startMs = new Date(start).getTime();
+          const endMs = new Date(end).getTime();
+          const rangeMs = endMs - startMs;
+          prevRange = {
+            start: new Date(startMs - rangeMs).toISOString(),
+            end: new Date(startMs).toISOString(),
+          };
+        } else {
+          const ms: Record<string, number> = {
+            '1h': 3_600_000,
+            '6h': 21_600_000,
+            '24h': 86_400_000,
+            '7d': 604_800_000,
+            '30d': 2_592_000_000,
+          };
+          const periodMs = ms[period] || 86_400_000;
+          const now = Date.now();
+          prevRange = {
+            start: new Date(now - 2 * periodMs).toISOString(),
+            end: new Date(now - periodMs).toISOString(),
+          };
+        }
 
         const [batch, prevPeriod] = await Promise.all([
           optic.queryBatch({
             summary: {
               ...SESSION_DEFAULTS,
               projectId,
-              timeRange: { period },
+              timeRange,
               select: [
                 { field: 'count()', alias: 'total_sessions' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },
@@ -63,7 +82,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             trend: {
               ...SESSION_DEFAULTS,
               projectId,
-              timeRange: { period },
+              timeRange,
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'total' },
@@ -86,7 +105,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             byRelease: {
               ...SESSION_DEFAULTS,
               projectId,
-              timeRange: { period },
+              timeRange,
               select: [
                 { field: 'release' },
                 { field: 'count()', alias: 'total' },
@@ -107,7 +126,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
             statusTimeline: {
               ...SESSION_DEFAULTS,
               projectId,
-              timeRange: { period },
+              timeRange,
               select: [
                 { field: '$bucket', alias: 'hour' },
                 {
@@ -142,11 +161,12 @@ export default async function sessionsRoutes(app: FastifyInstance) {
           }),
         ]);
 
-        // Duration distribution & browser/OS breakdown require complex multiIf ??        // these are best expressed as rawQuery since multiIf isn't part of the query language
+        // Duration distribution & browser/OS breakdown require complex multiIf
+        // these are best expressed as rawQuery since multiIf isn't part of the query language
         const bucket = getBucketingConfig(
           period,
-          undefined,
-          undefined,
+          isCustom ? start : undefined,
+          isCustom ? end : undefined,
           'started'
         );
         const rawParams = {

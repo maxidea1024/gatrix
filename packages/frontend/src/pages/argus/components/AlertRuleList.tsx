@@ -387,7 +387,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                 const options = {
                   plugins: {
                     legend: { display: false },
-                    tooltip: { enabled: false },
+                    tooltip: { enabled: false, external: null as any },
                   },
                   scales: {
                     x: { display: false },

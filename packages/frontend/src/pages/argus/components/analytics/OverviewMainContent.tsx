@@ -365,7 +365,7 @@ export const OverviewMainContent: React.FC<OverviewMainContentProps> = ({
                 fontSize: '0.65rem',
               }}
             >
-              {t('argus.analytics.topEvents', 'Top Events')} ({dateRangeLabel})
+              {t('argus.analytics.topEvents', 'Top Events')}
             </Typography>
           </SectionHeader>
           <Box
@@ -383,7 +383,7 @@ export const OverviewMainContent: React.FC<OverviewMainContentProps> = ({
                 </Typography>
               </Box>
             ) : (
-              eventNames.slice(0, 10).map((ev, i) => {
+              eventNames.slice(0, 20).map((ev, i) => {
                 const pctValue =
                   totalEvents > 0 ? (ev.count / totalEvents) * 100 : 0;
                 const pctLabel =
@@ -404,7 +404,7 @@ export const OverviewMainContent: React.FC<OverviewMainContentProps> = ({
                       px: 1.5,
                       py: 0.6,
                       borderBottom:
-                        i < Math.min(eventNames.length, 10) - 1
+                        i < Math.min(eventNames.length, 20) - 1
                           ? `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`
                           : 'none',
                       position: 'relative',

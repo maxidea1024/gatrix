@@ -178,23 +178,6 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
     [isDark]
   );
 
-  const pieTooltipConfig = React.useMemo(
-    () => ({
-      callbacks: {
-        label: (context: any) => {
-          const label = context.label || '';
-          const value = context.parsed || 0;
-          const total = context.dataset.data.reduce(
-            (a: number, b: number) => a + b,
-            0
-          );
-          const pct = total > 0 ? (value / total) * 100 : 0;
-          return ` ${label}: ${formatCompactNumber(value)} (${pct.toFixed(1)}%)`;
-        },
-      },
-    }),
-    []
-  );
 
   const pieOptions = React.useMemo(
     () => ({
@@ -203,10 +186,9 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
       onClick: pieClickHandler,
       plugins: {
         legend: pieLegendConfig,
-        tooltip: pieTooltipConfig,
       },
     }),
-    [pieClickHandler, pieLegendConfig, pieTooltipConfig]
+    [pieClickHandler, pieLegendConfig]
   );
 
   const doughnutOptions = React.useMemo(
@@ -217,10 +199,9 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
       onClick: pieClickHandler,
       plugins: {
         legend: pieLegendConfig,
-        tooltip: pieTooltipConfig,
       },
     }),
-    [pieClickHandler, pieLegendConfig, pieTooltipConfig]
+    [pieClickHandler, pieLegendConfig]
   );
 
   const hBarData = React.useMemo(() => {
@@ -261,11 +242,8 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
       plugins: {
         legend: { display: false },
         tooltip: {
-          callbacks: {
-            label: (context: any) => {
-              return ` ${formatCompactNumber(context.parsed.x)}`;
-            },
-          },
+          mode: 'nearest' as const,
+          intersect: true,
         },
       },
       scales: {

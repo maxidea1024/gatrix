@@ -569,7 +569,7 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
           {chartType === 'line' ? (
             <LineChart
               data={data}
-              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
               onMouseDown={(e) =>
                 e &&
                 setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
@@ -672,7 +672,7 @@ export const InsightsChartSection: React.FC<InsightsChartSectionProps> = ({
           ) : (
             <BarChart
               data={data}
-              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
               onMouseDown={(e) =>
                 e &&
                 setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)

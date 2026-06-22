@@ -54,6 +54,7 @@ import IssueViewTabs, { IssueView } from '@/components/argus/IssueViewTabs';
 import {
   QueryAQLEditor,
   ISSUES_CONFIG,
+  resolveSearchMagicValues,
   type QueryAQLEditorHandle,
 } from '@/components/argus/query-aql';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
@@ -541,7 +542,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         sort,
         limit: rowsPerPage,
         offset: (currentPage - 1) * rowsPerPage,
-        query: storeSearch.trim() || undefined,
+        query: storeSearch.trim()
+          ? resolveSearchMagicValues(storeSearch.trim(), { userName: user?.name })
+          : undefined,
         ...dateParams,
         substatus: substatus || undefined,
         assigned_to: assignedTo || undefined,
@@ -810,7 +813,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         sort,
         limit: 1000,
         offset: 0,
-        query: storeSearch || undefined,
+        query: storeSearch
+          ? resolveSearchMagicValues(storeSearch, { userName: user?.name })
+          : undefined,
         ...dateParams,
         substatus: substatus || undefined,
         assigned_to: assignedTo || undefined,

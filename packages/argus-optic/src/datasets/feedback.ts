@@ -33,6 +33,18 @@ const columns = new Map<string, ColumnDef>([
   ['is_spam', { name: 'is_spam', type: 'UInt8' }],
   ['attachments', { name: 'attachments', type: 'Array(String)' }],
   ['resolved_at', { name: 'resolved_at', type: 'Nullable(DateTime64)' }],
+
+  // Added by 010_alter_user_feedback.sql
+  ['browser', { name: 'browser', type: 'String', lowCardinality: true }],
+  ['browser_version', { name: 'browser_version', type: 'String' }],
+  ['os', { name: 'os', type: 'String', lowCardinality: true }],
+  ['os_version', { name: 'os_version', type: 'String' }],
+  ['device', { name: 'device', type: 'String', lowCardinality: true }],
+  ['user_id', { name: 'user_id', type: 'String' }],
+  ['locale', { name: 'locale', type: 'String', lowCardinality: true }],
+  ['is_read', { name: 'is_read', type: 'UInt8' }],
+  ['category', { name: 'category', type: 'String', lowCardinality: true }],
+  ['sentiment', { name: 'sentiment', type: 'String', lowCardinality: true }],
 ]);
 
 export const feedbackDataset: DatasetConfig = {
@@ -52,7 +64,12 @@ export const feedbackDataset: DatasetConfig = {
     'anyLast',
     'countIf',
   ]),
-  columnAliases: {},
-  searchableColumns: ['name', 'message', 'url'],
+  columnAliases: {
+    os_name: 'os',
+    browser_name: 'browser',
+    assigned: 'assigned_to',
+    feedback: 'message',
+  },
+  searchableColumns: ['name', 'message', 'url', 'contact_email'],
   materializedViews: [],
 };

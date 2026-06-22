@@ -39,6 +39,7 @@ import {
   FilterListOff as FilterExcludeIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ArgusFeedbackItem, ArgusIssue } from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
@@ -103,6 +104,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
   onAddFilter,
 }) => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [assigneeAnchor, setAssigneeAnchor] = useState<{
@@ -338,7 +340,16 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                 })
               }
             >
-              {selectedItem.assigned_to || t('argus.feedback.assign')}
+              {(() => {
+                if (!selectedItem.assigned_to) return t('argus.feedback.assign');
+                const assignedIsMe =
+                  user &&
+                  (selectedItem.assigned_to === user.name ||
+                    selectedItem.assigned_to === user.email);
+                return assignedIsMe
+                  ? t('argus.issues.assigneeMe', { name: selectedItem.assigned_to })
+                  : selectedItem.assigned_to;
+              })()}
             </ToolbarButton>
           </ToolbarButtonGroup>
 
@@ -759,6 +770,14 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
         <Divider />
         {members.map((member) => {
           const dn = member.name || member.email || member.userId;
+          const memberIsMe =
+            user &&
+            (member.email === user.email ||
+              member.name === user.name ||
+              member.userId === String(user.id));
+          const label = memberIsMe
+            ? t('argus.issues.assigneeMe', { name: dn })
+            : dn;
           return (
             <MenuItem key={member.userId} onClick={() => handleAssign(dn)}>
               <Avatar
@@ -774,8 +793,11 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                 {getInitials(dn)}
               </Avatar>
               <ListItemText
-                primary={dn}
-                primaryTypographyProps={{ fontSize: '0.82rem' }}
+                primary={label}
+                primaryTypographyProps={{
+                  fontSize: '0.82rem',
+                  fontWeight: memberIsMe ? 700 : 400,
+                }}
               />
             </MenuItem>
           );

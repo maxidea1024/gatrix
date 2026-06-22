@@ -15,11 +15,12 @@ import {
   VisibilityOff as HideIcon,
   Visibility as ShowIcon,
 } from '@mui/icons-material';
-import { formatCompactNumber } from '@/utils/numberFormat';
-import { Line, Bar } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getCrosshairPlugin } from '../../../utils/chartPlugins';
+import InteractiveTimeSeriesChart, {
+  ChartDataset,
+} from '@/components/argus/InteractiveTimeSeriesChart';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import { ArgusSessionHealth } from '@/services/argusService';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
@@ -33,6 +34,7 @@ interface SessionHealthChartsProps {
   projectId: string | number;
   hideHealthy: boolean;
   onToggleHideHealthy: () => void;
+  onZoom?: (start: string, end: string) => void;
 }
 
 const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
@@ -42,6 +44,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
   projectId,
   hideHealthy,
   onToggleHideHealthy,
+  onZoom,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -49,47 +52,43 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
   const navigate = useNavigate();
 
   // ─── Chart Data ───
-  const statusTimelineData = useMemo(() => {
-    if (!data?.status_timeline) return { labels: [], datasets: [] };
-    const datasets = [];
+  const timelineLabels = useMemo(
+    () => data?.status_timeline?.map((d) => formatHour(d.hour)) || [],
+    [data]
+  );
+
+  // Raw hour strings for zoom index → ISO conversion
+  const rawHours = useMemo(
+    () => data?.status_timeline?.map((d) => d.hour) || [],
+    [data]
+  );
+
+  const statusDatasets = useMemo(() => {
+    if (!data?.status_timeline) return [];
+    const ds: ChartDataset[] = [];
     if (!hideHealthy) {
-      datasets.push({
+      ds.push({
         label: t('argus.sessions.healthy'),
         data: data.status_timeline.map((d) => Number(d.healthy)),
-        borderColor: '#4caf50',
-        backgroundColor: alpha('#4caf50', 0.15),
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
+        color: '#4caf50',
+        type: 'area',
       });
     }
-    datasets.push(
+    ds.push(
       {
         label: t('argus.sessions.errored'),
         data: data.status_timeline.map((d) => Number(d.errored)),
-        borderColor: '#ff9800',
-        backgroundColor: alpha('#ff9800', 0.25),
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
+        color: '#ff9800',
+        type: 'area',
       },
       {
         label: t('argus.sessions.crashed'),
         data: data.status_timeline.map((d) => Number(d.crashed)),
-        borderColor: '#f44336',
-        backgroundColor: alpha('#f44336', 0.25),
-        borderWidth: 2,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
+        color: '#f44336',
+        type: 'area',
       }
     );
-    return {
-      labels: data.status_timeline.map((d) => formatHour(d.hour)),
-      datasets,
-    };
+    return ds;
   }, [data, t, hideHealthy]);
 
   const durationChartData = useMemo(() => {
@@ -110,87 +109,49 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
     };
   }, [data, t]);
 
-  const unhealthyChartData = useMemo(() => {
-    if (!data?.status_timeline) return { labels: [], datasets: [] };
-    return {
-      labels: data.status_timeline.map((d) => formatHour(d.hour)),
-      datasets: [
-        {
-          label: t('argus.sessions.errored'),
-          data: data.status_timeline.map((d) => Number(d.errored)),
-          backgroundColor: alpha('#ff9800', 0.7),
-          borderColor: '#ff9800',
-          borderWidth: 0,
-          borderRadius: 2,
-          borderSkipped: false as const,
-        },
-        {
-          label: t('argus.sessions.crashed'),
-          data: data.status_timeline.map((d) => Number(d.crashed)),
-          backgroundColor: alpha('#f44336', 0.7),
-          borderColor: '#f44336',
-          borderWidth: 0,
-          borderRadius: 2,
-          borderSkipped: false as const,
-        },
-        {
-          label: t('argus.sessions.abnormal'),
-          data: data.status_timeline.map((d) => Number(d.abnormal)),
-          backgroundColor: alpha('#9e9e9e', 0.7),
-          borderColor: '#9e9e9e',
-          borderWidth: 0,
-          borderRadius: 2,
-          borderSkipped: false as const,
-        },
-      ],
-    };
+  const unhealthyDatasets = useMemo(() => {
+    if (!data?.status_timeline) return [];
+    return [
+      {
+        label: t('argus.sessions.errored'),
+        data: data.status_timeline.map((d) => Number(d.errored)),
+        color: '#ff9800',
+        type: 'stacked-bar' as const,
+      },
+      {
+        label: t('argus.sessions.crashed'),
+        data: data.status_timeline.map((d) => Number(d.crashed)),
+        color: '#f44336',
+        type: 'stacked-bar' as const,
+      },
+      {
+        label: t('argus.sessions.abnormal'),
+        data: data.status_timeline.map((d) => Number(d.abnormal)),
+        color: '#9e9e9e',
+        type: 'stacked-bar' as const,
+      },
+    ];
   }, [data, t]);
 
-  const chartOpts = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 300 },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top' as const,
-          labels: {
-            boxWidth: 8,
-            font: { size: 11 },
-            usePointStyle: true,
-            pointStyle: 'circle',
-          },
-        },
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          border: { display: false },
-          ticks: {
-            maxRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 10,
-            font: { size: 10 },
-          },
-        },
-        y: {
-          beginAtZero: true,
-          stacked: true,
-          border: { display: false },
-          grid: {
-            color: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-          },
-          ticks: { font: { size: 10 } },
-        },
-      },
-      interaction: {
-        mode: 'nearest' as const,
-        axis: 'x' as const,
-        intersect: false,
-      },
-    }),
-    [isDark]
+  const handleChartZoom = React.useCallback(
+    (startIdx: number, endIdx: number) => {
+      if (!onZoom) return;
+      const si = Math.min(startIdx, endIdx);
+      const ei = Math.max(startIdx, endIdx);
+      if (rawHours[si] && rawHours[ei]) {
+        const startDate = new Date(rawHours[si]);
+        let endDate = new Date(rawHours[ei]);
+        if (rawHours.length > 1) {
+          const gap =
+            new Date(rawHours[1]).getTime() - new Date(rawHours[0]).getTime();
+          endDate = new Date(endDate.getTime() + gap);
+        } else {
+          endDate = new Date(endDate.getTime() + 3600000);
+        }
+        onZoom(startDate.toISOString(), endDate.toISOString());
+      }
+    },
+    [onZoom, rawHours]
   );
 
   const barOpts = useMemo(
@@ -310,10 +271,12 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
           {loading ? (
             <ArgusChartSkeleton type="line" height={220} color="#4caf50" />
           ) : (
-            <Line
-              data={statusTimelineData}
-              options={chartOpts}
-              plugins={[getCrosshairPlugin(isDark)]}
+            <InteractiveTimeSeriesChart
+              labels={timelineLabels}
+              datasets={statusDatasets}
+              height={220}
+              onZoom={onZoom ? handleChartZoom : undefined}
+              showLegend
             />
           )}
         </Box>
@@ -491,62 +454,12 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
           {loading ? (
             <ArgusChartSkeleton type="bar" height={200} color="#f44336" />
           ) : (
-            <Bar
-              data={unhealthyChartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: { duration: 300 },
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: 'top' as const,
-                    labels: {
-                      boxWidth: 8,
-                      font: { size: 10 },
-                      usePointStyle: true,
-                      pointStyle: 'circle',
-                    },
-                  },
-                  tooltip: {
-                    callbacks: {
-                      footer: (items: any[]) => {
-                        const total = items.reduce(
-                          (sum: number, i: any) => sum + (i.raw as number),
-                          0
-                        );
-                        return `${t('common.total')}: ${formatCompactNumber(total)}`;
-                      },
-                    },
-                  },
-                },
-                scales: {
-                  x: {
-                    stacked: true,
-                    grid: { display: false },
-                    border: { display: false },
-                    ticks: {
-                      maxRotation: 0,
-                      autoSkip: true,
-                      maxTicksLimit: 12,
-                      font: { size: 10 },
-                    },
-                  },
-                  y: {
-                    stacked: true,
-                    beginAtZero: true,
-                    border: { display: false },
-                    grid: {
-                      color: isDark
-                        ? 'rgba(255,255,255,0.04)'
-                        : 'rgba(0,0,0,0.04)',
-                    },
-                    ticks: { font: { size: 10 } },
-                  },
-                },
-                interaction: { mode: 'index' as const, intersect: false },
-              }}
-              plugins={[getCrosshairPlugin(isDark)]}
+            <InteractiveTimeSeriesChart
+              labels={timelineLabels}
+              datasets={unhealthyDatasets}
+              height={200}
+              onZoom={onZoom ? handleChartZoom : undefined}
+              showLegend
             />
           )}
         </Box>

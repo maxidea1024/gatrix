@@ -636,31 +636,32 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
               ))}
             </Box>
 
-            <Box sx={{ flex: 1, position: 'relative' }}>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  pointerEvents: 'none',
-                  zIndex: 0,
-                }}
-              >
-                {[0, 25, 50, 75, 100].map((tick) => (
-                  <Box
-                    key={tick}
-                    sx={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      bottom: `${tick}%`,
-                      borderTop: `1px solid ${gridStroke}`,
-                    }}
-                  />
-                ))}
-              </Box>
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ position: 'relative', height: 280 }}>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }}
+                >
+                  {[0, 25, 50, 75, 100].map((tick) => (
+                    <Box
+                      key={tick}
+                      sx={{
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: `${tick}%`,
+                        borderTop: `1px solid ${gridStroke}`,
+                      }}
+                    />
+                  ))}
+                </Box>
 
               <Box
                 sx={{
@@ -869,13 +870,14 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
                 ))}
               </Box>
             </Box>
+            </Box>
           </Box>
 
           <Box
             sx={{
               display: 'flex',
               gap: '8px',
-              mt: 0.25,
+              mt: 1.5,
               height: 44,
               pl: '40px',
             }}
@@ -1498,14 +1500,15 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
               ))}
             </Box>
 
-            <Box sx={{ flex: 1, position: 'relative' }}>
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ position: 'relative' }}>
               <Box
                 sx={{
                   position: 'absolute',
                   top: 0,
-                  bottom: 0,
                   left: 0,
                   right: 0,
+                  height: 280,
                   pointerEvents: 'none',
                   zIndex: 0,
                 }}
@@ -1802,6 +1805,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
                   </Tooltip>
                 ))}
               </Box>
+            </Box>
             </Box>
           </Box>
         ) : (
@@ -2331,7 +2335,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
           >
             <BarChart
               data={segChartData}
-              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -2495,7 +2499,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
         >
           <LineChart
             data={trendingData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+            margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
             onMouseDown={(e) =>
               e && setRefAreaLeft(e.activeLabel ? String(e.activeLabel) : null)
             }
@@ -2653,7 +2657,7 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
           >
             <BarChart
               data={ttcData.distribution}
-              margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+              margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"

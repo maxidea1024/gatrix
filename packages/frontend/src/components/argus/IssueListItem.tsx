@@ -16,6 +16,7 @@ import {
   OpenInNew as ExternalLinkIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import { ArgusIssue } from '@/services/argusService';
 import {
   LEVEL_CONFIG,
@@ -84,6 +85,7 @@ const IssueListItem: React.FC<IssueListItemProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const isDark = theme.palette.mode === 'dark';
   const lc = LEVEL_CONFIG[issue.level] || LEVEL_CONFIG.info;
 
@@ -395,7 +397,7 @@ const IssueListItem: React.FC<IssueListItemProps> = ({
             >
               {issue.assigned_to ? (
                 <Tooltip
-                  title={`${t('argus.issues.assignedTo')}: ${issue.assigned_to}`}
+                  title={`${t('argus.issues.assignedTo')}: ${user && (issue.assigned_to === user.name || issue.assigned_to === user.email) ? t('argus.issues.assigneeMe', { name: issue.assigned_to }) : issue.assigned_to}`}
                 >
                   <Avatar
                     onClick={(e) => {

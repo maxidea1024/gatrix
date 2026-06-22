@@ -30,6 +30,7 @@ import {
   getCrosshairPlugin,
   getDragSelectPlugin,
 } from '../../utils/chartPlugins';
+import '../../utils/chartTooltip';
 import { formatCompactNumber } from '../../utils/numberFormat';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -262,16 +263,6 @@ const ArgusOverviewPage: React.FC = () => {
         tooltip: {
           mode: 'index' as const,
           intersect: false,
-          backgroundColor: isDark
-            ? 'rgba(30,30,40,0.95)'
-            : 'rgba(255,255,255,0.95)',
-          titleColor: isDark ? '#fff' : '#1a1a2e',
-          bodyColor: isDark ? '#ccc' : '#555',
-          borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-          borderWidth: 1,
-          padding: 10,
-          cornerRadius: 8,
-          displayColors: false,
         },
       },
       scales: {

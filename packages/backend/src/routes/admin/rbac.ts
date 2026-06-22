@@ -623,7 +623,8 @@ router.delete(
 // GET /api/admin/rbac/projects/:id/members
 router.get('/projects/:id/members', async (req: any, res) => {
   try {
-    const members = await db('g_project_members as pm')
+    // 1. Explicit project members
+    const projectMembers = await db('g_project_members as pm')
       .join('g_users as u', 'pm.userId', 'u.id')
       .where('pm.projectId', req.params.id)
       .select(
@@ -635,7 +636,42 @@ router.get('/projects/:id/members', async (req: any, res) => {
         'u.name',
         'u.email'
       );
-    res.json({ success: true, data: members });
+
+    // 2. Also include organisation members (everyone in the org that owns this project)
+    const project = await db('g_projects')
+      .where('id', req.params.id)
+      .select('orgId')
+      .first();
+
+    let orgMembers: any[] = [];
+    if (project?.orgId) {
+      orgMembers = await db('g_organisation_members as om')
+        .join('g_users as u', 'om.userId', 'u.id')
+        .where('om.orgId', project.orgId)
+        .select(
+          'om.id',
+          'om.userId',
+          'om.joinedAt',
+          'u.name',
+          'u.email'
+        );
+    }
+
+    // 3. Merge & deduplicate by userId (project members take priority)
+    const seenUserIds = new Set(projectMembers.map((m: any) => m.userId));
+    const merged = [...projectMembers];
+    for (const om of orgMembers) {
+      if (!seenUserIds.has(om.userId)) {
+        seenUserIds.add(om.userId);
+        merged.push({
+          ...om,
+          projectId: req.params.id,
+          projectRole: 'member',
+        });
+      }
+    }
+
+    res.json({ success: true, data: merged });
   } catch (error) {
     logger.error('Error getting project members:', error);
     res

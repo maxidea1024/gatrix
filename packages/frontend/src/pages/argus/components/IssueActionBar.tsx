@@ -23,6 +23,7 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -97,6 +98,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
 
@@ -430,7 +432,17 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           }
           label={
             issue.assigned_to
-              ? issue.assigned_to
+              ? (() => {
+                  const isMe =
+                    user &&
+                    (issue.assigned_to === user.name ||
+                      issue.assigned_to === user.email);
+                  return isMe
+                    ? t('argus.issues.assigneeMe', {
+                        name: issue.assigned_to,
+                      })
+                    : issue.assigned_to;
+                })()
               : t('argus.issues.unassigned', 'Unassigned')
           }
           onClick={onAssigneeClick}

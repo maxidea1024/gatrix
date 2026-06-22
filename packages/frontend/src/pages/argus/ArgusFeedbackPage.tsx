@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -73,6 +74,7 @@ import FilterChipSelect from '@/components/common/FilterChipSelect';
 import {
   QueryAQLEditor,
   FEEDBACK_CONFIG,
+  resolveSearchMagicValues,
   type QueryAQLEditorHandle,
 } from '@/components/argus/query-aql';
 import {
@@ -117,6 +119,7 @@ type FeedbackStatusTab = 'all' | 'unresolved' | 'resolved' | 'spam';
 
 // ─── Main Component ───
 const ArgusFeedbackPage: React.FC = () => {
+  const { user } = useAuth();
   const theme = useTheme();
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
@@ -420,7 +423,9 @@ const ArgusFeedbackPage: React.FC = () => {
         ...ap,
         page,
         limit: rowsPerPage,
-        search: search || undefined,
+        search: search
+          ? resolveSearchMagicValues(search, { userName: user?.name })
+          : undefined,
         status: statusTab === 'all' ? undefined : statusTab || undefined,
         sort: sortOrder,
       });
@@ -931,6 +936,10 @@ const ArgusFeedbackPage: React.FC = () => {
                   config={FEEDBACK_CONFIG}
                   initialQuery={search}
                   onSearch={(q) => {
+                    setSearch(q);
+                    setUrlState({ page: '1', fb: '' });
+                  }}
+                  onChange={(q) => {
                     setSearch(q);
                     setUrlState({ page: '1', fb: '' });
                   }}
