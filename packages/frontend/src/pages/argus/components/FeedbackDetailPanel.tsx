@@ -341,13 +341,16 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
               }
             >
               {(() => {
-                if (!selectedItem.assigned_to) return t('argus.feedback.assign');
+                if (!selectedItem.assigned_to)
+                  return t('argus.feedback.assign');
                 const assignedIsMe =
                   user &&
                   (selectedItem.assigned_to === user.name ||
                     selectedItem.assigned_to === user.email);
                 return assignedIsMe
-                  ? t('argus.issues.assigneeMe', { name: selectedItem.assigned_to })
+                  ? t('argus.issues.assigneeMe', {
+                      name: selectedItem.assigned_to,
+                    })
                   : selectedItem.assigned_to;
               })()}
             </ToolbarButton>

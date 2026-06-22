@@ -85,9 +85,7 @@ export function externalTooltipHandler(context: any): void {
   // ── Theme tokens ──
   const bg = dk ? 'rgba(16,16,28,0.97)' : 'rgba(255,255,255,0.98)';
   const bdr = dk ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)';
-  const shd = dk
-    ? '0 8px 30px rgba(0,0,0,0.55)'
-    : '0 8px 30px rgba(0,0,0,0.1)';
+  const shd = dk ? '0 8px 30px rgba(0,0,0,0.55)' : '0 8px 30px rgba(0,0,0,0.1)';
   const ttlC = dk ? '#e2e8f0' : '#1e293b';
   const lblC = dk ? '#94a3b8' : '#64748b';
   const valC = dk ? '#f1f5f9' : '#0f172a';
@@ -118,8 +116,7 @@ export function externalTooltipHandler(context: any): void {
     const lc = tooltip.labelColors?.[i];
     const dot = resolveColor(lc?.borderColor, lc?.backgroundColor);
     const label = pt.dataset?.label || pt.label || '';
-    const raw =
-      pt.raw != null ? pt.raw : (pt.parsed?.y ?? pt.parsed?.x ?? 0);
+    const raw = pt.raw != null ? pt.raw : (pt.parsed?.y ?? pt.parsed?.x ?? 0);
     const isNum = typeof raw === 'number' && isFinite(raw);
     const val = isNum ? fmt(raw) : String(raw);
 

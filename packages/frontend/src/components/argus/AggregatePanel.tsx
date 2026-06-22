@@ -178,7 +178,6 @@ const AggregatePanel: React.FC<AggregatePanelProps> = ({
     [isDark]
   );
 
-
   const pieOptions = React.useMemo(
     () => ({
       responsive: true,

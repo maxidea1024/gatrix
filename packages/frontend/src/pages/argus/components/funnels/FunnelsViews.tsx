@@ -663,213 +663,217 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
                   ))}
                 </Box>
 
-              <Box
-                sx={{
-                  display: 'flex',
-                  height: 280,
-                  gap: '8px',
-                  position: 'relative',
-                  zIndex: 1,
-                }}
-              >
-                {stepDefs.map((step, stepIdx) => (
-                  <Box
-                    key={stepIdx}
-                    sx={{
-                      flex: 1,
-                      height: '100%',
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      gap: '2px',
-                      minWidth: 0,
-                      position: 'relative',
-                    }}
-                  >
-                    {bdKeys.map((bdKey, bdIdx) => {
-                      const bdSteps = (breakdowns[bdKey].steps || []) as any[];
-                      const bdStep = bdSteps[stepIdx];
-                      const prevBdStep =
-                        stepIdx > 0 ? bdSteps[stepIdx - 1] : null;
-                      const count = bdStep?.count ?? 0;
-                      const rate = bdStep?.conversion_rate ?? 0;
-                      const prevCount = prevBdStep?.count ?? 0;
-                      const color = BDC[bdIdx % BDC.length];
-                      const filledPct =
-                        globalMax > 0 ? (count / globalMax) * 100 : 0;
-                      const ghostPct =
-                        stepIdx > 0 && globalMax > 0
-                          ? (prevCount / globalMax) * 100
-                          : 0;
-                      const dropCount =
-                        prevBdStep && prevCount > count ? prevCount - count : 0;
+                <Box
+                  sx={{
+                    display: 'flex',
+                    height: 280,
+                    gap: '8px',
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
+                  {stepDefs.map((step, stepIdx) => (
+                    <Box
+                      key={stepIdx}
+                      sx={{
+                        flex: 1,
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        gap: '2px',
+                        minWidth: 0,
+                        position: 'relative',
+                      }}
+                    >
+                      {bdKeys.map((bdKey, bdIdx) => {
+                        const bdSteps = (breakdowns[bdKey].steps ||
+                          []) as any[];
+                        const bdStep = bdSteps[stepIdx];
+                        const prevBdStep =
+                          stepIdx > 0 ? bdSteps[stepIdx - 1] : null;
+                        const count = bdStep?.count ?? 0;
+                        const rate = bdStep?.conversion_rate ?? 0;
+                        const prevCount = prevBdStep?.count ?? 0;
+                        const color = BDC[bdIdx % BDC.length];
+                        const filledPct =
+                          globalMax > 0 ? (count / globalMax) * 100 : 0;
+                        const ghostPct =
+                          stepIdx > 0 && globalMax > 0
+                            ? (prevCount / globalMax) * 100
+                            : 0;
+                        const dropCount =
+                          prevBdStep && prevCount > count
+                            ? prevCount - count
+                            : 0;
 
-                      return (
-                        <Box
-                          key={bdKey}
-                          sx={{
-                            flex: 1,
-                            height: '100%',
-                            position: 'relative',
-                            minWidth: 0,
-                          }}
-                        >
-                          {stepIdx > 0 && ghostPct > 0 && (
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                height: `${ghostPct}%`,
-                                bgcolor: 'background.paper',
-                                borderRadius: '4px 4px 0 0',
-                                transition: 'height 0.5s ease',
-                                zIndex: 1,
-                              }}
-                            >
+                        return (
+                          <Box
+                            key={bdKey}
+                            sx={{
+                              flex: 1,
+                              height: '100%',
+                              position: 'relative',
+                              minWidth: 0,
+                            }}
+                          >
+                            {stepIdx > 0 && ghostPct > 0 && (
                               <Box
                                 sx={{
                                   position: 'absolute',
-                                  top: 0,
                                   bottom: 0,
                                   left: 0,
                                   right: 0,
-                                  bgcolor: `${color}1c`,
-                                  borderRadius: 'inherit',
+                                  height: `${ghostPct}%`,
+                                  bgcolor: 'background.paper',
+                                  borderRadius: '4px 4px 0 0',
+                                  transition: 'height 0.5s ease',
+                                  zIndex: 1,
                                 }}
-                              />
-                              {dropCount > 0 &&
-                                ghostPct - filledPct > 12 &&
-                                (() => {
-                                  const pct =
-                                    ((ghostPct - filledPct) / 2 / ghostPct) *
-                                    100;
-                                  return (
-                                    <Box
-                                      sx={{
-                                        position: 'absolute',
-                                        top: `${pct}%`,
-                                        transform: 'translateY(-50%)',
-                                        left: 0,
-                                        right: 0,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        pointerEvents: 'none',
-                                      }}
-                                    >
-                                      <Typography
+                              >
+                                <Box
+                                  sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bgcolor: `${color}1c`,
+                                    borderRadius: 'inherit',
+                                  }}
+                                />
+                                {dropCount > 0 &&
+                                  ghostPct - filledPct > 12 &&
+                                  (() => {
+                                    const pct =
+                                      ((ghostPct - filledPct) / 2 / ghostPct) *
+                                      100;
+                                    return (
+                                      <Box
                                         sx={{
-                                          fontSize: '0.5rem',
-                                          color: '#ef4444',
-                                          opacity: 0.7,
-                                          fontWeight: 700,
+                                          position: 'absolute',
+                                          top: `${pct}%`,
+                                          transform: 'translateY(-50%)',
+                                          left: 0,
+                                          right: 0,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          pointerEvents: 'none',
                                         }}
                                       >
-                                        −{formatCompactNumber(dropCount)}
-                                      </Typography>
-                                    </Box>
-                                  );
-                                })()}
-                            </Box>
-                          )}
-                          {stepIdx > 0 &&
-                            ghostPct > filledPct &&
-                            filledPct > 1 && (
+                                        <Typography
+                                          sx={{
+                                            fontSize: '0.5rem',
+                                            color: '#ef4444',
+                                            opacity: 0.7,
+                                            fontWeight: 700,
+                                          }}
+                                        >
+                                          −{formatCompactNumber(dropCount)}
+                                        </Typography>
+                                      </Box>
+                                    );
+                                  })()}
+                              </Box>
+                            )}
+                            {stepIdx > 0 &&
+                              ghostPct > filledPct &&
+                              filledPct > 1 && (
+                                <Box
+                                  sx={{
+                                    position: 'absolute',
+                                    bottom: `${filledPct}%`,
+                                    left: 0,
+                                    right: 0,
+                                    borderTop:
+                                      '1px dashed rgba(239,68,68,0.25)',
+                                    pointerEvents: 'none',
+                                    zIndex: 2,
+                                  }}
+                                />
+                              )}
+                            <Tooltip
+                              title={`${splitBreakdownValue(bdKey).join(' · ') || bdKey}: ${formatCompactNumber(count)} (${rate}%)`}
+                              placement="top"
+                              arrow
+                            >
                               <Box
+                                onClick={() => handleBarClick(step.name)}
                                 sx={{
                                   position: 'absolute',
-                                  bottom: `${filledPct}%`,
+                                  bottom: 0,
                                   left: 0,
                                   right: 0,
-                                  borderTop: '1px dashed rgba(239,68,68,0.25)',
-                                  pointerEvents: 'none',
+                                  height:
+                                    count > 0
+                                      ? `${Math.max(filledPct, 0.5)}%`
+                                      : 0,
+                                  minHeight: count > 0 ? 3 : 0,
+                                  bgcolor: color,
+                                  borderRadius: '4px 4px 0 0',
+                                  cursor: 'pointer',
+                                  transition:
+                                    'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
+                                  '&:hover': {
+                                    filter: 'brightness(1.1)',
+                                    zIndex: 3,
+                                  },
                                   zIndex: 2,
                                 }}
                               />
+                            </Tooltip>
+                            {count > 0 && (
+                              <Box
+                                sx={{
+                                  position: 'absolute',
+                                  bottom: `${Math.max(filledPct, 0.5)}%`,
+                                  left: '50%',
+                                  transform: 'translateX(-50%)',
+                                  mb: '2px',
+                                  bgcolor: isDark
+                                    ? 'rgba(18,18,30,0.92)'
+                                    : 'rgba(255,255,255,0.97)',
+                                  borderRadius: '3px',
+                                  px: '3px',
+                                  py: '1px',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
+                                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`,
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  zIndex: 10,
+                                  whiteSpace: 'nowrap',
+                                  pointerEvents: 'none',
+                                }}
+                              >
+                                <Typography
+                                  sx={{
+                                    fontSize: '0.6rem',
+                                    fontWeight: 700,
+                                    color: 'text.primary',
+                                    lineHeight: 1.2,
+                                  }}
+                                >
+                                  {rate}%
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontSize: '0.55rem',
+                                    color: 'text.secondary',
+                                    lineHeight: 1,
+                                  }}
+                                >
+                                  {formatCompactNumber(count)}
+                                </Typography>
+                              </Box>
                             )}
-                          <Tooltip
-                            title={`${splitBreakdownValue(bdKey).join(' · ') || bdKey}: ${formatCompactNumber(count)} (${rate}%)`}
-                            placement="top"
-                            arrow
-                          >
-                            <Box
-                              onClick={() => handleBarClick(step.name)}
-                              sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                height:
-                                  count > 0
-                                    ? `${Math.max(filledPct, 0.5)}%`
-                                    : 0,
-                                minHeight: count > 0 ? 3 : 0,
-                                bgcolor: color,
-                                borderRadius: '4px 4px 0 0',
-                                cursor: 'pointer',
-                                transition:
-                                  'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
-                                '&:hover': {
-                                  filter: 'brightness(1.1)',
-                                  zIndex: 3,
-                                },
-                                zIndex: 2,
-                              }}
-                            />
-                          </Tooltip>
-                          {count > 0 && (
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                bottom: `${Math.max(filledPct, 0.5)}%`,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                mb: '2px',
-                                bgcolor: isDark
-                                  ? 'rgba(18,18,30,0.92)'
-                                  : 'rgba(255,255,255,0.97)',
-                                borderRadius: '3px',
-                                px: '3px',
-                                py: '1px',
-                                boxShadow: '0 1px 3px rgba(0,0,0,0.18)',
-                                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                zIndex: 10,
-                                whiteSpace: 'nowrap',
-                                pointerEvents: 'none',
-                              }}
-                            >
-                              <Typography
-                                sx={{
-                                  fontSize: '0.6rem',
-                                  fontWeight: 700,
-                                  color: 'text.primary',
-                                  lineHeight: 1.2,
-                                }}
-                              >
-                                {rate}%
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  fontSize: '0.55rem',
-                                  color: 'text.secondary',
-                                  lineHeight: 1,
-                                }}
-                              >
-                                {formatCompactNumber(count)}
-                              </Typography>
-                            </Box>
-                          )}
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                ))}
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-            </Box>
             </Box>
           </Box>
 
@@ -1502,310 +1506,313 @@ export const FunnelsViews: React.FC<FunnelsViewsProps> = ({
 
             <Box sx={{ flex: 1 }}>
               <Box sx={{ position: 'relative' }}>
-              <Box
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 280,
-                  pointerEvents: 'none',
-                  zIndex: 0,
-                }}
-              >
-                {[0, 25, 50, 75, 100].map((tick) => (
-                  <Box
-                    key={tick}
-                    sx={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      bottom: `${tick}%`,
-                      borderTop: `1px solid ${gridStroke}`,
-                    }}
-                  />
-                ))}
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  height: 280,
-                  alignItems: 'flex-end',
-                  gap: '3px',
-                  position: 'relative',
-                  zIndex: 1,
-                }}
-              >
-                {chartData.map((entry: any, idx: number) => {
-                  const prevEntry = idx > 0 ? chartData[idx - 1] : null;
-                  const prevCount = prevEntry ? prevEntry.count : entry.count;
-                  const filledPct =
-                    maxCount > 0 ? (entry.count / maxCount) * 100 : 0;
-                  const ghostPct =
-                    prevEntry && maxCount > 0
-                      ? (prevCount / maxCount) * 100
-                      : 0;
-                  const dropCount = prevEntry
-                    ? prevEntry.count - entry.count
-                    : 0;
-                  const dropPct =
-                    prevEntry && prevEntry.count > 0
-                      ? Math.round((dropCount / prevEntry.count) * 1000) / 10
-                      : 0;
-
-                  return (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 280,
+                    pointerEvents: 'none',
+                    zIndex: 0,
+                  }}
+                >
+                  {[0, 25, 50, 75, 100].map((tick) => (
                     <Box
-                      key={idx}
+                      key={tick}
                       sx={{
-                        flex: 1,
-                        height: '100%',
-                        position: 'relative',
-                        minWidth: 0,
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: `${tick}%`,
+                        borderTop: `1px solid ${gridStroke}`,
                       }}
-                    >
-                      {idx > 0 && ghostPct > 0 && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            height: `${ghostPct}%`,
-                            bgcolor: 'background.paper',
-                            borderRadius: '6px 6px 0 0',
-                            transition: 'height 0.5s ease',
-                            zIndex: 1,
-                          }}
-                        >
+                    />
+                  ))}
+                </Box>
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    height: 280,
+                    alignItems: 'flex-end',
+                    gap: '3px',
+                    position: 'relative',
+                    zIndex: 1,
+                  }}
+                >
+                  {chartData.map((entry: any, idx: number) => {
+                    const prevEntry = idx > 0 ? chartData[idx - 1] : null;
+                    const prevCount = prevEntry ? prevEntry.count : entry.count;
+                    const filledPct =
+                      maxCount > 0 ? (entry.count / maxCount) * 100 : 0;
+                    const ghostPct =
+                      prevEntry && maxCount > 0
+                        ? (prevCount / maxCount) * 100
+                        : 0;
+                    const dropCount = prevEntry
+                      ? prevEntry.count - entry.count
+                      : 0;
+                    const dropPct =
+                      prevEntry && prevEntry.count > 0
+                        ? Math.round((dropCount / prevEntry.count) * 1000) / 10
+                        : 0;
+
+                    return (
+                      <Box
+                        key={idx}
+                        sx={{
+                          flex: 1,
+                          height: '100%',
+                          position: 'relative',
+                          minWidth: 0,
+                        }}
+                      >
+                        {idx > 0 && ghostPct > 0 && (
                           <Box
                             sx={{
                               position: 'absolute',
-                              top: 0,
                               bottom: 0,
                               left: 0,
                               right: 0,
-                              bgcolor: `${entry.fill}1c`,
-                              borderRadius: 'inherit',
+                              height: `${ghostPct}%`,
+                              bgcolor: 'background.paper',
+                              borderRadius: '6px 6px 0 0',
+                              transition: 'height 0.5s ease',
+                              zIndex: 1,
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                top: 0,
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                bgcolor: `${entry.fill}1c`,
+                                borderRadius: 'inherit',
+                              }}
+                            />
+                            {dropCount > 0 &&
+                              ghostPct - filledPct > 5 &&
+                              (() => {
+                                const dropZoneTopPct =
+                                  ((ghostPct - filledPct) / 2 / ghostPct) * 100;
+                                return (
+                                  <Box
+                                    sx={{
+                                      position: 'absolute',
+                                      top: `${dropZoneTopPct}%`,
+                                      transform: 'translateY(-50%)',
+                                      left: 0,
+                                      right: 0,
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      alignItems: 'center',
+                                      pointerEvents: 'none',
+                                    }}
+                                  >
+                                    <Typography
+                                      sx={{
+                                        fontSize: '0.6rem',
+                                        color: '#ef4444',
+                                        opacity: 0.8,
+                                        fontWeight: 700,
+                                        lineHeight: 1.3,
+                                      }}
+                                    >
+                                      −{formatCompactNumber(dropCount)}
+                                    </Typography>
+                                    <Typography
+                                      sx={{
+                                        fontSize: '0.55rem',
+                                        color: '#ef4444',
+                                        opacity: 0.55,
+                                        lineHeight: 1,
+                                      }}
+                                    >
+                                      −{dropPct}%
+                                    </Typography>
+                                  </Box>
+                                );
+                              })()}
+                          </Box>
+                        )}
+
+                        {idx > 0 && ghostPct > filledPct && filledPct > 1 && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              bottom: `${filledPct}%`,
+                              left: 0,
+                              right: 0,
+                              borderTop: '1.5px dashed rgba(239,68,68,0.3)',
+                              pointerEvents: 'none',
+                              zIndex: 2,
                             }}
                           />
-                          {dropCount > 0 &&
-                            ghostPct - filledPct > 5 &&
-                            (() => {
-                              const dropZoneTopPct =
-                                ((ghostPct - filledPct) / 2 / ghostPct) * 100;
-                              return (
-                                <Box
-                                  sx={{
-                                    position: 'absolute',
-                                    top: `${dropZoneTopPct}%`,
-                                    transform: 'translateY(-50%)',
-                                    left: 0,
-                                    right: 0,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    pointerEvents: 'none',
-                                  }}
-                                >
-                                  <Typography
-                                    sx={{
-                                      fontSize: '0.6rem',
-                                      color: '#ef4444',
-                                      opacity: 0.8,
-                                      fontWeight: 700,
-                                      lineHeight: 1.3,
-                                    }}
-                                  >
-                                    −{formatCompactNumber(dropCount)}
-                                  </Typography>
-                                  <Typography
-                                    sx={{
-                                      fontSize: '0.55rem',
-                                      color: '#ef4444',
-                                      opacity: 0.55,
-                                      lineHeight: 1,
-                                    }}
-                                  >
-                                    −{dropPct}%
-                                  </Typography>
-                                </Box>
-                              );
-                            })()}
-                        </Box>
-                      )}
+                        )}
 
-                      {idx > 0 && ghostPct > filledPct && filledPct > 1 && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: `${filledPct}%`,
-                            left: 0,
-                            right: 0,
-                            borderTop: '1.5px dashed rgba(239,68,68,0.3)',
-                            pointerEvents: 'none',
-                            zIndex: 2,
-                          }}
-                        />
-                      )}
-
-                      <Tooltip
-                        title={`${lexiconMap.get(entry.name) || entry.name}: ${formatCompactNumber(entry.count)} (${entry.rate}%)`}
-                        placement="top"
-                        arrow
-                      >
-                        <Box
-                          onClick={() => handleBarClick(entry.name)}
-                          sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            right: 0,
-                            height:
-                              entry.count > 0
-                                ? `${Math.max(filledPct, 1)}%`
-                                : 0,
-                            minHeight: entry.count > 0 ? 4 : 0,
-                            bgcolor: entry.fill,
-                            borderRadius: '6px 6px 0 0',
-                            cursor: 'pointer',
-                            overflow: 'hidden',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            pt: filledPct > 8 ? 1 : 0,
-                            transition:
-                              'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
-                            '&:hover': { filter: 'brightness(1.1)', zIndex: 3 },
-                            zIndex: 2,
-                          }}
+                        <Tooltip
+                          title={`${lexiconMap.get(entry.name) || entry.name}: ${formatCompactNumber(entry.count)} (${entry.rate}%)`}
+                          placement="top"
+                          arrow
                         >
-                          {filledPct > 8 && (
-                            <>
-                              <Typography
-                                sx={{
-                                  color: 'rgba(255,255,255,0.95)',
-                                  fontSize: '0.75rem',
-                                  fontWeight: 700,
-                                  lineHeight: 1.3,
-                                }}
-                              >
-                                {entry.rate}%
-                              </Typography>
-                              {filledPct > 18 && (
+                          <Box
+                            onClick={() => handleBarClick(entry.name)}
+                            sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              height:
+                                entry.count > 0
+                                  ? `${Math.max(filledPct, 1)}%`
+                                  : 0,
+                              minHeight: entry.count > 0 ? 4 : 0,
+                              bgcolor: entry.fill,
+                              borderRadius: '6px 6px 0 0',
+                              cursor: 'pointer',
+                              overflow: 'hidden',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              pt: filledPct > 8 ? 1 : 0,
+                              transition:
+                                'height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease',
+                              '&:hover': {
+                                filter: 'brightness(1.1)',
+                                zIndex: 3,
+                              },
+                              zIndex: 2,
+                            }}
+                          >
+                            {filledPct > 8 && (
+                              <>
                                 <Typography
                                   sx={{
-                                    color: 'rgba(255,255,255,0.75)',
-                                    fontSize: '0.65rem',
-                                    lineHeight: 1.2,
+                                    color: 'rgba(255,255,255,0.95)',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    lineHeight: 1.3,
                                   }}
                                 >
-                                  {formatCompactNumber(entry.count)}
+                                  {entry.rate}%
                                 </Typography>
-                              )}
-                            </>
-                          )}
-                        </Box>
-                      </Tooltip>
+                                {filledPct > 18 && (
+                                  <Typography
+                                    sx={{
+                                      color: 'rgba(255,255,255,0.75)',
+                                      fontSize: '0.65rem',
+                                      lineHeight: 1.2,
+                                    }}
+                                  >
+                                    {formatCompactNumber(entry.count)}
+                                  </Typography>
+                                )}
+                              </>
+                            )}
+                          </Box>
+                        </Tooltip>
 
-                      {filledPct <= 8 && entry.count > 0 && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            bottom: `${Math.max(filledPct, 1) + 1}%`,
-                            left: 0,
-                            right: 0,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            pointerEvents: 'none',
-                            zIndex: 3,
-                          }}
-                        >
-                          <Typography
+                        {filledPct <= 8 && entry.count > 0 && (
+                          <Box
                             sx={{
-                              fontSize: '0.65rem',
-                              fontWeight: 700,
-                              color: 'text.primary',
-                              lineHeight: 1.2,
+                              position: 'absolute',
+                              bottom: `${Math.max(filledPct, 1) + 1}%`,
+                              left: 0,
+                              right: 0,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              pointerEvents: 'none',
+                              zIndex: 3,
                             }}
                           >
-                            {entry.rate}%
-                          </Typography>
-                          <Typography
-                            sx={{
-                              fontSize: '0.6rem',
-                              color: 'text.secondary',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {formatCompactNumber(entry.count)}
-                          </Typography>
-                        </Box>
-                      )}
-                    </Box>
-                  );
-                })}
-              </Box>
+                            <Typography
+                              sx={{
+                                fontSize: '0.65rem',
+                                fontWeight: 700,
+                                color: 'text.primary',
+                                lineHeight: 1.2,
+                              }}
+                            >
+                              {entry.rate}%
+                            </Typography>
+                            <Typography
+                              sx={{
+                                fontSize: '0.6rem',
+                                color: 'text.secondary',
+                                lineHeight: 1,
+                              }}
+                            >
+                              {formatCompactNumber(entry.count)}
+                            </Typography>
+                          </Box>
+                        )}
+                      </Box>
+                    );
+                  })}
+                </Box>
 
-              <Box sx={{ display: 'flex', gap: '3px', mt: 1, height: 44 }}>
-                {chartData.map((entry: any, idx: number) => (
-                  <Tooltip
-                    key={idx}
-                    title={entry.name}
-                    placement="bottom"
-                    arrow
-                  >
-                    <Box
-                      sx={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'flex-start',
-                        gap: 0.25,
-                        pt: 0.5,
-                        minWidth: 0,
-                      }}
+                <Box sx={{ display: 'flex', gap: '3px', mt: 1, height: 44 }}>
+                  {chartData.map((entry: any, idx: number) => (
+                    <Tooltip
+                      key={idx}
+                      title={entry.name}
+                      placement="bottom"
+                      arrow
                     >
                       <Box
                         sx={{
-                          width: 18,
-                          height: 18,
-                          borderRadius: '4px',
-                          bgcolor: entry.fill,
-                          color: '#fff',
+                          flex: 1,
                           display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.55rem',
-                          fontWeight: 800,
-                          flexShrink: 0,
+                          justifyContent: 'flex-start',
+                          gap: 0.25,
+                          pt: 0.5,
+                          minWidth: 0,
                         }}
                       >
-                        {idx + 1}
+                        <Box
+                          sx={{
+                            width: 18,
+                            height: 18,
+                            borderRadius: '4px',
+                            bgcolor: entry.fill,
+                            color: '#fff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.55rem',
+                            fontWeight: 800,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {idx + 1}
+                        </Box>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontSize: '0.65rem',
+                            fontWeight: 500,
+                            maxWidth: '100%',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            color: 'text.secondary',
+                            textAlign: 'center',
+                            display: 'block',
+                          }}
+                        >
+                          {lexiconMap.get(entry.name) || entry.name}
+                        </Typography>
                       </Box>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontSize: '0.65rem',
-                          fontWeight: 500,
-                          maxWidth: '100%',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          color: 'text.secondary',
-                          textAlign: 'center',
-                          display: 'block',
-                        }}
-                      >
-                        {lexiconMap.get(entry.name) || entry.name}
-                      </Typography>
-                    </Box>
-                  </Tooltip>
-                ))}
+                    </Tooltip>
+                  ))}
+                </Box>
               </Box>
-            </Box>
             </Box>
           </Box>
         ) : (

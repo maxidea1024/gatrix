@@ -648,13 +648,7 @@ router.get('/projects/:id/members', async (req: any, res) => {
       orgMembers = await db('g_organisation_members as om')
         .join('g_users as u', 'om.userId', 'u.id')
         .where('om.orgId', project.orgId)
-        .select(
-          'om.id',
-          'om.userId',
-          'om.joinedAt',
-          'u.name',
-          'u.email'
-        );
+        .select('om.id', 'om.userId', 'om.joinedAt', 'u.name', 'u.email');
     }
 
     // 3. Merge & deduplicate by userId (project members take priority)

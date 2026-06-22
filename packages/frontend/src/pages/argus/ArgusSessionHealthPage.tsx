@@ -176,7 +176,11 @@ const ArgusSessionHealthPage: React.FC = () => {
         newFilters.dateRange.type === 'preset' &&
         newFilters.dateRange.preset
       ) {
-        setUrlState({ period: newFilters.dateRange.preset, start: '', end: '' });
+        setUrlState({
+          period: newFilters.dateRange.preset,
+          start: '',
+          end: '',
+        });
       } else if (
         newFilters.dateRange.type === 'custom' &&
         newFilters.dateRange.start &&

@@ -543,7 +543,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         limit: rowsPerPage,
         offset: (currentPage - 1) * rowsPerPage,
         query: storeSearch.trim()
-          ? resolveSearchMagicValues(storeSearch.trim(), { userName: user?.name })
+          ? resolveSearchMagicValues(storeSearch.trim(), {
+              userName: user?.name,
+            })
           : undefined,
         ...dateParams,
         substatus: substatus || undefined,
