@@ -345,81 +345,89 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
     const isDark = theme.palette.mode === 'dark';
     const [newFacetKey, setNewFacetKey] = useState('');
 
-    if (collapsed) {
-      return (
-        <Box
-          sx={{
-            width: 32,
-            flexShrink: 0,
-            borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            pt: 1,
-          }}
-        >
-          <SafeTooltip
-            title={t('argus.logs.facet.expandFacets', 'Expand facets')}
-            placement="right"
-          >
-            <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.5 }}>
-              <ExpandIcon sx={{ fontSize: 16 }} />
-            </IconButton>
-          </SafeTooltip>
-        </Box>
-      );
-    }
-
     return (
-      <Box
-        sx={{
-          width,
-          flexShrink: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-          '&::-webkit-scrollbar': { width: 4 },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: isDark
-              ? 'rgba(255,255,255,0.1)'
-              : 'rgba(0,0,0,0.1)',
-            borderRadius: 2,
-          },
-        }}
-      >
-        {/* Header */}
+      <Box sx={{ position: 'relative', flexShrink: 0 }}>
+        {/* Edge toggle button — circular, straddling the right border */}
         <Box
+          onClick={onToggleCollapse}
           sx={{
+            position: 'absolute',
+            right: -12,
+            top: 6,
+            zIndex: 100,
+            width: 24,
+            height: 24,
+            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            px: 1.5,
-            py: 1,
-            borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+            justifyContent: 'center',
+            bgcolor: isDark ? '#1e1e1e' : '#ffffff',
+            border: `1px solid ${theme.palette.divider}`,
+            cursor: 'pointer',
+            color: 'text.secondary',
+            transition:
+              'background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
+            '&:hover': {
+              bgcolor: isDark ? '#252525' : '#f5f5f5',
+              boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
+              color: isDark ? 'primary.main' : 'text.primary',
+            },
           }}
         >
-          <Typography
+          {collapsed ? (
+            <ExpandIcon sx={{ fontSize: 14, color: 'inherit' }} />
+          ) : (
+            <CollapseIcon sx={{ fontSize: 14, color: 'inherit' }} />
+          )}
+        </Box>
+
+        {/* Panel content */}
+        {collapsed ? (
+          <Box
             sx={{
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              color: 'text.secondary',
+              width: 12,
+              borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              height: '100%',
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              width,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              '&::-webkit-scrollbar': { width: 4 },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.1)'
+                  : 'rgba(0,0,0,0.1)',
+                borderRadius: 2,
+              },
             }}
           >
-            {t('argus.logs.facet.facets', 'Facets')}
-          </Typography>
-          <SafeTooltip
-            title={t('argus.logs.facet.collapseFacets', 'Collapse')}
-            placement="right"
-          >
-            <IconButton size="small" onClick={onToggleCollapse} sx={{ p: 0.3 }}>
-              <CollapseIcon
-                sx={{ fontSize: 14, transform: 'rotate(180deg)' }}
-              />
-            </IconButton>
-          </SafeTooltip>
-        </Box>
+            {/* Header */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                px: 1.5,
+                py: 1,
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                  color: 'text.secondary',
+                }}
+              >
+                {t('argus.logs.facet.facets', 'Facets')}
+              </Typography>
+            </Box>
 
         {/* Facet sections */}
         {facets.map((facet) => (
@@ -575,6 +583,8 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
                 </IconButton>
               </SafeTooltip>
             </Box>
+          </Box>
+        )}
           </Box>
         )}
       </Box>
