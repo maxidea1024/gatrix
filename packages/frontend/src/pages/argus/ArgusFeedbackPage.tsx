@@ -858,29 +858,30 @@ const ArgusFeedbackPage: React.FC = () => {
       icon: <FeedbackIcon />,
       color: '#7c4dff',
       label: t('argus.feedback.totalFeedback'),
-      value: summary?.total_feedback,
+      value: summary ? Number(summary.total_feedback) : undefined,
     },
     {
       icon: <PeopleIcon />,
       color: '#2196f3',
       label: t('argus.feedback.uniqueUsers'),
-      value: summary?.unique_users,
+      value: summary ? Number(summary.unique_users) : undefined,
     },
     {
       icon: <ContactIcon />,
       color: '#4caf50',
       label: t('argus.feedback.withContact'),
-      value: summary?.with_contact,
+      value: summary ? Number(summary.with_contact) : undefined,
     },
     {
       icon: <TextIcon />,
       color: '#ff9800',
       label: t('argus.feedback.avgMessageLength'),
       value: summary
-        ? `${Math.round(Number(summary.avg_message_length))}`
+        ? Math.round(Number(summary.avg_message_length))
         : undefined,
     },
   ];
+
 
   const SORT_OPTIONS = [
     { value: 'newest', label: t('argus.feedback.sortNewest') },
