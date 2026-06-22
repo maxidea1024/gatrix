@@ -128,9 +128,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
         setExpandedOrgs((prev) => new Set(prev).add(currentOrg.id));
       }
       if (currentProject && currentOrg) {
-        setExpandedProjects((prev) =>
-          new Set(prev).add(currentProject.id)
-        );
+        setExpandedProjects((prev) => new Set(prev).add(currentProject.id));
         loadProjectEnvironments(currentProject.id, currentOrg.id);
       }
     },
@@ -268,24 +266,15 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
             py: 0.5,
             '&.Mui-selected': {
               backgroundColor: (theme) =>
-                alpha(
-                  itemColor,
-                  theme.palette.mode === 'dark' ? 0.2 : 0.1
-                ),
+                alpha(itemColor, theme.palette.mode === 'dark' ? 0.2 : 0.1),
               '&:hover': {
                 backgroundColor: (theme) =>
-                  alpha(
-                    itemColor,
-                    theme.palette.mode === 'dark' ? 0.25 : 0.15
-                  ),
+                  alpha(itemColor, theme.palette.mode === 'dark' ? 0.25 : 0.15),
               },
             },
             '&:hover': {
               backgroundColor: (theme) =>
-                alpha(
-                  itemColor,
-                  theme.palette.mode === 'dark' ? 0.15 : 0.08
-                ),
+                alpha(itemColor, theme.palette.mode === 'dark' ? 0.15 : 0.08),
             },
           }}
         >
@@ -310,9 +299,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
             }}
           />
           {isSelected && (
-            <CheckIcon
-              sx={{ fontSize: 16, color: 'success.main', ml: 0.5 }}
-            />
+            <CheckIcon sx={{ fontSize: 16, color: 'success.main', ml: 0.5 }} />
           )}
         </ListItemButton>
       );
@@ -369,7 +356,9 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
               onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 handleClose();
-                navigate(`/admin/environments?orgId=${orgId}&projectId=${proj.id}`);
+                navigate(
+                  `/admin/environments?orgId=${orgId}&projectId=${proj.id}`
+                );
               }}
               sx={{
                 display: 'flex',
@@ -390,8 +379,6 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
       </React.Fragment>
     );
   }
-
-
 
   // ─── Trigger element (unchanged from original) ───
 
@@ -497,11 +484,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
         >
           {envLabel}
         </Typography>
-        <Tooltip
-          title={`${orgLabel} / ${projLabel}`}
-          placement="bottom"
-          arrow
-        >
+        <Tooltip title={`${orgLabel} / ${projLabel}`} placement="bottom" arrow>
           <Typography
             variant="caption"
             color="text.secondary"
@@ -580,9 +563,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
                       sx={{ pl: 1.5, py: 0.75 }}
                     >
                       <ListItemIcon sx={{ minWidth: 24 }}>
-                        <ProjectIcon
-                          sx={{ fontSize: 16, opacity: 0.5 }}
-                        />
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
                       </ListItemIcon>
                       <ListItemText
                         primary={t('environments.noProjects')}
@@ -594,9 +575,7 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
                       />
                     </ListItemButton>
                   ) : (
-                    orgProjects.map((proj) =>
-                      renderProject(proj, org.id, 1.5)
-                    )
+                    orgProjects.map((proj) => renderProject(proj, org.id, 1.5))
                   )}
                 </React.Fragment>
               );
@@ -627,11 +606,14 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
                     primary={org.displayName || org.orgName}
                     primaryTypographyProps={{
                       variant: 'body2',
-                      fontWeight:
-                        currentOrg?.id === org.id ? 600 : 400,
+                      fontWeight: currentOrg?.id === org.id ? 600 : 400,
                     }}
                   />
-                  <Tooltip title={t('sidebar.context.manage')} placement="top" arrow>
+                  <Tooltip
+                    title={t('sidebar.context.manage')}
+                    placement="top"
+                    arrow
+                  >
                     <Box
                       className="manage-icon"
                       onClick={(e: React.MouseEvent) => {
@@ -657,22 +639,16 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
                     <ListItemButton
                       onClick={() => {
                         handleClose();
-                        navigate(
-                          `/admin/projects?orgId=${org.id}`
-                        );
+                        navigate(`/admin/projects?orgId=${org.id}`);
                       }}
                       dense
                       sx={{ pl: 4, py: 0.75 }}
                     >
                       <ListItemIcon sx={{ minWidth: 24 }}>
-                        <ProjectIcon
-                          sx={{ fontSize: 16, opacity: 0.5 }}
-                        />
+                        <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
                       </ListItemIcon>
                       <ListItemText
-                        primary={t(
-                          'environments.goToProjectManagement'
-                        )}
+                        primary={t('environments.goToProjectManagement')}
                         primaryTypographyProps={{
                           variant: 'caption',
                           color: 'text.secondary',
@@ -681,16 +657,12 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
                       />
                     </ListItemButton>
                   )}
-                  {orgProjects.map((proj) =>
-                    renderProject(proj, org.id, 4)
-                  )}
+                  {orgProjects.map((proj) => renderProject(proj, org.id, 4))}
                 </Collapse>
               </React.Fragment>
             );
           })}
         </Box>
-
-
       </Popover>
     </>
   );

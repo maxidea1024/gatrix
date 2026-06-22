@@ -93,32 +93,44 @@ const UnknownFlagsPage: React.FC = () => {
     const startParam = searchParams.get('start');
     const endParam = searchParams.get('end');
     if (startParam && endParam) {
-      return { type: 'custom', start: new Date(startParam), end: new Date(endParam) };
+      return {
+        type: 'custom',
+        start: new Date(startParam),
+        end: new Date(endParam),
+      };
     }
     if (rangeParam) {
       return { type: 'preset', preset: rangeParam };
     }
     return { type: 'preset', preset: '7d' };
   });
-  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'flag' | 'env' | 'app'>('all');
+  const [chartGroupBy, setChartGroupBy] = useState<
+    'all' | 'flag' | 'env' | 'app'
+  >('all');
 
   // Sync dateRange to URL
-  const setDateRange = useCallback((value: DateRangeValue) => {
-    setDateRangeState(value);
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.delete('range');
-      next.delete('start');
-      next.delete('end');
-      if (value.type === 'custom' && value.start && value.end) {
-        next.set('start', value.start.toISOString());
-        next.set('end', value.end.toISOString());
-      } else if (value.type === 'preset' && value.preset) {
-        next.set('range', value.preset);
-      }
-      return next;
-    }, { replace: true });
-  }, [setSearchParams]);
+  const setDateRange = useCallback(
+    (value: DateRangeValue) => {
+      setDateRangeState(value);
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('range');
+          next.delete('start');
+          next.delete('end');
+          if (value.type === 'custom' && value.start && value.end) {
+            next.set('start', value.start.toISOString());
+            next.set('end', value.end.toISOString());
+          } else if (value.type === 'preset' && value.preset) {
+            next.set('range', value.preset);
+          }
+          return next;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -506,9 +518,21 @@ const UnknownFlagsPage: React.FC = () => {
 
   // ─── Chart: aggregate filteredFlags by hour buckets with grouping ───
   const seriesColors = [
-    '#ed6c02', '#2196f3', '#4caf50', '#9c27b0', '#f44336',
-    '#00bcd4', '#ff9800', '#e91e63', '#3f51b5', '#009688',
-    '#cddc39', '#795548', '#607d8b', '#ff5722', '#8bc34a',
+    '#ed6c02',
+    '#2196f3',
+    '#4caf50',
+    '#9c27b0',
+    '#f44336',
+    '#00bcd4',
+    '#ff9800',
+    '#e91e63',
+    '#3f51b5',
+    '#009688',
+    '#cddc39',
+    '#795548',
+    '#607d8b',
+    '#ff5722',
+    '#8bc34a',
   ];
 
   const { chartLabels, chartDatasets, bucketSizeMs } = useMemo(() => {
@@ -532,7 +556,11 @@ const UnknownFlagsPage: React.FC = () => {
       cur.setTime(cur.getTime() + stepMs);
     }
     if (buckets.length === 0) {
-      return { chartLabels: [] as string[], chartDatasets: [] as ChartDataset[], bucketSizeMs: stepMs };
+      return {
+        chartLabels: [] as string[],
+        chartDatasets: [] as ChartDataset[],
+        bucketSizeMs: stepMs,
+      };
     }
 
     const bucketStartMs = buckets[0].getTime();
@@ -560,11 +588,13 @@ const UnknownFlagsPage: React.FC = () => {
       }
       return {
         chartLabels: labels,
-        chartDatasets: [{
-          label: t('featureFlags.unknownFlags'),
-          data: counts,
-          color: '#ed6c02',
-        }],
+        chartDatasets: [
+          {
+            label: t('featureFlags.unknownFlags'),
+            data: counts,
+            color: '#ed6c02',
+          },
+        ],
         bucketSizeMs: stepMs,
       };
     }
@@ -572,15 +602,18 @@ const UnknownFlagsPage: React.FC = () => {
     // Group by key
     const getKey = (flag: UnknownFlag): string => {
       switch (chartGroupBy) {
-        case 'flag': return flag.flagName;
+        case 'flag':
+          return flag.flagName;
         case 'env': {
           const org = flag.orgName || '';
           const proj = flag.projectName || '';
           const env = flag.environmentName || flag.environmentId;
           return `${org}/${proj}/${env}`;
         }
-        case 'app': return flag.appName || '-';
-        default: return 'all';
+        case 'app':
+          return flag.appName || '-';
+        default:
+          return 'all';
       }
     };
 
@@ -629,7 +662,11 @@ const UnknownFlagsPage: React.FC = () => {
       });
     }
 
-    return { chartLabels: labels, chartDatasets: datasets, bucketSizeMs: stepMs };
+    return {
+      chartLabels: labels,
+      chartDatasets: datasets,
+      bucketSizeMs: stepMs,
+    };
   }, [filteredFlags, dateRange, chartGroupBy, t]);
 
   const handleChartZoom = useCallback(
@@ -867,15 +904,11 @@ const UnknownFlagsPage: React.FC = () => {
                 },
               }}
             >
-              <ToggleButton value="all">
-                {t('network.groupByAll')}
-              </ToggleButton>
+              <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
               <ToggleButton value="flag">
                 {t('featureFlags.flagName')}
               </ToggleButton>
-              <ToggleButton value="env">
-                {t('common.environment')}
-              </ToggleButton>
+              <ToggleButton value="env">{t('common.environment')}</ToggleButton>
               <ToggleButton value="app">
                 {t('featureFlags.appName')}
               </ToggleButton>
@@ -889,7 +922,6 @@ const UnknownFlagsPage: React.FC = () => {
           />
         </Box>
       </Box>
-
 
       <ArgusVolumeChart
         labels={chartLabels}

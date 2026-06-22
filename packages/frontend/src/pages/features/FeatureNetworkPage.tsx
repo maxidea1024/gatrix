@@ -184,7 +184,8 @@ const FeatureNetworkPage: React.FC = () => {
 
   // Lookup maps: environmentId -> projectName / orgName (for table columns)
   const envProjectMap = useMemo(
-    () => new Map(globalEnvs.map((e) => [e.environmentId, e.projectName || '-'])),
+    () =>
+      new Map(globalEnvs.map((e) => [e.environmentId, e.projectName || '-'])),
     [globalEnvs]
   );
   const envOrgMap = useMemo(
@@ -238,23 +239,27 @@ const FeatureNetworkPage: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // Reset pagination when data changes
-  useEffect(() => { setTrafficPage(0); }, [trafficData]);
-  useEffect(() => { setEvalPage(0); }, [evaluationTimeSeriesByApp]);
+  useEffect(() => {
+    setTrafficPage(0);
+  }, [trafficData]);
+  useEffect(() => {
+    setEvalPage(0);
+  }, [evaluationTimeSeriesByApp]);
 
   const [appsLoaded, setAppsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const tabParam = searchParams.get('tab');
     return tabParam === '1' ? 1 : 0;
   });
-  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'app' | 'env' | 'flag'>(
-    () => {
-      const groupParam = searchParams.get('groupBy');
-      if (groupParam === 'env') return 'env';
-      if (groupParam === 'app') return 'app';
-      if (groupParam === 'flag') return 'flag';
-      return 'all';
-    }
-  );
+  const [chartGroupBy, setChartGroupBy] = useState<
+    'all' | 'app' | 'env' | 'flag'
+  >(() => {
+    const groupParam = searchParams.get('groupBy');
+    if (groupParam === 'env') return 'env';
+    if (groupParam === 'app') return 'app';
+    if (groupParam === 'flag') return 'flag';
+    return 'all';
+  });
 
   // Reset grouping to 'all' if 'flag' is active and user switches to API Requests tab
   useEffect(() => {
@@ -455,11 +460,7 @@ const FeatureNetworkPage: React.FC = () => {
       setIsRefreshing(false);
       hasLoadedRef.current = true;
     }
-  }, [
-    getTimeRange,
-    selectedEnvironments,
-    selectedApps,
-  ]);
+  }, [getTimeRange, selectedEnvironments, selectedApps]);
 
   // Set default environments when global envs are loaded (only on initial load)
   useEffect(() => {
@@ -481,8 +482,6 @@ const FeatureNetworkPage: React.FC = () => {
     selectedEnvironments.length,
     initialEnvLoad,
   ]);
-
-
 
   // Fetch applications when environments or time range changes
   useEffect(() => {
@@ -515,12 +514,17 @@ const FeatureNetworkPage: React.FC = () => {
     setDateRange(value);
   }, []);
 
-
   // Colors for different series
   const seriesColors = useMemo(
     () => [
-      '#2196f3', '#4caf50', '#ff9800', '#e91e63',
-      '#9c27b0', '#00bcd4', '#795548', '#607d8b',
+      '#2196f3',
+      '#4caf50',
+      '#ff9800',
+      '#e91e63',
+      '#9c27b0',
+      '#00bcd4',
+      '#795548',
+      '#607d8b',
     ],
     []
   );
@@ -549,7 +553,7 @@ const FeatureNetworkPage: React.FC = () => {
     const buildGroupedDatasets = (
       groupKey: 'environmentId' | 'appName',
       labelFn: (key: string) => string,
-      valueFn: (d: ChartDataPointByApp) => number,
+      valueFn: (d: ChartDataPointByApp) => number
     ): ChartDataset[] => {
       // Aggregate total per group for ranking
       const groupTotals = new Map<string, number>();
@@ -577,11 +581,13 @@ const FeatureNetworkPage: React.FC = () => {
         }
       });
 
-      const datasets: ChartDataset[] = [...groupAgg.entries()].map(([key, agg], i) => ({
-        label: labelFn(key),
-        data: chartTimeLabels.map((t) => agg.get(t) || 0),
-        color: seriesColors[i % seriesColors.length],
-      }));
+      const datasets: ChartDataset[] = [...groupAgg.entries()].map(
+        ([key, agg], i) => ({
+          label: labelFn(key),
+          data: chartTimeLabels.map((t) => agg.get(t) || 0),
+          color: seriesColors[i % seriesColors.length],
+        })
+      );
 
       if (otherAgg.size > 0) {
         datasets.push({
@@ -597,26 +603,38 @@ const FeatureNetworkPage: React.FC = () => {
       return buildGroupedDatasets(
         'environmentId',
         (k) => envFullPathMap.get(k) || envNameMap.get(k) || k,
-        (d) => d.totalCount,
+        (d) => d.totalCount
       );
     } else if (chartGroupBy === 'app') {
       return buildGroupedDatasets(
         'appName',
         (k) => k,
-        (d) => d.totalCount,
+        (d) => d.totalCount
       );
     } else {
       const aggregated = new Map<string, number>();
       chartDataByApp.forEach((d) => {
-        aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.totalCount);
+        aggregated.set(
+          d.displayTime,
+          (aggregated.get(d.displayTime) || 0) + d.totalCount
+        );
       });
-      return [{
-        label: '',
-        data: chartTimeLabels.map((time) => aggregated.get(time) || 0),
-        color: seriesColors[0],
-      }];
+      return [
+        {
+          label: '',
+          data: chartTimeLabels.map((time) => aggregated.get(time) || 0),
+          color: seriesColors[0],
+        },
+      ];
     }
-  }, [chartDataByApp, chartTimeLabels, seriesColors, chartGroupBy, envFullPathMap, envNameMap]);
+  }, [
+    chartDataByApp,
+    chartTimeLabels,
+    seriesColors,
+    chartGroupBy,
+    envFullPathMap,
+    envNameMap,
+  ]);
 
   // Zoom handler — converts chart index range to custom date range
   const handleChartZoom = useCallback(
@@ -639,7 +657,7 @@ const FeatureNetworkPage: React.FC = () => {
 
     const buildGroupedEvalDatasets = (
       groupKey: 'environmentId' | 'appName',
-      labelFn: (key: string) => string,
+      labelFn: (key: string) => string
     ): ChartDataset[] => {
       const groupTotals = new Map<string, number>();
       evaluationTimeSeriesByApp.forEach((d) => {
@@ -658,15 +676,20 @@ const FeatureNetworkPage: React.FC = () => {
           const m = groupAgg.get(key)!;
           m.set(d.displayTime, (m.get(d.displayTime) || 0) + d.evaluations);
         } else {
-          otherAgg.set(d.displayTime, (otherAgg.get(d.displayTime) || 0) + d.evaluations);
+          otherAgg.set(
+            d.displayTime,
+            (otherAgg.get(d.displayTime) || 0) + d.evaluations
+          );
         }
       });
 
-      const datasets: ChartDataset[] = [...groupAgg.entries()].map(([key, agg], i) => ({
-        label: labelFn(key),
-        data: chartTimeLabels.map((t) => agg.get(t) || 0),
-        color: seriesColors[i % seriesColors.length],
-      }));
+      const datasets: ChartDataset[] = [...groupAgg.entries()].map(
+        ([key, agg], i) => ({
+          label: labelFn(key),
+          data: chartTimeLabels.map((t) => agg.get(t) || 0),
+          color: seriesColors[i % seriesColors.length],
+        })
+      );
       if (otherAgg.size > 0) {
         datasets.push({
           label: 'Other',
@@ -680,7 +703,7 @@ const FeatureNetworkPage: React.FC = () => {
     if (chartGroupBy === 'env') {
       return buildGroupedEvalDatasets(
         'environmentId',
-        (k) => envFullPathMap.get(k) || envNameMap.get(k) || k,
+        (k) => envFullPathMap.get(k) || envNameMap.get(k) || k
       );
     } else if (chartGroupBy === 'app') {
       return buildGroupedEvalDatasets('appName', (k) => k);
@@ -703,15 +726,20 @@ const FeatureNetworkPage: React.FC = () => {
           const m = groupAgg.get(key)!;
           m.set(d.displayTime, (m.get(d.displayTime) || 0) + d.evaluations);
         } else {
-          otherAgg.set(d.displayTime, (otherAgg.get(d.displayTime) || 0) + d.evaluations);
+          otherAgg.set(
+            d.displayTime,
+            (otherAgg.get(d.displayTime) || 0) + d.evaluations
+          );
         }
       });
 
-      const datasets: ChartDataset[] = [...groupAgg.entries()].map(([key, agg], i) => ({
-        label: key,
-        data: chartTimeLabels.map((t) => agg.get(t) || 0),
-        color: seriesColors[i % seriesColors.length],
-      }));
+      const datasets: ChartDataset[] = [...groupAgg.entries()].map(
+        ([key, agg], i) => ({
+          label: key,
+          data: chartTimeLabels.map((t) => agg.get(t) || 0),
+          color: seriesColors[i % seriesColors.length],
+        })
+      );
       if (otherAgg.size > 0) {
         datasets.push({
           label: 'Other',
@@ -723,15 +751,28 @@ const FeatureNetworkPage: React.FC = () => {
     } else {
       const aggregated = new Map<string, number>();
       evaluationTimeSeriesByApp.forEach((d) => {
-        aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.evaluations);
+        aggregated.set(
+          d.displayTime,
+          (aggregated.get(d.displayTime) || 0) + d.evaluations
+        );
       });
-      return [{
-        label: '',
-        data: chartTimeLabels.map((time) => aggregated.get(time) || 0),
-        color: seriesColors[0],
-      }];
+      return [
+        {
+          label: '',
+          data: chartTimeLabels.map((time) => aggregated.get(time) || 0),
+          color: seriesColors[0],
+        },
+      ];
     }
-  }, [evaluationTimeSeriesByApp, evaluationTimeSeriesByFlag, chartTimeLabels, seriesColors, chartGroupBy, envFullPathMap, envNameMap]);
+  }, [
+    evaluationTimeSeriesByApp,
+    evaluationTimeSeriesByFlag,
+    chartTimeLabels,
+    seriesColors,
+    chartGroupBy,
+    envFullPathMap,
+    envNameMap,
+  ]);
 
   // API Request tab summary cards
   const apiSummaryCards = useMemo(
@@ -873,19 +914,11 @@ const FeatureNetworkPage: React.FC = () => {
             },
           }}
         >
-          <ToggleButton value="all">
-            {t('network.groupByAll')}
-          </ToggleButton>
-          <ToggleButton value="app">
-            {t('network.groupByApp')}
-          </ToggleButton>
-          <ToggleButton value="env">
-            {t('network.groupByEnv')}
-          </ToggleButton>
+          <ToggleButton value="all">{t('network.groupByAll')}</ToggleButton>
+          <ToggleButton value="app">{t('network.groupByApp')}</ToggleButton>
+          <ToggleButton value="env">{t('network.groupByEnv')}</ToggleButton>
           {activeTab === 1 && (
-            <ToggleButton value="flag">
-              {t('network.groupByFlag')}
-            </ToggleButton>
+            <ToggleButton value="flag">{t('network.groupByFlag')}</ToggleButton>
           )}
         </ToggleButtonGroup>
 
@@ -967,7 +1000,6 @@ const FeatureNetworkPage: React.FC = () => {
                 ))}
               </Box>
 
-
               <ArgusVolumeChart
                 labels={chartTimeLabels}
                 datasets={apiChartDatasets}
@@ -1000,111 +1032,124 @@ const FeatureNetworkPage: React.FC = () => {
                 <Collapse in={showTable}>
                   <Card variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
                     <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                      <TableContainer sx={{ maxHeight: 'calc(100vh - 480px)', minHeight: 300 }}>
-                    <Table
-                      size="small"
-                      stickyHeader
-                      sx={{ '& .MuiTableCell-root': { py: 0.75 } }}
-                    >
-                      <TableHead
+                      <TableContainer
                         sx={{
-                          '& .MuiTableCell-root': {
-                            bgcolor: 'background.paper',
-                            zIndex: 1,
-                          },
+                          maxHeight: 'calc(100vh - 480px)',
+                          minHeight: 300,
                         }}
                       >
-                        <TableRow>
-                          <TableCell>{t('network.time')}</TableCell>
-                          <TableCell>{t('common.environment')}</TableCell>
-                          <TableCell>{t('common.project')}</TableCell>
-                          <TableCell>{t('common.organization')}</TableCell>
-                          <TableCell>{t('network.application')}</TableCell>
-                          <TableCell align="right">
-                            {t('network.features')}
-                          </TableCell>
-                          <TableCell align="right">
-                            {t('network.segments')}
-                          </TableCell>
-                          <TableCell align="right">
-                            {t('network.total')}
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {trafficData.length === 0 ? (
-                          <TableRow hover>
-                            <TableCell
-                              colSpan={8}
-                              align="center"
-                              sx={{ py: 4 }}
-                            >
-                              <Typography color="text.secondary">
-                                {t('common.noData')}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          trafficData
-                            .slice()
-                            .reverse()
-                            .slice(trafficPage * rowsPerPage, trafficPage * rowsPerPage + rowsPerPage)
-                            .map((row, index) => (
-                              <TableRow key={index} hover>
-                                <TableCell>{row.displayTime}</TableCell>
-                                <TableCell>
-                                  <Tooltip title={row.environmentId}>
-                                    <Chip
-                                      label={
-                                        envNameMap.get(row.environmentId) ||
-                                        row.environmentId
-                                      }
-                                      size="small"
-                                      color="primary"
-                                      variant="outlined"
-                                      sx={{ borderRadius: '16px' }}
-                                    />
-                                  </Tooltip>
-                                </TableCell>
-                                <TableCell>{envProjectMap.get(row.environmentId) || '-'}</TableCell>
-                                <TableCell>{envOrgMap.get(row.environmentId) || '-'}</TableCell>
-                                <TableCell>
-                                  {row.appName ? (
-                                    <Chip
-                                      label={row.appName}
-                                      size="small"
-                                      color="info"
-                                      sx={{ borderRadius: '16px' }}
-                                    />
-                                  ) : (
-                                    '-'
-                                  )}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {row.featuresCount.toLocaleString()}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {row.segmentsCount.toLocaleString()}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {row.totalCount.toLocaleString()}
+                        <Table
+                          size="small"
+                          stickyHeader
+                          sx={{ '& .MuiTableCell-root': { py: 0.75 } }}
+                        >
+                          <TableHead
+                            sx={{
+                              '& .MuiTableCell-root': {
+                                bgcolor: 'background.paper',
+                                zIndex: 1,
+                              },
+                            }}
+                          >
+                            <TableRow>
+                              <TableCell>{t('network.time')}</TableCell>
+                              <TableCell>{t('common.environment')}</TableCell>
+                              <TableCell>{t('common.project')}</TableCell>
+                              <TableCell>{t('common.organization')}</TableCell>
+                              <TableCell>{t('network.application')}</TableCell>
+                              <TableCell align="right">
+                                {t('network.features')}
+                              </TableCell>
+                              <TableCell align="right">
+                                {t('network.segments')}
+                              </TableCell>
+                              <TableCell align="right">
+                                {t('network.total')}
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {trafficData.length === 0 ? (
+                              <TableRow hover>
+                                <TableCell
+                                  colSpan={8}
+                                  align="center"
+                                  sx={{ py: 4 }}
+                                >
+                                  <Typography color="text.secondary">
+                                    {t('common.noData')}
+                                  </Typography>
                                 </TableCell>
                               </TableRow>
-                            ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <SimplePagination
-                    page={trafficPage}
-                    rowsPerPage={rowsPerPage}
-                    count={trafficData.length}
-                    onPageChange={(_, newPage) => setTrafficPage(newPage)}
-                    onRowsPerPageChange={(e) => {
-                      setRowsPerPage(Number(e.target.value));
-                      setTrafficPage(0);
-                    }}
-                  />
+                            ) : (
+                              trafficData
+                                .slice()
+                                .reverse()
+                                .slice(
+                                  trafficPage * rowsPerPage,
+                                  trafficPage * rowsPerPage + rowsPerPage
+                                )
+                                .map((row, index) => (
+                                  <TableRow key={index} hover>
+                                    <TableCell>{row.displayTime}</TableCell>
+                                    <TableCell>
+                                      <Tooltip title={row.environmentId}>
+                                        <Chip
+                                          label={
+                                            envNameMap.get(row.environmentId) ||
+                                            row.environmentId
+                                          }
+                                          size="small"
+                                          color="primary"
+                                          variant="outlined"
+                                          sx={{ borderRadius: '16px' }}
+                                        />
+                                      </Tooltip>
+                                    </TableCell>
+                                    <TableCell>
+                                      {envProjectMap.get(row.environmentId) ||
+                                        '-'}
+                                    </TableCell>
+                                    <TableCell>
+                                      {envOrgMap.get(row.environmentId) || '-'}
+                                    </TableCell>
+                                    <TableCell>
+                                      {row.appName ? (
+                                        <Chip
+                                          label={row.appName}
+                                          size="small"
+                                          color="info"
+                                          sx={{ borderRadius: '16px' }}
+                                        />
+                                      ) : (
+                                        '-'
+                                      )}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.featuresCount.toLocaleString()}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.segmentsCount.toLocaleString()}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.totalCount.toLocaleString()}
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      <SimplePagination
+                        page={trafficPage}
+                        rowsPerPage={rowsPerPage}
+                        count={trafficData.length}
+                        onPageChange={(_, newPage) => setTrafficPage(newPage)}
+                        onRowsPerPageChange={(e) => {
+                          setRowsPerPage(Number(e.target.value));
+                          setTrafficPage(0);
+                        }}
+                      />
                     </CardContent>
                   </Card>
                 </Collapse>
@@ -1162,7 +1207,6 @@ const FeatureNetworkPage: React.FC = () => {
                 ))}
               </Box>
 
-
               <ArgusVolumeChart
                 labels={chartTimeLabels}
                 datasets={evalChartDatasets}
@@ -1195,100 +1239,110 @@ const FeatureNetworkPage: React.FC = () => {
                 <Collapse in={showEvalTable}>
                   <Card variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
                     <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
-                      <TableContainer sx={{ maxHeight: 'calc(100vh - 480px)', minHeight: 300 }}>
-                    <Table
-                      size="small"
-                      stickyHeader
-                      sx={{ '& .MuiTableCell-root': { py: 0.75 } }}
-                    >
-                      <TableHead
+                      <TableContainer
                         sx={{
-                          '& .MuiTableCell-root': {
-                            bgcolor: 'background.paper',
-                            zIndex: 1,
-                          },
+                          maxHeight: 'calc(100vh - 480px)',
+                          minHeight: 300,
                         }}
                       >
-                        <TableRow>
-                          <TableCell>{t('network.time')}</TableCell>
-                          <TableCell>{t('common.environment')}</TableCell>
-                          <TableCell>{t('common.project')}</TableCell>
-                          <TableCell>{t('common.organization')}</TableCell>
-                          <TableCell>{t('network.application')}</TableCell>
-                          <TableCell align="right">
-                            {t('network.flagEvaluations')}
-                          </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {evaluationTimeSeriesByApp.length === 0 ? (
-                          <TableRow hover>
-                            <TableCell
-                              colSpan={6}
-                              align="center"
-                              sx={{ py: 4 }}
-                            >
-                              <Typography color="text.secondary">
-                                {t('common.noData')}
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          evaluationTimeSeriesByApp
-                            .slice()
-                            .reverse()
-                            .slice(evalPage * rowsPerPage, evalPage * rowsPerPage + rowsPerPage)
-                            .map((row, index) => (
-                              <TableRow key={index} hover>
-                                <TableCell>{row.displayTime}</TableCell>
-                                <TableCell>
-                                  <Tooltip title={row.environmentId}>
-                                    <Chip
-                                      label={
-                                        row.environmentName ||
-                                        envNameMap.get(row.environmentId) ||
-                                        row.environmentId
-                                      }
-                                      size="small"
-                                      color="primary"
-                                      variant="outlined"
-                                      sx={{ borderRadius: '16px' }}
-                                    />
-                                  </Tooltip>
-                                </TableCell>
-                                <TableCell>{row.projectName || '-'}</TableCell>
-                                <TableCell>{row.orgName || '-'}</TableCell>
-                                <TableCell>
-                                  {row.appName ? (
-                                    <Chip
-                                      label={row.appName}
-                                      size="small"
-                                      color="info"
-                                      sx={{ borderRadius: '16px' }}
-                                    />
-                                  ) : (
-                                    '-'
-                                  )}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {row.evaluations.toLocaleString()}
+                        <Table
+                          size="small"
+                          stickyHeader
+                          sx={{ '& .MuiTableCell-root': { py: 0.75 } }}
+                        >
+                          <TableHead
+                            sx={{
+                              '& .MuiTableCell-root': {
+                                bgcolor: 'background.paper',
+                                zIndex: 1,
+                              },
+                            }}
+                          >
+                            <TableRow>
+                              <TableCell>{t('network.time')}</TableCell>
+                              <TableCell>{t('common.environment')}</TableCell>
+                              <TableCell>{t('common.project')}</TableCell>
+                              <TableCell>{t('common.organization')}</TableCell>
+                              <TableCell>{t('network.application')}</TableCell>
+                              <TableCell align="right">
+                                {t('network.flagEvaluations')}
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {evaluationTimeSeriesByApp.length === 0 ? (
+                              <TableRow hover>
+                                <TableCell
+                                  colSpan={6}
+                                  align="center"
+                                  sx={{ py: 4 }}
+                                >
+                                  <Typography color="text.secondary">
+                                    {t('common.noData')}
+                                  </Typography>
                                 </TableCell>
                               </TableRow>
-                            ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <SimplePagination
-                    page={evalPage}
-                    rowsPerPage={rowsPerPage}
-                    count={evaluationTimeSeriesByApp.length}
-                    onPageChange={(_, newPage) => setEvalPage(newPage)}
-                    onRowsPerPageChange={(e) => {
-                      setRowsPerPage(Number(e.target.value));
-                      setEvalPage(0);
-                    }}
-                  />
+                            ) : (
+                              evaluationTimeSeriesByApp
+                                .slice()
+                                .reverse()
+                                .slice(
+                                  evalPage * rowsPerPage,
+                                  evalPage * rowsPerPage + rowsPerPage
+                                )
+                                .map((row, index) => (
+                                  <TableRow key={index} hover>
+                                    <TableCell>{row.displayTime}</TableCell>
+                                    <TableCell>
+                                      <Tooltip title={row.environmentId}>
+                                        <Chip
+                                          label={
+                                            row.environmentName ||
+                                            envNameMap.get(row.environmentId) ||
+                                            row.environmentId
+                                          }
+                                          size="small"
+                                          color="primary"
+                                          variant="outlined"
+                                          sx={{ borderRadius: '16px' }}
+                                        />
+                                      </Tooltip>
+                                    </TableCell>
+                                    <TableCell>
+                                      {row.projectName || '-'}
+                                    </TableCell>
+                                    <TableCell>{row.orgName || '-'}</TableCell>
+                                    <TableCell>
+                                      {row.appName ? (
+                                        <Chip
+                                          label={row.appName}
+                                          size="small"
+                                          color="info"
+                                          sx={{ borderRadius: '16px' }}
+                                        />
+                                      ) : (
+                                        '-'
+                                      )}
+                                    </TableCell>
+                                    <TableCell align="right">
+                                      {row.evaluations.toLocaleString()}
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                            )}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                      <SimplePagination
+                        page={evalPage}
+                        rowsPerPage={rowsPerPage}
+                        count={evaluationTimeSeriesByApp.length}
+                        onPageChange={(_, newPage) => setEvalPage(newPage)}
+                        onRowsPerPageChange={(e) => {
+                          setRowsPerPage(Number(e.target.value));
+                          setEvalPage(0);
+                        }}
+                      />
                     </CardContent>
                   </Card>
                 </Collapse>

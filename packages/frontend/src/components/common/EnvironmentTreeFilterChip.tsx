@@ -113,9 +113,7 @@ const EnvironmentTreeFilterChip: React.FC<EnvironmentTreeFilterChipProps> = ({
       }
 
       if (
-        !project.environments.some(
-          (e) => e.environmentId === env.environmentId
-        )
+        !project.environments.some((e) => e.environmentId === env.environmentId)
       ) {
         project.environments.push(env);
       }
@@ -163,9 +161,7 @@ const EnvironmentTreeFilterChip: React.FC<EnvironmentTreeFilterChipProps> = ({
         const orgMatch = org.orgName.toLowerCase().includes(lower);
         const filteredProjects = org.projects
           .map((proj) => {
-            const projMatch = proj.projectName
-              .toLowerCase()
-              .includes(lower);
+            const projMatch = proj.projectName.toLowerCase().includes(lower);
             const filteredEnvs = proj.environments.filter(
               (env) =>
                 env.environmentName.toLowerCase().includes(lower) ||
@@ -196,9 +192,7 @@ const EnvironmentTreeFilterChip: React.FC<EnvironmentTreeFilterChipProps> = ({
       // Auto-expand all orgs and all projects
       setExpandedOrgs(new Set(tree.map((o) => o.orgId)));
       setExpandedProjects(
-        new Set(
-          tree.flatMap((o) => o.projects.map((p) => p.projectId))
-        )
+        new Set(tree.flatMap((o) => o.projects.map((p) => p.projectId)))
       );
     },
     [tree]
@@ -478,9 +472,7 @@ const EnvironmentTreeFilterChip: React.FC<EnvironmentTreeFilterChipProps> = ({
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon
-                      sx={{ fontSize: 16, color: 'text.disabled' }}
-                    />
+                    <SearchIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
                   </InputAdornment>
                 ),
               }}
@@ -511,8 +503,7 @@ const EnvironmentTreeFilterChip: React.FC<EnvironmentTreeFilterChipProps> = ({
             </Typography>
           ) : (
             filteredTree.map((org) => {
-              const isOrgExpanded =
-                expandedOrgs.has(org.orgId) || !isMultiOrg;
+              const isOrgExpanded = expandedOrgs.has(org.orgId) || !isMultiOrg;
 
               return (
                 <Box key={org.orgId}>
