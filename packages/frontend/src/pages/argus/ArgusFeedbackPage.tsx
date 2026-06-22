@@ -882,7 +882,6 @@ const ArgusFeedbackPage: React.FC = () => {
     },
   ];
 
-
   const SORT_OPTIONS = [
     { value: 'newest', label: t('argus.feedback.sortNewest') },
     { value: 'oldest', label: t('argus.feedback.sortOldest') },
