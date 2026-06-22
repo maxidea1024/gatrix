@@ -231,7 +231,11 @@ const FeatureNetworkPage: React.FC = () => {
     const startParam = searchParams.get('start');
     const endParam = searchParams.get('end');
     if (startParam && endParam) {
-      return { type: 'custom', start: new Date(startParam), end: new Date(endParam) };
+      return {
+        type: 'custom',
+        start: new Date(startParam),
+        end: new Date(endParam),
+      };
     }
     if (rangeParam) {
       return { type: 'preset', preset: rangeParam };
@@ -1118,7 +1122,8 @@ const FeatureNetworkPage: React.FC = () => {
                                 .reverse()
                                 .slice(
                                   trafficPage * trafficRowsPerPage,
-                                  trafficPage * trafficRowsPerPage + trafficRowsPerPage
+                                  trafficPage * trafficRowsPerPage +
+                                    trafficRowsPerPage
                                 )
                                 .map((row, index) => (
                                   <TableRow key={index} hover>
@@ -1177,7 +1182,9 @@ const FeatureNetworkPage: React.FC = () => {
                         count={trafficData.length}
                         onPageChange={(_, newPage) => setTrafficPage(newPage)}
                         onRowsPerPageChange={(e) => {
-                          handleTrafficRowsPerPageChange(Number(e.target.value));
+                          handleTrafficRowsPerPageChange(
+                            Number(e.target.value)
+                          );
                           setTrafficPage(0);
                         }}
                       />

@@ -630,8 +630,10 @@ export function dateRangeToApiParams(value: DateRangeValue): {
     return { period: value.preset || '24h' };
   }
   if (value.type === 'custom' && value.start && value.end) {
-    const startObj = typeof value.start === 'string' ? new Date(value.start) : value.start;
-    const endObj = typeof value.end === 'string' ? new Date(value.end) : value.end;
+    const startObj =
+      typeof value.start === 'string' ? new Date(value.start) : value.start;
+    const endObj =
+      typeof value.end === 'string' ? new Date(value.end) : value.end;
     return {
       period: 'custom',
       start: startObj.toISOString(),
@@ -666,8 +668,10 @@ export function dateRangeToDatePair(value: DateRangeValue): {
   end: Date;
 } {
   if (value.type === 'custom' && value.start && value.end) {
-    const startObj = typeof value.start === 'string' ? new Date(value.start) : value.start;
-    const endObj = typeof value.end === 'string' ? new Date(value.end) : value.end;
+    const startObj =
+      typeof value.start === 'string' ? new Date(value.start) : value.start;
+    const endObj =
+      typeof value.end === 'string' ? new Date(value.end) : value.end;
     return { start: startObj, end: endObj };
   }
   const preset = value.preset || '24h';
