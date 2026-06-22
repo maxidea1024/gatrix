@@ -126,7 +126,9 @@ const CouponsPage: React.FC = () => {
                     backgroundColor: isActive
                       ? alpha(theme.palette.primary.main, isDark ? 0.12 : 0.08)
                       : 'transparent',
-                    color: isActive ? theme.palette.primary.main : 'text.primary',
+                    color: isActive
+                      ? theme.palette.primary.main
+                      : 'text.primary',
                     transition: 'all 0.1s ease-in-out',
                     '&:hover': {
                       backgroundColor: isActive

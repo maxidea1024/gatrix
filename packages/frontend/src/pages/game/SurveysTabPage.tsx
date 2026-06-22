@@ -127,21 +127,13 @@ const SurveysTabPage: React.FC = () => {
                     cursor: 'pointer',
                     position: 'relative',
                     backgroundColor: active
-                      ? alpha(
-                          theme.palette.primary.main,
-                          isDark ? 0.12 : 0.08
-                        )
+                      ? alpha(theme.palette.primary.main, isDark ? 0.12 : 0.08)
                       : 'transparent',
-                    color: active
-                      ? theme.palette.primary.main
-                      : 'text.primary',
+                    color: active ? theme.palette.primary.main : 'text.primary',
                     transition: 'all 0.1s ease-in-out',
                     '&:hover': {
                       backgroundColor: active
-                        ? alpha(
-                            theme.palette.primary.main,
-                            isDark ? 0.15 : 0.1
-                          )
+                        ? alpha(theme.palette.primary.main, isDark ? 0.15 : 0.1)
                         : isDark
                           ? 'rgba(255,255,255,0.05)'
                           : 'rgba(0,0,0,0.04)',

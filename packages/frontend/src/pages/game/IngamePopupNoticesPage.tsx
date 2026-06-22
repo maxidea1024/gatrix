@@ -83,7 +83,9 @@ import {
 } from '../../utils/changeRequestToast';
 import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
 
-const IngamePopupNoticesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
+const IngamePopupNoticesPage: React.FC<{ embedded?: boolean }> = ({
+  embedded,
+}) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -560,7 +562,14 @@ const IngamePopupNoticesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) 
                 onOperatorChange={handleOperatorChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('users.columnSettings')}>

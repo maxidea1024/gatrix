@@ -121,7 +121,9 @@ import SortableColumnItem from './SortableColumnItem';
 import HotTimeBuffDrawer from './HotTimeBuffDrawer';
 import PageHeader from '@/components/common/PageHeader';
 
-const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
+const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({
+  embedded,
+}) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -1354,10 +1356,7 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
   return (
     <PageContentLoader loading={isInitialLoad}>
       {!embedded && (
-        <PageHeader
-          icon={<EventIcon />}
-          title={t('sidebar.operationEvents')}
-        />
+        <PageHeader icon={<EventIcon />} title={t('sidebar.operationEvents')} />
       )}
       <Box>
         {/* Toolbar */}
@@ -1413,7 +1412,14 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
                 onOperatorChange={handleOperatorChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('hotTimeBuffEvent.columnSettings')}>
@@ -1435,7 +1441,14 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
                 </IconButton>
               </Tooltip>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Date range filter toggle */}
               <Tooltip title={t('hotTimeBuffEvent.filterDateRangeHint')}>
@@ -1447,7 +1460,9 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
                     width: 30,
                     height: 30,
                     color: showOnlyInPeriod ? 'primary.main' : 'text.secondary',
-                    bgcolor: showOnlyInPeriod ? 'action.selected' : 'transparent',
+                    bgcolor: showOnlyInPeriod
+                      ? 'action.selected'
+                      : 'transparent',
                     '&:hover': {
                       bgcolor: 'action.hover',
                     },
@@ -1466,8 +1481,12 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
                     borderRadius: '6px',
                     width: 30,
                     height: 30,
-                    color: showOnlyMatchingDay ? 'primary.main' : 'text.secondary',
-                    bgcolor: showOnlyMatchingDay ? 'action.selected' : 'transparent',
+                    color: showOnlyMatchingDay
+                      ? 'primary.main'
+                      : 'text.secondary',
+                    bgcolor: showOnlyMatchingDay
+                      ? 'action.selected'
+                      : 'transparent',
                     '&:hover': {
                       bgcolor: 'action.hover',
                     },
@@ -1477,7 +1496,14 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
                 </IconButton>
               </Tooltip>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* View mode toggle: table ↔ calendar */}
               <Tooltip
@@ -1489,15 +1515,23 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
               >
                 <IconButton
                   onClick={() =>
-                    handleSetViewMode(viewMode === 'table' ? 'calendar' : 'table')
+                    handleSetViewMode(
+                      viewMode === 'table' ? 'calendar' : 'table'
+                    )
                   }
                   size="small"
                   sx={{
                     borderRadius: '6px',
                     width: 30,
                     height: 30,
-                    color: viewMode === 'calendar' ? 'primary.main' : 'text.secondary',
-                    bgcolor: viewMode === 'calendar' ? 'action.selected' : 'transparent',
+                    color:
+                      viewMode === 'calendar'
+                        ? 'primary.main'
+                        : 'text.secondary',
+                    bgcolor:
+                      viewMode === 'calendar'
+                        ? 'action.selected'
+                        : 'transparent',
                     '&:hover': {
                       bgcolor: 'action.hover',
                     },
@@ -1514,7 +1548,14 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
               {/* Month jump — only visible in calendar mode */}
               {viewMode === 'calendar' && (
                 <>
-                  <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+                  <Box
+                    sx={{
+                      width: '1px',
+                      height: '20px',
+                      bgcolor: 'divider',
+                      mx: 0.5,
+                    }}
+                  />
                   <DatePicker
                     views={['year', 'month']}
                     value={dayjs(calendarMonth + '-01')}
@@ -1614,8 +1655,6 @@ const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) =>
                 size="small"
               />
             )}
-
-
 
             {canManage && (
               <Badge badgeContent={dirtyCount} color="warning">

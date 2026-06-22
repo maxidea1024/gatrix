@@ -470,7 +470,14 @@ const SurveysPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 onOperatorChange={handleOperatorChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('users.columnSettings')}>

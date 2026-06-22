@@ -1118,7 +1118,14 @@ export default function AllCharactersTab({
                 onFilterChange={handleFilterChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Multi-search button */}
               <Tooltip title={t('playerConnections.multiSearch.title')}>
@@ -1126,14 +1133,22 @@ export default function AllCharactersTab({
                   size="small"
                   onClick={(e) => setMultiSearchAnchor(e.currentTarget)}
                   sx={{
-                    color: activeMultiSearch ? 'primary.main' : 'text.secondary',
+                    color: activeMultiSearch
+                      ? 'primary.main'
+                      : 'text.secondary',
                     borderRadius: '6px',
                     width: 30,
                     height: 30,
-                    bgcolor: activeMultiSearch ? 'action.selected' : 'transparent',
+                    bgcolor: activeMultiSearch
+                      ? 'action.selected'
+                      : 'transparent',
                     '&:hover': {
-                      bgcolor: activeMultiSearch ? 'primary.dark' : 'action.hover',
-                      color: activeMultiSearch ? 'primary.contrastText' : 'primary.main',
+                      bgcolor: activeMultiSearch
+                        ? 'primary.dark'
+                        : 'action.hover',
+                      color: activeMultiSearch
+                        ? 'primary.contrastText'
+                        : 'primary.main',
                     },
                   }}
                 >
@@ -1141,7 +1156,14 @@ export default function AllCharactersTab({
                 </IconButton>
               </Tooltip>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* GroupBy Button */}
               <Tooltip title={t('playerConnections.groupBy.label')}>
@@ -1183,7 +1205,14 @@ export default function AllCharactersTab({
                 ))}
               </Menu>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>
@@ -1292,7 +1321,12 @@ export default function AllCharactersTab({
           </Popover>
 
           {/* Right side actions */}
-          <Stack direction="row" spacing={1.5} alignItems="center" flexShrink={0}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="center"
+            flexShrink={0}
+          >
             <Typography
               variant="body2"
               color="text.secondary"
@@ -1326,7 +1360,9 @@ export default function AllCharactersTab({
             onClose={() => setExportMenuAnchor(null)}
           >
             <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>
+              Excel (XLSX)
+            </MenuItem>
           </Menu>
         </Box>
       </Box>

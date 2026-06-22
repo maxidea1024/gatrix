@@ -1861,7 +1861,14 @@ const FeatureFlagsPage: React.FC = () => {
 
               {!cardView && (
                 <>
-                  <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+                  <Box
+                    sx={{
+                      width: '1px',
+                      height: '20px',
+                      bgcolor: 'divider',
+                      mx: 0.5,
+                    }}
+                  />
 
                   {/* Column Settings Button */}
                   <Tooltip
@@ -1870,9 +1877,7 @@ const FeatureFlagsPage: React.FC = () => {
                   >
                     <IconButton
                       size="small"
-                      onClick={(e) =>
-                        setColumnSettingsAnchor(e.currentTarget)
-                      }
+                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                       sx={{
                         color: 'text.secondary',
                         borderRadius: '6px',
@@ -1890,13 +1895,17 @@ const FeatureFlagsPage: React.FC = () => {
                 </>
               )}
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Card View Toggle */}
-              <Tooltip
-                title={t('featureFlags.cardView')}
-                disableFocusListener
-              >
+              <Tooltip title={t('featureFlags.cardView')} disableFocusListener>
                 <IconButton
                   size="small"
                   onClick={handleCardViewToggle}
@@ -1921,7 +1930,11 @@ const FeatureFlagsPage: React.FC = () => {
           {/* Create Buttons */}
           {canManage && (
             <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-              <ButtonGroup variant="contained" size="small" sx={{ height: '36px' }}>
+              <ButtonGroup
+                variant="contained"
+                size="small"
+                sx={{ height: '36px' }}
+              >
                 <Button
                   startIcon={<AddIcon />}
                   onClick={() => handleOpenCreateDialog('featureFlag')}
@@ -1953,9 +1966,7 @@ const FeatureFlagsPage: React.FC = () => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
               >
-                <MenuItem
-                  onClick={() => handleOpenCreateDialog('featureFlag')}
-                >
+                <MenuItem onClick={() => handleOpenCreateDialog('featureFlag')}>
                   <ListItemIcon>
                     <FlagIcon fontSize="small" />
                   </ListItemIcon>
@@ -1974,9 +1985,7 @@ const FeatureFlagsPage: React.FC = () => {
                     secondary={t('featureFlags.flagTypes.release.desc')}
                   />
                 </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenCreateDialog('experiment')}
-                >
+                <MenuItem onClick={() => handleOpenCreateDialog('experiment')}>
                   <ListItemIcon>
                     <ExperimentIcon fontSize="small" color="secondary" />
                   </ListItemIcon>
@@ -1985,9 +1994,7 @@ const FeatureFlagsPage: React.FC = () => {
                     secondary={t('featureFlags.flagTypes.experiment.desc')}
                   />
                 </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenCreateDialog('operational')}
-                >
+                <MenuItem onClick={() => handleOpenCreateDialog('operational')}>
                   <ListItemIcon>
                     <OperationalIcon fontSize="small" color="warning" />
                   </ListItemIcon>
@@ -1996,9 +2003,7 @@ const FeatureFlagsPage: React.FC = () => {
                     secondary={t('featureFlags.flagTypes.operational.desc')}
                   />
                 </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenCreateDialog('killSwitch')}
-                >
+                <MenuItem onClick={() => handleOpenCreateDialog('killSwitch')}>
                   <ListItemIcon>
                     <KillSwitchIcon fontSize="small" color="error" />
                   </ListItemIcon>
@@ -2007,9 +2012,7 @@ const FeatureFlagsPage: React.FC = () => {
                     secondary={t('featureFlags.flagTypes.killSwitch.desc')}
                   />
                 </MenuItem>
-                <MenuItem
-                  onClick={() => handleOpenCreateDialog('permission')}
-                >
+                <MenuItem onClick={() => handleOpenCreateDialog('permission')}>
                   <ListItemIcon>
                     <PermissionIcon fontSize="small" color="action" />
                   </ListItemIcon>

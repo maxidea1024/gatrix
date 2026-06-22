@@ -939,7 +939,14 @@ const StoreProductsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 onOperatorChange={handleOperatorChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>
@@ -961,7 +968,14 @@ const StoreProductsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 </IconButton>
               </Tooltip>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Product Statistics Box */}
               <Box
@@ -1005,9 +1019,7 @@ const StoreProductsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     </strong>
                   </Typography>
                 </Box>
-                <Box
-                  sx={{ width: '1px', height: 14, bgcolor: 'divider' }}
-                />
+                <Box sx={{ width: '1px', height: 14, bgcolor: 'divider' }} />
                 <Box
                   sx={{
                     display: 'flex',
@@ -1036,9 +1048,7 @@ const StoreProductsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     </strong>
                   </Typography>
                 </Box>
-                <Box
-                  sx={{ width: '1px', height: 14, bgcolor: 'divider' }}
-                />
+                <Box sx={{ width: '1px', height: 14, bgcolor: 'divider' }} />
                 <Box
                   sx={{
                     display: 'flex',
@@ -1067,9 +1077,7 @@ const StoreProductsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                     </strong>
                   </Typography>
                 </Box>
-                <Box
-                  sx={{ width: '1px', height: 14, bgcolor: 'divider' }}
-                />
+                <Box sx={{ width: '1px', height: 14, bgcolor: 'divider' }} />
                 <Box
                   sx={{
                     display: 'flex',
@@ -1100,7 +1108,14 @@ const StoreProductsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                 </Box>
               </Box>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Batch Process Button */}
               <Button

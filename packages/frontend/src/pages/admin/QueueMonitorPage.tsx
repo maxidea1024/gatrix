@@ -510,14 +510,9 @@ const QueueMonitorPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
                       cursor: 'pointer',
                       border: 1,
                       borderColor: 'divider',
-                      borderRightWidth:
-                        selectedQueue === q.name
-                          ? 4
-                          : 1,
+                      borderRightWidth: selectedQueue === q.name ? 4 : 1,
                       borderRightColor:
-                        selectedQueue === q.name
-                          ? 'primary.main'
-                          : 'divider',
+                        selectedQueue === q.name ? 'primary.main' : 'divider',
                       bgcolor:
                         selectedQueue === q.name
                           ? (theme) => alpha(theme.palette.primary.main, 0.15)

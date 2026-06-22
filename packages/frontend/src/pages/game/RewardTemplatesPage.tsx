@@ -70,7 +70,9 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 
-const RewardTemplatesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
+const RewardTemplatesPage: React.FC<{ embedded?: boolean }> = ({
+  embedded,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -667,7 +669,14 @@ const RewardTemplatesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => 
                 onOperatorChange={handleOperatorChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>

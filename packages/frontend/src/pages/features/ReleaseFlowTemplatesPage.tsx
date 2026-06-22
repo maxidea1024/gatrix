@@ -1525,9 +1525,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
           );
         } else if (filter.key === 'hasMilestones' && filter.value) {
           if (filter.value === 'yes') {
-            filtered = filtered.filter(
-              (t) => (t.milestones?.length || 0) > 0
-            );
+            filtered = filtered.filter((t) => (t.milestones?.length || 0) > 0);
           } else {
             filtered = filtered.filter(
               (t) => !t.milestones || t.milestones.length === 0
@@ -1564,7 +1562,15 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [debouncedSearchTerm, page, rowsPerPage, orderBy, order, activeFilters, enqueueSnackbar]);
+  }, [
+    debouncedSearchTerm,
+    page,
+    rowsPerPage,
+    orderBy,
+    order,
+    activeFilters,
+    enqueueSnackbar,
+  ]);
 
   // Save filters to localStorage
   useEffect(() => {
@@ -1803,7 +1809,14 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
                 onOperatorChange={handleOperatorChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>

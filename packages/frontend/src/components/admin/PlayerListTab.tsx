@@ -903,7 +903,14 @@ const PlayerListTab: React.FC<Props> = ({
                 onFilterChange={handleFilterChange}
               />
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* GroupBy Button */}
               <Tooltip title={t('playerConnections.groupBy.label')}>
@@ -945,7 +952,14 @@ const PlayerListTab: React.FC<Props> = ({
                 ))}
               </Menu>
 
-              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+              <Box
+                sx={{
+                  width: '1px',
+                  height: '20px',
+                  bgcolor: 'divider',
+                  mx: 0.5,
+                }}
+              />
 
               {/* Column Settings Button */}
               <Tooltip title={t('common.columnSettings')}>
@@ -970,7 +984,12 @@ const PlayerListTab: React.FC<Props> = ({
           </Box>
 
           {/* Right side actions */}
-          <Stack direction="row" spacing={1.5} alignItems="center" flexShrink={0}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            alignItems="center"
+            flexShrink={0}
+          >
             {/* Total online counter */}
             {totalOnline !== undefined && (
               <Typography
@@ -1026,7 +1045,9 @@ const PlayerListTab: React.FC<Props> = ({
             onClose={() => setExportMenuAnchor(null)}
           >
             <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>
+              Excel (XLSX)
+            </MenuItem>
           </Menu>
         </Box>
       </Box>
