@@ -166,7 +166,8 @@ export const SavedQueriesPanel: React.FC<SavedQueriesPanelProps> = ({
                   {sq.name}
                 </Typography>
                 <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
-                  {sq.created_by} · {new Date(sq.created_at).toLocaleDateString()}
+                  {sq.created_by} ·{' '}
+                  {new Date(sq.created_at).toLocaleDateString()}
                 </Typography>
               </Box>
               <IconButton
@@ -186,4 +187,3 @@ export const SavedQueriesPanel: React.FC<SavedQueriesPanelProps> = ({
     </ResizableDrawer>
   );
 };
-
