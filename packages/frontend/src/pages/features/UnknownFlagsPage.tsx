@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -26,6 +26,8 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  ToggleButtonGroup,
+  ToggleButton,
 } from '@mui/material';
 import {
   Refresh as RefreshIcon,
@@ -68,6 +70,8 @@ import DateRangeSelector, {
   DateRangeValue,
   dateRangeToDatePair,
 } from '@/components/common/DateRangeSelector';
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 
 const UnknownFlagsPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -77,15 +81,44 @@ const UnknownFlagsPage: React.FC = () => {
   const projectApiPath = getProjectApiPath();
   const navigate = useNavigate();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [flags, setFlags] = useState<UnknownFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [dateRange, setDateRange] = useState<DateRangeValue>(() => ({
-    type: 'preset',
-    preset: '7d',
-  }));
+  const [dateRange, setDateRangeState] = useState<DateRangeValue>(() => {
+    const rangeParam = searchParams.get('range');
+    const startParam = searchParams.get('start');
+    const endParam = searchParams.get('end');
+    if (startParam && endParam) {
+      return { type: 'custom', start: new Date(startParam), end: new Date(endParam) };
+    }
+    if (rangeParam) {
+      return { type: 'preset', preset: rangeParam };
+    }
+    return { type: 'preset', preset: '7d' };
+  });
+  const [chartGroupBy, setChartGroupBy] = useState<'all' | 'flag' | 'env' | 'app'>('all');
+
+  // Sync dateRange to URL
+  const setDateRange = useCallback((value: DateRangeValue) => {
+    setDateRangeState(value);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete('range');
+      next.delete('start');
+      next.delete('end');
+      if (value.type === 'custom' && value.start && value.end) {
+        next.set('start', value.start.toISOString());
+        next.set('end', value.end.toISOString());
+      } else if (value.type === 'preset' && value.preset) {
+        next.set('range', value.preset);
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   // Pagination state
   const [page, setPage] = useState(0);
@@ -307,13 +340,10 @@ const UnknownFlagsPage: React.FC = () => {
         statusFilter?.includes('resolved') ||
         statusFilter?.length === 2 ||
         !statusFilter;
-      const { start, end } = dateRangeToDatePair(dateRange);
       const result = await unknownFlagService.getUnknownFlags(
         {
           includeResolved,
           environmentId: currentEnvironmentId || undefined,
-          startDate: start.toISOString(),
-          endDate: end.toISOString(),
         },
         projectApiPath
       );
@@ -323,7 +353,7 @@ const UnknownFlagsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, currentEnvironmentId, dateRange, enqueueSnackbar, t]);
+  }, [statusFilter, currentEnvironmentId, enqueueSnackbar, t, projectApiPath]);
 
   useEffect(() => {
     loadFlags();
@@ -384,6 +414,16 @@ const UnknownFlagsPage: React.FC = () => {
     let result = flags;
 
     // Apply search
+    // Apply date range filter first (biggest reduction for large datasets)
+    const { start: rangeStart, end: rangeEnd } = dateRangeToDatePair(dateRange);
+    const rangeStartMs = rangeStart.getTime();
+    const rangeEndMs = rangeEnd.getTime();
+    result = result.filter((f) => {
+      const ts = new Date(f.lastReportedAt).getTime();
+      return ts >= rangeStartMs && ts <= rangeEndMs;
+    });
+
+    // Apply search filter
     if (debouncedSearchTerm) {
       const lower = debouncedSearchTerm.toLowerCase();
       result = result.filter(
@@ -440,6 +480,7 @@ const UnknownFlagsPage: React.FC = () => {
     return result;
   }, [
     flags,
+    dateRange,
     debouncedSearchTerm,
     statusFilter,
     environmentFilter,
@@ -453,6 +494,7 @@ const UnknownFlagsPage: React.FC = () => {
   useEffect(() => {
     setPage(0);
   }, [
+    dateRange,
     debouncedSearchTerm,
     statusFilter,
     environmentFilter,
@@ -461,6 +503,155 @@ const UnknownFlagsPage: React.FC = () => {
     appNameFilter,
     sdkVersionFilter,
   ]);
+
+  // ─── Chart: aggregate filteredFlags by hour buckets with grouping ───
+  const seriesColors = [
+    '#ed6c02', '#2196f3', '#4caf50', '#9c27b0', '#f44336',
+    '#00bcd4', '#ff9800', '#e91e63', '#3f51b5', '#009688',
+    '#cddc39', '#795548', '#607d8b', '#ff5722', '#8bc34a',
+  ];
+
+  const { chartLabels, chartDatasets, bucketSizeMs } = useMemo(() => {
+    const { start, end } = dateRangeToDatePair(dateRange);
+    const rangeMs = end.getTime() - start.getTime();
+    const HOUR_MS = 3_600_000;
+    const DAY_MS = 86_400_000;
+    const useDaily = rangeMs > 7 * DAY_MS;
+    const stepMs = useDaily ? DAY_MS : HOUR_MS;
+
+    // Build buckets
+    const buckets: Date[] = [];
+    const cur = new Date(start);
+    if (useDaily) {
+      cur.setHours(0, 0, 0, 0);
+    } else {
+      cur.setMinutes(0, 0, 0);
+    }
+    while (cur <= end) {
+      buckets.push(new Date(cur));
+      cur.setTime(cur.getTime() + stepMs);
+    }
+    if (buckets.length === 0) {
+      return { chartLabels: [] as string[], chartDatasets: [] as ChartDataset[], bucketSizeMs: stepMs };
+    }
+
+    const bucketStartMs = buckets[0].getTime();
+
+    const labels = buckets.map((d) => {
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      if (useDaily) return `${month}/${day}`;
+      const hour = String(d.getHours()).padStart(2, '0');
+      return `${month}/${day} ${hour}:00`;
+    });
+
+    // O(1) bucket index calculation
+    const findBucket = (ts: number): number => {
+      const idx = Math.floor((ts - bucketStartMs) / stepMs);
+      if (idx < 0 || idx >= buckets.length) return -1;
+      return idx;
+    };
+
+    if (chartGroupBy === 'all') {
+      const counts = new Array(buckets.length).fill(0);
+      for (const flag of filteredFlags) {
+        const idx = findBucket(new Date(flag.lastReportedAt).getTime());
+        if (idx >= 0) counts[idx] += flag.accessCount;
+      }
+      return {
+        chartLabels: labels,
+        chartDatasets: [{
+          label: t('featureFlags.unknownFlags'),
+          data: counts,
+          color: '#ed6c02',
+        }],
+        bucketSizeMs: stepMs,
+      };
+    }
+
+    // Group by key
+    const getKey = (flag: UnknownFlag): string => {
+      switch (chartGroupBy) {
+        case 'flag': return flag.flagName;
+        case 'env': {
+          const org = flag.orgName || '';
+          const proj = flag.projectName || '';
+          const env = flag.environmentName || flag.environmentId;
+          return `${org}/${proj}/${env}`;
+        }
+        case 'app': return flag.appName || '-';
+        default: return 'all';
+      }
+    };
+
+    // Collect unique groups (limit to top 10 by total accessCount)
+    const groupTotals = new Map<string, number>();
+    for (const flag of filteredFlags) {
+      const key = getKey(flag);
+      groupTotals.set(key, (groupTotals.get(key) || 0) + flag.accessCount);
+    }
+    const topGroups = [...groupTotals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([key]) => key);
+    const topGroupSet = new Set(topGroups);
+
+    // Build per-group counts
+    const groupCounts = new Map<string, number[]>();
+    for (const g of topGroups) {
+      groupCounts.set(g, new Array(buckets.length).fill(0));
+    }
+    let hasOther = false;
+    const otherCounts = new Array(buckets.length).fill(0);
+
+    for (const flag of filteredFlags) {
+      const key = getKey(flag);
+      const idx = findBucket(new Date(flag.lastReportedAt).getTime());
+      if (idx < 0) continue;
+      if (topGroupSet.has(key)) {
+        groupCounts.get(key)![idx] += flag.accessCount;
+      } else {
+        otherCounts[idx] += flag.accessCount;
+        hasOther = true;
+      }
+    }
+
+    const datasets: ChartDataset[] = topGroups.map((g, i) => ({
+      label: g,
+      data: groupCounts.get(g)!,
+      color: seriesColors[i % seriesColors.length],
+    }));
+    if (hasOther) {
+      datasets.push({
+        label: 'Other',
+        data: otherCounts,
+        color: '#9e9e9e',
+      });
+    }
+
+    return { chartLabels: labels, chartDatasets: datasets, bucketSizeMs: stepMs };
+  }, [filteredFlags, dateRange, chartGroupBy, t]);
+
+  const handleChartZoom = useCallback(
+    (startIndex: number, endIndex: number) => {
+      const { start: rangeStart } = dateRangeToDatePair(dateRange);
+      const DAY_MS = 86_400_000;
+      const isDaily = bucketSizeMs >= DAY_MS;
+
+      // Mirror the same alignment as chart bucket builder
+      const base = new Date(rangeStart);
+      if (isDaily) {
+        base.setHours(0, 0, 0, 0);
+      } else {
+        base.setMinutes(0, 0, 0);
+      }
+
+      const s = new Date(base.getTime() + startIndex * bucketSizeMs);
+      const e = new Date(base.getTime() + endIndex * bucketSizeMs);
+      setDateRange({ type: 'custom', start: s, end: e });
+    },
+    [dateRange, bucketSizeMs, setDateRange]
+  );
 
   // Client-side pagination
   const paginatedFlags = useMemo(() => {
@@ -667,6 +858,47 @@ const UnknownFlagsPage: React.FC = () => {
           />
         </Box>
       </Box>
+
+      {/* Volume Chart with grouping */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          mb: 1,
+        }}
+      >
+        <ToggleButtonGroup
+          size="small"
+          value={chartGroupBy}
+          exclusive
+          onChange={(_, value) => value && setChartGroupBy(value)}
+        >
+          <ToggleButton value="all">
+            {t('network.groupByAll')}
+          </ToggleButton>
+          <ToggleButton value="flag">
+            {t('featureFlags.flagName')}
+          </ToggleButton>
+          <ToggleButton value="env">
+            {t('common.environment')}
+          </ToggleButton>
+          <ToggleButton value="app">
+            {t('featureFlags.appName')}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Box>
+      <ArgusVolumeChart
+        labels={chartLabels}
+        datasets={chartDatasets}
+        loading={loading}
+        title={t('featureFlags.unknownFlags')}
+        onZoom={handleChartZoom}
+        storagePrefix="unknown_flags"
+        skeletonColor="#ed6c02"
+        showLegend={chartGroupBy !== 'all'}
+        mb={2}
+      />
 
       {/* Content */}
       <PageContentLoader loading={loading}>

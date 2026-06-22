@@ -1,23 +1,23 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
   Popover,
-  List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Skeleton,
   alpha,
-  InputBase,
   Tooltip,
-  Divider,
   useTheme,
+  Collapse,
+  CircularProgress,
 } from '@mui/material';
 import {
   Business as OrgIcon,
   Folder as ProjectIcon,
-  Search as SearchIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
   Check as CheckIcon,
   UnfoldMore as UnfoldMoreIcon,
   Settings as SettingsIcon,
@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useTranslation } from 'react-i18next';
+import { environmentService, Environment } from '@/services/environmentService';
 
 // Environment type colors
 const getEnvironmentColor = (type: string, customColor?: string): string => {
@@ -46,192 +47,6 @@ interface SidebarContextSwitcherProps {
   collapsed: boolean;
 }
 
-// ─── Searchable list inside popover ───
-interface SelectionListProps<T> {
-  items: T[];
-  getKey: (item: T) => string;
-  getLabel: (item: T) => string;
-  getIcon?: (item: T) => React.ReactNode;
-  selectedKey: string | null;
-  onSelect: (item: T) => void;
-  emptyMessage: string;
-  searchable?: boolean;
-  title?: string;
-  onManageClick?: () => void;
-  manageTooltip?: string;
-}
-
-function SelectionList<T>({
-  items,
-  getKey,
-  getLabel,
-  getIcon,
-  selectedKey,
-  onSelect,
-  emptyMessage,
-  searchable = false,
-  title,
-  onManageClick,
-  manageTooltip,
-}: SelectionListProps<T>) {
-  const [search, setSearch] = useState('');
-  const searchRef = useRef<HTMLInputElement>(null);
-
-  const filtered = useMemo(() => {
-    if (!search.trim()) return items;
-    const q = search.toLowerCase();
-    return items.filter((item) => getLabel(item).toLowerCase().includes(q));
-  }, [items, search, getLabel]);
-
-  return (
-    <Box>
-      {title && (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            px: 1.5,
-            pt: 1,
-            pb: 0.5,
-          }}
-        >
-          <Typography
-            variant="caption"
-            sx={{
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              fontSize: '0.6875rem',
-              opacity: 0.5,
-            }}
-          >
-            {title}
-          </Typography>
-          {onManageClick && (
-            <Tooltip title={manageTooltip || ''} placement="top" arrow>
-              <Box
-                component="span"
-                onClick={(e: React.MouseEvent) => {
-                  e.stopPropagation();
-                  onManageClick();
-                }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 20,
-                  height: 20,
-                  borderRadius: 0.5,
-                  cursor: 'pointer',
-                  opacity: 0.4,
-                  transition: 'opacity 0.15s ease, background-color 0.15s ease',
-                  '&:hover': {
-                    opacity: 1,
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark'
-                        ? 'rgba(255,255,255,0.1)'
-                        : 'rgba(0,0,0,0.08)',
-                  },
-                }}
-              >
-                <SettingsIcon sx={{ fontSize: 13 }} />
-              </Box>
-            </Tooltip>
-          )}
-        </Box>
-      )}
-      {searchable && items.length > 3 && (
-        <Box sx={{ px: 1.5, pb: 0.5 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              px: 1,
-              py: 0.5,
-              borderRadius: 1,
-              bgcolor: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'rgba(255,255,255,0.04)'
-                  : 'rgba(0,0,0,0.03)',
-            }}
-          >
-            <SearchIcon sx={{ fontSize: 14, opacity: 0.4 }} />
-            <InputBase
-              inputRef={searchRef}
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              sx={{ fontSize: '0.8125rem', flex: 1 }}
-              size="small"
-              autoFocus={searchable}
-            />
-          </Box>
-        </Box>
-      )}
-      <List dense sx={{ py: 0.5, maxHeight: 200, overflow: 'auto' }}>
-        {filtered.length === 0 ? (
-          <ListItemButton disabled dense>
-            <ListItemText
-              primary={emptyMessage}
-              primaryTypographyProps={{
-                variant: 'caption',
-                color: 'text.secondary',
-                fontStyle: 'italic',
-              }}
-            />
-          </ListItemButton>
-        ) : (
-          filtered.map((item) => {
-            const key = getKey(item);
-            const isSelected = key === selectedKey;
-            return (
-              <ListItemButton
-                key={key}
-                selected={isSelected}
-                onClick={() => onSelect(item)}
-                dense
-                sx={{
-                  py: 0.5,
-                  px: 1.5,
-                  '&.Mui-selected': {
-                    bgcolor: (theme) =>
-                      alpha(
-                        theme.palette.primary.main,
-                        theme.palette.mode === 'dark' ? 0.15 : 0.08
-                      ),
-                  },
-                }}
-              >
-                {getIcon && (
-                  <ListItemIcon sx={{ minWidth: 28 }}>
-                    <Box sx={{ display: 'flex' }}>{getIcon(item)}</Box>
-                  </ListItemIcon>
-                )}
-                <ListItemText
-                  primary={getLabel(item)}
-                  primaryTypographyProps={{
-                    variant: 'body2',
-                    fontWeight: isSelected ? 600 : 400,
-                    noWrap: true,
-                  }}
-                />
-                {isSelected && (
-                  <CheckIcon
-                    sx={{ fontSize: 16, color: 'primary.main', ml: 0.5 }}
-                  />
-                )}
-              </ListItemButton>
-            );
-          })
-        )}
-      </List>
-    </Box>
-  );
-}
-
-// ─── Main component: Header-integrated context switcher ───
 const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
   collapsed,
 }) => {
@@ -246,8 +61,6 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
     currentProject,
     currentProjectId,
     isLoading: orgLoading,
-    switchOrg,
-    switchProject,
   } = useOrgProject();
 
   const {
@@ -262,50 +75,106 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
-  const handleOpen = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    setAnchorEl(e.currentTarget);
-  }, []);
+  // Tree expand state
+  const [expandedOrgs, setExpandedOrgs] = useState<Set<string>>(new Set());
+  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Per-project environment cache (lazy loading)
+  const [projectEnvMap, setProjectEnvMap] = useState<
+    Record<string, Environment[]>
+  >({});
+  const [loadingProjects, setLoadingProjects] = useState<Set<string>>(
+    new Set()
+  );
+  const loadedProjectsRef = useRef<Set<string>>(new Set());
+
+  // ─── Load environments for a specific project ───
+  const loadProjectEnvironments = useCallback(
+    async (projectId: string, orgId: string) => {
+      if (loadedProjectsRef.current.has(projectId)) return;
+      loadedProjectsRef.current.add(projectId);
+
+      setLoadingProjects((prev) => new Set(prev).add(projectId));
+      try {
+        const apiPath = `/admin/orgs/${orgId}/projects/${projectId}`;
+        const envs = await environmentService.getEnvironments(apiPath);
+        setProjectEnvMap((prev) => ({ ...prev, [projectId]: envs }));
+      } catch (error) {
+        console.error(
+          `Failed to load environments for project ${projectId}:`,
+          error
+        );
+        loadedProjectsRef.current.delete(projectId);
+      } finally {
+        setLoadingProjects((prev) => {
+          const next = new Set(prev);
+          next.delete(projectId);
+          return next;
+        });
+      }
+    },
+    []
+  );
+
+  // ─── Handlers ───
+  const handleOpen = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      e.stopPropagation();
+      setAnchorEl(e.currentTarget);
+      // Auto-expand current org and project
+      if (currentOrg) {
+        setExpandedOrgs((prev) => new Set(prev).add(currentOrg.id));
+      }
+      if (currentProject && currentOrg) {
+        setExpandedProjects((prev) =>
+          new Set(prev).add(currentProject.id)
+        );
+        loadProjectEnvironments(currentProject.id, currentOrg.id);
+      }
+    },
+    [currentOrg, currentProject, loadProjectEnvironments]
+  );
 
   const handleClose = useCallback(() => {
     setAnchorEl(null);
   }, []);
 
-  const handleSelectOrg = useCallback(
-    (org: (typeof organisations)[0]) => {
-      switchOrg(org.id);
+  const handleToggleOrg = useCallback((orgId: string) => {
+    setExpandedOrgs((prev) => {
+      const next = new Set(prev);
+      if (next.has(orgId)) next.delete(orgId);
+      else next.add(orgId);
+      return next;
+    });
+  }, []);
+
+  const handleToggleProject = useCallback(
+    (projectId: string, orgId: string) => {
+      setExpandedProjects((prev) => {
+        const next = new Set(prev);
+        if (next.has(projectId)) {
+          next.delete(projectId);
+        } else {
+          next.add(projectId);
+          loadProjectEnvironments(projectId, orgId);
+        }
+        return next;
+      });
+    },
+    [loadProjectEnvironments]
+  );
+
+  const handleSelectEnvironment = useCallback(
+    (envId: string, projectId: string, orgId: string) => {
+      switchEnvironment(orgId, projectId, envId);
       handleClose();
     },
-    [switchOrg, handleClose]
+    [switchEnvironment, handleClose]
   );
 
-  const orgProjects = useMemo(
-    () =>
-      currentOrgId
-        ? projects.filter((p) => p.orgId === currentOrgId)
-        : projects,
-    [projects, currentOrgId]
-  );
-
-  const handleSelectProject = useCallback(
-    (proj: (typeof projects)[0]) => {
-      switchProject(proj.id);
-      handleClose();
-    },
-    [switchProject, handleClose]
-  );
-
-  const handleSelectEnv = useCallback(
-    (env: (typeof environments)[0]) => {
-      if (currentOrgId && currentProjectId) {
-        switchEnvironment(currentOrgId, currentProjectId, env.environmentId);
-      }
-      handleClose();
-    },
-    [currentOrgId, currentProjectId, switchEnvironment, handleClose]
-  );
-
-  // Labels
+  // ─── Labels ───
   const orgLabel =
     currentOrg?.displayName ||
     currentOrg?.orgName ||
@@ -329,7 +198,236 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
     (orgLoading && organisations.length === 0) ||
     (envLoading && environments.length === 0);
 
-  // ─── Trigger element ───
+  const isMultiOrg = organisations.length > 1;
+
+  // ─── Render environments for a project ───
+  function renderEnvironments(projectId: string, orgId: string) {
+    const indent = isMultiOrg ? 7 : 4;
+    const envList = projectEnvMap[projectId] || [];
+    const isLoadingEnvs = loadingProjects.has(projectId);
+
+    if (isLoadingEnvs && envList.length === 0) {
+      return (
+        <ListItemButton dense disabled sx={{ pl: indent, py: 0.5 }}>
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <CircularProgress size={12} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('common.loading')}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    if (envList.length === 0) {
+      return (
+        <ListItemButton
+          onClick={() => {
+            handleClose();
+            navigate(
+              `/admin/environments?orgId=${orgId}&projectId=${projectId}`
+            );
+          }}
+          dense
+          sx={{ pl: indent, py: 0.75 }}
+        >
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <ProjectIcon sx={{ fontSize: 16, opacity: 0.5 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={t('environments.noEnvironments')}
+            primaryTypographyProps={{
+              variant: 'caption',
+              color: 'text.secondary',
+              fontStyle: 'italic',
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    return envList.map((env) => {
+      const itemColor = getEnvironmentColor(env.environmentType, env.color);
+      const isSelected = env.environmentId === currentEnvironmentId;
+
+      return (
+        <ListItemButton
+          key={env.environmentId}
+          onClick={() =>
+            handleSelectEnvironment(env.environmentId, projectId, orgId)
+          }
+          dense
+          selected={isSelected}
+          sx={{
+            pl: indent,
+            py: 0.5,
+            '&.Mui-selected': {
+              backgroundColor: (theme) =>
+                alpha(
+                  itemColor,
+                  theme.palette.mode === 'dark' ? 0.2 : 0.1
+                ),
+              '&:hover': {
+                backgroundColor: (theme) =>
+                  alpha(
+                    itemColor,
+                    theme.palette.mode === 'dark' ? 0.25 : 0.15
+                  ),
+              },
+            },
+            '&:hover': {
+              backgroundColor: (theme) =>
+                alpha(
+                  itemColor,
+                  theme.palette.mode === 'dark' ? 0.15 : 0.08
+                ),
+            },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                bgcolor: itemColor,
+                boxShadow: isSelected
+                  ? `0 0 6px ${alpha(itemColor, 0.6)}`
+                  : 'none',
+              }}
+            />
+          </ListItemIcon>
+          <ListItemText
+            primary={env.displayName || env.environmentName}
+            primaryTypographyProps={{
+              variant: 'body2',
+              fontWeight: isSelected ? 600 : 400,
+            }}
+          />
+          {isSelected && (
+            <CheckIcon
+              sx={{ fontSize: 16, color: 'success.main', ml: 0.5 }}
+            />
+          )}
+        </ListItemButton>
+      );
+    });
+  }
+
+  // ─── Render a project node with its environments ───
+  function renderProject(
+    proj: (typeof projects)[0],
+    orgId: string,
+    indent: number
+  ) {
+    const isProjExpanded = expandedProjects.has(proj.id);
+    const isCurrentProject = proj.id === currentProjectId;
+
+    return (
+      <React.Fragment key={proj.id}>
+        <ListItemButton
+          onClick={() => handleToggleProject(proj.id, orgId)}
+          dense
+          sx={{
+            py: 0.5,
+            pl: indent,
+            backgroundColor: isCurrentProject
+              ? (theme) =>
+                  alpha(
+                    theme.palette.primary.main,
+                    theme.palette.mode === 'dark' ? 0.1 : 0.04
+                  )
+              : 'transparent',
+            '&:hover .manage-icon': { opacity: 0.5 },
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 28 }}>
+            {isProjExpanded ? (
+              <ExpandMoreIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <ChevronRightIcon sx={{ fontSize: 18 }} />
+            )}
+          </ListItemIcon>
+          <ListItemIcon sx={{ minWidth: 24 }}>
+            <ProjectIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+          </ListItemIcon>
+          <ListItemText
+            primary={proj.displayName || proj.projectName}
+            primaryTypographyProps={{
+              variant: 'body2',
+              fontWeight: isCurrentProject ? 600 : 400,
+            }}
+          />
+          <Tooltip title={t('sidebar.context.manage')} placement="top" arrow>
+            <Box
+              className="manage-icon"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation();
+                handleClose();
+                navigate(`/admin/environments?orgId=${orgId}&projectId=${proj.id}`);
+              }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                opacity: 0,
+                transition: 'opacity 0.15s',
+                '&:hover': { opacity: '1 !important' },
+              }}
+            >
+              <SettingsIcon sx={{ fontSize: 13 }} />
+            </Box>
+          </Tooltip>
+        </ListItemButton>
+
+        <Collapse in={isProjExpanded} timeout="auto">
+          {renderEnvironments(proj.id, orgId)}
+        </Collapse>
+      </React.Fragment>
+    );
+  }
+
+
+
+  // ─── Trigger element (unchanged from original) ───
+
+  // Show nothing only if there are truly no environments (not just loading)
+  if (!isLoading && environments.length === 0 && organisations.length === 0) {
+    return null;
+  }
+
+  // During initial load with no data, show a placeholder to prevent layout shift
+  if (isLoading && environments.length === 0) {
+    return collapsed ? (
+      <Box
+        sx={{
+          width: 32,
+          height: 32,
+          borderRadius: 1,
+          bgcolor: '#757575',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Skeleton
+          variant="rectangular"
+          width={20}
+          height={16}
+          sx={{ borderRadius: 0.5 }}
+        />
+      </Box>
+    ) : (
+      <Box sx={{ px: 0.75, py: 0.5 }}>
+        <Skeleton width={60} height={16} sx={{ borderRadius: 0.5 }} />
+      </Box>
+    );
+  }
+
   const trigger = collapsed ? (
     // Collapsed: G icon with env-color ring
     <Tooltip
@@ -385,49 +483,43 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
       }}
     >
       <Box sx={{ minWidth: 0, flex: 1 }}>
-        {isLoading ? (
-          <Skeleton width={60} height={16} sx={{ borderRadius: 0.5 }} />
-        ) : (
-          <>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: 700,
-                fontSize: '0.875rem',
-                lineHeight: 1.3,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                color: envColor,
-              }}
-            >
-              {envLabel}
-            </Typography>
-            <Tooltip
-              title={`${orgLabel} / ${projLabel}`}
-              placement="bottom"
-              arrow
-            >
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{
-                  fontSize: '0.625rem',
-                  lineHeight: 1.2,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  display: 'block',
-                  opacity: 0.6,
-                  direction: 'rtl',
-                  textAlign: 'left',
-                }}
-              >
-                {orgLabel} / {projLabel}
-              </Typography>
-            </Tooltip>
-          </>
-        )}
+        <Typography
+          variant="body2"
+          sx={{
+            fontWeight: 700,
+            fontSize: '0.875rem',
+            lineHeight: 1.3,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            color: envColor,
+          }}
+        >
+          {envLabel}
+        </Typography>
+        <Tooltip
+          title={`${orgLabel} / ${projLabel}`}
+          placement="bottom"
+          arrow
+        >
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{
+              fontSize: '0.625rem',
+              lineHeight: 1.2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              display: 'block',
+              opacity: 0.6,
+              direction: 'rtl',
+              textAlign: 'left',
+            }}
+          >
+            {orgLabel} / {projLabel}
+          </Typography>
+        </Tooltip>
       </Box>
       <UnfoldMoreIcon
         className="context-unfold-icon"
@@ -441,13 +533,11 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
     </Box>
   );
 
-  const triggerElement = trigger;
-
   return (
     <>
-      {triggerElement}
+      {trigger}
 
-      {/* ─── Combined popover with all 3 sections ─── */}
+      {/* ─── Tree popover ─── */}
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -470,75 +560,137 @@ const SidebarContextSwitcher: React.FC<SidebarContextSwitcherProps> = ({
           },
         }}
       >
-        {/* Organisation */}
-        <SelectionList
-          title={t('sidebar.context.organisation')}
-          items={organisations}
-          getKey={(o) => o.id}
-          getLabel={(o) => o.displayName || o.orgName}
-          getIcon={() => <OrgIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
-          selectedKey={currentOrgId}
-          onSelect={handleSelectOrg}
-          emptyMessage={t('sidebar.context.noOrgs')}
-          searchable
-          onManageClick={() => {
-            handleClose();
-            navigate('/admin/workspace?tab=organisations');
-          }}
-          manageTooltip={t('sidebar.context.manage')}
-        />
+        {/* Tree content */}
+        <Box sx={{ py: 0.5 }}>
+          {organisations.map((org) => {
+            const isOrgExpanded = expandedOrgs.has(org.id) || !isMultiOrg;
+            const orgProjects = projects.filter((p) => p.orgId === org.id);
 
-        <Divider />
+            // Single-org: skip org header, show projects directly
+            if (!isMultiOrg) {
+              return (
+                <React.Fragment key={org.id}>
+                  {orgProjects.length === 0 ? (
+                    <ListItemButton
+                      onClick={() => {
+                        handleClose();
+                        navigate(`/admin/projects?orgId=${org.id}`);
+                      }}
+                      dense
+                      sx={{ pl: 1.5, py: 0.75 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon
+                          sx={{ fontSize: 16, opacity: 0.5 }}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t('environments.noProjects')}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  ) : (
+                    orgProjects.map((proj) =>
+                      renderProject(proj, org.id, 1.5)
+                    )
+                  )}
+                </React.Fragment>
+              );
+            }
 
-        {/* Project */}
-        <SelectionList
-          title={t('sidebar.context.project')}
-          items={orgProjects}
-          getKey={(p) => p.id}
-          getLabel={(p) => p.displayName || p.projectName}
-          getIcon={() => <ProjectIcon sx={{ fontSize: 16, opacity: 0.6 }} />}
-          selectedKey={currentProjectId}
-          onSelect={handleSelectProject}
-          emptyMessage={t('sidebar.context.noProjects')}
-          searchable
-          onManageClick={() => {
-            handleClose();
-            navigate('/admin/workspace?tab=projects');
-          }}
-          manageTooltip={t('sidebar.context.manage')}
-        />
-
-        <Divider />
-
-        {/* Environment */}
-        <SelectionList
-          title={t('sidebar.context.environment')}
-          items={environments}
-          getKey={(e) => e.environmentId}
-          getLabel={(e) => e.displayName || e.environmentName}
-          getIcon={(e) => {
-            const c = getEnvironmentColor(e.environmentType, e.color);
+            // Multi-org: show org header with expand/collapse
             return (
-              <Box
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  bgcolor: c,
-                  boxShadow: `0 0 4px ${alpha(c, 0.5)}`,
-                }}
-              />
+              <React.Fragment key={org.id}>
+                <ListItemButton
+                  onClick={() => handleToggleOrg(org.id)}
+                  dense
+                  sx={{
+                    py: 0.5,
+                    '&:hover .manage-icon': { opacity: 0.5 },
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 28 }}>
+                    {isOrgExpanded ? (
+                      <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                    ) : (
+                      <ChevronRightIcon sx={{ fontSize: 18 }} />
+                    )}
+                  </ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 24 }}>
+                    <OrgIcon sx={{ fontSize: 16, opacity: 0.7 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={org.displayName || org.orgName}
+                    primaryTypographyProps={{
+                      variant: 'body2',
+                      fontWeight:
+                        currentOrg?.id === org.id ? 600 : 400,
+                    }}
+                  />
+                  <Tooltip title={t('sidebar.context.manage')} placement="top" arrow>
+                    <Box
+                      className="manage-icon"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        handleClose();
+                        navigate(`/admin/projects?orgId=${org.id}`);
+                      }}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        opacity: 0,
+                        transition: 'opacity 0.15s',
+                        '&:hover': { opacity: '1 !important' },
+                      }}
+                    >
+                      <SettingsIcon sx={{ fontSize: 13 }} />
+                    </Box>
+                  </Tooltip>
+                </ListItemButton>
+
+                <Collapse in={isOrgExpanded} timeout="auto">
+                  {orgProjects.length === 0 && (
+                    <ListItemButton
+                      onClick={() => {
+                        handleClose();
+                        navigate(
+                          `/admin/projects?orgId=${org.id}`
+                        );
+                      }}
+                      dense
+                      sx={{ pl: 4, py: 0.75 }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 24 }}>
+                        <ProjectIcon
+                          sx={{ fontSize: 16, opacity: 0.5 }}
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={t(
+                          'environments.goToProjectManagement'
+                        )}
+                        primaryTypographyProps={{
+                          variant: 'caption',
+                          color: 'text.secondary',
+                          fontStyle: 'italic',
+                        }}
+                      />
+                    </ListItemButton>
+                  )}
+                  {orgProjects.map((proj) =>
+                    renderProject(proj, org.id, 4)
+                  )}
+                </Collapse>
+              </React.Fragment>
             );
-          }}
-          selectedKey={currentEnvironmentId}
-          onSelect={handleSelectEnv}
-          emptyMessage={t('sidebar.context.noEnvironments')}
-          onManageClick={() => {
-            handleClose();
-            navigate('/admin/workspace?tab=environments');
-          }}
-          manageTooltip={t('sidebar.context.manage')}
-        />
+          })}
+        </Box>
+
+
       </Popover>
     </>
   );

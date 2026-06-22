@@ -51,18 +51,6 @@ import {
   Flag as FlagIcon,
   Category as CategoryIcon,
 } from '@mui/icons-material';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip as ChartTooltip,
-  Legend,
-  Filler,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import { useTranslation } from 'react-i18next';
 
 import api from '../../services/api';
@@ -70,18 +58,11 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
-
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  ChartTooltip,
-  Legend,
-  Filler
-);
+import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
+import EnvironmentTreeFilterChip from '@/components/common/EnvironmentTreeFilterChip';
+import SimplePagination from '@/components/common/SimplePagination';
+import { useGlobalPageSize } from '@/hooks/useGlobalPageSize';
 
 // Types
 interface TrafficDataPoint {
@@ -106,15 +87,6 @@ interface EvaluationSummary {
   totalEvaluations: number;
   yesCount: number;
   noCount: number;
-}
-
-// Chart data point (aggregated by time)
-interface ChartDataPoint {
-  bucket: string;
-  displayTime: string;
-  featuresCount: number;
-  segmentsCount: number;
-  totalCount: number;
 }
 
 // Chart data point grouped by app
@@ -165,47 +137,6 @@ interface GlobalEnvironment {
 // Global API base path (not project-scoped)
 const GLOBAL_API_PATH = '/admin/network';
 
-// Fill missing hours with zero values
-function fillMissingHours<T extends { bucket: string; displayTime: string }>(
-  data: T[],
-  startDate: Date,
-  endDate: Date,
-  defaultValues: Omit<T, 'bucket' | 'displayTime'>
-): T[] {
-  const result: T[] = [];
-  const dataMap = new Map<string, T>();
-
-  // Create a map of existing data by display time
-  for (const item of data) {
-    dataMap.set(item.displayTime, item);
-  }
-
-  // Generate all hours in the range
-  const current = new Date(startDate);
-  current.setMinutes(0, 0, 0); // Round down to hour
-
-  while (current <= endDate) {
-    const month = String(current.getMonth() + 1).padStart(2, '0');
-    const day = String(current.getDate()).padStart(2, '0');
-    const hour = String(current.getHours()).padStart(2, '0');
-    const displayTime = `${month}/${day} ${hour}:00`;
-
-    if (dataMap.has(displayTime)) {
-      result.push(dataMap.get(displayTime)!);
-    } else {
-      result.push({
-        bucket: current.toISOString(),
-        displayTime,
-        ...defaultValues,
-      } as T);
-    }
-
-    current.setHours(current.getHours() + 1);
-  }
-
-  return result;
-}
-
 const spin = keyframes`
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -219,42 +150,6 @@ const FeatureNetworkPage: React.FC = () => {
   const [globalEnvs, setGlobalEnvs] = useState<GlobalEnvironment[]>([]);
   const [globalEnvsLoaded, setGlobalEnvsLoaded] = useState(false);
 
-  // Derived: unique orgs and projects
-  const allOrgs = useMemo(() => {
-    const map = new Map<string, string>();
-    globalEnvs.forEach((e) => map.set(e.orgId, e.orgName));
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [globalEnvs]);
-
-  const [selectedOrgIds, setSelectedOrgIds] = useState<string[]>([]);
-
-  // Projects filtered by selected orgs
-  const filteredProjects = useMemo(() => {
-    const map = new Map<string, string>();
-    globalEnvs
-      .filter(
-        (e) => selectedOrgIds.length === 0 || selectedOrgIds.includes(e.orgId)
-      )
-      .forEach((e) => map.set(e.projectId, e.projectName));
-    return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-  }, [globalEnvs, selectedOrgIds]);
-
-  const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
-
-  // Environments filtered by selected orgs + projects
-  const filteredEnvs = useMemo(() => {
-    return globalEnvs.filter((e) => {
-      if (selectedOrgIds.length > 0 && !selectedOrgIds.includes(e.orgId))
-        return false;
-      if (
-        selectedProjectIds.length > 0 &&
-        !selectedProjectIds.includes(e.projectId)
-      )
-        return false;
-      return true;
-    });
-  }, [globalEnvs, selectedOrgIds, selectedProjectIds]);
-
   // Lookup map: environmentId -> displayName
   const envNameMap = useMemo(
     () =>
@@ -267,12 +162,33 @@ const FeatureNetworkPage: React.FC = () => {
     [globalEnvs]
   );
 
+  // Lookup map: environmentId -> org/project/env full path (for chart labels)
+  const envFullPathMap = useMemo(
+    () =>
+      new Map(
+        globalEnvs.map((e) => [
+          e.environmentId,
+          `${e.orgName}/${e.projectName}/${e.environmentName}`,
+        ])
+      ),
+    [globalEnvs]
+  );
+
+  // Lookup maps: environmentId -> projectName / orgName (for table columns)
+  const envProjectMap = useMemo(
+    () => new Map(globalEnvs.map((e) => [e.environmentId, e.projectName || '-'])),
+    [globalEnvs]
+  );
+  const envOrgMap = useMemo(
+    () => new Map(globalEnvs.map((e) => [e.environmentId, e.orgName || '-'])),
+    [globalEnvs]
+  );
+
   // State - initialize from URL params
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const hasLoadedRef = useRef(false);
   const [trafficData, setTrafficData] = useState<TrafficDataPoint[]>([]);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [chartDataByApp, setChartDataByApp] = useState<ChartDataPointByApp[]>(
     []
   );
@@ -304,6 +220,15 @@ const FeatureNetworkPage: React.FC = () => {
   }));
   const [showTable, setShowTable] = useState(true);
   const [showEvalTable, setShowEvalTable] = useState(true);
+
+  // Pagination state for detail tables
+  const [trafficPage, setTrafficPage] = useState(0);
+  const [evalPage, setEvalPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
+
+  // Reset pagination when data changes
+  useEffect(() => { setTrafficPage(0); }, [trafficData]);
+  useEffect(() => { setEvalPage(0); }, [evaluationTimeSeriesByApp]);
   const [appsLoaded, setAppsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     const tabParam = searchParams.get('tab');
@@ -347,7 +272,7 @@ const FeatureNetworkPage: React.FC = () => {
     const params = new URLSearchParams();
     if (
       selectedEnvironments.length > 0 &&
-      selectedEnvironments.length < filteredEnvs.length
+      selectedEnvironments.length < globalEnvs.length
     ) {
       params.set('environments', selectedEnvironments.join(','));
     }
@@ -372,7 +297,7 @@ const FeatureNetworkPage: React.FC = () => {
     dateRange,
     activeTab,
     chartGroupBy,
-    filteredEnvs.length,
+    globalEnvs.length,
     applications.length,
     setSearchParams,
   ]);
@@ -397,10 +322,16 @@ const FeatureNetworkPage: React.FC = () => {
       const appsList = appsRes.data?.applications || [];
       setApplications(appsList);
 
-      // If no apps selected yet and apps are available, select all
       if (!appsLoaded && appsList.length > 0) {
+        // First load: select all apps
         setSelectedApps(appsList);
         setAppsLoaded(true);
+      } else if (appsLoaded) {
+        // Subsequent loads: keep only valid selections, or select all if none remain
+        setSelectedApps((prev) => {
+          const validApps = prev.filter((a) => appsList.includes(a));
+          return validApps.length > 0 ? validApps : appsList;
+        });
       }
     } catch (error) {
       console.error('Failed to fetch applications:', error);
@@ -418,19 +349,6 @@ const FeatureNetworkPage: React.FC = () => {
       // If no environments selected, show no data
       if (selectedEnvironments.length === 0) {
         setTrafficData([]);
-        setChartData([]);
-        setChartDataByApp([]);
-        setSummary(null);
-        setEvaluations(null);
-        setEvaluationTimeSeries([]);
-        setEvaluationTimeSeriesByApp([]);
-        return;
-      }
-
-      // If apps are loaded but none selected, show no data
-      if (appsLoaded && applications.length > 0 && selectedApps.length === 0) {
-        setTrafficData([]);
-        setChartData([]);
         setChartDataByApp([]);
         setSummary(null);
         setEvaluations(null);
@@ -474,7 +392,7 @@ const FeatureNetworkPage: React.FC = () => {
         api.get<{ traffic: TrafficDataPoint[] }>(
           `${GLOBAL_API_PATH}/traffic?${params}`
         ),
-        api.get<{ traffic: ChartDataPoint[] }>(
+        api.get<{ traffic: ChartDataPointByApp[] }>(
           `${GLOBAL_API_PATH}/traffic/aggregated?${params}`
         ),
         api.get<{ traffic: ChartDataPointByApp[] }>(
@@ -495,7 +413,6 @@ const FeatureNetworkPage: React.FC = () => {
       ]);
 
       setTrafficData(trafficRes.data?.traffic || []);
-      setChartData(aggregatedRes.data?.traffic || []);
       setChartDataByApp(aggregatedByAppRes.data?.traffic || []);
       setSummary(summaryRes.data?.summary || null);
       setEvaluations(evaluationsRes.data?.evaluations || null);
@@ -514,39 +431,30 @@ const FeatureNetworkPage: React.FC = () => {
     getTimeRange,
     selectedEnvironments,
     selectedApps,
-    appsLoaded,
-    applications.length,
   ]);
 
   // Set default environments when global envs are loaded (only on initial load)
   useEffect(() => {
     if (
       globalEnvsLoaded &&
-      filteredEnvs.length > 0 &&
+      globalEnvs.length > 0 &&
       selectedEnvironments.length === 0 &&
       initialEnvLoad
     ) {
       // Select all environments by default only on first load
-      setSelectedEnvironments(filteredEnvs.map((e) => e.environmentId));
+      setSelectedEnvironments(globalEnvs.map((e) => e.environmentId));
       setInitialEnvLoad(false);
     } else if (globalEnvsLoaded && initialEnvLoad) {
       setInitialEnvLoad(false);
     }
   }, [
     globalEnvsLoaded,
-    filteredEnvs,
+    globalEnvs,
     selectedEnvironments.length,
     initialEnvLoad,
   ]);
 
-  // When org/project filter changes, reset environment selection to all matching
-  useEffect(() => {
-    if (!globalEnvsLoaded || initialEnvLoad) return;
-    setSelectedEnvironments(filteredEnvs.map((e) => e.environmentId));
-    // Reset app selection when filter changes
-    setAppsLoaded(false);
-    setSelectedApps([]);
-  }, [selectedOrgIds, selectedProjectIds]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   // Fetch applications when environments or time range changes
   useEffect(() => {
@@ -579,309 +487,187 @@ const FeatureNetworkPage: React.FC = () => {
     setDateRange(value);
   }, []);
 
-  // Chart data - fill missing hours and downsample if needed
-  const downsampledChartData = useMemo<ChartDataPoint[]>(() => {
-    // If no original data, return empty to show "no data" message
-    if (chartData.length === 0) return [];
 
-    const { startDate, endDate } = getTimeRange();
-    const filledData = fillMissingHours(chartData, startDate, endDate, {
-      featuresCount: 0,
-      segmentsCount: 0,
-      totalCount: 0,
-    });
-
-    if (filledData.length <= 60) return filledData;
-
-    // Downsample to ~60 points for readability
-    const step = Math.ceil(filledData.length / 60);
-    return filledData.filter((_, i) => i % step === 0);
-  }, [chartData, getTimeRange]);
-
-  // Colors for different apps
-  const appColors = useMemo(() => {
-    const colors = [
-      { border: '#2196f3', bg: 'rgba(33, 150, 243, 0.1)' },
-      { border: '#4caf50', bg: 'rgba(76, 175, 80, 0.1)' },
-      { border: '#ff9800', bg: 'rgba(255, 152, 0, 0.1)' },
-      { border: '#e91e63', bg: 'rgba(233, 30, 99, 0.1)' },
-      { border: '#9c27b0', bg: 'rgba(156, 39, 176, 0.1)' },
-      { border: '#00bcd4', bg: 'rgba(0, 188, 212, 0.1)' },
-      { border: '#795548', bg: 'rgba(121, 85, 72, 0.1)' },
-      { border: '#607d8b', bg: 'rgba(96, 125, 139, 0.1)' },
-    ];
-    return colors;
-  }, []);
-
-  // Prepare chart.js data - per app or env breakdown
-  const lineChartData = useMemo(() => {
-    if (chartDataByApp.length === 0) {
-      return { labels: [], datasets: [] };
-    }
-
-    // Get all unique display times
-    const { startDate, endDate } = getTimeRange();
-    const allDisplayTimes: string[] = [];
-    const current = new Date(startDate);
-    current.setMinutes(0, 0, 0);
-    while (current <= endDate) {
-      const month = String(current.getMonth() + 1).padStart(2, '0');
-      const day = String(current.getDate()).padStart(2, '0');
-      const hour = String(current.getHours()).padStart(2, '0');
-      allDisplayTimes.push(`${month}/${day} ${hour}:00`);
-      current.setHours(current.getHours() + 1);
-    }
-
-    if (chartGroupBy === 'env') {
-      // Group by environment
-      const envNames = [...new Set(chartDataByApp.map((d) => d.environmentId))];
-      const datasets = envNames.map((envName, index) => {
-        const envData = chartDataByApp.filter(
-          (d) => d.environmentId === envName
-        );
-        // Aggregate by displayTime
-        const aggregated = new Map<string, number>();
-        envData.forEach((d) => {
-          aggregated.set(
-            d.displayTime,
-            (aggregated.get(d.displayTime) || 0) + d.totalCount
-          );
-        });
-        const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
-        const colorIndex = index % appColors.length;
-
-        return {
-          label: envName,
-          data,
-          borderColor: appColors[colorIndex].border,
-          backgroundColor: appColors[colorIndex].bg,
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-        };
-      });
-      return { labels: allDisplayTimes, datasets };
-    } else if (chartGroupBy === 'app') {
-      // Group by app
-      const appNames = [...new Set(chartDataByApp.map((d) => d.appName))];
-      const datasets = appNames.map((appName, index) => {
-        const appData = chartDataByApp.filter((d) => d.appName === appName);
-        // Aggregate by displayTime
-        const aggregated = new Map<string, number>();
-        appData.forEach((d) => {
-          aggregated.set(
-            d.displayTime,
-            (aggregated.get(d.displayTime) || 0) + d.totalCount
-          );
-        });
-        const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
-        const colorIndex = index % appColors.length;
-
-        return {
-          label: appName,
-          data,
-          borderColor: appColors[colorIndex].border,
-          backgroundColor: appColors[colorIndex].bg,
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-        };
-      });
-      return { labels: allDisplayTimes, datasets };
-    } else {
-      // 'all' - Single aggregated line
-      const aggregated = new Map<string, number>();
-      chartDataByApp.forEach((d) => {
-        aggregated.set(
-          d.displayTime,
-          (aggregated.get(d.displayTime) || 0) + d.totalCount
-        );
-      });
-      const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
-
-      return {
-        labels: allDisplayTimes,
-        datasets: [
-          {
-            label: '',
-            data,
-            borderColor: appColors[0].border,
-            backgroundColor: appColors[0].bg,
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true,
-            pointRadius: 0,
-            pointHoverRadius: 4,
-          },
-        ],
-      };
-    }
-  }, [chartDataByApp, getTimeRange, appColors, chartGroupBy, t]);
-
-  // Chart options
-  const lineChartOptions = useMemo(
-    () => ({
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: false as const,
-      plugins: {
-        legend: {
-          display: chartGroupBy !== 'all',
-          position: 'top' as const,
-        },
-        tooltip: {
-          mode: 'index' as const,
-          intersect: false,
-        },
-      },
-      scales: {
-        x: {
-          grid: {
-            display: true,
-            color: 'rgba(0, 0, 0, 0.05)',
-          },
-          ticks: {
-            maxRotation: 45,
-            minRotation: 45,
-            autoSkip: true,
-            maxTicksLimit: 12,
-          },
-        },
-        y: {
-          beginAtZero: true,
-          grid: {
-            color: 'rgba(0, 0, 0, 0.05)',
-          },
-        },
-      },
-      interaction: {
-        mode: 'nearest' as const,
-        axis: 'x' as const,
-        intersect: false,
-      },
-    }),
-    [chartGroupBy]
+  // Colors for different series
+  const seriesColors = useMemo(
+    () => [
+      '#2196f3', '#4caf50', '#ff9800', '#e91e63',
+      '#9c27b0', '#00bcd4', '#795548', '#607d8b',
+    ],
+    []
   );
 
-  // Evaluation chart data - per app or env breakdown
-  const evaluationChartData = useMemo(() => {
-    // If no original data, return empty to show "no data" message
-    if (evaluationTimeSeriesByApp.length === 0) {
-      return { labels: [], datasets: [] };
-    }
-
-    // Get all unique display times
+  // Shared time axis labels for both tabs
+  const chartTimeLabels = useMemo(() => {
     const { startDate, endDate } = getTimeRange();
-    const allDisplayTimes: string[] = [];
+    const labels: string[] = [];
     const current = new Date(startDate);
     current.setMinutes(0, 0, 0);
     while (current <= endDate) {
       const month = String(current.getMonth() + 1).padStart(2, '0');
       const day = String(current.getDate()).padStart(2, '0');
       const hour = String(current.getHours()).padStart(2, '0');
-      allDisplayTimes.push(`${month}/${day} ${hour}:00`);
+      labels.push(`${month}/${day} ${hour}:00`);
       current.setHours(current.getHours() + 1);
     }
+    return labels;
+  }, [getTimeRange]);
+
+  // API Requests chart datasets (Top 10 + Other)
+  const MAX_SERIES = 10;
+  const apiChartDatasets = useMemo<ChartDataset[]>(() => {
+    if (chartDataByApp.length === 0) return [];
+
+    const buildGroupedDatasets = (
+      groupKey: 'environmentId' | 'appName',
+      labelFn: (key: string) => string,
+      valueFn: (d: ChartDataPointByApp) => number,
+    ): ChartDataset[] => {
+      // Aggregate total per group for ranking
+      const groupTotals = new Map<string, number>();
+      chartDataByApp.forEach((d) => {
+        const key = d[groupKey];
+        groupTotals.set(key, (groupTotals.get(key) || 0) + valueFn(d));
+      });
+
+      // Sort by total descending, pick top N
+      const sorted = [...groupTotals.entries()].sort((a, b) => b[1] - a[1]);
+      const topKeys = new Set(sorted.slice(0, MAX_SERIES).map(([k]) => k));
+
+      // Build per-group time series
+      const groupAgg = new Map<string, Map<string, number>>();
+      const otherAgg = new Map<string, number>();
+      chartDataByApp.forEach((d) => {
+        const key = d[groupKey];
+        const val = valueFn(d);
+        if (topKeys.has(key)) {
+          if (!groupAgg.has(key)) groupAgg.set(key, new Map());
+          const m = groupAgg.get(key)!;
+          m.set(d.displayTime, (m.get(d.displayTime) || 0) + val);
+        } else {
+          otherAgg.set(d.displayTime, (otherAgg.get(d.displayTime) || 0) + val);
+        }
+      });
+
+      const datasets: ChartDataset[] = [...groupAgg.entries()].map(([key, agg], i) => ({
+        label: labelFn(key),
+        data: chartTimeLabels.map((t) => agg.get(t) || 0),
+        color: seriesColors[i % seriesColors.length],
+      }));
+
+      if (otherAgg.size > 0) {
+        datasets.push({
+          label: 'Other',
+          data: chartTimeLabels.map((t) => otherAgg.get(t) || 0),
+          color: '#9e9e9e',
+        });
+      }
+      return datasets;
+    };
 
     if (chartGroupBy === 'env') {
-      // Group by environment
-      const envNames = [
-        ...new Set(evaluationTimeSeriesByApp.map((d) => d.environmentId)),
-      ];
-      const datasets = envNames.map((envName, index) => {
-        const envData = evaluationTimeSeriesByApp.filter(
-          (d) => d.environmentId === envName
-        );
-        // Aggregate by displayTime
-        const aggregated = new Map<string, number>();
-        envData.forEach((d) => {
-          aggregated.set(
-            d.displayTime,
-            (aggregated.get(d.displayTime) || 0) + d.evaluations
-          );
-        });
-        const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
-        const colorIndex = index % appColors.length;
-
-        return {
-          label: envName,
-          data,
-          borderColor: appColors[colorIndex].border,
-          backgroundColor: appColors[colorIndex].bg,
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-        };
-      });
-      return { labels: allDisplayTimes, datasets };
+      return buildGroupedDatasets(
+        'environmentId',
+        (k) => envFullPathMap.get(k) || envNameMap.get(k) || k,
+        (d) => d.totalCount,
+      );
     } else if (chartGroupBy === 'app') {
-      // Group by app
-      const appNames = [
-        ...new Set(evaluationTimeSeriesByApp.map((d) => d.appName)),
-      ];
-      const datasets = appNames.map((appName, index) => {
-        const appData = evaluationTimeSeriesByApp.filter(
-          (d) => d.appName === appName
-        );
-        // Aggregate by displayTime
-        const aggregated = new Map<string, number>();
-        appData.forEach((d) => {
-          aggregated.set(
-            d.displayTime,
-            (aggregated.get(d.displayTime) || 0) + d.evaluations
-          );
-        });
-        const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
-        const colorIndex = index % appColors.length;
-
-        return {
-          label: appName,
-          data,
-          borderColor: appColors[colorIndex].border,
-          backgroundColor: appColors[colorIndex].bg,
-          borderWidth: 2,
-          tension: 0.3,
-          fill: true,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-        };
-      });
-      return { labels: allDisplayTimes, datasets };
+      return buildGroupedDatasets(
+        'appName',
+        (k) => k,
+        (d) => d.totalCount,
+      );
     } else {
-      // 'all' - Single aggregated line
+      const aggregated = new Map<string, number>();
+      chartDataByApp.forEach((d) => {
+        aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.totalCount);
+      });
+      return [{
+        label: '',
+        data: chartTimeLabels.map((time) => aggregated.get(time) || 0),
+        color: seriesColors[0],
+      }];
+    }
+  }, [chartDataByApp, chartTimeLabels, seriesColors, chartGroupBy, envFullPathMap, envNameMap]);
+
+  // Zoom handler — converts chart index range to custom date range
+  const handleChartZoom = useCallback(
+    (startIndex: number, endIndex: number) => {
+      const { startDate } = getTimeRange();
+      const start = new Date(startDate);
+      start.setMinutes(0, 0, 0);
+      start.setHours(start.getHours() + startIndex);
+      const end = new Date(startDate);
+      end.setMinutes(0, 0, 0);
+      end.setHours(end.getHours() + endIndex);
+      setDateRange({ type: 'custom', start, end });
+    },
+    [getTimeRange]
+  );
+
+  // Evaluation chart datasets (Top 10 + Other)
+  const evalChartDatasets = useMemo<ChartDataset[]>(() => {
+    if (evaluationTimeSeriesByApp.length === 0) return [];
+
+    const buildGroupedEvalDatasets = (
+      groupKey: 'environmentId' | 'appName',
+      labelFn: (key: string) => string,
+    ): ChartDataset[] => {
+      const groupTotals = new Map<string, number>();
+      evaluationTimeSeriesByApp.forEach((d) => {
+        const key = d[groupKey];
+        groupTotals.set(key, (groupTotals.get(key) || 0) + d.evaluations);
+      });
+      const sorted = [...groupTotals.entries()].sort((a, b) => b[1] - a[1]);
+      const topKeys = new Set(sorted.slice(0, MAX_SERIES).map(([k]) => k));
+
+      const groupAgg = new Map<string, Map<string, number>>();
+      const otherAgg = new Map<string, number>();
+      evaluationTimeSeriesByApp.forEach((d) => {
+        const key = d[groupKey];
+        if (topKeys.has(key)) {
+          if (!groupAgg.has(key)) groupAgg.set(key, new Map());
+          const m = groupAgg.get(key)!;
+          m.set(d.displayTime, (m.get(d.displayTime) || 0) + d.evaluations);
+        } else {
+          otherAgg.set(d.displayTime, (otherAgg.get(d.displayTime) || 0) + d.evaluations);
+        }
+      });
+
+      const datasets: ChartDataset[] = [...groupAgg.entries()].map(([key, agg], i) => ({
+        label: labelFn(key),
+        data: chartTimeLabels.map((t) => agg.get(t) || 0),
+        color: seriesColors[i % seriesColors.length],
+      }));
+      if (otherAgg.size > 0) {
+        datasets.push({
+          label: 'Other',
+          data: chartTimeLabels.map((t) => otherAgg.get(t) || 0),
+          color: '#9e9e9e',
+        });
+      }
+      return datasets;
+    };
+
+    if (chartGroupBy === 'env') {
+      return buildGroupedEvalDatasets(
+        'environmentId',
+        (k) => envFullPathMap.get(k) || envNameMap.get(k) || k,
+      );
+    } else if (chartGroupBy === 'app') {
+      return buildGroupedEvalDatasets('appName', (k) => k);
+    } else {
       const aggregated = new Map<string, number>();
       evaluationTimeSeriesByApp.forEach((d) => {
-        aggregated.set(
-          d.displayTime,
-          (aggregated.get(d.displayTime) || 0) + d.evaluations
-        );
+        aggregated.set(d.displayTime, (aggregated.get(d.displayTime) || 0) + d.evaluations);
       });
-      const data = allDisplayTimes.map((time) => aggregated.get(time) || 0);
-
-      return {
-        labels: allDisplayTimes,
-        datasets: [
-          {
-            label: '',
-            data,
-            borderColor: appColors[0].border,
-            backgroundColor: appColors[0].bg,
-            borderWidth: 2,
-            tension: 0.3,
-            fill: true,
-            pointRadius: 0,
-            pointHoverRadius: 4,
-          },
-        ],
-      };
+      return [{
+        label: '',
+        data: chartTimeLabels.map((time) => aggregated.get(time) || 0),
+        color: seriesColors[0],
+      }];
     }
-  }, [evaluationTimeSeriesByApp, getTimeRange, appColors, chartGroupBy, t]);
+  }, [evaluationTimeSeriesByApp, chartTimeLabels, seriesColors, chartGroupBy, envFullPathMap, envNameMap]);
 
   // API Request tab summary cards
   const apiSummaryCards = useMemo(
@@ -990,38 +776,9 @@ const FeatureNetworkPage: React.FC = () => {
           flexWrap: 'wrap',
         }}
       >
-        {/* Organization */}
-        {allOrgs.length > 1 && (
-          <MultiSelectFilterChip
-            label={t('common.organization')}
-            options={allOrgs.map((org) => ({ value: org.id, label: org.name }))}
-            selected={selectedOrgIds}
-            onChange={setSelectedOrgIds}
-            emptyMeansAll
-          />
-        )}
-
-        {/* Project */}
-        {filteredProjects.length > 1 && (
-          <MultiSelectFilterChip
-            label={t('common.project')}
-            options={filteredProjects.map((proj) => ({
-              value: proj.id,
-              label: proj.name,
-            }))}
-            selected={selectedProjectIds}
-            onChange={setSelectedProjectIds}
-            emptyMeansAll
-          />
-        )}
-
-        {/* Environment */}
-        <MultiSelectFilterChip
-          label={t('network.environment')}
-          options={filteredEnvs.map((env) => ({
-            value: env.environmentId,
-            label: env.environmentName || env.environmentId,
-          }))}
+        {/* Environment tree selector */}
+        <EnvironmentTreeFilterChip
+          environments={globalEnvs}
           selected={selectedEnvironments}
           onChange={setSelectedEnvironments}
         />
@@ -1117,13 +874,10 @@ const FeatureNetworkPage: React.FC = () => {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 2,
+                  justifyContent: 'flex-end',
+                  mb: 1,
                 }}
               >
-                <Typography variant="h6">
-                  {t('network.requestsOverTime')}
-                </Typography>
                 <ToggleButtonGroup
                   size="small"
                   value={chartGroupBy}
@@ -1141,26 +895,16 @@ const FeatureNetworkPage: React.FC = () => {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {loading && chartDataByApp.length === 0 ? (
-                <Skeleton variant="rectangular" height={300} />
-              ) : chartDataByApp.length === 0 ? (
-                <Box
-                  sx={{
-                    height: 300,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Typography color="text.secondary">
-                    {t('common.noData')}
-                  </Typography>
-                </Box>
-              ) : (
-                <Box sx={{ height: 300 }}>
-                  <Line data={lineChartData} options={lineChartOptions} />
-                </Box>
-              )}
+              <ArgusVolumeChart
+                labels={chartTimeLabels}
+                datasets={apiChartDatasets}
+                loading={loading}
+                title={t('network.requestsOverTime')}
+                onZoom={handleChartZoom}
+                storagePrefix="feature_network_api"
+                showLegend={chartGroupBy !== 'all'}
+                mb={0}
+              />
 
               {/* Traffic Detail Table */}
               <Box sx={{ mt: 3 }}>
@@ -1181,7 +925,9 @@ const FeatureNetworkPage: React.FC = () => {
                   </IconButton>
                 </Box>
                 <Collapse in={showTable}>
-                  <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
+                  <Card variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
+                    <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                      <TableContainer sx={{ maxHeight: 400 }}>
                     <Table
                       size="small"
                       stickyHeader
@@ -1198,6 +944,8 @@ const FeatureNetworkPage: React.FC = () => {
                         <TableRow>
                           <TableCell>{t('network.time')}</TableCell>
                           <TableCell>{t('common.environment')}</TableCell>
+                          <TableCell>{t('common.project')}</TableCell>
+                          <TableCell>{t('common.organization')}</TableCell>
                           <TableCell>{t('network.application')}</TableCell>
                           <TableCell align="right">
                             {t('network.features')}
@@ -1214,7 +962,7 @@ const FeatureNetworkPage: React.FC = () => {
                         {trafficData.length === 0 ? (
                           <TableRow hover>
                             <TableCell
-                              colSpan={6}
+                              colSpan={8}
                               align="center"
                               sx={{ py: 4 }}
                             >
@@ -1227,6 +975,7 @@ const FeatureNetworkPage: React.FC = () => {
                           trafficData
                             .slice()
                             .reverse()
+                            .slice(trafficPage * rowsPerPage, trafficPage * rowsPerPage + rowsPerPage)
                             .map((row, index) => (
                               <TableRow key={index} hover>
                                 <TableCell>{row.displayTime}</TableCell>
@@ -1244,6 +993,8 @@ const FeatureNetworkPage: React.FC = () => {
                                     />
                                   </Tooltip>
                                 </TableCell>
+                                <TableCell>{envProjectMap.get(row.environmentId) || '-'}</TableCell>
+                                <TableCell>{envOrgMap.get(row.environmentId) || '-'}</TableCell>
                                 <TableCell>
                                   {row.appName ? (
                                     <Chip
@@ -1271,6 +1022,18 @@ const FeatureNetworkPage: React.FC = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  <SimplePagination
+                    page={trafficPage}
+                    rowsPerPage={rowsPerPage}
+                    count={trafficData.length}
+                    onPageChange={(_, newPage) => setTrafficPage(newPage)}
+                    onRowsPerPageChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setTrafficPage(0);
+                    }}
+                  />
+                    </CardContent>
+                  </Card>
                 </Collapse>
               </Box>
             </Box>
@@ -1330,13 +1093,10 @@ const FeatureNetworkPage: React.FC = () => {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  mb: 2,
+                  justifyContent: 'flex-end',
+                  mb: 1,
                 }}
               >
-                <Typography variant="h6">
-                  {t('network.evaluationsOverTime')}
-                </Typography>
                 <ToggleButtonGroup
                   size="small"
                   value={chartGroupBy}
@@ -1354,26 +1114,16 @@ const FeatureNetworkPage: React.FC = () => {
                   </ToggleButton>
                 </ToggleButtonGroup>
               </Box>
-              {loading && evaluationTimeSeriesByApp.length === 0 ? (
-                <Skeleton variant="rectangular" height={300} />
-              ) : evaluationTimeSeriesByApp.length === 0 ? (
-                <Box
-                  sx={{
-                    height: 300,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Typography color="text.secondary">
-                    {t('common.noData')}
-                  </Typography>
-                </Box>
-              ) : (
-                <Box sx={{ height: 300 }}>
-                  <Line data={evaluationChartData} options={lineChartOptions} />
-                </Box>
-              )}
+              <ArgusVolumeChart
+                labels={chartTimeLabels}
+                datasets={evalChartDatasets}
+                loading={loading}
+                title={t('network.evaluationsOverTime')}
+                onZoom={handleChartZoom}
+                storagePrefix="feature_network_eval"
+                showLegend={chartGroupBy !== 'all'}
+                mb={0}
+              />
 
               {/* Evaluation Detail Table */}
               <Box sx={{ mt: 3 }}>
@@ -1394,7 +1144,9 @@ const FeatureNetworkPage: React.FC = () => {
                   </IconButton>
                 </Box>
                 <Collapse in={showEvalTable}>
-                  <TableContainer sx={{ mt: 2, maxHeight: 400 }}>
+                  <Card variant="outlined" sx={{ mt: 2, borderRadius: 2 }}>
+                    <CardContent sx={{ p: 0, '&:last-child': { pb: 0 } }}>
+                      <TableContainer sx={{ maxHeight: 400 }}>
                     <Table
                       size="small"
                       stickyHeader
@@ -1436,6 +1188,7 @@ const FeatureNetworkPage: React.FC = () => {
                           evaluationTimeSeriesByApp
                             .slice()
                             .reverse()
+                            .slice(evalPage * rowsPerPage, evalPage * rowsPerPage + rowsPerPage)
                             .map((row, index) => (
                               <TableRow key={index} hover>
                                 <TableCell>{row.displayTime}</TableCell>
@@ -1477,6 +1230,18 @@ const FeatureNetworkPage: React.FC = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  <SimplePagination
+                    page={evalPage}
+                    rowsPerPage={rowsPerPage}
+                    count={evaluationTimeSeriesByApp.length}
+                    onPageChange={(_, newPage) => setEvalPage(newPage)}
+                    onRowsPerPageChange={(e) => {
+                      setRowsPerPage(Number(e.target.value));
+                      setEvalPage(0);
+                    }}
+                  />
+                    </CardContent>
+                  </Card>
                 </Collapse>
               </Box>
             </Box>
