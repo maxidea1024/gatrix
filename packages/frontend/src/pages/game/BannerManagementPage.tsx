@@ -461,19 +461,6 @@ const BannerManagementPage: React.FC = () => {
         icon={<ImageIcon />}
         title={t('banners.title')}
         subtitle={t('banners.subtitle')}
-        actions={
-          <>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t('banners.createBanner')}
-              </Button>
-            )}
-          </>
-        }
       />
 
       {/* Search and Filters */}
@@ -485,15 +472,16 @@ const BannerManagementPage: React.FC = () => {
             gap: 2,
             flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
               flexWrap: 'wrap',
-              flex: 1,
+              flexGrow: 1,
             }}
           >
             <SearchTextField
@@ -504,20 +492,67 @@ const BannerManagementPage: React.FC = () => {
                 setPage(0);
               }}
             />
-            <Tooltip title={t('common.columnSettings')}>
-              <IconButton
-                size="small"
-                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+            }}
+          >
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
                 sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': { bgcolor: 'action.hover' },
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <ViewColumnIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+                {t('banners.createBanner')}
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>

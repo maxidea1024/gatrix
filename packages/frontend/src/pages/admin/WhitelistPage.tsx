@@ -593,30 +593,48 @@ const WhitelistPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           {/* Tab Content */}
           <Box sx={{ display: currentTab === 0 ? 'block' : 'none' }}>
             {/* Search & Actions Row */}
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 2,
-                mb: 2,
-                alignItems: 'center',
-              }}
-            >
-              <SearchTextField
-                placeholder={t('whitelist.searchPlaceholder')}
-                value={pageState.filters?.search || ''}
-                onChange={(value) => updateFilters({ search: value })}
-              />
-              {canManage && (
-                <Box sx={{ display: 'flex', gap: 1, ml: 'auto' }}>
+            <Box sx={{ mb: 2 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    gap: 1.5,
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    flexGrow: 1,
+                  }}
+                >
+                  <SearchTextField
+                    placeholder={t('whitelist.searchPlaceholder')}
+                    value={pageState.filters?.search || ''}
+                    onChange={(value) => updateFilters({ search: value })}
+                  />
+                </Box>
+                {canManage && (
                   <Button
                     variant="contained"
                     startIcon={<AddIcon />}
                     onClick={handleAdd}
+                    sx={{
+                      height: '36px',
+                      borderRadius: '8px',
+                      textTransform: 'none',
+                      fontWeight: 600,
+                    }}
                   >
                     {t('whitelist.addEntry')}
                   </Button>
-                </Box>
-              )}
+                )}
+              </Box>
             </Box>
 
             {/* Nickname Whitelist Table */}

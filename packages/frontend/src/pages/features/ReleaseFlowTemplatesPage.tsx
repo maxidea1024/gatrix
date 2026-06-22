@@ -84,7 +84,6 @@ import { useGlobalPageSize } from '../../hooks/useGlobalPageSize';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
-import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
 import TagSelector from '../../components/common/TagSelector';
 import TagChips from '../../components/common/TagChips';
 import { Tag } from '../../services/tagService';
@@ -1449,7 +1448,25 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
   });
 
   // Filter definitions
-  const availableFilterDefinitions: FilterDefinition[] = useMemo(() => [], []);
+  const availableFilterDefinitions: FilterDefinition[] = useMemo(
+    () => [
+      {
+        key: 'tag',
+        label: t('common.tags'),
+        type: 'text',
+      },
+      {
+        key: 'hasMilestones',
+        label: t('releaseFlow.milestones'),
+        type: 'select',
+        options: [
+          { value: 'yes', label: t('common.yes') },
+          { value: 'no', label: t('common.no') },
+        ],
+      },
+    ],
+    [t]
+  );
 
   // Default columns
   const defaultColumns: ColumnConfig[] = [
@@ -1495,8 +1512,32 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       );
       const allItems = data || [];
 
+      // Client-side filtering by activeFilters
+      let filtered = [...allItems];
+      for (const filter of activeFilters) {
+        if (filter.key === 'tag' && filter.value) {
+          const tagSearch = String(filter.value).toLowerCase();
+          filtered = filtered.filter((t) =>
+            (t.tags || []).some((tag: any) => {
+              const name = typeof tag === 'string' ? tag : tag?.name || '';
+              return name.toLowerCase().includes(tagSearch);
+            })
+          );
+        } else if (filter.key === 'hasMilestones' && filter.value) {
+          if (filter.value === 'yes') {
+            filtered = filtered.filter(
+              (t) => (t.milestones?.length || 0) > 0
+            );
+          } else {
+            filtered = filtered.filter(
+              (t) => !t.milestones || t.milestones.length === 0
+            );
+          }
+        }
+      }
+
       // Client-side sorting
-      const sorted = [...allItems].sort((a, b) => {
+      const sorted = [...filtered].sort((a, b) => {
         let cmp = 0;
         if (orderBy === 'name') {
           cmp = (a.flowName || '').localeCompare(b.flowName || '');
@@ -1523,7 +1564,7 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
       setLoading(false);
       setIsInitialLoad(false);
     }
-  }, [debouncedSearchTerm, page, rowsPerPage, orderBy, order, enqueueSnackbar]);
+  }, [debouncedSearchTerm, page, rowsPerPage, orderBy, order, activeFilters, enqueueSnackbar]);
 
   // Save filters to localStorage
   useEffect(() => {
@@ -1708,23 +1749,6 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
         icon={<TemplateIcon />}
         title={t('releaseFlow.templatesTitle')}
         subtitle={t('releaseFlow.templatesSubtitle')}
-        actions={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t('releaseFlow.addTemplate')}
-              </Button>
-            )}
-            <PageHeaderContextMenu
-              onRefresh={loadTemplates}
-              refreshDisabled={loading}
-            />
-          </Box>
-        }
       />
 
       <Box sx={{ mb: 2 }}>
@@ -1733,18 +1757,18 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            flexWrap: 'nowrap',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               flexGrow: 1,
-              minWidth: 0,
             }}
           >
             <SearchTextField
@@ -1756,32 +1780,77 @@ const ReleaseFlowTemplatesPage: React.FC = () => {
               }}
             />
 
-            {/* Dynamic Filter Bar */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-              noWrap={true}
-              afterFilterAddActions={
-                <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  >
-                    <ViewColumnIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+            }}
+          >
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+                sx={{
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {t('releaseFlow.addTemplate')}
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>

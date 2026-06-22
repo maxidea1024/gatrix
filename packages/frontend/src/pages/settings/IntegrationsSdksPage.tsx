@@ -459,7 +459,9 @@ const SdkCard: React.FC<{ sdk: SdkProvider }> = ({ sdk }) => {
   );
 };
 
-const IntegrationsSdksPage: React.FC = () => {
+const IntegrationsSdksPage: React.FC<{ hideHeader?: boolean }> = ({
+  hideHeader = false,
+}) => {
   const { t } = useTranslation();
 
   const openDocs = (path: string) => {
@@ -486,7 +488,7 @@ const IntegrationsSdksPage: React.FC = () => {
 
   return (
     <Box>
-      <PageHeader title={t('integrations.sdks.title')} />
+      {!hideHeader && <PageHeader title={t('integrations.sdks.title')} />}
       <Box sx={{ mb: 4 }}>
         <Typography variant="body2" color="text.secondary">
           {t('integrations.sdks.subtitle')}

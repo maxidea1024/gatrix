@@ -21,10 +21,7 @@ import {
   LinearProgress,
   TableSortLabel,
   Chip,
-  Select,
   MenuItem,
-  FormControl,
-  InputLabel,
   alpha,
   Menu,
   ListItemIcon,
@@ -34,7 +31,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Paper,
   Stack,
 } from '@mui/material';
 import {
@@ -42,7 +38,6 @@ import {
   ViewColumn as ColumnIcon,
   ErrorOutline as ErrorIcon,
   ContentCopy as CopyIcon,
-  Refresh as RefreshIcon,
   UnfoldMore as GroupIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -257,6 +252,9 @@ const PlayerListTab: React.FC<Props> = ({
   useEffect(() => {
     localStorage.setItem(GROUPBY_STORAGE_KEY, groupBy);
   }, [groupBy]);
+
+  const [groupByMenuAnchor, setGroupByMenuAnchor] =
+    useState<null | HTMLElement>(null);
 
   // Filters
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>(() => {
@@ -857,155 +855,181 @@ const PlayerListTab: React.FC<Props> = ({
   return (
     <Box>
       {/* Filter bar */}
-      <Paper
-        variant="outlined"
-        sx={{
-          display: 'flex',
-          gap: 1.5,
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          p: 1.5,
-          mb: 2,
-          bgcolor: (theme) => alpha(theme.palette.action.hover, 0.04),
-          borderRadius: 2.5,
-          borderColor: 'divider',
-        }}
-      >
-        <SearchTextField
-          placeholder={t('playerConnections.players.searchPlaceholder')}
-          value={search}
-          onChange={handleSearchChange}
-          sx={{ minWidth: 250 }}
-        />
-        <DynamicFilterBar
-          availableFilters={availableFilters}
-          activeFilters={activeFilters}
-          onFilterAdd={handleFilterAdd}
-          onFilterRemove={handleFilterRemove}
-          onFilterChange={handleFilterChange}
-        />
-
-        {/* GroupBy selector */}
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel id="groupby-label" sx={{ fontSize: '0.8125rem' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <GroupIcon sx={{ fontSize: 16 }} />
-              {t('playerConnections.groupBy.label')}
-            </Box>
-          </InputLabel>
-          <Select
-            labelId="groupby-label"
-            value={groupBy}
-            label={'\u2003' + t('playerConnections.groupBy.label')}
-            onChange={(e) => handleGroupByChange(e.target.value as string)}
+      <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <Box
             sx={{
-              fontSize: '0.8125rem',
-              '& .MuiSelect-select': { py: 0.75 },
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flexGrow: 1,
             }}
           >
-            {GROUPABLE_COLUMNS.map((opt) => (
-              <MenuItem
-                key={opt.value}
-                value={opt.value}
-                sx={{ fontSize: '0.8125rem' }}
-              >
-                {t(opt.labelKey)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+            <SearchTextField
+              placeholder={t('playerConnections.players.searchPlaceholder')}
+              value={search}
+              onChange={handleSearchChange}
+            />
 
-        <Tooltip title={t('common.columnSettings')}>
-          <IconButton
-            size="small"
-            onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-            sx={{
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
-          >
-            <ColumnIcon />
-          </IconButton>
-        </Tooltip>
-        <Box sx={{ flex: 1 }} />
-
-        {/* Right side actions */}
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          {/* Total online counter */}
-          {totalOnline !== undefined && (
-            <Typography
-              variant="body2"
+            {/* Unified Control Group */}
+            <Box
               sx={{
-                color: 'text.secondary',
-                fontSize: '0.8125rem',
-                fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.5,
-              }}
-            >
-              {totalOnline.toLocaleString()}
-              <Typography
-                component="span"
-                sx={{
-                  fontSize: '0.75rem',
-                  color: 'text.disabled',
-                  fontWeight: 400,
-                }}
-              >
-                ({t('playerConnections.players.playerLabel')}{' '}
-                {((totalOnline ?? 0) - (botTotal ?? 0)).toLocaleString()}
-                {' · '}
-                {t('playerConnections.players.botLabel')}{' '}
-                {(botTotal ?? 0).toLocaleString()})
-              </Typography>
-            </Typography>
-          )}
-
-          <Tooltip title={t('common.refresh')}>
-            <IconButton
-              onClick={loadUsers}
-              disabled={loading}
-              size="small"
-              sx={{
                 bgcolor: 'background.paper',
                 border: 1,
                 borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
               }}
             >
-              <RefreshIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title={t('common.export')}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-                disabled={exporting || total === 0}
+              <DynamicFilterBar
+                availableFilters={availableFilters}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleFilterChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* GroupBy Button */}
+              <Tooltip title={t('playerConnections.groupBy.label')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setGroupByMenuAnchor(e.currentTarget)}
+                  sx={{
+                    color: groupBy ? 'primary.main' : 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    bgcolor: groupBy ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: groupBy ? 'primary.dark' : 'action.hover',
+                      color: groupBy ? 'primary.contrastText' : 'primary.main',
+                    },
+                  }}
+                >
+                  <GroupIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                anchorEl={groupByMenuAnchor}
+                open={Boolean(groupByMenuAnchor)}
+                onClose={() => setGroupByMenuAnchor(null)}
+              >
+                {GROUPABLE_COLUMNS.map((opt) => (
+                  <MenuItem
+                    key={opt.value}
+                    selected={groupBy === opt.value}
+                    onClick={() => {
+                      handleGroupByChange(opt.value);
+                      setGroupByMenuAnchor(null);
+                    }}
+                    sx={{ fontSize: '0.8125rem' }}
+                  >
+                    {t(opt.labelKey)}
+                  </MenuItem>
+                ))}
+              </Menu>
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          {/* Right side actions */}
+          <Stack direction="row" spacing={1.5} alignItems="center" flexShrink={0}>
+            {/* Total online counter */}
+            {totalOnline !== undefined && (
+              <Typography
+                variant="body2"
                 sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': { bgcolor: 'action.hover' },
+                  color: 'text.secondary',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
                 }}
               >
-                <DownloadIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Stack>
-        <Menu
-          anchorEl={exportMenuAnchor}
-          open={Boolean(exportMenuAnchor)}
-          onClose={() => setExportMenuAnchor(null)}
-        >
-          <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-          <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
-        </Menu>
-      </Paper>
+                {totalOnline.toLocaleString()}
+                <Typography
+                  component="span"
+                  sx={{
+                    fontSize: '0.75rem',
+                    color: 'text.disabled',
+                    fontWeight: 400,
+                  }}
+                >
+                  ({t('playerConnections.players.playerLabel')}{' '}
+                  {((totalOnline ?? 0) - (botTotal ?? 0)).toLocaleString()}
+                  {' · '}
+                  {t('playerConnections.players.botLabel')}{' '}
+                  {(botTotal ?? 0).toLocaleString()})
+                </Typography>
+              </Typography>
+            )}
+
+            <Tooltip title={t('common.export')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+                  disabled={exporting || total === 0}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}
+                >
+                  <DownloadIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
+          >
+            <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+          </Menu>
+        </Box>
+      </Box>
 
       {/* Active groupBy indicator */}
       {groupBy && (

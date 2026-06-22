@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography, useTheme, alpha } from '@mui/material';
 import {
   Poll as PollIcon,
   Description as DescriptionIcon,
@@ -11,9 +11,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
 import PageHeader from '@/components/common/PageHeader';
-import SegmentedTabs, {
-  SegmentedTabItem,
-} from '@/components/common/SegmentedTabs';
 
 // Lazy-load the actual page contents
 const SurveysPage = React.lazy(() => import('./SurveysPage'));
@@ -55,6 +52,8 @@ const TAB_CONFIGS: TabConfig[] = [
 const SurveysTabPage: React.FC = () => {
   const { t } = useTranslation();
   const { hasPermission } = useAuth();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Filter tabs by permission
@@ -73,41 +72,126 @@ const SurveysTabPage: React.FC = () => {
     visibleTabs.findIndex((t) => t.key === activeTabKey)
   );
 
-  const handleSegmentChange = (key: string) => {
+  const handleTabChange = (key: string) => {
     setSearchParams({ tab: key }, { replace: true });
   };
-
-  const segmentItems: SegmentedTabItem[] = useMemo(
-    () =>
-      visibleTabs.map((tab) => ({
-        key: tab.key,
-        label: t(tab.labelKey),
-        icon: tab.icon,
-      })),
-    [visibleTabs, t]
-  );
 
   const ActiveComponent = visibleTabs[activeTabIndex]?.component;
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       <PageHeader
         icon={<PollIcon />}
         title={t('surveys.title')}
         subtitle={t('surveys.subtitle')}
-        tabs={
-          <SegmentedTabs
-            items={segmentItems}
-            value={activeTabKey}
-            onChange={handleSegmentChange}
-          />
-        }
       />
 
-      {/* Tab content */}
-      <React.Suspense fallback={null}>
-        {ActiveComponent && <ActiveComponent />}
-      </React.Suspense>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          flex: 1,
+          mt: -2,
+          ml: -2,
+          mr: -2,
+          mb: -2,
+        }}
+      >
+        {/* ══════ LEFT SIDEBAR ══════ */}
+        <Box
+          sx={{
+            width: 200,
+            flexShrink: 0,
+            borderRight: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            pt: 2,
+            pl: 2,
+          }}
+        >
+          <Box sx={{ position: 'sticky', top: 2, pr: 1 }}>
+            {visibleTabs.map((tab) => {
+              const active = tab.key === activeTabKey;
+              return (
+                <Box
+                  key={tab.key}
+                  onClick={() => handleTabChange(tab.key)}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.2,
+                    px: 1.5,
+                    py: 1,
+                    mb: 0.2,
+                    borderRadius: '6px 0 0 6px',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    backgroundColor: active
+                      ? alpha(
+                          theme.palette.primary.main,
+                          isDark ? 0.12 : 0.08
+                        )
+                      : 'transparent',
+                    color: active
+                      ? theme.palette.primary.main
+                      : 'text.primary',
+                    transition: 'all 0.1s ease-in-out',
+                    '&:hover': {
+                      backgroundColor: active
+                        ? alpha(
+                            theme.palette.primary.main,
+                            isDark ? 0.15 : 0.1
+                          )
+                        : isDark
+                          ? 'rgba(255,255,255,0.05)'
+                          : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  {active && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        left: 0,
+                        top: '20%',
+                        bottom: '20%',
+                        width: 3,
+                        borderRadius: '0 4px 4px 0',
+                        backgroundColor: theme.palette.primary.main,
+                      }}
+                    />
+                  )}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      opacity: active ? 1 : 0.6,
+                      color: 'inherit',
+                    }}
+                  >
+                    {tab.icon}
+                  </Box>
+                  <Typography
+                    noWrap
+                    sx={{
+                      fontSize: '0.85rem',
+                      fontWeight: active ? 600 : 400,
+                    }}
+                  >
+                    {t(tab.labelKey)}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+
+        {/* ══════ RIGHT CONTENT ══════ */}
+        <Box sx={{ flex: 1, minWidth: 0, pt: 2, pr: 2, pb: 6 }}>
+          <React.Suspense fallback={null}>
+            {ActiveComponent && <ActiveComponent />}
+          </React.Suspense>
+        </Box>
+      </Box>
     </Box>
   );
 };

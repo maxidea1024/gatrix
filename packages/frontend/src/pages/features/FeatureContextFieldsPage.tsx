@@ -32,6 +32,8 @@ import {
   Menu,
   ListItemIcon,
   ListItemText,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import ResizableDrawer from '../../components/common/ResizableDrawer';
 import {
@@ -41,6 +43,8 @@ import {
   Delete as DeleteIcon,
   ViewColumn as ViewColumnIcon,
   MoreVert as MoreVertIcon,
+  Checklist as DefinedIcon,
+  Explore as DiscoveredIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
@@ -76,8 +80,6 @@ import ValidationRulesEditor from '../../components/features/ValidationRulesEdit
 import { ValidationRules } from '../../services/featureFlagService';
 import SvgIcon from '@mui/material/SvgIcon';
 import PageHeader from '@/components/common/PageHeader';
-import PageHeaderContextMenu from '@/components/common/PageHeaderContextMenu';
-import SegmentedTabs from '@/components/common/SegmentedTabs';
 import DiscoveredContextFieldsTab from '../../components/features/DiscoveredContextFieldsTab';
 
 // Trim option value → localization key mapping
@@ -789,84 +791,167 @@ const FeatureContextFieldsPage: React.FC = () => {
     }
   };
 
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
+  const sidebarItems = [
+    {
+      key: 'defined',
+      label: t('contextFieldUsage.definedTab'),
+      icon: <DefinedIcon sx={{ fontSize: 18 }} />,
+    },
+    {
+      key: 'discovered',
+      label: t('contextFieldUsage.discoveredTab'),
+      icon: <DiscoveredIcon sx={{ fontSize: 18 }} />,
+    },
+  ];
+
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
       {/* Header */}
       <PageHeader
         icon={<ContextIcon />}
         title={t('featureFlags.contextFields')}
         subtitle={t('featureFlags.contextFieldsDescription')}
-        tabs={
-          <SegmentedTabs
-            items={[
-              { key: 'defined', label: t('contextFieldUsage.definedTab') },
-              {
-                key: 'discovered',
-                label: t('contextFieldUsage.discoveredTab'),
-              },
-            ]}
-            value={activeTab === 0 ? 'defined' : 'discovered'}
-            onChange={(key) => setActiveTab(key === 'defined' ? 0 : 1)}
-          />
-        }
-        actions={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {canManage && activeTab === 0 && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t('featureFlags.addContextField')}
-              </Button>
-            )}
-            <PageHeaderContextMenu onRefresh={loadFields} />
-          </Box>
-        }
       />
 
-      {/* Discovered Tab */}
-      {activeTab === 1 && (
-        <DiscoveredContextFieldsTab
-          definedFieldNames={new Set(allFields.map((f) => f.fieldName))}
-          onPromote={(fieldName, inferredType) => {
-            // Switch to Defined tab and open create dialog pre-filled
-            setActiveTab(0);
-            handleCreate();
-            // Pre-fill the field name after dialog opens
-            setTimeout(() => {
-              setEditingField((prev) => ({
-                ...prev,
-                fieldName,
-                fieldType: inferredType as any,
-              }));
-            }, 100);
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          flex: 1,
+          mt: -2,
+          ml: -2,
+          mr: -2,
+          mb: -2,
+        }}
+      >
+        {/* ══════ LEFT SIDEBAR ══════ */}
+        <Box
+          sx={{
+            width: 220,
+            flexShrink: 0,
+            borderRight: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            pt: 2,
+            pl: 2,
           }}
-        />
-      )}
+        >
+          <Box sx={{ position: 'sticky', top: 2, pr: 1 }}>
+            {sidebarItems.map((item) => (
+              <Box
+                key={item.key}
+                onClick={() => setActiveTab(item.key === 'defined' ? 0 : 1)}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.2,
+                  px: 1.5,
+                  py: 1,
+                  mb: 0.2,
+                  borderRadius: '6px 0 0 6px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  backgroundColor:
+                    (item.key === 'defined' ? activeTab === 0 : activeTab === 1)
+                      ? alpha(theme.palette.primary.main, isDark ? 0.12 : 0.08)
+                      : 'transparent',
+                  color:
+                    (item.key === 'defined' ? activeTab === 0 : activeTab === 1)
+                      ? theme.palette.primary.main
+                      : 'text.primary',
+                  transition: 'all 0.1s ease-in-out',
+                  '&:hover': {
+                    backgroundColor:
+                      (item.key === 'defined' ? activeTab === 0 : activeTab === 1)
+                        ? alpha(theme.palette.primary.main, isDark ? 0.15 : 0.1)
+                        : isDark
+                          ? 'rgba(255,255,255,0.05)'
+                          : 'rgba(0,0,0,0.04)',
+                  },
+                }}
+              >
+                {(item.key === 'defined' ? activeTab === 0 : activeTab === 1) && (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      left: 0,
+                      top: '20%',
+                      bottom: '20%',
+                      width: 3,
+                      borderRadius: '0 4px 4px 0',
+                      backgroundColor: theme.palette.primary.main,
+                    }}
+                  />
+                )}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    opacity: (item.key === 'defined' ? activeTab === 0 : activeTab === 1) ? 1 : 0.6,
+                    color: 'inherit',
+                  }}
+                >
+                  {item.icon}
+                </Box>
+                <Typography
+                  sx={{
+                    fontSize: '0.85rem',
+                    fontWeight: (item.key === 'defined' ? activeTab === 0 : activeTab === 1) ? 600 : 400,
+                  }}
+                >
+                  {item.label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
 
-      {/* Defined Tab Content */}
-      {activeTab === 0 && (
-        <>
+        {/* ══════ RIGHT CONTENT ══════ */}
+        <Box sx={{ flex: 1, minWidth: 0, pt: 2, pr: 2, pb: 6 }}>
+          {/* Discovered Tab */}
+          {activeTab === 1 && (
+            <DiscoveredContextFieldsTab
+              definedFieldNames={new Set(allFields.map((f) => f.fieldName))}
+              onPromote={(fieldName, inferredType) => {
+                // Switch to Defined tab and open create dialog pre-filled
+                setActiveTab(0);
+                handleCreate();
+                // Pre-fill the field name after dialog opens
+                setTimeout(() => {
+                  setEditingField((prev) => ({
+                    ...prev,
+                    fieldName,
+                    fieldType: inferredType as any,
+                  }));
+                }, 100);
+              }}
+            />
+          )}
+
+          {/* Defined Tab Content */}
+          {activeTab === 0 && (
+            <>
           {/* Search and Filters */}
           <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               gap: 2,
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               justifyContent: 'space-between',
               mb: 2,
+              width: '100%',
             }}
           >
             <Box
               sx={{
                 display: 'flex',
-                gap: 2,
+                gap: 1.5,
                 alignItems: 'center',
-                flexWrap: 'nowrap',
+                flexWrap: 'wrap',
                 flexGrow: 1,
-                minWidth: 0,
               }}
             >
               <SearchTextField
@@ -878,31 +963,76 @@ const FeatureContextFieldsPage: React.FC = () => {
                 }}
               />
 
-              {/* Dynamic Filter Bar */}
-              <DynamicFilterBar
-                availableFilters={availableFilterDefinitions}
-                activeFilters={activeFilters}
-                onFilterAdd={handleFilterAdd}
-                onFilterRemove={handleFilterRemove}
-                onFilterChange={handleFilterChange}
-                noWrap={true}
-                afterFilterAddActions={
-                  <Tooltip title={t('common.columnSettings')}>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                      sx={{
-                        bgcolor: 'background.paper',
-                        border: 1,
-                        borderColor: 'divider',
-                        '&:hover': { bgcolor: 'action.hover' },
-                      }}
-                    >
-                      <ViewColumnIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                }
-              />
+              {/* Unified Control Group */}
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  bgcolor: 'background.paper',
+                  border: 1,
+                  borderColor: 'divider',
+                  borderRadius: '8px',
+                  minHeight: '36px',
+                  px: 0.5,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                }}
+              >
+                <DynamicFilterBar
+                  availableFilters={availableFilterDefinitions}
+                  activeFilters={activeFilters}
+                  onFilterAdd={handleFilterAdd}
+                  onFilterRemove={handleFilterRemove}
+                  onFilterChange={handleFilterChange}
+                />
+
+                <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+                {/* Column Settings Button */}
+                <Tooltip title={t('common.columnSettings')}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      color: 'text.secondary',
+                      borderRadius: '6px',
+                      width: 30,
+                      height: 30,
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    <ViewColumnIcon sx={{ fontSize: 18 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                flexShrink: 0,
+              }}
+            >
+              {canManage && (
+                <Button
+                  variant="contained"
+                  startIcon={<AddIcon />}
+                  onClick={handleCreate}
+                  sx={{
+                    height: '36px',
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t('featureFlags.addContextField')}
+                </Button>
+              )}
             </Box>
           </Box>
 
@@ -1896,6 +2026,8 @@ const FeatureContextFieldsPage: React.FC = () => {
           {/* End of Defined tab */}
         </>
       )}
+        </Box>
+      </Box>
     </Box>
   );
 };

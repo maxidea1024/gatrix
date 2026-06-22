@@ -48,8 +48,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         flexGrow: 1,
         maxWidth: 500,
         '& .MuiOutlinedInput-root': {
-          height: '40px',
-          borderRadius: '20px',
+          height: '36px',
+          borderRadius: '8px',
           bgcolor: 'background.paper',
           transition: 'all 0.2s ease-in-out',
           '& fieldset': {

@@ -587,21 +587,10 @@ const FeatureSegmentsPage: React.FC = () => {
         title={t('featureFlags.segments')}
         subtitle={t('featureFlags.segmentsDescription')}
         actions={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t('featureFlags.addSegment')}
-              </Button>
-            )}
-            <PageHeaderContextMenu
-              onRefresh={loadSegments}
-              refreshDisabled={loading}
-            />
-          </Box>
+          <PageHeaderContextMenu
+            onRefresh={loadSegments}
+            refreshDisabled={loading}
+          />
         }
       />
 
@@ -612,18 +601,18 @@ const FeatureSegmentsPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            flexWrap: 'nowrap',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               flexGrow: 1,
-              minWidth: 0,
             }}
           >
             <SearchTextField
@@ -635,31 +624,76 @@ const FeatureSegmentsPage: React.FC = () => {
               }}
             />
 
-            {/* Dynamic Filter Bar */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleFilterChange}
-              noWrap={true}
-              afterFilterAddActions={
-                <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  >
-                    <ViewColumnIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleFilterChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+            }}
+          >
+            {canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleCreate}
+                sx={{
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {t('featureFlags.addSegment')}
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>

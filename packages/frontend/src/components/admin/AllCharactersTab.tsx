@@ -34,11 +34,9 @@ import {
   LinearProgress,
   Popover,
   TextField,
-  Paper,
   Stack,
 } from '@mui/material';
 import {
-  Refresh as RefreshIcon,
   UnfoldMore as GroupIcon,
   FiberManualRecord as OnlineIcon,
   ViewColumn as ViewColumnIcon,
@@ -306,6 +304,9 @@ export default function AllCharactersTab({
   });
 
   const [columnSettingsAnchor, setColumnSettingsAnchor] =
+    useState<null | HTMLElement>(null);
+
+  const [groupByMenuAnchor, setGroupByMenuAnchor] =
     useState<null | HTMLElement>(null);
 
   // Row action menu
@@ -1068,243 +1069,267 @@ export default function AllCharactersTab({
   return (
     <Box>
       {/* Toolbar */}
-      <Paper
-        variant="outlined"
-        sx={{
-          display: 'flex',
-          gap: 1.5,
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          p: 1.5,
-          mb: 2,
-          bgcolor: (theme) => alpha(theme.palette.action.hover, 0.04),
-          borderRadius: 2.5,
-          borderColor: 'divider',
-        }}
-      >
-        <SearchTextField
-          placeholder={t('playerConnections.allPlayers.searchPlaceholder')}
-          value={searchTerm}
-          onChange={handleSearchChange}
-          sx={{ minWidth: 250 }}
-          disabled={!!activeMultiSearch}
-        />
-
-        {/* Multi-search button */}
-        <Tooltip title={t('playerConnections.multiSearch.title')}>
-          <IconButton
-            size="small"
-            onClick={(e) => setMultiSearchAnchor(e.currentTarget)}
-            color={activeMultiSearch ? 'primary' : 'default'}
+      <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <Box
             sx={{
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-              '&:hover': { bgcolor: 'action.hover' },
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flexGrow: 1,
             }}
           >
-            <ManageSearchIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+            <SearchTextField
+              placeholder={t('playerConnections.allPlayers.searchPlaceholder')}
+              value={searchTerm}
+              onChange={handleSearchChange}
+              disabled={!!activeMultiSearch}
+            />
 
-        {/* Active multi-search chip */}
-        {activeMultiSearch && (
-          <Chip
-            label={t('playerConnections.multiSearch.activeLabel', {
-              field: t(
-                MULTI_SEARCH_FIELDS.find(
-                  (f) => f.value === activeMultiSearch.field
-                )?.labelKey || ''
-              ),
-              count: activeMultiSearch.values.length,
-            })}
-            size="small"
-            color="primary"
-            onDelete={handleMultiSearchClear}
-            sx={{ fontWeight: 500 }}
-          />
-        )}
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilters}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleFilterChange}
+              />
 
-        {/* Multi-search popover */}
-        <Popover
-          open={Boolean(multiSearchAnchor)}
-          anchorEl={multiSearchAnchor}
-          onClose={() => setMultiSearchAnchor(null)}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        >
-          <Box sx={{ p: 2, minWidth: 400 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
-              {t('playerConnections.multiSearch.title')}
-            </Typography>
-            <FormControl size="small" fullWidth sx={{ mb: 1.5 }}>
-              <InputLabel>
-                {t('playerConnections.multiSearch.field')}
-              </InputLabel>
-              <Select
-                value={multiSearchField}
-                label={t('playerConnections.multiSearch.field')}
-                onChange={(e) => setMultiSearchField(e.target.value)}
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Multi-search button */}
+              <Tooltip title={t('playerConnections.multiSearch.title')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setMultiSearchAnchor(e.currentTarget)}
+                  sx={{
+                    color: activeMultiSearch ? 'primary.main' : 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    bgcolor: activeMultiSearch ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: activeMultiSearch ? 'primary.dark' : 'action.hover',
+                      color: activeMultiSearch ? 'primary.contrastText' : 'primary.main',
+                    },
+                  }}
+                >
+                  <ManageSearchIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* GroupBy Button */}
+              <Tooltip title={t('playerConnections.groupBy.label')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setGroupByMenuAnchor(e.currentTarget)}
+                  sx={{
+                    color: groupBy ? 'primary.main' : 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    bgcolor: groupBy ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: groupBy ? 'primary.dark' : 'action.hover',
+                      color: groupBy ? 'primary.contrastText' : 'primary.main',
+                    },
+                  }}
+                >
+                  <GroupIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                anchorEl={groupByMenuAnchor}
+                open={Boolean(groupByMenuAnchor)}
+                onClose={() => setGroupByMenuAnchor(null)}
               >
-                {MULTI_SEARCH_FIELDS.map((f) => (
-                  <MenuItem key={f.value} value={f.value}>
-                    {t(f.labelKey)}
+                {GROUP_BY_OPTIONS.map((opt) => (
+                  <MenuItem
+                    key={opt.value}
+                    selected={groupBy === opt.value}
+                    onClick={() => {
+                      setGroupBy(opt.value);
+                      setGroupByMenuAnchor(null);
+                    }}
+                    sx={{ fontSize: '0.8125rem' }}
+                  >
+                    {t(opt.labelKey)}
                   </MenuItem>
                 ))}
-              </Select>
-            </FormControl>
-            <TextField
-              multiline
-              fullWidth
-              size="small"
-              placeholder={t('playerConnections.multiSearch.placeholder')}
-              value={multiSearchInput}
-              onChange={(e) => setMultiSearchInput(e.target.value)}
-              inputRef={multiSearchTextareaRef}
-              inputProps={{
-                style: {
-                  width: multiSearchTextareaSize.width,
-                  height: multiSearchTextareaSize.height,
-                  resize: 'both',
-                  overflow: 'auto',
-                  fontSize: '0.85rem',
-                  fontWeight: 500,
-                },
-              }}
-              sx={{ mb: 1.5 }}
-            />
-            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-              {activeMultiSearch && (
-                <Button size="small" onClick={handleMultiSearchClear}>
-                  {t('playerConnections.multiSearch.clear')}
-                </Button>
-              )}
-              <Button
-                size="small"
-                variant="contained"
-                onClick={handleMultiSearchApply}
-                disabled={!multiSearchInput.trim()}
-              >
-                {t('playerConnections.multiSearch.search')}
-              </Button>
+              </Menu>
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
             </Box>
+
+            {/* Active multi-search chip */}
+            {activeMultiSearch && (
+              <Chip
+                label={t('playerConnections.multiSearch.activeLabel', {
+                  field: t(
+                    MULTI_SEARCH_FIELDS.find(
+                      (f) => f.value === activeMultiSearch.field
+                    )?.labelKey || ''
+                  ),
+                  count: activeMultiSearch.values.length,
+                })}
+                size="small"
+                color="primary"
+                onDelete={handleMultiSearchClear}
+                sx={{ fontWeight: 500 }}
+              />
+            )}
           </Box>
-        </Popover>
 
-        <DynamicFilterBar
-          availableFilters={availableFilters}
-          activeFilters={activeFilters}
-          onFilterAdd={handleFilterAdd}
-          onFilterRemove={handleFilterRemove}
-          onFilterChange={handleFilterChange}
-        />
-
-        {/* Group by */}
-        <FormControl size="small" sx={{ minWidth: 140 }}>
-          <InputLabel
-            id="allplayers-groupby-label"
-            sx={{ fontSize: '0.8125rem' }}
+          {/* Multi-search popover */}
+          <Popover
+            open={Boolean(multiSearchAnchor)}
+            anchorEl={multiSearchAnchor}
+            onClose={() => setMultiSearchAnchor(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <GroupIcon sx={{ fontSize: 16 }} />
-              {t('playerConnections.groupBy.label')}
+            <Box sx={{ p: 2, minWidth: 400 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+                {t('playerConnections.multiSearch.title')}
+              </Typography>
+              <FormControl size="small" fullWidth sx={{ mb: 1.5 }}>
+                <InputLabel>
+                  {t('playerConnections.multiSearch.field')}
+                </InputLabel>
+                <Select
+                  value={multiSearchField}
+                  label={t('playerConnections.multiSearch.field')}
+                  onChange={(e) => setMultiSearchField(e.target.value)}
+                >
+                  {MULTI_SEARCH_FIELDS.map((f) => (
+                    <MenuItem key={f.value} value={f.value}>
+                      {t(f.labelKey)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <TextField
+                multiline
+                fullWidth
+                size="small"
+                placeholder={t('playerConnections.multiSearch.placeholder')}
+                value={multiSearchInput}
+                onChange={(e) => setMultiSearchInput(e.target.value)}
+                inputRef={multiSearchTextareaRef}
+                inputProps={{
+                  style: {
+                    width: multiSearchTextareaSize.width,
+                    height: multiSearchTextareaSize.height,
+                    resize: 'both',
+                    overflow: 'auto',
+                    fontSize: '0.85rem',
+                    fontWeight: 500,
+                  },
+                }}
+                sx={{ mb: 1.5 }}
+              />
+              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                {activeMultiSearch && (
+                  <Button size="small" onClick={handleMultiSearchClear}>
+                    {t('playerConnections.multiSearch.clear')}
+                  </Button>
+                )}
+                <Button
+                  size="small"
+                  variant="contained"
+                  onClick={handleMultiSearchApply}
+                  disabled={!multiSearchInput.trim()}
+                >
+                  {t('playerConnections.multiSearch.search')}
+                </Button>
+              </Box>
             </Box>
-          </InputLabel>
-          <Select
-            labelId="allplayers-groupby-label"
-            value={groupBy}
-            label={'\u2003' + t('playerConnections.groupBy.label')}
-            onChange={(e) => setGroupBy(e.target.value)}
-            sx={{
-              fontSize: '0.8125rem',
-              '& .MuiSelect-select': { py: 0.75 },
-            }}
-          >
-            {GROUP_BY_OPTIONS.map((opt) => (
-              <MenuItem
-                key={opt.value}
-                value={opt.value}
-                sx={{ fontSize: '0.8125rem' }}
-              >
-                {t(opt.labelKey)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          </Popover>
 
-        {/* Column settings button */}
-        <Tooltip title={t('common.columnSettings')}>
-          <IconButton
-            size="small"
-            onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-            sx={{
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
+          {/* Right side actions */}
+          <Stack direction="row" spacing={1.5} alignItems="center" flexShrink={0}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: '0.8125rem', fontWeight: 500 }}
+            >
+              {t('playerConnections.allPlayers.totalCount', {
+                count: data.total,
+              })}
+            </Typography>
+            <Tooltip title={t('common.export')}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setExportMenuAnchor(e.currentTarget)}
+                  disabled={exporting || data.total === 0}
+                  sx={{
+                    bgcolor: 'background.paper',
+                    border: 1,
+                    borderColor: 'divider',
+                    '&:hover': { bgcolor: 'action.hover' },
+                  }}
+                >
+                  <DownloadIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
+          <Menu
+            anchorEl={exportMenuAnchor}
+            open={Boolean(exportMenuAnchor)}
+            onClose={() => setExportMenuAnchor(null)}
           >
-            <ViewColumnIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-
-        <Box sx={{ flex: 1 }} />
-
-        {/* Right side actions */}
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ fontSize: '0.8125rem', fontWeight: 500 }}
-          >
-            {t('playerConnections.allPlayers.totalCount', {
-              count: data.total,
-            })}
-          </Typography>
-          <Tooltip title={t('common.refresh')}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={fetchData}
-                disabled={loading}
-                sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
-              >
-                <RefreshIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-          <Tooltip title={t('common.export')}>
-            <span>
-              <IconButton
-                size="small"
-                onClick={(e) => setExportMenuAnchor(e.currentTarget)}
-                disabled={exporting || data.total === 0}
-                sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
-              >
-                <DownloadIcon fontSize="small" />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Stack>
-        <Menu
-          anchorEl={exportMenuAnchor}
-          open={Boolean(exportMenuAnchor)}
-          onClose={() => setExportMenuAnchor(null)}
-        >
-          <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
-          <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
-        </Menu>
-      </Paper>
+            <MenuItem onClick={() => handleExport('csv')}>CSV</MenuItem>
+            <MenuItem onClick={() => handleExport('xlsx')}>Excel (XLSX)</MenuItem>
+          </Menu>
+        </Box>
+      </Box>
 
       {/* Table content — hide everything until first fetch completes */}
       {isInitialLoad ? null : data.users.length === 0 && !loading ? (

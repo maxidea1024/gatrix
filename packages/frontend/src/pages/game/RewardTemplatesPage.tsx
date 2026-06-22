@@ -70,7 +70,7 @@ import ExportImportMenuItems from '../../components/common/ExportImportMenuItems
 import ImportDialog from '../../components/common/ImportDialog';
 import PageHeader from '@/components/common/PageHeader';
 
-const RewardTemplatesPage: React.FC = () => {
+const RewardTemplatesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -605,24 +605,13 @@ const RewardTemplatesPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <PageHeader
-        icon={<GiftIcon />}
-        title={t('rewardTemplates.title')}
-        subtitle={t('rewardTemplates.subtitle')}
-        actions={
-          <>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t('rewardTemplates.createTemplate')}
-              </Button>
-            )}
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          icon={<GiftIcon />}
+          title={t('rewardTemplates.title')}
+          subtitle={t('rewardTemplates.subtitle')}
+        />
+      )}
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
@@ -633,16 +622,17 @@ const RewardTemplatesPage: React.FC = () => {
             gap: 2,
             flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           {/* Left side: Search and Filters */}
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
               flexWrap: 'wrap',
-              flex: 1,
+              flexGrow: 1,
             }}
           >
             <SearchTextField
@@ -654,36 +644,69 @@ const RewardTemplatesPage: React.FC = () => {
               }}
             />
 
-            {/* Dynamic Filter Bar */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-              afterFilterAddActions={
-                <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <ViewColumnIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
 
-          {/* Right side: Refresh Button */}
+          {/* Add Button */}
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+              sx={{
+                height: '36px',
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {t('rewardTemplates.createTemplate')}
+            </Button>
+          )}
         </Box>
       </Box>
 

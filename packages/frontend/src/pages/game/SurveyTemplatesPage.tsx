@@ -31,7 +31,7 @@ import {
   Assessment,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import PageHeader from '@/components/common/PageHeader';
+
 import { useSnackbar } from 'notistack';
 import { useAuth } from '@/hooks/useAuth';
 import { P } from '@/types/permissions';
@@ -196,7 +196,6 @@ const SurveyTemplatesPage: React.FC = () => {
     <>
       {/* Search + Actions */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
-        <PageHeader title={t('surveys.templates.title', 'Survey Templates')} />
         <Box sx={{ flex: 1 }}>
           <SearchTextField
             value={search}

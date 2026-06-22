@@ -49,6 +49,7 @@ import {
   CalendarViewDay as CalendarViewDayIcon,
   CalendarMonth as CalendarMonthIcon,
   TableChart as TableChartIcon,
+  Event as EventIcon,
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -120,7 +121,7 @@ import SortableColumnItem from './SortableColumnItem';
 import HotTimeBuffDrawer from './HotTimeBuffDrawer';
 import PageHeader from '@/components/common/PageHeader';
 
-const HotTimeBuffEventPage: React.FC = () => {
+const HotTimeBuffEventPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t, i18n } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -1352,49 +1353,197 @@ const HotTimeBuffEventPage: React.FC = () => {
 
   return (
     <PageContentLoader loading={isInitialLoad}>
-      <PageHeader title={t('hotTimeBuff.title', 'Hot Time Buff Events')} />
+      {!embedded && (
+        <PageHeader
+          icon={<EventIcon />}
+          title={t('sidebar.operationEvents')}
+        />
+      )}
       <Box>
         {/* Toolbar */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
+            gap: 2,
             mb: 2,
             flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            width: '100%',
           }}
         >
-          <SearchTextField
-            value={searchTerm}
-            onChange={(v) => {
-              setSearchTerm(v);
-              setPage(0);
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flexGrow: 1,
             }}
-            sx={{ minWidth: 240 }}
-          />
-          <DynamicFilterBar
-            availableFilters={filterDefinitions}
-            activeFilters={activeFilters}
-            onFilterAdd={handleFilterAdd}
-            onFilterRemove={handleFilterRemove}
-            onFilterChange={handleDynamicFilterChange}
-            onOperatorChange={handleOperatorChange}
-          />
-          {/* Column Settings — right after filter bar */}
-          <Tooltip title={t('hotTimeBuffEvent.columnSettings')}>
-            <IconButton
-              onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+          >
+            <SearchTextField
+              value={searchTerm}
+              onChange={(v) => {
+                setSearchTerm(v);
+                setPage(0);
+              }}
+              sx={{ minWidth: 240 }}
+            />
+
+            {/* Unified Control Group */}
+            <Box
               sx={{
+                display: 'flex',
+                alignItems: 'center',
                 bgcolor: 'background.paper',
                 border: 1,
                 borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
               }}
-              size="small"
             >
-              <ViewColumnsIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+              <DynamicFilterBar
+                availableFilters={filterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('hotTimeBuffEvent.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnsIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Date range filter toggle */}
+              <Tooltip title={t('hotTimeBuffEvent.filterDateRangeHint')}>
+                <IconButton
+                  onClick={() => handleToggleDateRangeFilter(!showOnlyInPeriod)}
+                  size="small"
+                  sx={{
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    color: showOnlyInPeriod ? 'primary.main' : 'text.secondary',
+                    bgcolor: showOnlyInPeriod ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <DateRangeIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+
+              {/* Day-of-week filter toggle */}
+              <Tooltip title={t('hotTimeBuffEvent.filterDayHint')}>
+                <IconButton
+                  onClick={() => handleToggleDayFilter(!showOnlyMatchingDay)}
+                  size="small"
+                  sx={{
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    color: showOnlyMatchingDay ? 'primary.main' : 'text.secondary',
+                    bgcolor: showOnlyMatchingDay ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <CalendarViewDayIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* View mode toggle: table ↔ calendar */}
+              <Tooltip
+                title={
+                  viewMode === 'table'
+                    ? t('hotTimeBuffEvent.calendarView')
+                    : t('hotTimeBuffEvent.tableView')
+                }
+              >
+                <IconButton
+                  onClick={() =>
+                    handleSetViewMode(viewMode === 'table' ? 'calendar' : 'table')
+                  }
+                  size="small"
+                  sx={{
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    color: viewMode === 'calendar' ? 'primary.main' : 'text.secondary',
+                    bgcolor: viewMode === 'calendar' ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  {viewMode === 'table' ? (
+                    <CalendarMonthIcon sx={{ fontSize: 18 }} />
+                  ) : (
+                    <TableChartIcon sx={{ fontSize: 18 }} />
+                  )}
+                </IconButton>
+              </Tooltip>
+
+              {/* Month jump — only visible in calendar mode */}
+              {viewMode === 'calendar' && (
+                <>
+                  <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+                  <DatePicker
+                    views={['year', 'month']}
+                    value={dayjs(calendarMonth + '-01')}
+                    onChange={(val: Dayjs | null) => {
+                      if (val && val.isValid()) {
+                        const str = val.format('YYYY-MM');
+                        setCalendarMonth(str);
+                        calendarRef.current?.getApi().gotoDate(str + '-01');
+                      }
+                    }}
+                    slotProps={{
+                      textField: {
+                        size: 'small',
+                        sx: {
+                          width: 130,
+                          ml: 0.5,
+                          '& .MuiOutlinedInput-root': {
+                            height: 28,
+                            fontSize: '0.75rem',
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </>
+              )}
+            </Box>
+          </Box>
+
           <Popover
             open={Boolean(columnSettingsAnchor)}
             anchorEl={columnSettingsAnchor}
@@ -1448,159 +1597,45 @@ const HotTimeBuffEventPage: React.FC = () => {
             </Box>
           </Popover>
 
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-          {/* Date range filter toggle */}
-          <Tooltip title={t('hotTimeBuffEvent.filterDateRangeHint')}>
-            <IconButton
-              onClick={() => handleToggleDateRangeFilter(!showOnlyInPeriod)}
-              size="small"
-              sx={{
-                bgcolor: showOnlyInPeriod ? 'primary.main' : 'background.paper',
-                border: 1,
-                borderColor: showOnlyInPeriod ? 'primary.main' : 'divider',
-                borderRadius: 1,
-                color: showOnlyInPeriod
-                  ? 'primary.contrastText'
-                  : 'action.active',
-                '&:hover': {
-                  bgcolor: showOnlyInPeriod ? 'primary.dark' : 'action.hover',
-                },
-              }}
-            >
-              <DateRangeIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          {/* Day-of-week filter toggle */}
-          <Tooltip title={t('hotTimeBuffEvent.filterDayHint')}>
-            <IconButton
-              onClick={() => handleToggleDayFilter(!showOnlyMatchingDay)}
-              size="small"
-              sx={{
-                bgcolor: showOnlyMatchingDay
-                  ? 'primary.main'
-                  : 'background.paper',
-                border: 1,
-                borderColor: showOnlyMatchingDay ? 'primary.main' : 'divider',
-                borderRadius: 1,
-                color: showOnlyMatchingDay
-                  ? 'primary.contrastText'
-                  : 'action.active',
-                '&:hover': {
-                  bgcolor: showOnlyMatchingDay
-                    ? 'primary.dark'
-                    : 'action.hover',
-                },
-              }}
-            >
-              <CalendarViewDayIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-
-          {/* View mode toggle: table ↔ calendar */}
-          <Tooltip
-            title={
-              viewMode === 'table'
-                ? t('hotTimeBuffEvent.calendarView')
-                : t('hotTimeBuffEvent.tableView')
-            }
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              flexShrink: 0,
+            }}
           >
-            <IconButton
-              onClick={() =>
-                handleSetViewMode(viewMode === 'table' ? 'calendar' : 'table')
-              }
-              size="small"
-              sx={{
-                bgcolor:
-                  viewMode === 'calendar' ? 'primary.main' : 'background.paper',
-                border: 1,
-                borderColor:
-                  viewMode === 'calendar' ? 'primary.main' : 'divider',
-                borderRadius: 1,
-                color:
-                  viewMode === 'calendar'
-                    ? 'primary.contrastText'
-                    : 'action.active',
-                '&:hover': {
-                  bgcolor:
-                    viewMode === 'calendar' ? 'primary.dark' : 'action.hover',
-                },
-              }}
-            >
-              {viewMode === 'table' ? (
-                <CalendarMonthIcon fontSize="small" />
-              ) : (
-                <TableChartIcon fontSize="small" />
-              )}
-            </IconButton>
-          </Tooltip>
-
-          {/* Month jump — only visible in calendar mode */}
-          {viewMode === 'calendar' && (
-            <DatePicker
-              views={['year', 'month']}
-              value={dayjs(calendarMonth + '-01')}
-              onChange={(val: Dayjs | null) => {
-                if (val && val.isValid()) {
-                  const str = val.format('YYYY-MM');
-                  setCalendarMonth(str);
-                  calendarRef.current?.getApi().gotoDate(str + '-01');
-                }
-              }}
-              slotProps={{
-                textField: {
-                  size: 'small',
-                  sx: { width: 160, ml: 0.5 },
-                  inputProps: {
-                    style: {
-                      paddingTop: 6,
-                      paddingBottom: 6,
-                      fontSize: '0.8rem',
-                    },
-                  },
-                },
-              }}
-            />
-          )}
-
-          <Box sx={{ flex: 1 }} />
-
-          {dirtyCount > 0 && (
-            <Chip
-              label={t('hotTimeBuffEvent.pendingChanges', {
-                count: dirtyCount,
-              })}
-              color="warning"
-              size="small"
-              sx={{ mr: 1 }}
-            />
-          )}
-
-          <Button
-            startIcon={<RefreshIcon />}
-            onClick={loadData}
-            disabled={loading}
-            size="small"
-          >
-            {t('common.refresh')}
-          </Button>
-
-          {canManage && (
-            <Badge badgeContent={dirtyCount} color="warning">
-              <Button
-                variant="contained"
-                startIcon={<ApplyIcon />}
-                onClick={() => setApplyConfirmOpen(true)}
-                disabled={loading || dirtyCount === 0}
+            {dirtyCount > 0 && (
+              <Chip
+                label={t('hotTimeBuffEvent.pendingChanges', {
+                  count: dirtyCount,
+                })}
+                color="warning"
                 size="small"
-              >
-                {t('hotTimeBuffEvent.applyChanges')}
-              </Button>
-            </Badge>
-          )}
+              />
+            )}
+
+
+
+            {canManage && (
+              <Badge badgeContent={dirtyCount} color="warning">
+                <Button
+                  variant="contained"
+                  startIcon={<ApplyIcon />}
+                  onClick={() => setApplyConfirmOpen(true)}
+                  disabled={loading || dirtyCount === 0}
+                  sx={{
+                    height: '36px',
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                  }}
+                >
+                  {t('hotTimeBuffEvent.applyChanges')}
+                </Button>
+              </Badge>
+            )}
+          </Box>
         </Box>
 
         {/* Content: Table or Calendar */}

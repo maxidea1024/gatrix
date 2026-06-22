@@ -381,7 +381,7 @@ const SortableRow: React.FC<SortableRowProps> = ({
   );
 };
 
-const GameWorldsPage: React.FC = () => {
+const GameWorldsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t, i18n } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -1780,22 +1780,13 @@ const GameWorldsPage: React.FC = () => {
 
   return (
     <Box key={i18n.language}>
-      <PageHeader
-        icon={<WorldIcon />}
-        title={t('gameWorlds.title')}
-        subtitle={t('gameWorlds.subtitle')}
-        actions={
-          canManage ? (
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleAddWorld}
-            >
-              {t('gameWorlds.addGameWorld')}
-            </Button>
-          ) : undefined
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          icon={<WorldIcon />}
+          title={t('gameWorlds.title')}
+          subtitle={t('gameWorlds.subtitle')}
+        />
+      )}
 
       {/* Search and Filters */}
       <Box sx={{ mb: 2 }}>
@@ -1806,12 +1797,13 @@ const GameWorldsPage: React.FC = () => {
             gap: 2,
             flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
               flexWrap: 'wrap',
               flexGrow: 1,
@@ -1823,13 +1815,18 @@ const GameWorldsPage: React.FC = () => {
               onChange={setSearch}
             />
 
-            {/* Dynamic Filter Bar */}
+            {/* Unified Control Group */}
             <Box
               sx={{
                 display: 'flex',
-                flexWrap: 'wrap',
-                gap: 1,
                 alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
               }}
             >
               <DynamicFilterBar
@@ -1841,25 +1838,46 @@ const GameWorldsPage: React.FC = () => {
                 onOperatorChange={handleOperatorChange}
               />
 
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
               {/* Column Settings Button */}
               <Tooltip title={t('users.columnSettings')}>
                 <IconButton
                   size="small"
                   onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
                   sx={{
-                    bgcolor: 'background.paper',
-                    border: 1,
-                    borderColor: 'divider',
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
                     '&:hover': {
                       bgcolor: 'action.hover',
+                      color: 'primary.main',
                     },
                   }}
                 >
-                  <ViewColumnIcon fontSize="small" />
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Tooltip>
             </Box>
           </Box>
+
+          {/* Add Button */}
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleAddWorld}
+              sx={{
+                height: '36px',
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {t('gameWorlds.addGameWorld')}
+            </Button>
+          )}
         </Box>
       </Box>
 

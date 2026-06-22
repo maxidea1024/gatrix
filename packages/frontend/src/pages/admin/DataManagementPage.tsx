@@ -22,7 +22,9 @@ import { apiService } from '../../services/api';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/common/PageHeader';
 
-const DataManagementPage: React.FC = () => {
+const DataManagementPage: React.FC<{ hideHeader?: boolean }> = ({
+  hideHeader = false,
+}) => {
   const { t } = useTranslation();
   const { hasPermission } = useAuth();
   const canManage = hasPermission([P.DATA_UPDATE]);
@@ -90,7 +92,9 @@ const DataManagementPage: React.FC = () => {
 
   return (
     <Box>
-      <PageHeader title={t('dataManagement.title', 'Data Management')} />
+      {!hideHeader && (
+        <PageHeader title={t('dataManagement.title', 'Data Management')} />
+      )}
       {message && (
         <Alert
           severity={message.type}

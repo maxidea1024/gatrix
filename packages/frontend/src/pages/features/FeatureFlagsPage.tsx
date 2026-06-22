@@ -1804,119 +1804,6 @@ const FeatureFlagsPage: React.FC = () => {
         icon={<FlagIcon />}
         title={t('featureFlags.title')}
         subtitle={t('featureFlags.subtitle')}
-        actions={
-          <>
-            {canManage && (
-              <>
-                <ButtonGroup variant="contained" size="small">
-                  <Button
-                    startIcon={<AddIcon />}
-                    onClick={() => handleOpenCreateDialog('featureFlag')}
-                  >
-                    {t('featureFlags.createFlagOrRemoteConfig')}
-                  </Button>
-                  <Button
-                    size="small"
-                    onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
-                    sx={{ px: '4px !important', minWidth: '24px !important' }}
-                  >
-                    <ExpandMoreIcon sx={{ fontSize: 16 }} />
-                  </Button>
-                </ButtonGroup>
-                <Menu
-                  anchorEl={createMenuAnchor}
-                  open={Boolean(createMenuAnchor)}
-                  onClose={() => setCreateMenuAnchor(null)}
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                >
-                  <MenuItem
-                    onClick={() => handleOpenCreateDialog('featureFlag')}
-                  >
-                    <ListItemIcon>
-                      <FlagIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.createFlagOption')}
-                      secondary={t('featureFlags.createFeatureFlagSubtitle')}
-                    />
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem onClick={() => handleOpenCreateDialog('release')}>
-                    <ListItemIcon>
-                      <ReleaseIcon fontSize="small" color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.flagTypes.release')}
-                      secondary={t('featureFlags.flagTypes.release.desc')}
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleOpenCreateDialog('experiment')}
-                  >
-                    <ListItemIcon>
-                      <ExperimentIcon fontSize="small" color="secondary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.flagTypes.experiment')}
-                      secondary={t('featureFlags.flagTypes.experiment.desc')}
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleOpenCreateDialog('operational')}
-                  >
-                    <ListItemIcon>
-                      <OperationalIcon fontSize="small" color="warning" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.flagTypes.operational')}
-                      secondary={t('featureFlags.flagTypes.operational.desc')}
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleOpenCreateDialog('killSwitch')}
-                  >
-                    <ListItemIcon>
-                      <KillSwitchIcon fontSize="small" color="error" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.flagTypes.killSwitch')}
-                      secondary={t('featureFlags.flagTypes.killSwitch.desc')}
-                    />
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => handleOpenCreateDialog('permission')}
-                  >
-                    <ListItemIcon>
-                      <PermissionIcon fontSize="small" color="action" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.flagTypes.permission')}
-                      secondary={t('featureFlags.flagTypes.permission.desc')}
-                    />
-                  </MenuItem>
-                  <Divider />
-                  <MenuItem
-                    onClick={() => handleOpenCreateDialog('remoteConfig')}
-                  >
-                    <ListItemIcon>
-                      <RemoteConfigIcon fontSize="small" color="info" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={t('featureFlags.flagTypes.remoteConfig')}
-                      secondary={t('featureFlags.flagTypes.remoteConfig.desc')}
-                    />
-                  </MenuItem>
-                </Menu>
-              </>
-            )}
-            <IconButton
-              onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
-            >
-              <MoreVertIcon />
-            </IconButton>
-          </>
-        }
       />
 
       {/* Search and Filters */}
@@ -1926,18 +1813,18 @@ const FeatureFlagsPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            flexWrap: 'nowrap',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               flexGrow: 1,
-              minWidth: 0,
             }}
           >
             <SearchTextField
@@ -1949,69 +1836,220 @@ const FeatureFlagsPage: React.FC = () => {
               }}
             />
 
-            {/* Dynamic Filter Bar */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleFilterChange}
-              onOperatorChange={handleOperatorChange}
-              noWrap={true}
-              afterFilterAddActions={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  {!cardView && (
-                    <Tooltip
-                      title={t('common.columnSettings')}
-                      disableFocusListener
-                    >
-                      <IconButton
-                        size="small"
-                        onClick={(e) =>
-                          setColumnSettingsAnchor(e.currentTarget)
-                        }
-                        sx={{
-                          bgcolor: 'background.paper',
-                          border: 1,
-                          borderColor: 'divider',
-                          '&:hover': { bgcolor: 'action.hover' },
-                        }}
-                      >
-                        <ViewColumnIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  <Divider
-                    orientation="vertical"
-                    flexItem
-                    sx={{ mx: 0.5, my: 0.5 }}
-                  />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              {!cardView && (
+                <>
+                  <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+                  {/* Column Settings Button */}
                   <Tooltip
-                    title={t('featureFlags.cardView')}
+                    title={t('common.columnSettings')}
                     disableFocusListener
                   >
                     <IconButton
                       size="small"
-                      onClick={handleCardViewToggle}
+                      onClick={(e) =>
+                        setColumnSettingsAnchor(e.currentTarget)
+                      }
                       sx={{
-                        bgcolor: cardView ? 'primary.main' : 'background.paper',
-                        color: cardView
-                          ? 'primary.contrastText'
-                          : 'text.primary',
-                        border: 1,
-                        borderColor: cardView ? 'primary.main' : 'divider',
+                        color: 'text.secondary',
+                        borderRadius: '6px',
+                        width: 30,
+                        height: 30,
                         '&:hover': {
-                          bgcolor: cardView ? 'primary.dark' : 'action.hover',
+                          bgcolor: 'action.hover',
+                          color: 'primary.main',
                         },
                       }}
                     >
-                      <GridViewIcon fontSize="small" />
+                      <ViewColumnIcon sx={{ fontSize: 18 }} />
                     </IconButton>
                   </Tooltip>
-                </Box>
-              }
-            />
+                </>
+              )}
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Card View Toggle */}
+              <Tooltip
+                title={t('featureFlags.cardView')}
+                disableFocusListener
+              >
+                <IconButton
+                  size="small"
+                  onClick={handleCardViewToggle}
+                  sx={{
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    color: cardView ? 'primary.main' : 'text.secondary',
+                    bgcolor: cardView ? 'action.selected' : 'transparent',
+                    '&:hover': {
+                      bgcolor: cardView ? 'primary.dark' : 'action.hover',
+                      color: cardView ? 'primary.contrastText' : 'primary.main',
+                    },
+                  }}
+                >
+                  <GridViewIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
+
+          {/* Create Buttons */}
+          {canManage && (
+            <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
+              <ButtonGroup variant="contained" size="small" sx={{ height: '36px' }}>
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={() => handleOpenCreateDialog('featureFlag')}
+                  sx={{
+                    borderRadius: '8px 0 0 8px',
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {t('featureFlags.createFlagOrRemoteConfig')}
+                </Button>
+                <Button
+                  size="small"
+                  onClick={(e) => setCreateMenuAnchor(e.currentTarget)}
+                  sx={{
+                    px: '4px !important',
+                    minWidth: '24px !important',
+                    borderRadius: '0 8px 8px 0',
+                  }}
+                >
+                  <ExpandMoreIcon sx={{ fontSize: 16 }} />
+                </Button>
+              </ButtonGroup>
+              <Menu
+                anchorEl={createMenuAnchor}
+                open={Boolean(createMenuAnchor)}
+                onClose={() => setCreateMenuAnchor(null)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+              >
+                <MenuItem
+                  onClick={() => handleOpenCreateDialog('featureFlag')}
+                >
+                  <ListItemIcon>
+                    <FlagIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.createFlagOption')}
+                    secondary={t('featureFlags.createFeatureFlagSubtitle')}
+                  />
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={() => handleOpenCreateDialog('release')}>
+                  <ListItemIcon>
+                    <ReleaseIcon fontSize="small" color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.flagTypes.release')}
+                    secondary={t('featureFlags.flagTypes.release.desc')}
+                  />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleOpenCreateDialog('experiment')}
+                >
+                  <ListItemIcon>
+                    <ExperimentIcon fontSize="small" color="secondary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.flagTypes.experiment')}
+                    secondary={t('featureFlags.flagTypes.experiment.desc')}
+                  />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleOpenCreateDialog('operational')}
+                >
+                  <ListItemIcon>
+                    <OperationalIcon fontSize="small" color="warning" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.flagTypes.operational')}
+                    secondary={t('featureFlags.flagTypes.operational.desc')}
+                  />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleOpenCreateDialog('killSwitch')}
+                >
+                  <ListItemIcon>
+                    <KillSwitchIcon fontSize="small" color="error" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.flagTypes.killSwitch')}
+                    secondary={t('featureFlags.flagTypes.killSwitch.desc')}
+                  />
+                </MenuItem>
+                <MenuItem
+                  onClick={() => handleOpenCreateDialog('permission')}
+                >
+                  <ListItemIcon>
+                    <PermissionIcon fontSize="small" color="action" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.flagTypes.permission')}
+                    secondary={t('featureFlags.flagTypes.permission.desc')}
+                  />
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={() => handleOpenCreateDialog('remoteConfig')}
+                >
+                  <ListItemIcon>
+                    <RemoteConfigIcon fontSize="small" color="info" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={t('featureFlags.flagTypes.remoteConfig')}
+                    secondary={t('featureFlags.flagTypes.remoteConfig.desc')}
+                  />
+                </MenuItem>
+              </Menu>
+            </Box>
+          )}
+
+          <IconButton
+            size="small"
+            onClick={(e) => setImportExportMenuAnchor(e.currentTarget)}
+            sx={{
+              color: 'text.secondary',
+              borderRadius: '6px',
+              width: 36,
+              height: 36,
+              '&:hover': {
+                bgcolor: 'action.hover',
+                color: 'primary.main',
+              },
+            }}
+          >
+            <MoreVertIcon sx={{ fontSize: 20 }} />
+          </IconButton>
         </Box>
       </Box>
 

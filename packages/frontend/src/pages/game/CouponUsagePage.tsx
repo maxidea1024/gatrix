@@ -64,7 +64,7 @@ import PageHeader from '@/components/common/PageHeader';
 
 import { CopyButton } from '@/components/common/CopyButton';
 // Coupon Usage page (admin view of redemption records)
-const CouponUsagePage: React.FC = () => {
+const CouponUsagePage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
@@ -516,18 +516,18 @@ const CouponUsagePage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            flexWrap: 'nowrap',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               flexGrow: 1,
-              minWidth: 0,
             }}
           >
             <SearchTextField
@@ -539,35 +539,66 @@ const CouponUsagePage: React.FC = () => {
               }}
             />
 
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleFilterChange}
-              noWrap
-              afterFilterAddActions={
-                <Tooltip title={t('common.columnSettings')}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  >
-                    <ViewColumnIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleFilterChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('common.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
           <Box sx={{ flexShrink: 0 }}>
             <IconButton
               onClick={(e) => setExportMenuAnchor(e.currentTarget)}
               aria-label="more options"
+              sx={{
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                width: 36,
+                height: 36,
+                bgcolor: 'background.paper',
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+              }}
             >
               <MoreVertIcon />
             </IconButton>

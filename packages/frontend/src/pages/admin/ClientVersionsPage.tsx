@@ -384,7 +384,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
   );
 };
 
-const ClientVersionsPage: React.FC = () => {
+const ClientVersionsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -1537,91 +1537,125 @@ const ClientVersionsPage: React.FC = () => {
 
   return (
     <Box>
-      <PageHeader
-        icon={<WidgetsIcon />}
-        title={t('clientVersions.title')}
-        subtitle={t('clientVersions.description')}
-        actions={
-          canManage ? (
+      {!embedded && (
+        <PageHeader
+          icon={<WidgetsIcon />}
+          title={t('clientVersions.title')}
+          subtitle={t('clientVersions.description')}
+        />
+      )}
+
+      {/* Filter and Search Toolbar */}
+      <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flexGrow: 1,
+            }}
+          >
+            <SearchTextField
+              placeholder={t('common.search')}
+              value={searchTerm}
+              onChange={(value) => setSearchTerm(value)}
+            />
+
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          {/* Add Buttons */}
+          {canManage && (
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
                 variant="contained"
-                size="small"
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setEditingClientVersion(null);
                   setIsCopyMode(false);
                   setFormDialogOpen(true);
                 }}
+                sx={{
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
               >
                 {t('clientVersions.addIndividual')}
               </Button>
               <Button
                 variant="contained"
-                size="small"
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setBulkFormDialogOpen(true);
+                }}
+                sx={{
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
                 }}
               >
                 {t('clientVersions.addBulk')}
               </Button>
             </Box>
-          ) : undefined
-        }
-      />
-
-      {/* Filter */}
-      <Box sx={{ mb: 2 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2,
-            alignItems: 'center',
-            flexWrap: 'wrap',
-          }}
-        >
-          <SearchTextField
-            placeholder={t('common.search')}
-            value={searchTerm}
-            onChange={(value) => setSearchTerm(value)}
-          />
-          {/* Dynamic Filter Bar */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1,
-              alignItems: 'center',
-            }}
-          >
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-            />
-
-            {/* Column Settings Button */}
-            <Tooltip title={t('users.columnSettings')}>
-              <IconButton
-                size="small"
-                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                sx={{
-                  bgcolor: 'background.paper',
-                  border: 1,
-                  borderColor: 'divider',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
-                }}
-              >
-                <ViewColumnIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
+          )}
         </Box>
       </Box>
 

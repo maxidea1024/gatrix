@@ -23,7 +23,15 @@ export const EnvironmentAwareLayout: React.FC<EnvironmentAwareLayoutProps> = ({
   // This keeps AppBar stable while remounting page content on environment change
   return (
     <MainLayout>
-      <Box key={currentEnvironmentId || 'default'} sx={{ height: '100%' }}>
+      <Box
+        key={currentEnvironmentId || 'default'}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: '100%',
+        }}
+      >
         {children}
       </Box>
     </MainLayout>

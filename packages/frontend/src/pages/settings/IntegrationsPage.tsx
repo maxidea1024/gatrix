@@ -112,7 +112,9 @@ const PROVIDER_ICONS: Record<string, string> = {
   debug: debugIcon,
 };
 
-export const IntegrationsPage: React.FC = () => {
+export const IntegrationsPage: React.FC<{ hideHeader?: boolean }> = ({
+  hideHeader = false,
+}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
@@ -200,7 +202,7 @@ export const IntegrationsPage: React.FC = () => {
 
   return (
     <Box>
-      <PageHeader title={t('integrations.title')} />
+      {!hideHeader && <PageHeader title={t('integrations.title')} />}
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="body2" color="text.secondary">

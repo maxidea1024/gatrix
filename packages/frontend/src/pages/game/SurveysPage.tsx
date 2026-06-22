@@ -73,12 +73,12 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import { exportToFile, ExportColumn } from '../../utils/exportImportUtils';
 import ExportImportMenuItems from '../../components/common/ExportImportMenuItems';
 import ImportDialog from '../../components/common/ImportDialog';
-import PageHeader from '@/components/common/PageHeader';
+
 import TagChips from '../../components/common/TagChips';
 import { useEnvironment } from '../../contexts/EnvironmentContext';
 import SurveyLogsDrawer from '../../components/game/SurveyLogsDrawer';
 
-const SurveysPage: React.FC = () => {
+const SurveysPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -427,18 +427,18 @@ const SurveysPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            flexWrap: 'nowrap',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               flexGrow: 1,
-              minWidth: 0,
             }}
           >
             <SearchTextField
@@ -447,34 +447,51 @@ const SurveysPage: React.FC = () => {
               onChange={setSearchTerm}
             />
 
-            {/* Dynamic Filter Bar with Column Settings */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-              noWrap={true}
-              afterFilterAddActions={
-                <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <ViewColumnIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
           <Box
             sx={{
@@ -489,7 +506,13 @@ const SurveysPage: React.FC = () => {
                 variant="contained"
                 startIcon={<AddIcon />}
                 onClick={handleCreate}
-                sx={{ whiteSpace: 'nowrap' }}
+                sx={{
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                }}
               >
                 {t('surveys.createSurvey')}
               </Button>

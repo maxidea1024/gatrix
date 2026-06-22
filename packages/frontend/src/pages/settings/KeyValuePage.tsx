@@ -46,7 +46,9 @@ import { useEnvironment } from '@/contexts/EnvironmentContext';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 
-const KeyValuePage: React.FC = () => {
+const KeyValuePage: React.FC<{ hideHeader?: boolean }> = ({
+  hideHeader = false,
+}) => {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const { hasPermission } = useAuth();
@@ -254,7 +256,9 @@ const KeyValuePage: React.FC = () => {
 
   return (
     <Box>
-      <PageHeader title={t('keyValue.title', 'Key-Value Store')} />
+      {!hideHeader && (
+        <PageHeader title={t('keyValue.title', 'Key-Value Store')} />
+      )}
       {/* Header */}
       <Box
         sx={{

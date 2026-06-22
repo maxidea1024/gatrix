@@ -2116,36 +2116,81 @@ const ApiTokensPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
               alignItems: 'center',
+              gap: 2,
               flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              width: '100%',
             }}
           >
-            {/* Search */}
-            <SearchTextField
-              placeholder={t('apiTokens.searchPlaceholder')}
-              value={searchTerm}
-              onChange={setSearchTerm}
-            />
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1.5,
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                flexGrow: 1,
+              }}
+            >
+              {/* Search */}
+              <SearchTextField
+                placeholder={t('apiTokens.searchPlaceholder')}
+                value={searchTerm}
+                onChange={setSearchTerm}
+              />
 
-            {/* Column Settings Button */}
-            <Tooltip title={t('common.columnSettings')}>
-              <IconButton
-                size="small"
-                onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+              {/* Unified Control Group */}
+              <Box
                 sx={{
-                  ml: 1,
+                  display: 'flex',
+                  alignItems: 'center',
                   bgcolor: 'background.paper',
                   border: 1,
                   borderColor: 'divider',
-                  '&:hover': {
-                    bgcolor: 'action.hover',
-                  },
+                  borderRadius: '8px',
+                  minHeight: '36px',
+                  px: 0.5,
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
                 }}
               >
-                <ViewColumnIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
+                {/* Column Settings Button */}
+                <Tooltip title={t('common.columnSettings')}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                    sx={{
+                      color: 'text.secondary',
+                      borderRadius: '6px',
+                      width: 30,
+                      height: 30,
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                        color: 'primary.main',
+                      },
+                    }}
+                  >
+                    <ViewColumnIcon sx={{ fontSize: 18 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+
+            {/* Create Button (Visible only when embedded & has permission) */}
+            {embedded && canManage && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={openCreateDialog}
+                sx={{
+                  height: '36px',
+                  borderRadius: '8px',
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
+              >
+                {t('apiTokens.createToken')}
+              </Button>
+            )}
           </Box>
         </Box>
 

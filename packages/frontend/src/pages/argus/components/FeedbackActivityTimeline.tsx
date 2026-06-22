@@ -52,11 +52,11 @@ const FeedbackActivityTimeline: React.FC<FeedbackActivityTimelineProps> = ({
         const data = await argusService.getFeedbackActivity(
           projectId,
           feedbackId,
-          customLimit,
+          customLimit + 1,
           0
         );
-        setActivities(data);
-        setHasMore(data.length === customLimit);
+        setActivities(data.slice(0, customLimit));
+        setHasMore(data.length > customLimit);
       } catch {
         setActivities([]);
       } finally {
@@ -78,15 +78,14 @@ const FeedbackActivityTimeline: React.FC<FeedbackActivityTimelineProps> = ({
       const data = await argusService.getFeedbackActivity(
         projectId,
         feedbackId,
-        5,
+        6,
         offset
       );
-      if (data.length > 0) {
-        setActivities((prev) => [...prev, ...data]);
-        if (data.length < 5) {
-          setHasMore(false);
-        }
+      if (data.length > 5) {
+        setActivities((prev) => [...prev, ...data.slice(0, 5)]);
+        setHasMore(true);
       } else {
+        setActivities((prev) => [...prev, ...data]);
         setHasMore(false);
       }
     } catch (error) {

@@ -157,7 +157,7 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(
           px: 1.5,
           py: 1,
           mb: 0.2,
-          borderRadius: '6px',
+          borderRadius: '6px 0 0 6px',
           cursor: 'pointer',
           position: 'relative',
           backgroundColor: active
@@ -378,7 +378,17 @@ const SystemSettingsPage: React.FC = () => {
         subtitle={t('settings.subtitle')}
       />
 
-      <Box sx={{ display: 'flex', gap: 3, flex: 1, mb: -2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          flex: 1,
+          mt: -2,
+          ml: -2,
+          mr: -2,
+          mb: -2,
+        }}
+      >
         {/* ══════ LEFT SIDEBAR ══════ */}
         <Box
           sx={{
@@ -386,9 +396,12 @@ const SystemSettingsPage: React.FC = () => {
             flexShrink: 0,
             borderRight: '1px solid',
             borderColor: 'divider',
+            bgcolor: 'background.paper',
+            pt: 2,
+            pl: 2,
           }}
         >
-          <Box sx={{ position: 'sticky', top: 0, pr: 1 }}>
+          <Box sx={{ position: 'sticky', top: 2, pr: 1 }}>
             {NAV_GROUPS.map((group, gi) => (
               <Box key={gi} sx={{ mb: 2 }}>
                 <Typography
@@ -420,7 +433,7 @@ const SystemSettingsPage: React.FC = () => {
         </Box>
 
         {/* ══════ RIGHT CONTENT ══════ */}
-        <Box sx={{ flex: 1, minWidth: 0, pb: 6, pr: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0, pt: 2, pr: 2, pb: 6 }}>
           {/* ─── NETWORK ─── */}
           {currentSection === 'network' && (
             <SectionCard>
@@ -462,7 +475,7 @@ const SystemSettingsPage: React.FC = () => {
           )}
 
           {/* ─── KEY-VALUE ─── */}
-          {currentSection === 'kv' && <KeyValuePage />}
+          {currentSection === 'kv' && <KeyValuePage hideHeader />}
 
           {/* ─── AI CHAT ─── */}
           {currentSection === 'ai' && (
@@ -619,7 +632,7 @@ const SystemSettingsPage: React.FC = () => {
                 </PageContentLoader>
               }
             >
-              <DataManagementPage />
+              <DataManagementPage hideHeader />
             </Suspense>
           )}
 
@@ -632,7 +645,7 @@ const SystemSettingsPage: React.FC = () => {
                 </PageContentLoader>
               }
             >
-              <IntegrationsPage />
+              <IntegrationsPage hideHeader />
             </Suspense>
           )}
 
@@ -645,7 +658,7 @@ const SystemSettingsPage: React.FC = () => {
                 </PageContentLoader>
               }
             >
-              <IntegrationsSdksPage />
+              <IntegrationsSdksPage hideHeader />
             </Suspense>
           )}
         </Box>

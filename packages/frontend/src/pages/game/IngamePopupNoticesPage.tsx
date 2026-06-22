@@ -83,7 +83,7 @@ import {
 } from '../../utils/changeRequestToast';
 import { ChangeRequestSubmitButtons } from '../../components/common/ChangeRequestSubmitButtons';
 
-const IngamePopupNoticesPage: React.FC = () => {
+const IngamePopupNoticesPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
@@ -502,24 +502,13 @@ const IngamePopupNoticesPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <PageHeader
-        icon={<NotificationsIcon />}
-        title={t('ingamePopupNotices.title')}
-        subtitle={t('ingamePopupNotices.subtitle')}
-        actions={
-          <>
-            {canManage && (
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={handleCreate}
-              >
-                {t('ingamePopupNotices.createNotice')}
-              </Button>
-            )}
-          </>
-        }
-      />
+      {!embedded && (
+        <PageHeader
+          icon={<NotificationsIcon />}
+          title={t('ingamePopupNotices.title')}
+          subtitle={t('ingamePopupNotices.subtitle')}
+        />
+      )}
 
       {/* Search and Filters Card */}
       <Box sx={{ mb: 2 }}>
@@ -528,18 +517,18 @@ const IngamePopupNoticesPage: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: 2,
-            flexWrap: 'nowrap',
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
+            width: '100%',
           }}
         >
           <Box
             sx={{
               display: 'flex',
-              gap: 2,
+              gap: 1.5,
               alignItems: 'center',
-              flexWrap: 'nowrap',
+              flexWrap: 'wrap',
               flexGrow: 1,
-              minWidth: 0,
             }}
           >
             <SearchTextField
@@ -548,35 +537,69 @@ const IngamePopupNoticesPage: React.FC = () => {
               onChange={handleSearchChange}
             />
 
-            {/* Dynamic Filter Bar with Column Settings and Refresh Button */}
-            <DynamicFilterBar
-              availableFilters={availableFilterDefinitions}
-              activeFilters={activeFilters}
-              onFilterAdd={handleFilterAdd}
-              onFilterRemove={handleFilterRemove}
-              onFilterChange={handleDynamicFilterChange}
-              onOperatorChange={handleOperatorChange}
-              noWrap={true}
-              afterFilterAddActions={
-                <Tooltip title={t('users.columnSettings')}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-                    sx={{
-                      bgcolor: 'background.paper',
-                      border: 1,
-                      borderColor: 'divider',
-                      '&:hover': {
-                        bgcolor: 'action.hover',
-                      },
-                    }}
-                  >
-                    <ViewColumnIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {/* Unified Control Group */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                bgcolor: 'background.paper',
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              }}
+            >
+              <DynamicFilterBar
+                availableFilters={availableFilterDefinitions}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
+
+          {/* Add Button */}
+          {canManage && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleCreate}
+              sx={{
+                height: '36px',
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontWeight: 600,
+              }}
+            >
+              {t('ingamePopupNotices.createNotice')}
+            </Button>
+          )}
         </Box>
       </Box>
 

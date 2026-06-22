@@ -178,7 +178,7 @@ const SortableColumnItem: React.FC<SortableColumnItemProps> = ({
   );
 };
 
-const AuditLogsPage: React.FC = () => {
+const AuditLogsPage: React.FC<{ embedded?: boolean }> = ({ embedded }) => {
   const { t } = useTranslation();
   const { language } = useI18n();
   const { enqueueSnackbar } = useSnackbar();
@@ -651,64 +651,98 @@ const AuditLogsPage: React.FC = () => {
 
   return (
     <Box>
-      <PageHeader
-        icon={<HistoryIcon />}
-        title={t('auditLogs.title')}
-        subtitle={t('auditLogs.subtitle')}
-      />
+      {!embedded && (
+        <PageHeader
+          icon={<HistoryIcon />}
+          title={t('auditLogs.title')}
+          subtitle={t('auditLogs.subtitle')}
+        />
+      )}
 
       {/* Filters */}
       <Box sx={{ mb: 2 }}>
         <Box
           sx={{
             display: 'flex',
-            gap: 2,
             alignItems: 'center',
+            gap: 2,
             flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            width: '100%',
           }}
         >
-          {/* Date Range Picker */}
-          <DateRangeSelector
-            value={dateRange}
-            onChange={setDateRange}
-            compact
-          />
-
-          {/* Search */}
-          <SearchTextField
-            placeholder={t('auditLogs.searchUserPlaceholder')}
-            value={userFilter}
-            onChange={(value) => {
-              setUserFilter(value);
-              handleFilterChange('user', value);
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1.5,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              flexGrow: 1,
             }}
-          />
+          >
+            {/* Date Range Picker */}
+            <DateRangeSelector
+              value={dateRange}
+              onChange={setDateRange}
+              compact
+            />
 
-          {/* Dynamic Filters */}
-          <DynamicFilterBar
-            availableFilters={availableFilters}
-            activeFilters={activeFilters}
-            onFilterAdd={handleFilterAdd}
-            onFilterRemove={handleFilterRemove}
-            onFilterChange={handleDynamicFilterChange}
-            onOperatorChange={handleOperatorChange}
-          />
+            {/* Search */}
+            <SearchTextField
+              placeholder={t('auditLogs.searchUserPlaceholder')}
+              value={userFilter}
+              onChange={(value) => {
+                setUserFilter(value);
+                handleFilterChange('user', value);
+              }}
+            />
 
-          {/* Column Settings Button */}
-          <Tooltip title={t('users.columnSettings')}>
-            <IconButton
-              size="small"
-              onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+            {/* Unified Control Group */}
+            <Box
               sx={{
+                display: 'flex',
+                alignItems: 'center',
                 bgcolor: 'background.paper',
                 border: 1,
                 borderColor: 'divider',
-                '&:hover': { bgcolor: 'action.hover' },
+                borderRadius: '8px',
+                minHeight: '36px',
+                px: 0.5,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
               }}
             >
-              <ViewColumnIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+              <DynamicFilterBar
+                availableFilters={availableFilters}
+                activeFilters={activeFilters}
+                onFilterAdd={handleFilterAdd}
+                onFilterRemove={handleFilterRemove}
+                onFilterChange={handleDynamicFilterChange}
+                onOperatorChange={handleOperatorChange}
+              />
+
+              <Box sx={{ width: '1px', height: '20px', bgcolor: 'divider', mx: 0.5 }} />
+
+              {/* Column Settings Button */}
+              <Tooltip title={t('users.columnSettings')}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+                  sx={{
+                    color: 'text.secondary',
+                    borderRadius: '6px',
+                    width: 30,
+                    height: 30,
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                      color: 'primary.main',
+                    },
+                  }}
+                >
+                  <ViewColumnIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
         </Box>
       </Box>
 
