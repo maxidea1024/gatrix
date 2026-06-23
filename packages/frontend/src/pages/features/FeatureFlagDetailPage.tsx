@@ -246,6 +246,12 @@ const DEFAULT_PLAYGROUND_WIDTH = 300;
 const MIN_PLAYGROUND_WIDTH = 300;
 const MAX_PLAYGROUND_WIDTH = 700;
 
+// Left sidebar panel constants
+const LEFT_SIDEBAR_WIDTH_KEY = 'gatrix.leftSidebarWidth';
+const DEFAULT_LEFT_SIDEBAR_WIDTH = 320;
+const MIN_LEFT_SIDEBAR_WIDTH = 240;
+const MAX_LEFT_SIDEBAR_WIDTH = 500;
+
 /**
  * Custom SVG Icon for Release Flow Active Status - Premium Professional Design
  */
@@ -374,7 +380,16 @@ interface TabPanelProps {
 }
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index }) => (
-  <Box role="tabpanel" hidden={value !== index} sx={{ py: 0 }}>
+  <Box
+    role="tabpanel"
+    hidden={value !== index}
+    sx={{
+      py: 0,
+      flex: value === index ? 1 : undefined,
+      display: value === index ? 'flex' : 'none',
+      flexDirection: 'column',
+    }}
+  >
     {value === index && children}
   </Box>
 );
@@ -1114,6 +1129,68 @@ const FeatureFlagDetailPage: React.FC = () => {
       currentWidthRef.current = currentWidth;
       setPlaygroundPanelWidth(currentWidth);
       localStorage.setItem(PLAYGROUND_WIDTH_KEY, currentWidth.toString());
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
+  // ==================== Left Sidebar Panel Resize ====================
+
+  const leftSidebarRef = useRef<HTMLDivElement>(null);
+  const leftResizeHandleRef = useRef<HTMLDivElement>(null);
+  const [leftSidebarWidth, setLeftSidebarWidth] = useState(() => {
+    const saved = localStorage.getItem(LEFT_SIDEBAR_WIDTH_KEY);
+    return saved
+      ? Math.min(
+          MAX_LEFT_SIDEBAR_WIDTH,
+          Math.max(MIN_LEFT_SIDEBAR_WIDTH, parseInt(saved, 10))
+        )
+      : DEFAULT_LEFT_SIDEBAR_WIDTH;
+  });
+  const leftWidthRef = useRef(leftSidebarWidth);
+
+  useEffect(() => {
+    leftWidthRef.current = leftSidebarWidth;
+  }, [leftSidebarWidth]);
+
+  useEffect(() => {
+    if (leftSidebarRef.current) {
+      leftSidebarRef.current.style.width = `${leftSidebarWidth}px`;
+    }
+  }, [leftSidebarWidth]);
+
+  const handleLeftSidebarResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = leftWidthRef.current;
+    let currentWidth = startWidth;
+
+    if (leftResizeHandleRef.current) {
+      leftResizeHandleRef.current.style.backgroundColor =
+        'var(--mui-palette-primary-main, #1976d2)';
+    }
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      currentWidth = Math.min(
+        MAX_LEFT_SIDEBAR_WIDTH,
+        Math.max(MIN_LEFT_SIDEBAR_WIDTH, startWidth + deltaX)
+      );
+      if (leftSidebarRef.current) {
+        leftSidebarRef.current.style.width = `${currentWidth}px`;
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (leftResizeHandleRef.current) {
+        leftResizeHandleRef.current.style.backgroundColor = '';
+      }
+      leftWidthRef.current = currentWidth;
+      setLeftSidebarWidth(currentWidth);
+      localStorage.setItem(LEFT_SIDEBAR_WIDTH_KEY, currentWidth.toString());
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
@@ -2195,7 +2272,7 @@ const FeatureFlagDetailPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100% + 32px)', m: -2 }}>
       <PageHeader
         title={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -2217,6 +2294,7 @@ const FeatureFlagDetailPage: React.FC = () => {
           </Box>
         }
         subtitle={flag.description || undefined}
+        actionsUpdateTrigger={tabValue}
         actions={
           <SegmentedTabs
             value={String(tabValue)}
@@ -2266,26 +2344,34 @@ const FeatureFlagDetailPage: React.FC = () => {
       />
 
       {/* Main Content */}
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         {/* Overview Tab */}
         <TabPanel value={tabValue} index={0}>
           <Box
             sx={{
               display: 'flex',
-              gap: 3,
               flexDirection: { xs: 'column', md: 'row' },
+              flex: 1,
+              minHeight: 0,
             }}
           >
             {/* Left Sidebar - Flag Details */}
-            <Box sx={{ width: { xs: '100%', md: 320 }, flexShrink: 0 }}>
+            <Box
+              ref={leftSidebarRef}
+              sx={(theme) => ({
+                width: { xs: '100%', md: leftSidebarWidth },
+                flexShrink: 0,
+                borderRight: { xs: 'none', md: `1px solid ${theme.palette.divider}` },
+                borderBottom: { xs: `1px solid ${theme.palette.divider}`, md: 'none' },
+                position: 'relative',
+                overflow: 'auto',
+              })}
+            >
               {/* Flag Details Card */}
-              <Paper
-                variant="outlined"
+              <Box
                 sx={{
                   p: 2,
-                  mb: 2,
-                  borderRadius: 1,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  mb: 0,
                 }}
               >
                 <Box
@@ -2644,11 +2730,11 @@ const FeatureFlagDetailPage: React.FC = () => {
                     </>
                   )}
                 </Stack>
-              </Paper>
+              </Box>
 
               {/* Basic Info - only in create mode */}
               {isCreating && (
-                <Paper variant="outlined" sx={{ p: 2 }}>
+                <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
                   <Typography variant="subtitle2" fontWeight={600} gutterBottom>
                     {t('featureFlags.basicInfo')}
                   </Typography>
@@ -2691,16 +2777,15 @@ const FeatureFlagDetailPage: React.FC = () => {
                       }
                     />
                   </Stack>
-                </Paper>
+                </Box>
               )}
 
               {/* Links Section */}
-              <Paper
-                variant="outlined"
+              <Box
                 sx={{
                   p: 2,
-                  borderRadius: 1,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  borderTop: 1,
+                  borderColor: 'divider',
                 }}
               >
                 <Typography
@@ -2805,13 +2890,33 @@ const FeatureFlagDetailPage: React.FC = () => {
                     </Button>
                   </Box>
                 )}
-              </Paper>
+              </Box>
+              {/* Left Sidebar Resize Handle */}
+              <Box
+                ref={leftResizeHandleRef}
+                onMouseDown={handleLeftSidebarResizeStart}
+                sx={{
+                  position: 'absolute',
+                  right: -3,
+                  top: 0,
+                  bottom: 0,
+                  width: 6,
+                  cursor: 'col-resize',
+                  bgcolor: 'transparent',
+                  transition: 'background-color 0.2s',
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                  zIndex: 10,
+                  display: { xs: 'none', md: 'block' },
+                }}
+              />
             </Box>
 
             {/* Right Main Area - Environment Cards */}
-            <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Box sx={{ flex: 1, minWidth: 0, overflow: 'auto' }}>
               <PageContentLoader loading={envLoading}>
-                <Stack spacing={2} sx={{ minWidth: 0 }}>
+                <Stack spacing={0} sx={{ minWidth: 0 }}>
                   {environments.map((env, envIndex) => {
                     // Get environment-specific isEnabled from flag.environments
                     const envSettings = flag.environments?.find(
@@ -2825,17 +2930,13 @@ const FeatureFlagDetailPage: React.FC = () => {
 
                     return (
                       <React.Fragment key={env.environmentId}>
-                        {envIndex > 0 && (
-                          <Divider sx={{ borderStyle: 'dashed', my: 1 }} />
-                        )}
                         <Box
                           sx={{
                             display: 'flex',
-                            border: 1,
-                            borderColor: 'divider',
                             overflow: 'hidden',
-                            borderRadius: 1,
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                            borderBottom:
+                              envIndex < environments.length - 1 ? 1 : 0,
+                            borderColor: 'divider',
                           }}
                         >
                           {/* Content */}
@@ -2856,7 +2957,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                               disableGutters
                               sx={{
                                 '&:before': { display: 'none' },
-                                bgcolor: 'background.paper',
+                                bgcolor: 'transparent',
+                                border: 'none',
+                                borderRadius: '0 !important',
                               }}
                             >
                               <AccordionSummary
@@ -3658,12 +3761,13 @@ const FeatureFlagDetailPage: React.FC = () => {
             {!isCreating && embeddedPlaygroundVisible && (
               <Box
                 ref={playgroundPanelRef}
-                sx={{
+                sx={(theme) => ({
                   width: playgroundPanelWidth,
                   flexShrink: 0,
                   position: 'relative',
-                  ml: 1,
-                }}
+                  overflow: 'hidden',
+                  borderLeft: `1px solid ${theme.palette.divider}`,
+                })}
               >
                 {/* Resize Handle */}
                 <Box
@@ -3671,7 +3775,7 @@ const FeatureFlagDetailPage: React.FC = () => {
                   onMouseDown={handlePlaygroundResizeStart}
                   sx={{
                     position: 'absolute',
-                    left: 0,
+                    left: -3,
                     top: 0,
                     bottom: 0,
                     width: 6,
@@ -3686,10 +3790,9 @@ const FeatureFlagDetailPage: React.FC = () => {
                 />
                 <Box
                   sx={{
-                    borderLeft: 1,
-                    borderColor: 'divider',
-                    pl: 1.5,
+                    p: 2,
                     height: '100%',
+                    overflow: 'auto',
                   }}
                 >
                   <Box
@@ -3746,8 +3849,9 @@ const FeatureFlagDetailPage: React.FC = () => {
 
         {/* Flag Values Tab */}
         <TabPanel value={tabValue} index={1}>
+          <Box sx={{ p: 2 }}>
           <PageContentLoader loading={false}>
-            <Box sx={{ maxWidth: 800, py: 2 }}>
+            <Box sx={{ maxWidth: 800 }}>
               <Paper
                 variant="outlined"
                 sx={{
@@ -4003,10 +4107,12 @@ const FeatureFlagDetailPage: React.FC = () => {
               </Paper>
             </Box>
           </PageContentLoader>
+          </Box>
         </TabPanel>
 
         {/* Metrics Tab */}
         <TabPanel value={tabValue} index={2}>
+          <Box sx={{ p: 2 }}>
           <PageContentLoader loading={false}>
             <FeatureFlagMetrics
               flagName={flag.flagName}
@@ -4019,19 +4125,24 @@ const FeatureFlagDetailPage: React.FC = () => {
               }
             />
           </PageContentLoader>
+          </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={3}>
+          <Box sx={{ p: 2 }}>
           <PageContentLoader loading={false}>
             <FeatureFlagCodeReferences
               flagName={flag.flagName}
               onLoad={(count) => setCodeReferenceCount(count)}
             />
           </PageContentLoader>
+          </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={4}>
+          <Box sx={{ p: 2 }}>
           <PageContentLoader loading={false}>
             <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
           </PageContentLoader>
+          </Box>
         </TabPanel>
 
         {/* Delete Confirmation Dialog */}

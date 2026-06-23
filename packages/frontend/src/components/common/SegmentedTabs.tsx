@@ -57,8 +57,8 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
               bgcolor: isActive
                 ? (theme) =>
                     theme.palette.mode === 'dark'
-                      ? 'primary.dark'
-                      : 'primary.main'
+                      ? theme.palette.primary.dark
+                      : theme.palette.primary.main
                 : 'transparent',
               opacity: isDisabled ? 0.5 : 1,
               cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -66,8 +66,12 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
               borderRight: index < items.length - 1 ? 1 : 0,
               borderColor: 'divider',
               '&:hover': {
-                bgcolor:
-                  isActive || isDisabled
+                bgcolor: isActive
+                  ? (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.primary.dark
+                        : theme.palette.primary.main
+                  : isDisabled
                     ? undefined
                     : (theme) =>
                         theme.palette.mode === 'dark'
@@ -76,7 +80,9 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
               },
               '& .MuiSvgIcon-root': {
                 fontSize: '0.95rem',
-                color: isActive ? '#fff' : 'text.secondary',
+                color: isActive
+                  ? (theme) => theme.palette.primary.contrastText
+                  : 'text.secondary',
                 transition: 'color 0.2s ease',
               },
             }}
@@ -88,7 +94,9 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({
               sx={{
                 fontSize: '0.8rem',
                 fontWeight: 600,
-                color: isActive ? '#fff' : 'text.secondary',
+                color: isActive
+                  ? (theme) => theme.palette.primary.contrastText
+                  : 'text.secondary',
                 whiteSpace: 'nowrap',
                 lineHeight: 1.4,
                 transition: 'all 0.2s ease',
