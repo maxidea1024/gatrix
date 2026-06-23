@@ -2272,7 +2272,14 @@ const FeatureFlagDetailPage: React.FC = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100% + 32px)', m: -2 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100% + 32px)',
+        m: -2,
+      }}
+    >
       <PageHeader
         title={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -2344,7 +2351,9 @@ const FeatureFlagDetailPage: React.FC = () => {
       />
 
       {/* Main Content */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Box
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      >
         {/* Overview Tab */}
         <TabPanel value={tabValue} index={0}>
           <Box
@@ -2361,8 +2370,14 @@ const FeatureFlagDetailPage: React.FC = () => {
               sx={(theme) => ({
                 width: { xs: '100%', md: leftSidebarWidth },
                 flexShrink: 0,
-                borderRight: { xs: 'none', md: `1px solid ${theme.palette.divider}` },
-                borderBottom: { xs: `1px solid ${theme.palette.divider}`, md: 'none' },
+                borderRight: {
+                  xs: 'none',
+                  md: `1px solid ${theme.palette.divider}`,
+                },
+                borderBottom: {
+                  xs: `1px solid ${theme.palette.divider}`,
+                  md: 'none',
+                },
                 position: 'relative',
                 overflow: 'auto',
               })}
@@ -3850,298 +3865,301 @@ const FeatureFlagDetailPage: React.FC = () => {
         {/* Flag Values Tab */}
         <TabPanel value={tabValue} index={1}>
           <Box sx={{ p: 2 }}>
-          <PageContentLoader loading={false}>
-            <Box sx={{ maxWidth: 800 }}>
-              <Paper
-                variant="outlined"
-                sx={{
-                  p: { xs: 3, md: 4 },
-                  borderRadius: 2,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                }}
-              >
-                <Typography variant="h6" gutterBottom>
-                  {t('featureFlags.valueSettings')}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 3 }}
+            <PageContentLoader loading={false}>
+              <Box sx={{ maxWidth: 800 }}>
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: { xs: 3, md: 4 },
+                    borderRadius: 2,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  }}
                 >
-                  {t('featureFlags.valueSettingsDescription')}
-                </Typography>
+                  <Typography variant="h6" gutterBottom>
+                    {t('featureFlags.valueSettings')}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 3 }}
+                  >
+                    {t('featureFlags.valueSettingsDescription')}
+                  </Typography>
 
-                <Stack spacing={3}>
-                  {/* Value Type Display (read-only) */}
-                  <Box>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        mb: 1,
-                      }}
-                    >
-                      {t('featureFlags.valueType')}
-                      <Tooltip title={t('featureFlags.valueTypeHelp')}>
-                        <HelpOutlineIcon fontSize="small" color="action" />
-                      </Tooltip>
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        p: 1.5,
-                        border: 1,
-                        borderColor: 'divider',
-                        borderRadius: 1,
-                        bgcolor: 'action.hover',
-                      }}
-                    >
-                      <FieldTypeIcon
-                        type={flag.valueType || 'boolean'}
-                        size={18}
-                      />
-                      <Typography variant="body2" fontWeight={500}>
-                        {t(
-                          `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
-                        )}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Validation Rules - component has internal toggle, returns null for boolean */}
-                  <ValidationRulesEditor
-                    valueType={flag.valueType || 'boolean'}
-                    rules={flag.validationRules}
-                    onChange={(rules) =>
-                      setFlag((prev) =>
-                        prev ? { ...prev, validationRules: rules } : prev
-                      )
-                    }
-                    disabled={saving || !canManage}
-                  />
-
-                  {/* Flag Values */}
-                  <Stack spacing={2}>
-                    <Box
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 1,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                      }}
-                    >
+                  <Stack spacing={3}>
+                    {/* Value Type Display (read-only) */}
+                    <Box>
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          fontWeight: 600,
-                          flexShrink: 0,
-                          whiteSpace: 'nowrap',
-                          minWidth: 120,
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
+                          mb: 1,
                         }}
                       >
-                        {t('featureFlags.enabledValue')}
-                        <Tooltip title={t('featureFlags.enabledValueHelp')}>
+                        {t('featureFlags.valueType')}
+                        <Tooltip title={t('featureFlags.valueTypeHelp')}>
                           <HelpOutlineIcon fontSize="small" color="action" />
                         </Tooltip>
                       </Typography>
-                      <Box sx={{ flex: 1 }}>
-                        {renderValueInput('enabledValue')}
-                      </Box>
-                    </Box>
-
-                    <Box
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 1,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                      }}
-                    >
-                      <Typography
-                        variant="subtitle2"
+                      <Box
                         sx={{
-                          fontWeight: 600,
-                          flexShrink: 0,
-                          whiteSpace: 'nowrap',
-                          minWidth: 120,
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 0.5,
+                          gap: 1,
+                          p: 1.5,
+                          border: 1,
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          bgcolor: 'action.hover',
                         }}
                       >
-                        {t('featureFlags.disabledValue')}
-                        <Tooltip title={t('featureFlags.disabledValueHelp')}>
-                          <HelpOutlineIcon fontSize="small" color="action" />
-                        </Tooltip>
-                      </Typography>
-                      <Box sx={{ flex: 1 }}>
-                        {renderValueInput('disabledValue')}
+                        <FieldTypeIcon
+                          type={flag.valueType || 'boolean'}
+                          size={18}
+                        />
+                        <Typography variant="body2" fontWeight={500}>
+                          {t(
+                            `featureFlags.valueTypes.${flag.valueType || 'boolean'}`
+                          )}
+                        </Typography>
                       </Box>
                     </Box>
-                  </Stack>
 
-                  {/* Action Buttons - only show for users with edit permission */}
-                  {canManage && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: 1,
-                        pt: 2,
-                      }}
-                    >
-                      <Button
-                        variant="contained"
-                        onClick={() => {
-                          if (originalFlag) {
-                            setFlag((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    enabledValue: originalFlag.enabledValue,
-                                    disabledValue: originalFlag.disabledValue,
-                                    validationRules:
-                                      originalFlag.validationRules,
-                                  }
-                                : prev
-                            );
+                    {/* Validation Rules - component has internal toggle, returns null for boolean */}
+                    <ValidationRulesEditor
+                      valueType={flag.valueType || 'boolean'}
+                      rules={flag.validationRules}
+                      onChange={(rules) =>
+                        setFlag((prev) =>
+                          prev ? { ...prev, validationRules: rules } : prev
+                        )
+                      }
+                      disabled={saving || !canManage}
+                    />
+
+                    {/* Flag Values */}
+                    <Stack spacing={2}>
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            fontWeight: 600,
+                            flexShrink: 0,
+                            whiteSpace: 'nowrap',
+                            minWidth: 120,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                          }}
+                        >
+                          {t('featureFlags.enabledValue')}
+                          <Tooltip title={t('featureFlags.enabledValueHelp')}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ flex: 1 }}>
+                          {renderValueInput('enabledValue')}
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 1,
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1.5,
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            fontWeight: 600,
+                            flexShrink: 0,
+                            whiteSpace: 'nowrap',
+                            minWidth: 120,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5,
+                          }}
+                        >
+                          {t('featureFlags.disabledValue')}
+                          <Tooltip title={t('featureFlags.disabledValueHelp')}>
+                            <HelpOutlineIcon fontSize="small" color="action" />
+                          </Tooltip>
+                        </Typography>
+                        <Box sx={{ flex: 1 }}>
+                          {renderValueInput('disabledValue')}
+                        </Box>
+                      </Box>
+                    </Stack>
+
+                    {/* Action Buttons - only show for users with edit permission */}
+                    {canManage && (
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'flex-end',
+                          gap: 1,
+                          pt: 2,
+                        }}
+                      >
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            if (originalFlag) {
+                              setFlag((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      enabledValue: originalFlag.enabledValue,
+                                      disabledValue: originalFlag.disabledValue,
+                                      validationRules:
+                                        originalFlag.validationRules,
+                                    }
+                                  : prev
+                              );
+                            }
+                          }}
+                          disabled={
+                            saving ||
+                            (JSON.stringify(flag.enabledValue) ===
+                              JSON.stringify(originalFlag?.enabledValue) &&
+                              JSON.stringify(flag.disabledValue) ===
+                                JSON.stringify(originalFlag?.disabledValue) &&
+                              JSON.stringify(flag.validationRules) ===
+                                JSON.stringify(originalFlag?.validationRules))
                           }
-                        }}
-                        disabled={
-                          saving ||
-                          (JSON.stringify(flag.enabledValue) ===
-                            JSON.stringify(originalFlag?.enabledValue) &&
-                            JSON.stringify(flag.disabledValue) ===
-                              JSON.stringify(originalFlag?.disabledValue) &&
-                            JSON.stringify(flag.validationRules) ===
-                              JSON.stringify(originalFlag?.validationRules))
-                        }
-                      >
-                        {t('common.cancel')}
-                      </Button>
-                      <Button
-                        variant="contained"
-                        onClick={async () => {
-                          if (!flag) return;
-                          try {
-                            setSaving(true);
-                            // Only include changed values in draft
-                            const updates: Record<string, any> = {};
-                            if (
-                              JSON.stringify(flag.enabledValue) !==
-                              JSON.stringify(originalFlag?.enabledValue)
-                            ) {
-                              updates.enabledValue = flag.enabledValue;
-                            }
-                            if (
-                              JSON.stringify(flag.disabledValue) !==
-                              JSON.stringify(originalFlag?.disabledValue)
-                            ) {
-                              updates.disabledValue = flag.disabledValue;
-                            }
-                            if (
-                              JSON.stringify(flag.validationRules) !==
-                              JSON.stringify(originalFlag?.validationRules)
-                            ) {
-                              updates.validationRules =
-                                flag.validationRules ?? null;
-                            }
-                            await saveGlobalChangesToDraft(updates);
-                            // Sync originalFlag so the update button becomes disabled
-                            setOriginalFlag((prev) =>
-                              prev
-                                ? {
-                                    ...prev,
-                                    enabledValue: flag.enabledValue,
-                                    disabledValue: flag.disabledValue,
-                                    validationRules: flag.validationRules,
-                                  }
-                                : prev
-                            );
-                          } catch (error: any) {
-                            enqueueSnackbar(
-                              parseApiErrorMessage(error, 'common.saveFailed'),
-                              {
-                                variant: 'error',
+                        >
+                          {t('common.cancel')}
+                        </Button>
+                        <Button
+                          variant="contained"
+                          onClick={async () => {
+                            if (!flag) return;
+                            try {
+                              setSaving(true);
+                              // Only include changed values in draft
+                              const updates: Record<string, any> = {};
+                              if (
+                                JSON.stringify(flag.enabledValue) !==
+                                JSON.stringify(originalFlag?.enabledValue)
+                              ) {
+                                updates.enabledValue = flag.enabledValue;
                               }
-                            );
-                          } finally {
-                            setSaving(false);
+                              if (
+                                JSON.stringify(flag.disabledValue) !==
+                                JSON.stringify(originalFlag?.disabledValue)
+                              ) {
+                                updates.disabledValue = flag.disabledValue;
+                              }
+                              if (
+                                JSON.stringify(flag.validationRules) !==
+                                JSON.stringify(originalFlag?.validationRules)
+                              ) {
+                                updates.validationRules =
+                                  flag.validationRules ?? null;
+                              }
+                              await saveGlobalChangesToDraft(updates);
+                              // Sync originalFlag so the update button becomes disabled
+                              setOriginalFlag((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      enabledValue: flag.enabledValue,
+                                      disabledValue: flag.disabledValue,
+                                      validationRules: flag.validationRules,
+                                    }
+                                  : prev
+                              );
+                            } catch (error: any) {
+                              enqueueSnackbar(
+                                parseApiErrorMessage(
+                                  error,
+                                  'common.saveFailed'
+                                ),
+                                {
+                                  variant: 'error',
+                                }
+                              );
+                            } finally {
+                              setSaving(false);
+                            }
+                          }}
+                          disabled={
+                            saving ||
+                            !!valueJsonErrors.enabledValue ||
+                            !!valueJsonErrors.disabledValue ||
+                            // Disable if nothing changed
+                            (JSON.stringify(flag.enabledValue) ===
+                              JSON.stringify(originalFlag?.enabledValue) &&
+                              JSON.stringify(flag.disabledValue) ===
+                                JSON.stringify(originalFlag?.disabledValue) &&
+                              JSON.stringify(flag.validationRules) ===
+                                JSON.stringify(originalFlag?.validationRules))
                           }
-                        }}
-                        disabled={
-                          saving ||
-                          !!valueJsonErrors.enabledValue ||
-                          !!valueJsonErrors.disabledValue ||
-                          // Disable if nothing changed
-                          (JSON.stringify(flag.enabledValue) ===
-                            JSON.stringify(originalFlag?.enabledValue) &&
-                            JSON.stringify(flag.disabledValue) ===
-                              JSON.stringify(originalFlag?.disabledValue) &&
-                            JSON.stringify(flag.validationRules) ===
-                              JSON.stringify(originalFlag?.validationRules))
-                        }
-                      >
-                        {saving ? (
-                          <CircularProgress size={20} />
-                        ) : (
-                          t('common.update')
-                        )}
-                      </Button>
-                    </Box>
-                  )}
-                </Stack>
-              </Paper>
-            </Box>
-          </PageContentLoader>
+                        >
+                          {saving ? (
+                            <CircularProgress size={20} />
+                          ) : (
+                            t('common.update')
+                          )}
+                        </Button>
+                      </Box>
+                    )}
+                  </Stack>
+                </Paper>
+              </Box>
+            </PageContentLoader>
           </Box>
         </TabPanel>
 
         {/* Metrics Tab */}
         <TabPanel value={tabValue} index={2}>
           <Box sx={{ p: 2 }}>
-          <PageContentLoader loading={false}>
-            <FeatureFlagMetrics
-              flagName={flag.flagName}
-              environments={(flag.environments || []).map((e) => ({
-                environmentId: e.environmentId,
-                isEnabled: e.isEnabled,
-              }))}
-              currentEnvironment={
-                flag.environments?.[0]?.environmentId || 'production'
-              }
-            />
-          </PageContentLoader>
+            <PageContentLoader loading={false}>
+              <FeatureFlagMetrics
+                flagName={flag.flagName}
+                environments={(flag.environments || []).map((e) => ({
+                  environmentId: e.environmentId,
+                  isEnabled: e.isEnabled,
+                }))}
+                currentEnvironment={
+                  flag.environments?.[0]?.environmentId || 'production'
+                }
+              />
+            </PageContentLoader>
           </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={3}>
           <Box sx={{ p: 2 }}>
-          <PageContentLoader loading={false}>
-            <FeatureFlagCodeReferences
-              flagName={flag.flagName}
-              onLoad={(count) => setCodeReferenceCount(count)}
-            />
-          </PageContentLoader>
+            <PageContentLoader loading={false}>
+              <FeatureFlagCodeReferences
+                flagName={flag.flagName}
+                onLoad={(count) => setCodeReferenceCount(count)}
+              />
+            </PageContentLoader>
           </Box>
         </TabPanel>
         <TabPanel value={tabValue} index={4}>
           <Box sx={{ p: 2 }}>
-          <PageContentLoader loading={false}>
-            <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
-          </PageContentLoader>
+            <PageContentLoader loading={false}>
+              <FeatureFlagAuditLogs flagName={flag.flagName} flagId={flag.id} />
+            </PageContentLoader>
           </Box>
         </TabPanel>
 
