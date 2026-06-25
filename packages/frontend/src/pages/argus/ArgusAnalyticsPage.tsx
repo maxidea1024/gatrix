@@ -397,6 +397,7 @@ const ArgusAnalyticsPage: React.FC = () => {
     splitWidth: unifiedPanelWidth,
     isDragging: unifiedIsDragging,
     handleMouseDown: unifiedHandleMouseDown,
+    panelRef: unifiedPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_analytics_panel_width',
     defaultWidth: 340,
@@ -711,6 +712,7 @@ const ArgusAnalyticsPage: React.FC = () => {
               panelWidth={unifiedPanelWidth}
               onPanelResizeMouseDown={unifiedHandleMouseDown}
               isPanelDragging={unifiedIsDragging}
+              panelRef={unifiedPanelRef}
               onDateRangeChange={handleDateRangeChange}
             />
           </Box>
@@ -733,6 +735,7 @@ const ArgusAnalyticsPage: React.FC = () => {
               panelWidth={unifiedPanelWidth}
               onPanelResizeMouseDown={unifiedHandleMouseDown}
               isPanelDragging={unifiedIsDragging}
+              panelRef={unifiedPanelRef}
             />
           </Box>
         )}
@@ -754,6 +757,7 @@ const ArgusAnalyticsPage: React.FC = () => {
               panelWidth={unifiedPanelWidth}
               onPanelResizeMouseDown={unifiedHandleMouseDown}
               isPanelDragging={unifiedIsDragging}
+              panelRef={unifiedPanelRef}
             />
           </Box>
         )}
@@ -775,6 +779,7 @@ const ArgusAnalyticsPage: React.FC = () => {
               panelWidth={unifiedPanelWidth}
               onPanelResizeMouseDown={unifiedHandleMouseDown}
               isPanelDragging={unifiedIsDragging}
+              panelRef={unifiedPanelRef}
             />
           </Box>
         )}

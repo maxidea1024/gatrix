@@ -39,6 +39,7 @@ interface ArgusFlowsPageProps {
   panelWidth?: number;
   onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
   isPanelDragging?: boolean;
+  panelRef?: React.RefObject<HTMLElement | null>;
 }
 
 const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
@@ -47,6 +48,7 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
   panelWidth,
   onPanelResizeMouseDown,
   isPanelDragging,
+  panelRef,
 }) => {
   const { t } = useTranslation();
   const { currentProject } = useOrgProject();
@@ -326,6 +328,7 @@ const ArgusFlowsPage: React.FC<ArgusFlowsPageProps> = ({
           panelWidth={panelWidth}
           onPanelResizeMouseDown={onPanelResizeMouseDown}
           isPanelDragging={isPanelDragging}
+          panelRef={panelRef}
         >
           <PageContentLoader
             loading={queryLoading || (!!anchorEventA && !hasQueried)}

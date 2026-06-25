@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import db from '../config/knex';
-import { optic } from '@gatrix/argus-optic';
+import { optic, parseSearchToSQL } from '@gatrix/argus-optic';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { ConfigBroadcaster } from '../utils/config-broadcaster';
@@ -14,6 +14,33 @@ import {
 const logger = createLogger('issues-api');
 const broadcaster = new ConfigBroadcaster(redis);
 
+/**
+ * Extract MySQL-only fields (status, substatus, assigned_to, level) from an AQL query string.
+ * These fields exist in the MySQL issues table but NOT in the ClickHouse errors table,
+ * so they must be separated before passing the query to parseSearchToSQL.
+ *
+ * Returns extracted field values and the remaining query for ClickHouse.
+ */
+function extractMySQLFields(query: string): {
+  fields: Record<string, string>;
+  remaining: string;
+} {
+  const mysqlFieldNames = ['status', 'substatus', 'assigned_to', 'level', 'priority'];
+  const fields: Record<string, string> = {};
+  let remaining = query;
+
+  for (const field of mysqlFieldNames) {
+    // Match field:"quoted value" or field:unquoted_value
+    const regex = new RegExp(`\\b${field}:(?:"([^"]*)"|([^\\s)]+))`, 'g');
+    remaining = remaining.replace(regex, (_match, quoted, unquoted) => {
+      fields[field] = quoted ?? unquoted;
+      return '';
+    });
+  }
+
+  return { fields, remaining: remaining.replace(/\s+/g, ' ').trim() };
+}
+
 export default async function issuesRoutes(app: FastifyInstance) {
   // Issue volume chart data (daily error counts)
   app.get(
@@ -22,14 +49,9 @@ export default async function issuesRoutes(app: FastifyInstance) {
       const { projectId } = request.params as { projectId: string };
       const {
         period = '24h',
-        status,
-        level,
         start,
         end,
         query,
-        environment,
-        browser,
-        os,
       } = request.query as Record<string, string>;
 
       try {
@@ -48,16 +70,46 @@ export default async function issuesRoutes(app: FastifyInstance) {
           `timestamp <= toDateTime({fillEnd:UInt32})`,
         ];
 
-        if (level) {
-          conditions.push(`level = {level:String}`);
-          qp.level = level;
+        // Extract MySQL fields from AQL query, pass remainder to ClickHouse
+        let mysqlFields: Record<string, string> = {};
+        let chQuery = query;
+        if (query && typeof query === 'string' && query.trim()) {
+          const extracted = extractMySQLFields(query);
+          mysqlFields = extracted.fields;
+          chQuery = extracted.remaining;
         }
 
-        // Optional: filter by issue status from MySQL
-        if (status && status !== 'all') {
+        // level is also a ClickHouse column, apply directly
+        if (mysqlFields.level) {
+          conditions.push(`level = {level:String}`);
+          qp.level = mysqlFields.level;
+        }
+
+        // Resolve matching issue_ids from MySQL if any MySQL-only filters are active
+        const mysqlFilters: Record<string, any> = { project_id: projectId };
+        let hasMysqlFilters = false;
+
+        if (mysqlFields.status && mysqlFields.status !== 'all') {
+          mysqlFilters.status = mysqlFields.status;
+          hasMysqlFilters = true;
+        }
+        if (mysqlFields.substatus) {
+          mysqlFilters.substatus = mysqlFields.substatus;
+          hasMysqlFilters = true;
+        }
+        if (mysqlFields.assigned_to) {
+          mysqlFilters.assigned_to = mysqlFields.assigned_to;
+          hasMysqlFilters = true;
+        }
+        if (mysqlFields.priority) {
+          mysqlFilters.priority = mysqlFields.priority;
+          hasMysqlFilters = true;
+        }
+
+        if (hasMysqlFilters) {
           const issueRows = await db('g_argus_issues')
             .select('id')
-            .where({ project_id: projectId, status });
+            .where(mysqlFilters);
           const issueIds = issueRows.map((r: any) => r.id);
           if (issueIds.length === 0) {
             return reply.send({ data: [] });
@@ -65,41 +117,10 @@ export default async function issuesRoutes(app: FastifyInstance) {
           conditions.push(`issue_id IN (${issueIds.join(',')})`);
         }
 
-        // Context filters (environment, browser, os) on ClickHouse errors
-        if (environment) {
-          conditions.push(`environment = {env:String}`);
-          qp.env = environment;
-        }
-        if (browser) {
-          conditions.push(`browser_name = {browser:String}`);
-          qp.browser = browser;
-        }
-        if (os) {
-          conditions.push(`os_name = {os:String}`);
-          qp.os = os;
-        }
-
-        // Text query filter — search in title/culprit by matching issue_ids from MySQL
-        if (query) {
-          try {
-            const queryRows = await db('g_argus_issues')
-              .select('id')
-              .where('project_id', projectId)
-              .andWhere(function () {
-                this.where('title', 'like', `%${query}%`).orWhere(
-                  'culprit',
-                  'like',
-                  `%${query}%`
-                );
-              });
-            const queryIssueIds = queryRows.map((r: any) => r.id);
-            if (queryIssueIds.length === 0) {
-              return reply.send({ data: [] });
-            }
-            conditions.push(`issue_id IN (${queryIssueIds.join(',')})`);
-          } catch {
-            /* ignore query filter errors */
-          }
+        // AQL query filter — parse remaining structured query into ClickHouse conditions
+        if (chQuery && chQuery.trim()) {
+          const { where: searchCond } = parseSearchToSQL('errors', chQuery, qp);
+          if (searchCond) conditions.push(`(${searchCond})`);
         }
 
         const result = await optic.rawQuery({
@@ -136,44 +157,44 @@ export default async function issuesRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        status = 'unresolved',
         sort = 'last_seen',
         limit = '25',
         offset = '0',
         query,
-        environment,
-        browser,
-        os,
         period,
         start,
         end,
-        substatus,
-        assigned_to,
-        level,
+        status: statusParam,
+        level: levelParam,
+        substatus: substatusParam,
+        assigned_to: assignedToParam,
       } = request.query as Record<string, string>;
 
       try {
-        // Resolve issue_ids from ClickHouse when contextual or time filters are set
-        let issueIdFilter: number[] | null = null;
-        const hasContextFilter = !!(environment || browser || os);
-        const hasTimeFilter = !!((start && end) || period);
+        // Extract MySQL-only fields from AQL query
+        let mysqlFields: Record<string, string> = {};
+        let chQuery = query;
+        if (query && typeof query === 'string' && query.trim()) {
+          const extracted = extractMySQLFields(query);
+          mysqlFields = extracted.fields;
+          chQuery = extracted.remaining;
+        }
 
-        if (hasContextFilter || hasTimeFilter) {
+        // Merge: AQL-extracted fields take precedence, then explicit params
+        const status = mysqlFields.status || statusParam || '';
+        const level = mysqlFields.level || levelParam || '';
+        const substatus = substatusParam || mysqlFields.substatus || '';
+        const assigned_to = assignedToParam || mysqlFields.assigned_to || '';
+        const priority = mysqlFields.priority || '';
+
+        // Resolve issue_ids from ClickHouse when time or AQL filters are set
+        let issueIdFilter: number[] | null = null;
+        const hasTimeFilter = !!((start && end) || period);
+        const hasQueryFilter = !!(chQuery && chQuery.trim());
+
+        if (hasTimeFilter || hasQueryFilter) {
           const conditions: string[] = [`project_id = {projectId:String}`];
           const qp: Record<string, any> = { projectId: String(projectId) };
-
-          if (environment) {
-            conditions.push(`environment = {env:String}`);
-            qp.env = environment;
-          }
-          if (browser) {
-            conditions.push(`browser_name = {browser:String}`);
-            qp.browser = browser;
-          }
-          if (os) {
-            conditions.push(`os_name = {os:String}`);
-            qp.os = os;
-          }
 
           // Time range filter on ClickHouse events
           if (start && end) {
@@ -186,6 +207,12 @@ export default async function issuesRoutes(app: FastifyInstance) {
             if (interval) {
               conditions.push(`timestamp >= now() - INTERVAL ${interval}`);
             }
+          }
+
+          // AQL query filter — parse remaining structured query into ClickHouse SQL
+          if (hasQueryFilter) {
+            const { where: searchCond } = parseSearchToSQL('errors', chQuery!, qp);
+            if (searchCond) conditions.push(`(${searchCond})`);
           }
 
           const chResult = await optic.rawQuery({
@@ -207,42 +234,41 @@ export default async function issuesRoutes(app: FastifyInstance) {
           }
         }
 
+        // Build dynamic WHERE clause for MySQL
+        let whereSql = '';
+        const whereParams: any[] = [];
+
+        if (status && status !== 'all') {
+          whereSql += ' AND status = ?';
+          whereParams.push(status);
+        }
+        if (substatus) {
+          whereSql += ' AND substatus = ?';
+          whereParams.push(substatus);
+        }
+        if (assigned_to) {
+          whereSql += ' AND assigned_to = ?';
+          whereParams.push(assigned_to);
+        }
+        if (level) {
+          whereSql += ' AND level = ?';
+          whereParams.push(level);
+        }
+        if (priority) {
+          whereSql += ' AND priority = ?';
+          whereParams.push(priority);
+        }
+        if (issueIdFilter && issueIdFilter.length > 0) {
+          whereSql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
+          whereParams.push(...issueIdFilter);
+        }
+
         let sql = `
           SELECT * FROM g_argus_issues
           WHERE project_id = ?
+          ${whereSql}
         `;
-        const params: any[] = [projectId];
-
-        if (status && status !== 'all') {
-          sql += ' AND status = ?';
-          params.push(status);
-        }
-
-        if (query) {
-          sql += ' AND (title LIKE ? OR culprit LIKE ?)';
-          params.push(`%${query}%`, `%${query}%`);
-        }
-
-        if (substatus) {
-          sql += ' AND substatus = ?';
-          params.push(substatus);
-        }
-
-        if (assigned_to) {
-          sql += ' AND assigned_to = ?';
-          params.push(assigned_to);
-        }
-
-        if (level) {
-          sql += ' AND level = ?';
-          params.push(level);
-        }
-
-        // Apply ClickHouse-resolved issue_id filter (covers context + time filters)
-        if (issueIdFilter && issueIdFilter.length > 0) {
-          sql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
-          params.push(...issueIdFilter);
-        }
+        const params: any[] = [projectId, ...whereParams];
 
         // Sort
         const sortMap: Record<string, string> = {
@@ -302,17 +328,9 @@ export default async function issuesRoutes(app: FastifyInstance) {
           user_count: issue.num_users,
         }));
 
-        // Total count
-        let countSql = `SELECT COUNT(*) as total FROM g_argus_issues WHERE project_id = ?`;
-        const countParams: any[] = [projectId];
-        if (status && status !== 'all') {
-          countSql += ' AND status = ?';
-          countParams.push(status);
-        }
-        if (issueIdFilter && issueIdFilter.length > 0) {
-          countSql += ` AND id IN (${issueIdFilter.map(() => '?').join(',')})`;
-          countParams.push(...issueIdFilter);
-        }
+        // Total count (using the same WHERE clause as list query)
+        let countSql = `SELECT COUNT(*) as total FROM g_argus_issues WHERE project_id = ? ${whereSql}`;
+        const countParams: any[] = [projectId, ...whereParams];
         const countRaw = await db.raw(countSql, countParams);
         const total = (countRaw[0] as any[])[0]?.total || 0;
 

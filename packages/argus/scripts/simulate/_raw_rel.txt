@@ -1,0 +1,14 @@
+﻿  '3.14.0-beta.1',
+];
+const CLIENT_RELEASES = ['2.8.0', '2.8.1', '2.9.0', '2.9.1', '2.10.0-beta'];
+const LUA_RELEASES = ['1.45.0', '1.45.1', '1.46.0', '1.46.1'];
+
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??ERROR SCENARIOS ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+interface ErrorScenario {
+  id: string;
+  runtime: 'nodejs' | 'lua' | 'ue4';
+  type: string;
+  title: string;
+  value: string;
+  level: 'fatal' | 'error' | 'warning';
+  culprit: string;

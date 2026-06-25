@@ -47,6 +47,7 @@ interface ArgusInsightsPageProps {
   panelWidth?: number;
   onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
   isPanelDragging?: boolean;
+  panelRef?: React.RefObject<HTMLElement | null>;
   /** Called when the chart drag-zoom sets a new date range (so parent UI can sync) */
   onDateRangeChange?: (
     v: import('@/components/common/DateRangeSelector').DateRangeValue
@@ -59,6 +60,7 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
   panelWidth,
   onPanelResizeMouseDown,
   isPanelDragging,
+  panelRef,
   onDateRangeChange,
 }) => {
   const theme = useTheme();
@@ -564,6 +566,7 @@ const ArgusInsightsPage: React.FC<ArgusInsightsPageProps> = ({
           panelWidth={panelWidth}
           onPanelResizeMouseDown={onPanelResizeMouseDown}
           isPanelDragging={isPanelDragging}
+          panelRef={panelRef}
         >
           <PageContentLoader
             loading={

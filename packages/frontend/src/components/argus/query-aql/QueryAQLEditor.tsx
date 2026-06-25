@@ -336,7 +336,7 @@ export const QueryAQLEditor = forwardRef<
                     ...c,
                     value: values[0],
                     values,
-                    operator: operator ?? (values.length > 1 ? 'IN' : '='),
+                    operator: operator ?? '=',
                   }
                 : c
             );
@@ -345,7 +345,7 @@ export const QueryAQLEditor = forwardRef<
               id: `chip-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
               type: 'filter',
               field,
-              operator: operator ?? (values.length > 1 ? 'IN' : '='),
+              operator: operator ?? '=',
               value: values[0],
               values,
             };

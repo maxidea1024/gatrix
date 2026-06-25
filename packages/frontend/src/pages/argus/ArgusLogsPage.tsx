@@ -192,6 +192,7 @@ const ArgusLogsPage: React.FC = () => {
     splitWidth: panelWidth,
     isDragging: isPanelDragging,
     handleMouseDown: handlePanelSplitterMouseDown,
+    panelRef: logPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_log_panel_width',
     defaultWidth: 420,
@@ -209,6 +210,7 @@ const ArgusLogsPage: React.FC = () => {
     splitWidth: facetWidth,
     isDragging: isFacetDragging,
     handleMouseDown: handleFacetSplitterMouseDown,
+    panelRef: facetPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_facet_panel_width',
     defaultWidth: 240,
@@ -437,7 +439,7 @@ const ArgusLogsPage: React.FC = () => {
         }}
         onRefresh={fetchAll}
         loading={loading}
-        hideFilters={['browser', 'os']}
+        
         extraControls={
           <Box
             sx={{
@@ -481,6 +483,7 @@ const ArgusLogsPage: React.FC = () => {
         {/* Left: Facets Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
           <FacetSidebar
+            ref={facetPanelRef as React.Ref<HTMLDivElement>}
             width={facetWidth}
             facets={facetGroups}
             onFilter={(key, value) => {
@@ -973,6 +976,7 @@ const ArgusLogsPage: React.FC = () => {
                       }}
                     />
                     <LogSidePanel
+                      ref={logPanelRef as React.Ref<HTMLDivElement>}
                       log={effectiveSelectedLog}
                       loading={activeTab === 0 ? selectedLogLoading : false}
                       open={effectiveIsRightPanelOpen}

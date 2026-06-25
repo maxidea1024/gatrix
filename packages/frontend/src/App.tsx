@@ -359,6 +359,30 @@ const ArgusRetentionPage = React.lazy(
   () => import('./pages/argus/ArgusRetentionPage')
 );
 const ArgusFlowsPage = React.lazy(() => import('./pages/argus/ArgusFlowsPage'));
+const ArgusUserProfilesPage = React.lazy(
+  () => import('./pages/argus/ArgusUserProfilesPage')
+);
+const ArgusCohortPage = React.lazy(
+  () => import('./pages/argus/ArgusCohortPage')
+);
+const ArgusRealtimePage = React.lazy(
+  () => import('./pages/argus/ArgusRealtimePage')
+);
+const ArgusImpactPage = React.lazy(
+  () => import('./pages/argus/ArgusImpactPage')
+);
+const ArgusRevenuePage = React.lazy(
+  () => import('./pages/argus/ArgusRevenuePage')
+);
+const ArgusLifecyclePage = React.lazy(
+  () => import('./pages/argus/ArgusLifecyclePage')
+);
+const ArgusKpiAlertsPage = React.lazy(
+  () => import('./pages/argus/ArgusKpiAlertsPage')
+);
+const ArgusDataGovernancePage = React.lazy(
+  () => import('./pages/argus/ArgusDataGovernancePage')
+);
 
 // LottieLoader is now imported from @/components/common/LottieLoader
 
@@ -1309,6 +1333,38 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="analytics/flows"
                                           element={<ArgusFlowsPage />}
+                                        />
+                                        <Route
+                                          path="analytics/users"
+                                          element={<ArgusUserProfilesPage />}
+                                        />
+                                        <Route
+                                          path="analytics/cohorts"
+                                          element={<ArgusCohortPage />}
+                                        />
+                                        <Route
+                                          path="analytics/realtime"
+                                          element={<ArgusRealtimePage />}
+                                        />
+                                        <Route
+                                          path="analytics/impact"
+                                          element={<ArgusImpactPage />}
+                                        />
+                                        <Route
+                                          path="analytics/revenue"
+                                          element={<ArgusRevenuePage />}
+                                        />
+                                        <Route
+                                          path="analytics/lifecycle"
+                                          element={<ArgusLifecyclePage />}
+                                        />
+                                        <Route
+                                          path="analytics/kpi-alerts"
+                                          element={<ArgusKpiAlertsPage />}
+                                        />
+                                        <Route
+                                          path="analytics/data-governance"
+                                          element={<ArgusDataGovernancePage />}
                                         />
                                         <Route
                                           path="explore/discover"

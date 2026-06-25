@@ -497,12 +497,59 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.MONITORING_READ,
         sectionHeader: 'sidebar.argusSection.analytics',
         matchPaths: [
-          '/argus/analytics',
           '/argus/analytics/insights',
           '/argus/analytics/funnels',
           '/argus/analytics/retention',
           '/argus/analytics/flows',
         ],
+      },
+      {
+        text: 'argus.userProfiles',
+        icon: 'Person',
+        path: '/argus/analytics/users',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.cohorts',
+        icon: 'Groups',
+        path: '/argus/analytics/cohorts',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.realtime',
+        icon: 'Stream',
+        path: '/argus/analytics/realtime',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.impact',
+        icon: 'CompareArrows',
+        path: '/argus/analytics/impact',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.revenue',
+        icon: 'AttachMoney',
+        path: '/argus/analytics/revenue',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.lifecycle',
+        icon: 'Autorenew',
+        path: '/argus/analytics/lifecycle',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.kpiAlerts',
+        icon: 'TrendingUp',
+        path: '/argus/analytics/kpi-alerts',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
+        text: 'argus.dataGovernance',
+        icon: 'VerifiedUser',
+        path: '/argus/analytics/data-governance',
+        requiredPermission: P.MONITORING_READ,
       },
       // ── Monitoring ──
       {

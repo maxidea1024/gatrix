@@ -41,6 +41,7 @@ interface ArgusRetentionPageProps {
   panelWidth?: number;
   onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
   isPanelDragging?: boolean;
+  panelRef?: React.RefObject<HTMLElement | null>;
 }
 
 const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
@@ -49,6 +50,7 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
   panelWidth,
   onPanelResizeMouseDown,
   isPanelDragging,
+  panelRef,
 }) => {
   const { t } = useTranslation();
   const { currentProject } = useOrgProject();
@@ -405,6 +407,7 @@ const ArgusRetentionPage: React.FC<ArgusRetentionPageProps> = ({
           panelWidth={panelWidth}
           onPanelResizeMouseDown={onPanelResizeMouseDown}
           isPanelDragging={isPanelDragging}
+          panelRef={panelRef}
         >
           <PageContentLoader
             loading={

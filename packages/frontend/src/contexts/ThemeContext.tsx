@@ -432,7 +432,7 @@ const getTheme = (mode: 'light' | 'dark', language: string): Theme => {
             fontSize: '0.8125rem',
             letterSpacing: '-0.01em',
             lineHeight: 1.5,
-            borderBottom: `1px solid ${colors.border}`,
+            borderBottom: 'none',
           },
           head: {
             backgroundColor: colors.theadBg,

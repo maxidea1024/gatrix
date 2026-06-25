@@ -56,18 +56,29 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       // Date filter
       const dateClause = `timestamp >= toDateTime({fillStart:UInt32}) AND timestamp <= toDateTime({fillEnd:UInt32})`;
 
+      // Extract status from AQL search (if present) — status has special spam logic
+      let effectiveSearch = search;
+      let effectiveStatus = status;
+      if (search) {
+        const statusMatch = search.match(/\bstatus:(?:"([^"]*)"|(\S+))/);
+        if (statusMatch) {
+          effectiveStatus = statusMatch[1] ?? statusMatch[2];
+          effectiveSearch = search.replace(/\bstatus:(?:"[^"]*"|\S+)/, '').replace(/\s+/g, ' ').trim();
+        }
+      }
+
       // Search filter — parse AQL query via parseSearchToSQL
       let searchClause = '';
-      const { where: searchCond } = parseSearchToSQL('feedback', search, qp);
+      const { where: searchCond } = parseSearchToSQL('feedback', effectiveSearch, qp);
       if (searchCond) searchClause = `AND (${searchCond})`;
 
-      // Status filter
+      // Status filter (special handling: unresolved excludes spam, spam uses is_spam flag)
       let statusClause = '';
-      if (status === 'unresolved') {
+      if (effectiveStatus === 'unresolved') {
         statusClause = `AND status = 'unresolved' AND is_spam = 0`;
-      } else if (status === 'resolved') {
+      } else if (effectiveStatus === 'resolved') {
         statusClause = `AND status = 'resolved'`;
-      } else if (status === 'spam') {
+      } else if (effectiveStatus === 'spam') {
         statusClause = `AND is_spam = 1`;
       }
 

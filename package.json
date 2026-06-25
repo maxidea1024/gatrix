@@ -19,7 +19,7 @@
     "dev:edge": "dotenv -e .env.local -- yarn workspace @gatrix/edge dev",
     "dev:chat-server": "dotenv -e .env.local -- yarn workspace @gatrix/chat-server dev",
     "dev:event-lens": "dotenv -e .env.local -- yarn workspace @gatrix/event-lens dev",
-    "dev:others": "concurrently -n frontend,edge,chat,event-lens -c green,cyan,magenta,yellow \"yarn dev:frontend\" \"yarn dev:edge\" \"yarn dev:chat-server\" \"yarn dev:event-lens\"",
+    "dev:others": "concurrently -n frontend,edge,chat,event-lens,argus-api,argus-worker -c green,cyan,magenta,yellow,blue,red \"yarn dev:frontend\" \"yarn dev:edge\" \"yarn dev:chat-server\" \"yarn dev:event-lens\" \"yarn dev:argus:api\" \"yarn dev:argus:worker\"",
     "dev:event-lens:worker": "dotenv -e .env.local -- yarn workspace @gatrix/event-lens dev:worker",
     "dev:argus:api": "dotenv -e .env.local -- yarn workspace @gatrix/argus dev:api",
     "dev:argus:worker": "dotenv -e .env.local -- yarn workspace @gatrix/argus-worker dev",

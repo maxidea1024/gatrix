@@ -173,6 +173,7 @@ export class ActivityWorker {
 
     if (batch.length > 0) {
       await this.insertActivities(batch);
+      await this.upsertProfiles(batch);
     }
 
     if (ackIds.length > 0) {
@@ -218,6 +219,70 @@ export class ActivityWorker {
         error: error instanceof Error ? error.message : String(error),
       });
       throw error;
+    }
+  }
+
+  /**
+   * Extract profile data from activities and upsert into argus.profiles.
+   * Only inserts rows when profile-relevant fields are present.
+   * ReplacingMergeTree(updated_at) keeps only the latest row per (project_id, user_id).
+   */
+  private async upsertProfiles(batch: NormalizedActivity[]): Promise<void> {
+    const PROFILE_FIELDS = ['avatar_url', 'email', 'first_name', 'last_name'];
+
+    const profileRows: Array<{
+      project_id: string;
+      user_id: string;
+      avatar_url: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      properties: Record<string, string>;
+      updated_at: string;
+    }> = [];
+
+    // Deduplicate: keep only the latest event per user_id within this batch
+    const latestByUser = new Map<string, NormalizedActivity>();
+    for (const act of batch) {
+      if (!act.user_id) continue;
+      const hasProfileField = PROFILE_FIELDS.some((f) => act.properties[f]);
+      if (!hasProfileField) continue;
+
+      const key = `${act.project_id}:${act.user_id}`;
+      const existing = latestByUser.get(key);
+      if (!existing || act.timestamp > existing.timestamp) {
+        latestByUser.set(key, act);
+      }
+    }
+
+    for (const act of latestByUser.values()) {
+      profileRows.push({
+        project_id: act.project_id,
+        user_id: act.user_id,
+        avatar_url: act.properties['avatar_url'] || '',
+        email: act.properties['email'] || '',
+        first_name: act.properties['first_name'] || '',
+        last_name: act.properties['last_name'] || '',
+        properties: {},
+        updated_at: act.timestamp,
+      });
+    }
+
+    if (profileRows.length === 0) return;
+
+    try {
+      await optic.insert({
+        table: 'argus.profiles',
+        values: profileRows,
+        format: 'JSONEachRow',
+      });
+      logger.debug('Profiles upserted', { count: profileRows.length });
+    } catch (error) {
+      // Profile upsert failure should not block activity processing
+      logger.error('ClickHouse profiles upsert failed', {
+        count: profileRows.length,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 

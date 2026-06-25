@@ -1,16 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  IconButton,
-  Divider,
-  useTheme,
-  alpha,
-  Tooltip,
-} from '@mui/material';
-import {
-  Refresh as RefreshIcon,
-  FilterList as FilterIcon,
-} from '@mui/icons-material';
+import { Box, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import MultiSelectFilterChip from '@/components/common/MultiSelectFilterChip';
 import DateRangeSelector, {
@@ -24,8 +13,6 @@ import argusService from '@/services/argusService';
 export interface ArgusFilterState {
   dateRange: DateRangeValue;
   environments: string[];
-  browsers: string[];
-  os: string[];
 }
 
 interface ArgusFilterBarProps {
@@ -38,8 +25,8 @@ interface ArgusFilterBarProps {
   onRefresh?: () => void;
   /** Show loading spinner on refresh icon */
   loading?: boolean;
-  /** Hide specific filters */
-  hideFilters?: ('environment' | 'browser' | 'os')[];
+  /** Hide the environment filter */
+  hideEnvironment?: boolean;
   /** Extra controls to render before the spacer (e.g., sort chip) */
   extraControls?: React.ReactNode;
 }
@@ -51,8 +38,6 @@ export const defaultArgusFilterState = (
 ): ArgusFilterState => ({
   dateRange: { type: 'preset', preset: savedPreset || '14d' },
   environments: [],
-  browsers: [],
-  os: [],
 });
 
 // ==================== Component ====================
@@ -63,24 +48,20 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
   onChange,
   onRefresh,
   loading = false,
-  hideFilters = [],
+  hideEnvironment = false,
   extraControls,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const isDark = theme.palette.mode === 'dark';
 
-  // Filter options from API
-  const [options, setOptions] = useState<{
-    environments: string[];
-    browsers: string[];
-    os: string[];
-  }>({ environments: [], browsers: [], os: [] });
+  // Environment options from API
+  const [envOptions, setEnvOptions] = useState<string[]>([]);
 
   const fetchOptions = useCallback(async () => {
     try {
       const result = await argusService.getFilterOptions(projectId);
-      setOptions(result);
+      setEnvOptions(result.environments || []);
     } catch (error) {
       console.error('Failed to fetch filter options:', error);
     }
@@ -98,18 +79,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
     onChange({ ...value, environments });
   };
 
-  const handleBrowserChange = (browsers: string[]) => {
-    onChange({ ...value, browsers });
-  };
-
-  const handleOsChange = (os: string[]) => {
-    onChange({ ...value, os });
-  };
-
-  const hasActiveFilters =
-    value.environments.length > 0 ||
-    value.browsers.length > 0 ||
-    value.os.length > 0;
+  const hasActiveFilters = value.environments.length > 0;
 
   return (
     <Box
@@ -133,51 +103,15 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         }),
       }}
     >
-      {/* Filter icon indicator */}
-      <Tooltip title={t('argus.filters.filters', { defaultValue: 'Filters' })}>
-        <FilterIcon
-          sx={{
-            fontSize: 16,
-            color: hasActiveFilters
-              ? theme.palette.primary.main
-              : 'text.disabled',
-            transition: 'color 0.2s',
-          }}
-        />
-      </Tooltip>
-
       {/* Environment */}
-      {!hideFilters.includes('environment') &&
-        options.environments.length > 0 && (
-          <MultiSelectFilterChip
-            label={t('argus.filters.environment', {
-              defaultValue: 'Environment',
-            })}
-            options={options.environments.map((e) => ({ value: e, label: e }))}
-            selected={value.environments}
-            onChange={handleEnvironmentChange}
-            emptyMeansAll
-          />
-        )}
-
-      {/* Browser */}
-      {!hideFilters.includes('browser') && options.browsers.length > 0 && (
+      {!hideEnvironment && envOptions.length > 0 && (
         <MultiSelectFilterChip
-          label={t('argus.filters.browser', { defaultValue: 'Browser' })}
-          options={options.browsers.map((b) => ({ value: b, label: b }))}
-          selected={value.browsers}
-          onChange={handleBrowserChange}
-          emptyMeansAll
-        />
-      )}
-
-      {/* OS */}
-      {!hideFilters.includes('os') && options.os.length > 0 && (
-        <MultiSelectFilterChip
-          label={t('argus.filters.os', { defaultValue: 'OS' })}
-          options={options.os.map((o) => ({ value: o, label: o }))}
-          selected={value.os}
-          onChange={handleOsChange}
+          label={t('argus.filters.environment', {
+            defaultValue: 'Environment',
+          })}
+          options={envOptions.map((e) => ({ value: e, label: e }))}
+          selected={value.environments}
+          onChange={handleEnvironmentChange}
           emptyMeansAll
         />
       )}

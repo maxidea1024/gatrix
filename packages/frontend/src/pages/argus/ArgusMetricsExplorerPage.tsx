@@ -1075,7 +1075,7 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           fetchMetricQueries();
         }}
         loading={loading || queryLoading}
-        hideFilters={['browser', 'os']}
+        
       />
 
       <MetricsQueryBuilder

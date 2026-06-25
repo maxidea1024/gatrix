@@ -9,6 +9,7 @@ const logger = createLogger('argus-discover');
 // Supported datasets for Discover
 const DISCOVER_DATASETS = new Set([
   'errors',
+  'feedback',
   'spans',
   'logs',
   'transactions',
@@ -362,10 +363,14 @@ export default async function discoverRoutes(app: FastifyInstance) {
           stats = (result.data as any[])?.[0] || {};
         }
 
-        // Dynamically build tag queries from lowCardinality columns
+        // Dynamically build tag queries from lowCardinality string columns
+        const NUMERIC_TYPES = new Set(['UInt8', 'UInt16', 'UInt32', 'UInt64', 'Float32', 'Float64', 'Int8', 'Int16', 'Int32', 'Int64']);
         const lowCardCols = [...dsObj.columns.entries()]
           .filter(
-            ([, def]) => def.lowCardinality && !def.type.startsWith('Map(')
+            ([, def]) =>
+              def.lowCardinality &&
+              !def.type.startsWith('Map(') &&
+              !NUMERIC_TYPES.has(def.type)
           )
           .map(([name]) => name)
           .slice(0, 10);
@@ -385,6 +390,60 @@ export default async function discoverRoutes(app: FastifyInstance) {
           for (const row of tagValues) {
             if (!tagMap[row.tag]) tagMap[row.tag] = [];
             tagMap[row.tag].push({ value: row.value, count: Number(row.cnt) });
+          }
+        }
+
+        // Discover dynamic tag keys from Map columns (e.g. tags Map(String,String))
+        // Filter out useless facets:
+        //   - unique_cnt >= 2: at least 2 distinct values (single-value = no filtering utility)
+        //   - unique_cnt <= 50: at most 50 distinct values (high cardinality = meaningless)
+        //   - unique_cnt < cnt * 0.5: unique ratio below 50% (near-unique = IDs, numeric)
+        const mapCols = [...dsObj.columns.entries()]
+          .filter(([, def]) => def.type === 'Map(String,String)')
+          .map(([name]) => name);
+
+        for (const mapCol of mapCols) {
+          try {
+            // Discover low-cardinality tag keys
+            const keysResult = await optic.rawQuery({
+              query: `
+                SELECT
+                  arrayJoin(mapKeys(${mapCol})) AS tag_key,
+                  count() AS cnt,
+                  uniq(${mapCol}[tag_key]) AS unique_cnt
+                FROM ${table}
+                WHERE project_id = {projectId:String} AND ${timeFilter}
+                GROUP BY tag_key
+                HAVING unique_cnt >= 2 AND unique_cnt <= 50 AND unique_cnt < cnt * 0.5
+                ORDER BY cnt DESC
+                LIMIT 20
+              `,
+              params: { projectId },
+            });
+            const discoveredKeys = (keysResult.data as any[])
+              .map((r: any) => r.tag_key)
+              .filter((k: string) => k && !tagMap[k]); // skip if already covered by a real column
+
+            if (discoveredKeys.length > 0) {
+              // Fetch top values for each discovered key
+              const mapTagParts = discoveredKeys.map(
+                (key: string) =>
+                  `SELECT '${key.replace(/'/g, "\\'")}' AS tag, ${mapCol}['${key.replace(/'/g, "\\'")}'] AS value, count() AS cnt FROM ${table} WHERE project_id = {projectId:String} AND ${timeFilter} AND mapContains(${mapCol}, '${key.replace(/'/g, "\\'")}') AND value != '' GROUP BY value ORDER BY cnt DESC LIMIT 15`
+              );
+              const mapTagsResult = await optic.rawQuery({
+                query: mapTagParts.join(' UNION ALL '),
+                params: { projectId },
+              });
+              for (const row of mapTagsResult.data as any[]) {
+                if (!tagMap[row.tag]) tagMap[row.tag] = [];
+                tagMap[row.tag].push({
+                  value: row.value,
+                  count: Number(row.cnt),
+                });
+              }
+            }
+          } catch (e) {
+            // Ignore map discovery errors — some tables may not have data
           }
         }
 

@@ -513,21 +513,12 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
       <Box
         sx={{
           display: 'flex',
-          gap: 2,
+          gap: 1.5,
           alignItems: 'center',
           flexWrap: 'wrap',
           mb: 3,
         }}
       >
-        <DateRangeSelector
-          value={dateRange}
-          onChange={(newDateRange) => {
-            setDateRange(newDateRange);
-            setPage(1);
-          }}
-          compact
-        />
-
         <SearchTextField
           placeholder={t('auditLogs.searchUserPlaceholder')}
           value={userFilter}
@@ -537,30 +528,54 @@ const FeatureFlagAuditLogs: React.FC<FeatureFlagAuditLogsProps> = ({
           }}
         />
 
-        <DynamicFilterBar
-          availableFilters={availableFilters}
-          activeFilters={activeFilters}
-          onFilterAdd={handleFilterAdd}
-          onFilterRemove={handleFilterRemove}
-          onFilterChange={handleDynamicFilterChange}
-          onOperatorChange={handleOperatorChange}
-        />
+        {/* Filter + Column Settings — unified control group */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1.5,
+            overflow: 'hidden',
+            height: 34,
+          }}
+        >
+          <DynamicFilterBar
+            availableFilters={availableFilters}
+            activeFilters={activeFilters}
+            onFilterAdd={handleFilterAdd}
+            onFilterRemove={handleFilterRemove}
+            onFilterChange={handleDynamicFilterChange}
+            onOperatorChange={handleOperatorChange}
+          />
+          <Divider orientation="vertical" flexItem />
+          <Tooltip title={t('users.columnSettings')}>
+            <IconButton
+              size="small"
+              onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
+              sx={{
+                borderRadius: 0,
+                px: 1,
+                height: '100%',
+                '&:hover': { bgcolor: 'action.hover' },
+              }}
+            >
+              <ViewColumnIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Tooltip>
+        </Box>
 
-        {/* Column Settings Button */}
-        <Tooltip title={t('users.columnSettings')}>
-          <IconButton
-            size="small"
-            onClick={(e) => setColumnSettingsAnchor(e.currentTarget)}
-            sx={{
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
-          >
-            <ViewColumnIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {/* Spacer — pushes DateRangeSelector to the right */}
+        <Box sx={{ flex: 1 }} />
+
+        <DateRangeSelector
+          value={dateRange}
+          onChange={(newDateRange) => {
+            setDateRange(newDateRange);
+            setPage(1);
+          }}
+          compact
+        />
       </Box>
 
       {/* Table */}

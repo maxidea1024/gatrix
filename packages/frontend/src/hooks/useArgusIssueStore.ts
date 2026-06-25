@@ -15,7 +15,7 @@ import { create } from 'zustand';
 const DEFAULTS = {
   currentPage: 1,
   search: '',
-  status: 'unresolved',
+  status: '',
   level: '',
   sort: 'last_seen',
   activeViewId: 'unresolved',

@@ -207,6 +207,16 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     description: 'aql.field.assigned.desc',
     staticValues: ['me', 'none', 'my_teams'],
   },
+  {
+    key: 'priority',
+    label: 'aql.field.priority',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.priority.desc',
+    staticValues: ['low', 'medium', 'high', 'critical'],
+  },
 
   // ── User fields ──
   {
@@ -377,6 +387,62 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     operators: ['=', '!=', '>', '>=', '<', '<='],
     searchable: true,
     description: 'aql.field.errors.desc',
+  },
+
+  // ── Feedback-specific fields ──
+  {
+    key: 'url',
+    label: 'aql.field.url',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!=', 'contains', '!contains', 'startsWith', '!startsWith'],
+    searchable: true,
+    description: 'aql.field.url.desc',
+  },
+  {
+    key: 'locale',
+    label: 'aql.field.locale',
+    type: 'string',
+    category: 'user',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.locale.desc',
+  },
+  {
+    key: 'category',
+    label: 'aql.field.category',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.category.desc',
+  },
+  {
+    key: 'sentiment',
+    label: 'aql.field.sentiment',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.sentiment.desc',
+  },
+  {
+    key: 'source',
+    label: 'aql.field.source',
+    type: 'string',
+    category: 'resource',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.source.desc',
+  },
+  {
+    key: 'user_id',
+    label: 'aql.field.userId',
+    type: 'string',
+    category: 'user',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.userId.desc',
   },
 ];
 
@@ -667,6 +733,7 @@ export const ISSUES_CONFIG: DomainConfig = {
       'issue_id',
       'status',
       'assigned',
+      'priority',
     ],
     {
       status: {
@@ -726,18 +793,25 @@ export const FEEDBACK_CONFIG: DomainConfig = {
     [
       'feedback',
       'contact_email',
+      'url',
       'environment',
       'release',
       'service',
       'browser_name',
       'os_name',
       'device',
+      'locale',
+      'category',
+      'sentiment',
+      'source',
+      'user_id',
       'timestamp',
       'status',
       'assigned',
     ],
     {
       status: { staticValues: ['resolved', 'unresolved', 'spam'] },
+      sentiment: { staticValues: ['positive', 'negative', 'neutral'] },
     }
   ),
   freeTextField: 'feedback',

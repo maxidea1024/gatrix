@@ -78,6 +78,13 @@ import {
   NotificationsActive as NotificationsActiveIcon,
   Speed as SpeedIcon,
   Analytics as AnalyticsIcon,
+  Groups as GroupsIcon,
+  Stream as StreamIcon,
+  CompareArrows as CompareArrowsIcon,
+  AttachMoney as AttachMoneyIcon,
+  Autorenew as AutorenewIcon,
+  TrendingUp as TrendingUpIcon,
+  VerifiedUser as VerifiedUserIcon,
 } from '@mui/icons-material';
 import RippleIcon from '@/components/icons/RippleIcon';
 import ArgusIcon from '@/components/icons/ArgusIcon';
@@ -157,6 +164,13 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   NotificationsActive: <NotificationsActiveIcon />,
   Speed: <SpeedIcon />,
   Analytics: <AnalyticsIcon />,
+  Groups: <GroupsIcon />,
+  Stream: <StreamIcon />,
+  CompareArrows: <CompareArrowsIcon />,
+  AttachMoney: <AttachMoneyIcon />,
+  Autorenew: <AutorenewIcon />,
+  TrendingUp: <TrendingUpIcon />,
+  VerifiedUser: <VerifiedUserIcon />,
   Ripple: <RippleIcon />,
   Argus: <ArgusIcon />,
 };

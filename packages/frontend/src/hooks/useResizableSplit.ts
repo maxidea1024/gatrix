@@ -24,14 +24,22 @@ export interface UseResizableSplitReturn {
   isDragging: boolean;
   /** Attach this to the splitter handle's onMouseDown */
   handleMouseDown: (e: React.MouseEvent) => void;
+  /**
+   * Attach this ref to the resizable panel element for zero-rerender drag performance.
+   * When attached, mousemove directly updates the DOM element's style.width,
+   * bypassing React re-renders entirely during the drag.
+   * If not attached, falls back to rAF-throttled state updates.
+   */
+  panelRef: React.RefObject<HTMLElement | null>;
 }
 
 /**
  * Reusable hook for resizable split panels.
  *
- * Performance: During drag, state updates are coalesced via requestAnimationFrame
- * so that at most one React re-render occurs per browser paint frame.
- * localStorage is only written on mouseup (not on every pixel move).
+ * Performance:
+ * - When panelRef is attached: DOM direct manipulation during drag (zero React re-renders).
+ * - When panelRef is not attached: rAF-throttled state updates (one re-render per frame).
+ * - localStorage is only written on mouseup (not on every pixel move).
  */
 export function useResizableSplit({
   storageKey,
@@ -51,7 +59,10 @@ export function useResizableSplit({
   // Ref to track the latest width during drag (for mouseup persist)
   const latestWidthRef = useRef(splitWidth);
   latestWidthRef.current = splitWidth;
-  // rAF-based throttle: pending frame ID
+
+  /** Attach to the resizable panel element for zero-rerender drag */
+  const panelRef = useRef<HTMLElement | null>(null);
+  // rAF-based throttle for fallback path (when panelRef is not attached)
   const rafRef = useRef(0);
 
   const handleMouseDown = useCallback(
@@ -60,28 +71,31 @@ export function useResizableSplit({
       setIsDragging(true);
       const startX = e.clientX;
       const startWidth = latestWidthRef.current;
-      // Track the latest desired width across mousemove events
       let pendingWidth = startWidth;
+
+      const clamp = (w: number) => Math.min(maxWidth, Math.max(minWidth, w));
 
       const onMouseMove = (ev: MouseEvent) => {
         const rawDelta = ev.clientX - startX;
         const delta = invertDelta ? -rawDelta : rawDelta;
-        pendingWidth = Math.min(
-          maxWidth,
-          Math.max(minWidth, startWidth + delta)
-        );
+        pendingWidth = clamp(startWidth + delta);
 
-        // rAF throttle: coalesce multiple mousemove events into one state update per frame
-        if (!rafRef.current) {
-          rafRef.current = requestAnimationFrame(() => {
-            rafRef.current = 0;
-            setSplitWidth(pendingWidth);
-          });
+        if (panelRef.current) {
+          // Fast path: DOM direct manipulation — zero React re-renders
+          panelRef.current.style.width = `${pendingWidth}px`;
+        } else {
+          // Fallback: rAF-throttled state update
+          if (!rafRef.current) {
+            rafRef.current = requestAnimationFrame(() => {
+              rafRef.current = 0;
+              setSplitWidth(pendingWidth);
+            });
+          }
         }
       };
 
       const onMouseUp = (ev: MouseEvent) => {
-        // Cancel any pending rAF to prevent stale update
+        // Cancel any pending rAF
         if (rafRef.current) {
           cancelAnimationFrame(rafRef.current);
           rafRef.current = 0;
@@ -95,13 +109,10 @@ export function useResizableSplit({
         // Final precise width from the last mouse position
         const rawDelta = ev.clientX - startX;
         const delta = invertDelta ? -rawDelta : rawDelta;
-        const finalWidth = Math.min(
-          maxWidth,
-          Math.max(minWidth, startWidth + delta)
-        );
-        setSplitWidth(finalWidth);
+        const finalWidth = clamp(startWidth + delta);
 
-        // Persist to localStorage only once on drag end
+        // Single React re-render + persist to localStorage
+        setSplitWidth(finalWidth);
         localStorage.setItem(storageKey, String(finalWidth));
       };
 
@@ -113,5 +124,5 @@ export function useResizableSplit({
     [storageKey, minWidth, maxWidth, invertDelta]
   );
 
-  return { splitWidth, isDragging, handleMouseDown };
+  return { splitWidth, isDragging, handleMouseDown, panelRef };
 }

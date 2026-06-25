@@ -5,8 +5,8 @@ import { Close as CloseIcon } from '@mui/icons-material';
 interface ResizableDrawerProps {
   open: boolean;
   onClose: () => void;
-  title?: string;
-  subtitle?: string;
+  title?: ReactNode;
+  subtitle?: ReactNode;
   children: ReactNode;
   anchor?: string; // Kept for compatibility but always 'right'
   storageKey?: string; // localStorage key for persisting width
@@ -84,7 +84,10 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
     <Drawer
       anchor="right"
       open={open}
-      onClose={onClose}
+      onClose={() => {
+        (document.activeElement as HTMLElement)?.blur();
+        onClose();
+      }}
       sx={{
         zIndex,
         '& .MuiDrawer-paper': {
@@ -136,20 +139,29 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
           bgcolor: 'background.paper',
         }}
       >
-        <Box>
-          <Typography variant="h6" component="h2" sx={{ fontWeight: 600 }}>
-            {title}
-          </Typography>
-          {subtitle && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {subtitle}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          {typeof title === 'string' ? (
+            <Typography variant="h6" component="h2" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {title}
             </Typography>
+          ) : (
+            title
+          )}
+          {subtitle && (
+            typeof subtitle === 'string' ? (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {subtitle}
+              </Typography>
+            ) : (
+              subtitle
+            )
           )}
         </Box>
         <IconButton
           onClick={onClose}
           size="small"
           sx={{
+            ml: 1.5,
             bgcolor: 'action.hover',
             '&:hover': {
               bgcolor: 'action.selected',

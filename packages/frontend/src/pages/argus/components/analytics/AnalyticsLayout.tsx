@@ -22,6 +22,8 @@ export interface AnalyticsLayoutProps {
   onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
   /** Whether external panel is currently being dragged */
   isPanelDragging?: boolean;
+  /** Externally controlled panel ref for zero-rerender drag */
+  panelRef?: React.RefObject<HTMLElement | null>;
 }
 
 const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
@@ -34,6 +36,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
   panelWidth: externalPanelWidth,
   onPanelResizeMouseDown: externalResizeHandler,
   isPanelDragging: externalDragging,
+  panelRef: externalPanelRef,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
@@ -42,6 +45,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
     splitWidth: internalPanelWidth,
     isDragging: internalIsDragging,
     handleMouseDown: internalHandleMouseDown,
+    panelRef: internalPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_analytics_panel_width',
     defaultWidth: 340,
@@ -54,6 +58,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
   const isPanelDragging = externalDragging ?? internalIsDragging;
   const handlePanelSplitterMouseDown =
     externalResizeHandler ?? internalHandleMouseDown;
+  const activePanelRef = externalPanelRef ?? internalPanelRef;
 
   return (
     <Box
@@ -67,6 +72,7 @@ const AnalyticsLayout: React.FC<AnalyticsLayoutProps> = ({
       {/* Left Sidebar: Query Builder */}
       <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
         <Box
+          ref={activePanelRef as React.Ref<HTMLDivElement>}
           sx={{
             width: panelWidth,
             borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,

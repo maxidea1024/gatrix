@@ -7,13 +7,7 @@ import {
   Chip,
   useTheme,
   alpha,
-  Skeleton,
 } from '@mui/material';
-import {
-  StatsRowSkeleton,
-  ListSkeleton,
-  TableSkeleton,
-} from '@/components/argus/ArgusSkeletons';
 import {
   Speed as SpeedIcon,
   Schedule as ScheduleIcon,
@@ -196,172 +190,6 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
   return (
     <PageContentLoader
       loading={detailLoading}
-      skeleton={
-        <Box>
-          {/* Summary Cards Skeleton */}
-          <StatsRowSkeleton count={4} />
-
-          {/* Charts Row Skeleton */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              gap: 2,
-              mb: 2,
-            }}
-          >
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-              }}
-            >
-              <Skeleton
-                variant="text"
-                width={100}
-                height={18}
-                sx={{ mb: 2, borderRadius: 0.5 }}
-              />
-              <ArgusChartSkeleton height={260} />
-            </Paper>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-              }}
-            >
-              <Skeleton
-                variant="text"
-                width={120}
-                height={18}
-                sx={{ mb: 2, borderRadius: 0.5 }}
-              />
-              <ArgusChartSkeleton height={220} />
-            </Paper>
-          </Box>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Insights Skeleton */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-              }}
-            >
-              <Skeleton
-                variant="text"
-                width={150}
-                height={18}
-                sx={{ mb: 2, borderRadius: 0.5 }}
-              />
-              <Skeleton
-                variant="rounded"
-                height={60}
-                sx={{ borderRadius: 1.5 }}
-              />
-            </Paper>
-
-            {/* Related Issues Skeleton */}
-            <Paper
-              elevation={0}
-              sx={{
-                p: 2.5,
-                border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                borderRadius: 2,
-              }}
-            >
-              <Skeleton
-                variant="text"
-                width={120}
-                height={18}
-                sx={{ mb: 2, borderRadius: 0.5 }}
-              />
-              <ListSkeleton rows={3} />
-            </Paper>
-
-            {/* Slowest Spans & Recent Traces Skeleton */}
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                gap: 2,
-              }}
-            >
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}
-              >
-                <Skeleton
-                  variant="text"
-                  width={110}
-                  height={18}
-                  sx={{ mb: 2, borderRadius: 0.5 }}
-                />
-                <Box
-                  sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
-                >
-                  {[1, 2, 3].map((i) => (
-                    <Box key={i}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          mb: 0.5,
-                        }}
-                      >
-                        <Skeleton
-                          variant="text"
-                          width="40%"
-                          height={14}
-                          sx={{ borderRadius: 0.5 }}
-                        />
-                        <Skeleton
-                          variant="text"
-                          width="15%"
-                          height={14}
-                          sx={{ borderRadius: 0.5 }}
-                        />
-                      </Box>
-                      <Skeleton
-                        variant="rectangular"
-                        height={8}
-                        sx={{ borderRadius: 1 }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              </Paper>
-
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2.5,
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                  borderRadius: 2,
-                }}
-              >
-                <Skeleton
-                  variant="text"
-                  width={110}
-                  height={18}
-                  sx={{ mb: 2, borderRadius: 0.5 }}
-                />
-                <TableSkeleton rows={4} cols={3} />
-              </Paper>
-            </Box>
-          </Box>
-        </Box>
-      }
     >
       {/* Summary Cards */}
       {detail?.summary && (
@@ -708,14 +536,14 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
           }}
         >
           {/* Slowest Spans */}
-          <DetailPaper elevation={0} isDark={isDark} sx={{ flex: 1 }}>
+          <DetailPaper elevation={0} isDark={isDark} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
               {t('argus.performance.slowestSpans')}
             </Typography>
             {detail?.spans?.length === 0 ? (
               <EmptyPlaceholder
                 message={t('argus.performance.noSpans')}
-                minHeight={100}
+                sx={{ flex: 1 }}
               />
             ) : (
               <Box sx={{ maxHeight: 280, overflow: 'auto' }}>

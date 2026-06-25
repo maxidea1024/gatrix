@@ -40,7 +40,9 @@ import {
   TraceHeaderBar,
 } from './LogSidePanel.styles';
 
-const LogSidePanel: React.FC<LogSidePanelProps> = ({
+const LogSidePanel = React.memo(
+  React.forwardRef<HTMLDivElement, LogSidePanelProps>((
+  {
   log,
   loading = false,
   open,
@@ -51,7 +53,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
   hasPrev,
   hasNext,
   width = 420,
-}) => {
+}, ref) => {
   const theme = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -112,6 +114,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
   if (!log && !loading) {
     return (
       <Box
+        ref={ref}
         sx={{
           width,
           flexShrink: 0,
@@ -153,6 +156,7 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
 
   return (
     <Box
+      ref={ref}
       sx={{
         width,
         flexShrink: 0,
@@ -394,6 +398,6 @@ const LogSidePanel: React.FC<LogSidePanelProps> = ({
       </PageContentLoader>
     </Box>
   );
-};
+}));
 
-export default React.memo(LogSidePanel);
+export default LogSidePanel;

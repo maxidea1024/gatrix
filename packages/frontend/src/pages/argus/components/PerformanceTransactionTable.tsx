@@ -23,11 +23,10 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { ArgusTransaction } from '@/services/argusService';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
+import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { getMethodColor, parseTransaction } from './performanceHelpers';
 
-const PERF_PAGE_SIZE_KEY = 'argusPerf.pageSize';
-const PERF_DEFAULT_PAGE_SIZE = 15;
-const PERF_VALID_PAGE_SIZES = [5, 10, 15, 20, 25, 50, 100];
+
 
 interface PerformanceTransactionTableProps {
   transactions: ArgusTransaction[];
@@ -44,15 +43,7 @@ const PerformanceTransactionTable: React.FC<
   const isDark = theme.palette.mode === 'dark';
 
   const [perfPage, setPerfPage] = useState(0);
-  const [perfRowsPerPage, setPerfRowsPerPage] = useState(() => {
-    const saved = parseInt(localStorage.getItem(PERF_PAGE_SIZE_KEY) || '', 10);
-    if (!isNaN(saved) && PERF_VALID_PAGE_SIZES.includes(saved)) return saved;
-    return PERF_DEFAULT_PAGE_SIZE;
-  });
-
-  useEffect(() => {
-    localStorage.setItem(PERF_PAGE_SIZE_KEY, String(perfRowsPerPage));
-  }, [perfRowsPerPage]);
+  const [perfRowsPerPage, setPerfRowsPerPage] = useGlobalPageSize();
 
   // Reset page on data change
   useEffect(() => {
@@ -567,7 +558,7 @@ const PerformanceTransactionTable: React.FC<
               setPerfRowsPerPage(Number(e.target.value));
               setPerfPage(0);
             }}
-            rowsPerPageOptions={PERF_VALID_PAGE_SIZES}
+            rowsPerPageOptions={[5, 10, 15, 20, 25, 50, 100]}
             size="small"
           />
         </Box>

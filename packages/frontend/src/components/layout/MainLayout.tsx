@@ -1370,6 +1370,26 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       return false;
     }
 
+    // Special handling for /argus/analytics: prevent highlighting when we are
+    // inside a distinct sub-menu (like /argus/analytics/cohorts).
+    // Only the original tab pages (insights/funnels/retention/flows) should
+    // keep the parent highlighted.
+    if (path === '/argus/analytics') {
+      const analyticsSubMenus = [
+        '/argus/analytics/users',
+        '/argus/analytics/cohorts',
+        '/argus/analytics/realtime',
+        '/argus/analytics/impact',
+        '/argus/analytics/revenue',
+        '/argus/analytics/lifecycle',
+        '/argus/analytics/kpi-alerts',
+        '/argus/analytics/data-governance',
+      ];
+      if (analyticsSubMenus.some((sub) => location.pathname.startsWith(sub))) {
+        return false;
+      }
+    }
+
     // /settings uses exact match only to prevent /settings matching /settings/members
     if (path === '/settings') {
       return false;

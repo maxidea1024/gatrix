@@ -56,11 +56,12 @@ import {
   type QueryAQLEditorHandle,
 } from '@/components/argus/query-aql';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
+import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import { evaluateAST } from './components/releasesHelpers';
 
-const PAGE_SIZE_STORAGE_KEY = 'argus:releases:pageSize';
+
 const DEEP_LINK_KEYS = ['page', 'search', 'sort'];
 
 const ArgusReleasesPage: React.FC = () => {
@@ -165,15 +166,7 @@ const ArgusReleasesPage: React.FC = () => {
     }));
   }, [urlState.period]);
 
-  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-    const stored = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
-    const saved = Number(stored);
-    return !isNaN(saved) && saved > 0 ? saved : 20;
-  });
-
-  useEffect(() => {
-    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
-  }, [rowsPerPage]);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   const handlePageChange = (_: unknown, page: number) => {
     setCurrentPage(page);

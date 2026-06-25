@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -18,6 +18,7 @@ import {
   ChevronRight as ExpandIcon,
   Add as AddIcon,
   Close as RemoveIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { formatCompactNumber } from '@/utils/numberFormat';
@@ -55,7 +56,25 @@ const FacetSection = React.memo<{
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showAll, setShowAll] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedSearch(value), 200);
+  }, []);
+
+  const handleClearSearch = useCallback(() => {
+    setSearch('');
+    setDebouncedSearch('');
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, []);
 
   const totalCount = useMemo(
     () => facet.values.reduce((s, v) => s + v.count, 0),
@@ -64,14 +83,14 @@ const FacetSection = React.memo<{
 
   const filteredValues = useMemo(() => {
     let vals = facet.values;
-    if (search.trim()) {
-      const q = search.toLowerCase();
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.toLowerCase();
       vals = vals.filter((v) => v.value.toLowerCase().includes(q));
     }
     return showAll ? vals : vals.slice(0, 10);
-  }, [facet.values, search, showAll]);
+  }, [facet.values, debouncedSearch, showAll]);
 
-  const hasMore = facet.values.length > 10 && !showAll && !search.trim();
+  const hasMore = facet.values.length > 10 && !showAll && !debouncedSearch.trim();
 
   return (
     <Box
@@ -140,13 +159,22 @@ const FacetSection = React.memo<{
               <SearchIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
               <InputBase
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder={t(
                   'argus.logs.facet.filterValues',
                   'Filter values...'
                 )}
                 sx={{ fontSize: '0.68rem', flex: 1, '& input': { p: 0 } }}
               />
+              {search && (
+                <IconButton
+                  size="small"
+                  onClick={handleClearSearch}
+                  sx={{ p: 0, width: 16, height: 16 }}
+                >
+                  <ClearIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
+                </IconButton>
+              )}
             </Box>
           )}
 
@@ -327,26 +355,42 @@ const FacetSection = React.memo<{
 
 /* ─── Main Sidebar ─── */
 
-const FacetSidebar = React.memo<FacetSidebarProps>(
-  ({
-    facets,
-    onFilter,
-    collapsed,
-    onToggleCollapse,
-    loading,
-    customFacets,
-    discoveredFacets,
-    onAddCustomFacet,
-    onRemoveCustomFacet,
-    width = 240,
-  }) => {
-    const theme = useTheme();
-    const { t } = useTranslation();
-    const isDark = theme.palette.mode === 'dark';
-    const [newFacetKey, setNewFacetKey] = useState('');
+const FacetSidebar = React.memo(
+  React.forwardRef<HTMLDivElement, FacetSidebarProps>(
+    (
+      {
+        facets,
+        onFilter,
+        collapsed,
+        onToggleCollapse,
+        loading,
+        customFacets,
+        discoveredFacets,
+        onAddCustomFacet,
+        onRemoveCustomFacet,
+        width = 240,
+      },
+      ref
+    ) => {
+      const theme = useTheme();
+      const { t } = useTranslation();
+      const isDark = theme.palette.mode === 'dark';
+      const [newFacetKey, setNewFacetKey] = useState('');
+      const [showLoading, setShowLoading] = useState(false);
 
-    return (
-      <Box sx={{ position: 'relative', flexShrink: 0 }}>
+      useEffect(() => {
+        if (!loading) {
+          setShowLoading(false);
+          return;
+        }
+        const timer = setTimeout(() => {
+          setShowLoading(true);
+        }, 250);
+        return () => clearTimeout(timer);
+      }, [loading]);
+
+      return (
+        <Box ref={ref} sx={{ position: 'relative', flexShrink: 0, height: '100%', width: collapsed ? undefined : width }}>
         {/* Edge toggle button — circular, straddling the right border */}
         <Box
           onClick={onToggleCollapse}
@@ -393,7 +437,8 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
         ) : (
           <Box
             sx={{
-              width,
+              width: '100%',
+              height: '100%',
               overflowY: 'auto',
               overflowX: 'hidden',
               borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
@@ -429,6 +474,40 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
               </Typography>
             </Box>
 
+            {/* Compact loading animation directly under header */}
+            {facets.length > 0 && showLoading && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 1.2,
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                  // Smooth bouncing dots animation
+                  '@keyframes bounceDotsCompact': {
+                    '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
+                    '50%': { transform: 'translateY(-4px)', opacity: 1 },
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                  {[0, 1, 2].map((i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        backgroundColor: theme.palette.divider,
+                        animation: 'bounceDotsCompact 1.4s infinite ease-in-out',
+                        animationDelay: `${i * 0.16}s`,
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )}
+
             {/* Facet sections */}
             {facets.map((facet) => (
               <FacetSection
@@ -438,6 +517,39 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
                 isDark={isDark}
               />
             ))}
+
+            {facets.length === 0 && showLoading && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  py: 8,
+                  width: '100%',
+                  // Smooth bouncing dots animation
+                  '@keyframes bounceDots': {
+                    '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
+                    '50%': { transform: 'translateY(-6px)', opacity: 1 },
+                  },
+                }}
+              >
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                  {[0, 1, 2].map((i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        backgroundColor: theme.palette.divider,
+                        animation: 'bounceDots 1.4s infinite ease-in-out',
+                        animationDelay: `${i * 0.16}s`,
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )}
 
             {facets.length === 0 && !loading && (
               <Typography
@@ -454,7 +566,7 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
             )}
 
             {/* Custom Facets */}
-            {customFacets && customFacets.length > 0 && (
+            {!(facets.length === 0 && loading) && customFacets && customFacets.length > 0 && (
               <Box
                 sx={{
                   borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
@@ -503,7 +615,7 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
             )}
 
             {/* Discovered Facets */}
-            {discoveredFacets && discoveredFacets.length > 0 && (
+            {!(facets.length === 0 && loading) && discoveredFacets && discoveredFacets.length > 0 && (
               <Box
                 sx={{
                   borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
@@ -535,7 +647,7 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
             )}
 
             {/* Add Custom Facet */}
-            {onAddCustomFacet && (
+            {!(facets.length === 0 && loading) && onAddCustomFacet && (
               <Box
                 sx={{
                   px: 1,
@@ -590,6 +702,7 @@ const FacetSidebar = React.memo<FacetSidebarProps>(
       </Box>
     );
   }
+  )
 );
 
 export default FacetSidebar;

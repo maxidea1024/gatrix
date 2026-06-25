@@ -12,7 +12,6 @@ import {
   alpha,
   Button,
   Tooltip,
-  Tab,
 } from '@mui/material';
 import {
   Feedback as FeedbackIcon,
@@ -55,6 +54,8 @@ import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/
 import { formatCompactNumber } from '@/utils/numberFormat';
 
 import useArgusUrlState from '@/hooks/useArgusUrlState';
+import useGlobalPageSize from '@/hooks/useGlobalPageSize';
+import { useResizableSplit } from '@/hooks/useResizableSplit';
 import SimplePagination from '@/components/common/SimplePagination';
 import PageHeader from '@/components/common/PageHeader';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
@@ -76,11 +77,13 @@ import {
   FEEDBACK_CONFIG,
   resolveSearchMagicValues,
   type QueryAQLEditorHandle,
+  type DomainConfig,
+  type QueryField,
 } from '@/components/argus/query-aql';
 import {
   PageContainer,
   TotalCountChip,
-  FeedbackTabs,
+
   SplitContainer,
   ListPanel,
   SplitterHandle,
@@ -115,7 +118,7 @@ const DEFAULT_FACET_WIDTH = 220;
 const MIN_FACET_WIDTH = 150;
 const MAX_FACET_WIDTH = 400;
 
-type FeedbackStatusTab = 'all' | 'unresolved' | 'resolved' | 'spam';
+
 
 // ─── Main Component ───
 const ArgusFeedbackPage: React.FC = () => {
@@ -138,7 +141,7 @@ const ArgusFeedbackPage: React.FC = () => {
       },
       start: { key: 'start', default: '' },
       end: { key: 'end', default: '' },
-      status: { key: 'status', default: 'unresolved' },
+      status: { key: 'status', default: '' },
       page: { key: 'page', default: '1' },
       sort: { key: 'sort', default: 'newest' },
       fb: { key: 'fb', default: '' },
@@ -200,15 +203,7 @@ const ArgusFeedbackPage: React.FC = () => {
   }, [selectedFbId, projectId]);
 
   const page = parseInt(urlState.page, 10) || 1;
-  const [rowsPerPage, setRowsPerPage] = useState(() => {
-    const saved = parseInt(localStorage.getItem(PAGE_SIZE_KEY) || '', 10);
-    if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
-    return DEFAULT_PAGE_SIZE;
-  });
-
-  useEffect(() => {
-    localStorage.setItem(PAGE_SIZE_KEY, String(rowsPerPage));
-  }, [rowsPerPage]);
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   const [filters, setFilters] = useState<ArgusFilterState>(() =>
     defaultArgusFilterState(urlState.period)
@@ -260,19 +255,22 @@ const ArgusFeedbackPage: React.FC = () => {
         const data = await argusService.getFeedbackAttributeFacet(
           projectId,
           chKey,
-          { period: urlState.period }
+          {
+            period: urlState.period,
+            start: urlState.start,
+            end: urlState.end,
+          }
         );
         return data.map((d) => d.attr_value);
       } catch {
         return [];
       }
     },
-    [projectId, urlState.period]
+    [projectId, urlState.period, urlState.start, urlState.end]
   );
 
   const [search, setSearch] = useState('');
   const dslEditorRef = useRef<QueryAQLEditorHandle>(null);
-  const statusTab = urlState.status as FeedbackStatusTab;
   const sortOrder = urlState.sort;
 
   // ─── Selection ───
@@ -301,86 +299,34 @@ const ArgusFeedbackPage: React.FC = () => {
   }>({ open: false, title: '', message: '', onConfirm: () => {} });
 
   // ─── Resizable Splitter ───
-  const [splitWidth, setSplitWidth] = useState(() => {
-    const saved = parseInt(localStorage.getItem(SPLIT_WIDTH_KEY) || '', 10);
-    return !isNaN(saved) && saved >= MIN_SPLIT_WIDTH && saved <= MAX_SPLIT_WIDTH
-      ? saved
-      : DEFAULT_SPLIT_WIDTH;
+  const {
+    splitWidth,
+    isDragging: isSplitDragging,
+    handleMouseDown: handleSplitterMouseDown,
+    panelRef: splitPanelRef,
+  } = useResizableSplit({
+    storageKey: SPLIT_WIDTH_KEY,
+    defaultWidth: DEFAULT_SPLIT_WIDTH,
+    minWidth: MIN_SPLIT_WIDTH,
+    maxWidth: MAX_SPLIT_WIDTH,
   });
-  const [isSplitDragging, setIsSplitDragging] = useState(false);
   const splitContainerRef = React.useRef<HTMLDivElement>(null);
-
-  const handleSplitterMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setIsSplitDragging(true);
-      const startX = e.clientX;
-      const startWidth = splitWidth;
-
-      const onMouseMove = (ev: MouseEvent) => {
-        const delta = ev.clientX - startX;
-        const newWidth = Math.min(
-          MAX_SPLIT_WIDTH,
-          Math.max(MIN_SPLIT_WIDTH, startWidth + delta)
-        );
-        setSplitWidth(newWidth);
-      };
-      const onMouseUp = () => {
-        setIsSplitDragging(false);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      };
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    },
-    [splitWidth]
-  );
 
   // ─── Resizable Facet Sidebar ───
   const [facetCollapsed, setFacetCollapsed] = useState(() => {
     return localStorage.getItem(FACET_COLLAPSED_KEY) === 'true';
   });
-  const [facetWidth, setFacetWidth] = useState(() => {
-    const saved = parseInt(localStorage.getItem(FACET_WIDTH_KEY) || '', 10);
-    return !isNaN(saved) && saved >= MIN_FACET_WIDTH && saved <= MAX_FACET_WIDTH
-      ? saved
-      : DEFAULT_FACET_WIDTH;
+  const {
+    splitWidth: facetWidth,
+    isDragging: isFacetDragging,
+    handleMouseDown: handleFacetSplitterMouseDown,
+    panelRef: facetPanelRef,
+  } = useResizableSplit({
+    storageKey: FACET_WIDTH_KEY,
+    defaultWidth: DEFAULT_FACET_WIDTH,
+    minWidth: MIN_FACET_WIDTH,
+    maxWidth: MAX_FACET_WIDTH,
   });
-  const [isFacetDragging, setIsFacetDragging] = useState(false);
-
-  const handleFacetSplitterMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setIsFacetDragging(true);
-      const startX = e.clientX;
-      const startWidth = facetWidth;
-
-      const onMouseMove = (ev: MouseEvent) => {
-        const delta = ev.clientX - startX;
-        const newWidth = Math.min(
-          MAX_FACET_WIDTH,
-          Math.max(MIN_FACET_WIDTH, startWidth + delta)
-        );
-        setFacetWidth(newWidth);
-      };
-      const onMouseUp = () => {
-        setIsFacetDragging(false);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      };
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    },
-    [facetWidth]
-  );
 
   const handleToggleFacetCollapse = useCallback(() => {
     setFacetCollapsed((prev) => {
@@ -390,13 +336,7 @@ const ArgusFeedbackPage: React.FC = () => {
     });
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(FACET_WIDTH_KEY, String(facetWidth));
-  }, [facetWidth]);
-
-  useEffect(() => {
-    localStorage.setItem(SPLIT_WIDTH_KEY, String(splitWidth));
-  }, [splitWidth]);
+  // localStorage persistence is handled by useResizableSplit on mouseup
 
   useEffect(() => {
     localStorage.setItem(STATS_COLLAPSED_KEY, String(statsCollapsed));
@@ -426,7 +366,6 @@ const ArgusFeedbackPage: React.FC = () => {
         search: search
           ? resolveSearchMagicValues(search, { userName: user?.name })
           : undefined,
-        status: statusTab === 'all' ? undefined : statusTab || undefined,
         sort: sortOrder,
       });
       setData(result);
@@ -435,64 +374,100 @@ const ArgusFeedbackPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, filters, page, rowsPerPage, search, statusTab, sortOrder]);
+  }, [projectId, filters, page, rowsPerPage, search, sortOrder]);
 
   const [facetGroups, setFacetGroups] = useState<FacetGroup[]>([]);
   const [facetsLoading, setFacetsLoading] = useState(false);
+  const [discoveredTagKeys, setDiscoveredTagKeys] = useState<
+    { key: string; values: string[] }[]
+  >([]);
+  const [rawFacets, setRawFacets] = useState<
+    Record<string, { value: string; count: number }[]>
+  >({});
 
   const fetchFacets = useCallback(async () => {
     setFacetsLoading(true);
     try {
-      const ap = argusDateRangeToApiParams(filters.dateRange);
-      const queryParams = {
-        period: urlState.period || undefined,
-        start: ap.start,
-        end: ap.end,
-      };
+      const data = await argusService.discoverTags(projectId, 'feedback', {
+        period: urlState.period,
+        start: urlState.start,
+        end: urlState.end,
+      });
+      const tags = data.tags || {};
 
-      const keys = [
-        {
-          key: 'environment',
-          label: t('argus.issues.environment', 'Environment'),
-        },
-        { key: 'release', label: t('argus.issues.release', 'Release') },
-        { key: 'browser', label: t('argus.issues.browser', 'Browser') },
-        { key: 'os', label: t('argus.issues.os', 'OS') },
-        { key: 'category', label: t('argus.feedback.category', 'Category') },
-        { key: 'sentiment', label: t('argus.feedback.sentiment', 'Sentiment') },
-        { key: 'assigned_to', label: t('argus.issues.assignee', 'Assignee') },
-      ];
+      // Convert discovered tags into FacetGroup format
+      const groups: FacetGroup[] = Object.entries(tags)
+        .filter(([, values]) => values.length > 0)
+        .map(([key, values]) => ({
+          key,
+          label: t(`argus.facet.${key}`, key),
+          values: values.map((v) => ({
+            value: v.value,
+            count: Number(v.count),
+          })),
+        }));
 
-      const results = await Promise.all(
-        keys.map(async ({ key, label }) => {
-          try {
-            const data = await argusService.getFeedbackAttributeFacet(
-              projectId,
-              key,
-              queryParams
-            );
-            return {
-              key,
-              label,
-              values: data.map((d) => ({
-                value: d.attr_value,
-                count: Number(d.count),
-              })),
-            };
-          } catch (err) {
-            console.error(`Failed to fetch facet for ${key}:`, err);
-            return { key, label, values: [] };
-          }
-        })
+      setFacetGroups(groups);
+      setRawFacets(tags);
+
+      // Track discovered tag keys for AQL autocomplete
+      setDiscoveredTagKeys(
+        Object.entries(tags)
+          .filter(([, values]) => values.length > 0)
+          .map(([key, values]) => ({
+            key,
+            values: values.map((v) => v.value),
+          }))
       );
-
-      setFacetGroups(results.filter((g) => g.values.length > 0));
     } catch (error) {
       console.error('Failed to fetch facets:', error);
     } finally {
       setFacetsLoading(false);
     }
-  }, [projectId, filters.dateRange, urlState.period, t]);
+    // Only re-fetch facets when time range changes — NOT on search/filter changes
+  }, [projectId, urlState.period, urlState.start, urlState.end, t]);
+
+  // Merge discovered tag keys into FEEDBACK_CONFIG for AQL autocomplete
+  const mergedConfig = useMemo<DomainConfig>(() => {
+    if (discoveredTagKeys.length === 0) return FEEDBACK_CONFIG;
+
+    const existingKeys = new Set(FEEDBACK_CONFIG.fields.map((f) => f.key));
+    const extraFields: QueryField[] = discoveredTagKeys
+      .filter((tag) => !existingKeys.has(tag.key))
+      .map((tag) => ({
+        key: tag.key,
+        label: tag.key,
+        type: 'string' as const,
+        searchable: true,
+        operators: ['=' as const, '!=' as const],
+        category: 'custom' as const,
+        description: `Tag: ${tag.key}`,
+        staticValues: tag.values,
+      }));
+
+    if (extraFields.length === 0) return FEEDBACK_CONFIG;
+
+    return {
+      ...FEEDBACK_CONFIG,
+      fields: [...FEEDBACK_CONFIG.fields, ...extraFields],
+    };
+  }, [discoveredTagKeys]);
+
+  // Map backend column names to frontend AQL field names for autocomplete values
+  const mappedInitialFacets = useMemo(() => {
+    const res: Record<string, any> = {};
+    const keyMapping: Record<string, string> = {
+      browser: 'browser_name',
+      os: 'os_name',
+      assigned_to: 'assigned',
+      message: 'feedback',
+    };
+    for (const [key, values] of Object.entries(rawFacets)) {
+      const targetKey = keyMapping[key] || key;
+      res[targetKey] = values;
+    }
+    return res;
+  }, [rawFacets]);
 
   useEffect(() => {
     fetchFacets();
@@ -792,9 +767,7 @@ const ArgusFeedbackPage: React.FC = () => {
     }
   }, [selectedItem?.issue_id, selectedItem?.feedback_id, projectId]);
 
-  const unresolvedCount = summary?.unresolved_count || 0;
-  const resolvedCount = summary?.resolved_count || 0;
-  const spamCount = summary?.spam_count || 0;
+
 
   // ─── Trend Chart — transformed for ArgusVolumeChart ───
   const trendLabelsRaw = useMemo(
@@ -933,7 +906,7 @@ const ArgusFeedbackPage: React.FC = () => {
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <QueryAQLEditor
                   ref={dslEditorRef}
-                  config={FEEDBACK_CONFIG}
+                  config={mergedConfig}
                   initialQuery={search}
                   onSearch={(q) => {
                     setSearch(q);
@@ -941,9 +914,9 @@ const ArgusFeedbackPage: React.FC = () => {
                   }}
                   onChange={(q) => {
                     setSearch(q);
-                    setUrlState({ page: '1', fb: '' });
                   }}
                   fetchFieldValues={fetchFieldValues}
+                  initialFacets={mappedInitialFacets}
                   placeholder={t('argus.feedback.searchPlaceholder')}
                 />
               </Box>
@@ -1004,28 +977,7 @@ const ArgusFeedbackPage: React.FC = () => {
         onZoom={handleChartZoom}
       />
 
-      {/* Status Tabs */}
-      <FeedbackTabs
-        value={statusTab}
-        onChange={(_, v) => {
-          setUrlState({ status: v, page: '1', fb: '' });
-          setSelectedIds(new Set());
-        }}
-      >
-        <Tab
-          value="unresolved"
-          label={`${t('argus.feedback.statusUnresolved')} (${formatCompactNumber(unresolvedCount)})`}
-        />
-        <Tab
-          value="resolved"
-          label={`${t('argus.feedback.statusResolved')} (${formatCompactNumber(resolvedCount)})`}
-        />
-        <Tab
-          value="spam"
-          label={`${t('argus.feedback.statusSpam')} (${formatCompactNumber(spamCount)})`}
-        />
-        <Tab value="all" label={t('argus.feedback.statusAll')} />
-      </FeedbackTabs>
+
 
       {/* Bulk Action Toolbar */}
       {selectedIds.size > 0 && (
@@ -1042,6 +994,7 @@ const ArgusFeedbackPage: React.FC = () => {
       <SplitContainer ref={splitContainerRef} isDark={isDark}>
         {/* Facet Sidebar */}
         <FacetSidebar
+          ref={facetPanelRef as React.Ref<HTMLDivElement>}
           width={facetWidth}
           facets={facetGroups}
           onFilter={(key, value, exclude) => {
@@ -1080,6 +1033,7 @@ const ArgusFeedbackPage: React.FC = () => {
 
         {/* ─── LEFT: Feedback List ─── */}
         <ListPanel
+          ref={splitPanelRef as React.Ref<HTMLDivElement>}
           panelWidth={splitWidth}
           isDragging={isSplitDragging}
           minPanelWidth={MIN_SPLIT_WIDTH}

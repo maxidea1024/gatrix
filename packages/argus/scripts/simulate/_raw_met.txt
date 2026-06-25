@@ -1,0 +1,103 @@
+﻿    valMin: 1024 * 1024 * 100,
+    valMax: 1024 * 1024 * 8000,
+  },
+  {
+    name: 'http.server.requests',
+    type: 'counter',
+    unit: 'none',
+    valMin: 1,
+    valMax: 100,
+  },
+  {
+    name: 'http.server.duration',
+    type: 'distribution',
+    unit: 'millisecond',
+    valMin: 5,
+    valMax: 500,
+  },
+  {
+    name: 'custom.user.login',
+    type: 'counter',
+    unit: 'none',
+    valMin: 1,
+    valMax: 5,
+  },
+  {
+    name: 'custom.checkout.cart_size',
+    type: 'distribution',
+    unit: 'none',
+    valMin: 1,
+    valMax: 15,
+  },
+  {
+    name: 'game.concurrent_players',
+    type: 'gauge',
+    unit: 'none',
+    valMin: 1000,
+    valMax: 15000,
+  },
+];
+
+function generateLogsForEvent(
+  issueId: number,
+  traceId: string,
+  timestamp: Date,
+  scenario: ErrorScenario,
+  user: { id: string; ip: string },
+  server: string,
+  env: string,
+  release: string
+): any[] {
+  const baseTime = new Date(timestamp.getTime() - randomInt(5000, 30000));
+  const service = randomPick(scenario.services);
+  const pod = k8sPodName(service);
+
+  const contextualLines = generateContextualLogs(
+    scenario,
+    user,
+    server,
+    env,
+    release
+  );
+
+  return contextualLines.map((line, i) => ({
+    log_id: uuid(),
+    project_id: PROJECT_ID,
+    trace_id: traceId,
+    span_id: uuid().substring(0, 16),
+    issue_id: issueId,
+    timestamp: new Date(
+      baseTime.getTime() + i * randomInt(200, 3000)
+    ).toISOString(),
+    level: line.level,
+    logger_name: line.logger,
+    message: line.msg,
+    body: line.body || '',
+    environment: env,
+    release,
+    service,
+    attributes: {
+      'server.name': server,
+      environment: env,
+      'trace.id': traceId,
+      'kubernetes.pod_name': pod,
+      'service.version': release,
+      'game.shard': randomPick(GAME_SHARDS),
+    },
+  }));
+}
+
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??MAIN ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+async function main() {
+  console.log('?렜 Argus Data Simulator ??Online Game (NodeJS / Lua / UE4)');
+  console.log('??.repeat(60));
+  console.log(
+    `   Scale: ${(TOTAL_ERROR_EVENTS / 1000).toFixed(0)}K events, ${(TOTAL_TRANSACTIONS / 1000).toFixed(0)}K txns, ${(TOTAL_SESSIONS / 1000).toFixed(0)}K sessions, ${TOTAL_FEEDBACK} feedback`
+  );
+  console.log(
+    `   Users: ${USER_POOL_SIZE.toLocaleString()}, Period: ${DAYS_BACK} days`
+  );
+  console.log(`   Scenarios: ${SCENARIOS.length} unique error types`);
+  console.log('');
+
+  // Connect

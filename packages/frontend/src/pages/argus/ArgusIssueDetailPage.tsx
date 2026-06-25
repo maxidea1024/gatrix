@@ -100,6 +100,7 @@ const ArgusIssueDetailPage: React.FC = () => {
     splitWidth,
     isDragging: isSplitDragging,
     handleMouseDown: handleSplitterMouseDown,
+    panelRef: splitPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_issue_split_width',
     defaultWidth: 320,
@@ -517,6 +518,7 @@ const ArgusIssueDetailPage: React.FC = () => {
 
                 {/* Sidebar Panel */}
                 <Box
+                  ref={splitPanelRef as React.Ref<HTMLDivElement>}
                   sx={{
                     width: { xs: '100%', md: splitWidth },
                     minWidth: { md: MIN_SPLIT_WIDTH },

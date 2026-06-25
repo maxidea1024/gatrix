@@ -338,7 +338,7 @@ export const FunnelsLeftPanel: React.FC<FunnelsLeftPanelProps> = ({
         >
           {t('argus.analytics.funnelSteps', 'Funnel Steps')}
         </Typography>
-        <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Box sx={{ mt: 1, display: 'flex', flexDirection: 'column' }}>
           <DndContext
             sensors={dndSensors}
             collisionDetection={closestCenter}
@@ -350,9 +350,58 @@ export const FunnelsLeftPanel: React.FC<FunnelsLeftPanelProps> = ({
               strategy={verticalListSortingStrategy}
             >
               {steps.map((step, idx) => (
-                <React.Fragment key={stepIds[idx]}>
-                  <SortableStepWrapper id={stepIds[idx]}>
-                    {({ dragHandleProps, isDragging }) => (
+                <SortableStepWrapper key={stepIds[idx]} id={stepIds[idx]}>
+                  {({ dragHandleProps, isDragging }) => (
+                    <>
+                      {/* Connector: rendered above step (except first) */}
+                      {idx > 0 && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            pointerEvents: 'none',
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 0,
+                              height: 14,
+                              borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: '50%',
+                              border: `2px solid ${isDark ? 'rgba(99,102,241,0.45)' : 'rgba(99,102,241,0.35)'}`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              bgcolor: 'background.paper',
+                              zIndex: 2,
+                            }}
+                          >
+                            <ArrowDownIcon
+                              sx={{
+                                fontSize: 14,
+                                color: isDark
+                                  ? 'rgba(99,102,241,0.7)'
+                                  : 'rgba(99,102,241,0.5)',
+                              }}
+                            />
+                          </Box>
+                          <Box
+                            sx={{
+                              width: 0,
+                              height: 14,
+                              borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
+                            }}
+                          />
+                        </Box>
+                      )}
+
                       <EventBlock
                         indexLabel={String(idx + 1)}
                         color={FUNNEL_COLORS[idx % FUNNEL_COLORS.length]}
@@ -510,57 +559,9 @@ export const FunnelsLeftPanel: React.FC<FunnelsLeftPanelProps> = ({
                           </Box>
                         )}
                       </EventBlock>
-                    )}
-                  </SortableStepWrapper>
-                  {idx < steps.length - 1 && (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        mt: 0,
-                        mb: -1,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: 0,
-                          height: 14,
-                          borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
-                        }}
-                      />
-                      <Box
-                        sx={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: '50%',
-                          border: `2px solid ${isDark ? 'rgba(99,102,241,0.45)' : 'rgba(99,102,241,0.35)'}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          bgcolor: 'background.paper',
-                          zIndex: 2,
-                        }}
-                      >
-                        <ArrowDownIcon
-                          sx={{
-                            fontSize: 14,
-                            color: isDark
-                              ? 'rgba(99,102,241,0.7)'
-                              : 'rgba(99,102,241,0.5)',
-                          }}
-                        />
-                      </Box>
-                      <Box
-                        sx={{
-                          width: 0,
-                          height: 14,
-                          borderLeft: `2px dashed ${isDark ? 'rgba(99,102,241,0.4)' : 'rgba(99,102,241,0.3)'}`,
-                        }}
-                      />
-                    </Box>
+                    </>
                   )}
-                </React.Fragment>
+                </SortableStepWrapper>
               ))}
             </SortableContext>
           </DndContext>

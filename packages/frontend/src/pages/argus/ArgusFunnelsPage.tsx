@@ -48,6 +48,7 @@ interface ArgusFunnelsPageProps {
   panelWidth?: number;
   onPanelResizeMouseDown?: (e: React.MouseEvent) => void;
   isPanelDragging?: boolean;
+  panelRef?: React.RefObject<HTMLElement | null>;
 }
 
 const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
@@ -56,6 +57,7 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
   panelWidth,
   onPanelResizeMouseDown,
   isPanelDragging,
+  panelRef,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -526,6 +528,7 @@ const ArgusFunnelsPage: React.FC<ArgusFunnelsPageProps> = ({
           panelWidth={panelWidth}
           onPanelResizeMouseDown={onPanelResizeMouseDown}
           isPanelDragging={isPanelDragging}
+          panelRef={panelRef}
         >
           <PageContentLoader
             loading={

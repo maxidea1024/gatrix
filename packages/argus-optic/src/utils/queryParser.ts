@@ -661,6 +661,10 @@ export class QueryParser {
 
         // ── Generate SQL for the value side ──
 
+        // Check if this known column also needs a Map fallback
+        // (data may exist in either the column or the tags Map)
+        const needsMapFallback = this.mapColumns.length > 0;
+
         if (Array.isArray(n.value)) {
           if (op === '!=') op = 'NOT IN';
           if (op !== 'IN' && op !== 'NOT IN') op = 'IN';
@@ -672,6 +676,10 @@ export class QueryParser {
           });
 
           const clause = `${key} ${op} (${arrParams.join(', ')})`;
+          if (needsMapFallback && !isAggregate) {
+            const mapClause = this.genMapCondition(key, op === 'IN' ? '=' : '!=', n.value, params);
+            return { w: `(${clause} OR ${mapClause})`, h: '' };
+          }
           return { w: isAggregate ? '' : clause, h: isAggregate ? clause : '' };
         } else {
           let val = String(n.value);
@@ -717,6 +725,17 @@ export class QueryParser {
 
           params[pName] = val;
           const clause = `${key} ${op} {${pName}:String}`;
+
+          // For non-aggregate, non-special columns: also check tags Map as fallback
+          if (needsMapFallback && !isAggregate && (op === '=' || op === '!=')) {
+            const mapClause = this.genMapCondition(key, n.op, n.value, params);
+            if (op === '!=') {
+              // Negative: column != val AND NOT in map
+              return { w: `(${clause} AND ${mapClause})`, h: '' };
+            }
+            return { w: `(${clause} OR ${mapClause})`, h: '' };
+          }
+
           return { w: isAggregate ? '' : clause, h: isAggregate ? clause : '' };
         }
       }

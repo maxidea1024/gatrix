@@ -95,11 +95,11 @@ const ArgusPerformancePage: React.FC = () => {
   const [transactions, setTransactions] = useState<ArgusTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [detail, setDetail] = useState<ArgusTransactionDetail | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(!!urlState.txn);
 
   // Trace waterfall state
   const [traceData, setTraceData] = useState<ArgusTraceDetail | null>(null);
-  const [traceLoading, setTraceLoading] = useState(false);
+  const [traceLoading, setTraceLoading] = useState(!!urlState.trace);
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
 
   const sortOptions = useMemo(
@@ -186,6 +186,7 @@ const ArgusPerformancePage: React.FC = () => {
   // ─── Navigation Handlers ───
   const handleTxnClick = useCallback(
     (txnName: string) => {
+      setDetailLoading(true);
       setUrlState({ view: 'detail', txn: txnName, trace: '' });
       fetchDetail(txnName);
     },
@@ -281,31 +282,33 @@ const ArgusPerformancePage: React.FC = () => {
         }
       />
 
-      {/* Filter Bar + Sort */}
-      <ArgusFilterBar
-        projectId={projectId}
-        value={filters}
-        onChange={handleFilterChange}
-        onRefresh={
-          viewMode === 'list'
-            ? fetchTransactions
-            : () => selectedTxn && fetchDetail(selectedTxn)
-        }
-        loading={loading}
-        extraControls={
-          viewMode === 'list' ? (
-            <FilterChipSelect
-              label={t('argus.issues.sort')}
-              value={sort}
-              options={sortOptions}
-              anchorEl={sortAnchor}
-              onOpen={handleSortOpen}
-              onClose={handleSortClose}
-              onSelect={handleSortChange}
-            />
-          ) : undefined
-        }
-      />
+      {/* Filter Bar + Sort – hidden in trace waterfall view since filters don't apply */}
+      {viewMode !== 'trace' && (
+        <ArgusFilterBar
+          projectId={projectId}
+          value={filters}
+          onChange={handleFilterChange}
+          onRefresh={
+            viewMode === 'list'
+              ? fetchTransactions
+              : () => selectedTxn && fetchDetail(selectedTxn)
+          }
+          loading={loading}
+          extraControls={
+            viewMode === 'list' ? (
+              <FilterChipSelect
+                label={t('argus.issues.sort')}
+                value={sort}
+                options={sortOptions}
+                anchorEl={sortAnchor}
+                onOpen={handleSortOpen}
+                onClose={handleSortClose}
+                onSelect={handleSortChange}
+              />
+            ) : undefined
+          }
+        />
+      )}
 
       {/* === TRACE WATERFALL VIEW === */}
       {viewMode === 'trace' && (

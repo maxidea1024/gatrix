@@ -1,0 +1,29 @@
+﻿];
+const FEEDBACK_MESSAGES_EN = [
+  'Game crashes during sea battles. Lost valuable cargo.',
+  'Payment went through but items not received. Please check order.',
+  'Lag spikes since last patch, especially in port towns.',
+  'Guild bank transfers keep failing with error.',
+  'Matchmaking takes forever and then times out.',
+  'Character equipment tab causes crash every time.',
+  'FPS drops below 10 during fleet battles.',
+  'Duplicate items appeared in my inventory after trade.',
+  'NPC dialog freezes mid-conversation, cannot complete quest.',
+  'Session keeps expiring, have to re-login every 30 minutes.',
+];
+
+const FEEDBACK_MESSAGES = [...FEEDBACK_MESSAGES_KO, ...FEEDBACK_MESSAGES_EN];
+
+// ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??METRICS TEMPLATES ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
+const METRICS_TEMPLATES = [
+  {
+    name: 'system.cpu.utilization',
+    type: 'gauge',
+    unit: 'percent',
+    valMin: 10,
+    valMax: 95,
+  },
+  {
+    name: 'system.memory.used',
+    type: 'gauge',
+    unit: 'byte',

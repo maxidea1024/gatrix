@@ -68,17 +68,13 @@ import IssueBulkActions from './components/IssueBulkActions';
 import IssueAssigneeMenu from './components/IssueAssigneeMenu';
 import NewIssuesBanner from './components/NewIssuesBanner';
 import { useArgusIssueStore } from '@/hooks/useArgusIssueStore';
+import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import {
   SaveQueryDialog,
   SavedQueriesPanel,
 } from './components/TraceExplorerDialogs';
 import {
-  PAGE_SIZE_STORAGE_KEY,
-  DEFAULT_PAGE_SIZE,
-  VALID_PAGE_SIZES,
   DEEP_LINK_KEYS,
-  getStatusOptions,
-  getLevelOptions,
   getSortOptions,
   EMPTY_FACET_COUNTS,
   type FacetCounts,
@@ -185,14 +181,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const { currentProject } = useOrgProject();
   const projectId =
     propProjectId || searchParams.get('projectId') || currentProject?.id || '1';
-  const [rowsPerPage, setRowsPerPage] = useState(() => {
-    const saved = parseInt(
-      localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '',
-      10
-    );
-    if (!isNaN(saved) && VALID_PAGE_SIZES.includes(saved)) return saved;
-    return DEFAULT_PAGE_SIZE;
-  });
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
 
   // ─── Saved Queries ───────────────────────────────────────────────
   const defaultQueryName = t(
@@ -406,6 +395,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const [issues, setIssues] = useState<ArgusIssue[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [facetsLoading, setFacetsLoading] = useState(false);
 
   // Search is managed directly by Zustand store (no local debounce needed)
 
@@ -419,8 +409,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   } | null>(null);
 
   // Filter chip popover anchors
-  const [statusAnchor, setStatusAnchor] = useState<HTMLElement | null>(null);
-  const [levelAnchor, setLevelAnchor] = useState<HTMLElement | null>(null);
   const [sortAnchor, setSortAnchor] = useState<HTMLElement | null>(null);
 
   // ─── Facet sidebar state ────────────────────────────────────────
@@ -432,6 +420,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     splitWidth: facetWidth,
     isDragging: isFacetDragging,
     handleMouseDown: handleFacetSplitterMouseDown,
+    panelRef: facetPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_issue_facet_width',
     defaultWidth: 220,
@@ -480,11 +469,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
       dateRange: initialDateRange,
     };
     const env = searchParams.get('environment');
-    const br = searchParams.get('browser');
-    const osParam = searchParams.get('os');
     if (env) state.environments = [env];
-    if (br) state.browsers = [br];
-    if (osParam) state.os = [osParam];
 
     const dayOfWeek = searchParams.get('dayOfWeek');
     const hour = searchParams.get('hour');
@@ -574,10 +559,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     assignedTo,
   ]);
 
-  // Persist page size
-  useEffect(() => {
-    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
-  }, [rowsPerPage]);
+
 
   useEffect(() => {
     fetchIssues();
@@ -727,31 +709,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   );
 
   // ─── Stable callback handlers (for React.memo) ─────────────────
-  const handleStatusOpen = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => setStatusAnchor(e.currentTarget),
-    []
-  );
-  const handleStatusClose = useCallback(() => setStatusAnchor(null), []);
-  const handleStatusSelect = useCallback(
-    (v: string) => {
-      setStatus(v);
-      setCurrentPage(1);
-    },
-    [setStatus, setCurrentPage]
-  );
-
-  const handleLevelOpen = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => setLevelAnchor(e.currentTarget),
-    []
-  );
-  const handleLevelClose = useCallback(() => setLevelAnchor(null), []);
-  const handleLevelSelect = useCallback(
-    (v: string) => {
-      setLevel(v);
-      setCurrentPage(1);
-    },
-    [setLevel, setCurrentPage]
-  );
 
   const handleSortOpen = useCallback(
     (e: React.MouseEvent<HTMLElement>) => setSortAnchor(e.currentTarget),
@@ -782,8 +739,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
   // ─── Filter options ────────────────────────────────────────────
 
-  const statusOptions = getStatusOptions(t);
-  const levelOptions = getLevelOptions(t);
   const sortOptions = getSortOptions(t);
 
   // Lazy-loading callback for QueryAQLEditor: fetch values for a specific field on demand
@@ -791,22 +746,26 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
   const fetchFieldValues = useCallback(
     async (fieldKey: string): Promise<string[]> => {
       try {
+        const dateParams = argusDateRangeToApiParams(filters.dateRange);
         const data = await argusService.getIssueAttributeFacet(
           projectId,
-          fieldKey
+          fieldKey,
+          dateParams
         );
         return data.map((d) => d.attr_value);
       } catch {
         return [];
       }
     },
-    [projectId]
+    [projectId, filters.dateRange]
   );
 
   // ─── Facet data (separate fetch without activeFilters) ───
   const [facetData, setFacetData] = useState<FacetCounts>(EMPTY_FACET_COUNTS);
+  const [discoveredTags, setDiscoveredTags] = useState<Record<string, { value: string; count: number }[]>>({});
 
-  const fetchFacets = useCallback(async () => {
+   const fetchFacets = useCallback(async () => {
+    setFacetsLoading(true);
     try {
       const dateParams = argusDateRangeToApiParams(filters.dateRange);
       const params: ArgusIssueListParams = {
@@ -823,10 +782,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         assigned_to: assignedTo || undefined,
       };
 
-      // Fetch MySQL-based issue counts + ClickHouse event facets in parallel
-      const [result, chFacets] = await Promise.all([
+      // Fetch MySQL-based issue counts + ClickHouse event facets + discovered tags in parallel
+      const [result, chFacets, discoveredData] = await Promise.all([
         argusService.listIssues(projectId, params),
         argusService.getIssueFacets(projectId, dateParams).catch(() => ({})),
+        argusService.discoverTags(projectId, 'errors').catch(() => ({ tags: {} })),
       ]);
 
       const issueFacets = buildFacetCounts(result.data);
@@ -838,8 +798,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         browser_name: (chFacets as any).browser_name || [],
         os_name: (chFacets as any).os_name || [],
       });
+      setDiscoveredTags(discoveredData.tags || {});
     } catch {
       /* ignore */
+    } finally {
+      setFacetsLoading(false);
     }
   }, [
     projectId,
@@ -859,9 +822,15 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
   const mappedFacets = facetData;
 
+  // Hardcoded facets (MySQL + ClickHouse columns)
+  const baseFacetKeys = new Set([
+    'level', 'status', 'platform', 'assigned_to', 'priority',
+    'release', 'environment', 'browser_name', 'os_name',
+  ]);
+
   const facetGroups: FacetGroup[] = useMemo(
-    () =>
-      [
+    () => {
+      const base: FacetGroup[] = [
         {
           key: 'level',
           label: t('argus.issues.level', 'Level'),
@@ -887,7 +856,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           label: t('argus.issues.priority', 'Priority'),
           values: mappedFacets.priority,
         },
-        // ClickHouse event-level facets (discovered from errors table)
+        // ClickHouse event-level facets
         {
           key: 'release',
           label: t('argus.issues.release', 'Release'),
@@ -908,9 +877,32 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
           label: t('argus.issues.os', 'OS'),
           values: mappedFacets.os_name,
         },
-      ].filter((g) => g.values.length > 0),
-    [mappedFacets, t]
+      ].filter((g) => g.values.length > 0);
+
+      // Append discovered tags from Map columns (skip if already in base facets)
+      const discovered: FacetGroup[] = Object.entries(discoveredTags)
+        .filter(([key, values]) => !baseFacetKeys.has(key) && values.length > 0)
+        .map(([key, values]) => ({
+          key,
+          label: t(`argus.facet.${key}`, key),
+          values: values.map((v) => ({ value: v.value, count: Number(v.count) })),
+        }));
+
+      return [...base, ...discovered];
+    },
+    [mappedFacets, discoveredTags, t]
   );
+
+  // Merge discovered tag keys with base facets for AQL autocomplete
+  const mergedFacets = useMemo(() => {
+    const res: Record<string, any> = { ...facetData };
+    for (const [key, values] of Object.entries(discoveredTags)) {
+      if (!res[key]) {
+        res[key] = values;
+      }
+    }
+    return res;
+  }, [facetData, discoveredTags]);
 
   // ─── Custom Facets (user-defined attribute keys) ───
   const CUSTOM_FACETS_KEY = 'argus_issue_custom_facets';
@@ -1087,29 +1079,10 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                   setCurrentPage(1);
                 }}
                 fetchFieldValues={fetchFieldValues}
-                initialFacets={facetData}
+                initialFacets={mergedFacets}
               />
             </Box>
-            <FilterChipSelect
-              label={t('argus.issues.status')}
-              value={status}
-              options={statusOptions}
-              anchorEl={statusAnchor}
-              onOpen={handleStatusOpen}
-              onClose={handleStatusClose}
-              onSelect={handleStatusSelect}
-              sx={{ height: 32 }}
-            />
-            <FilterChipSelect
-              label={t('argus.issues.level')}
-              value={level}
-              options={levelOptions}
-              anchorEl={levelAnchor}
-              onOpen={handleLevelOpen}
-              onClose={handleLevelClose}
-              onSelect={handleLevelSelect}
-              sx={{ height: 32 }}
-            />
+
             <FilterChipSelect
               label={t('argus.issues.sort')}
               value={sort}
@@ -1137,6 +1110,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
         {/* Left: Facet Sidebar */}
         <Box sx={{ display: 'flex', flexShrink: 0, position: 'relative' }}>
           <FacetSidebar
+            ref={facetPanelRef as React.Ref<HTMLDivElement>}
             width={facetWidth}
             facets={facetGroups}
             onFilter={(key, value) => {
@@ -1154,7 +1128,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
             }}
             collapsed={facetCollapsed}
             onToggleCollapse={handleToggleFacetCollapse}
-            loading={loading}
+            loading={facetsLoading || loading}
             customFacets={customFacetData}
             onAddCustomFacet={handleAddCustomFacet}
             onRemoveCustomFacet={handleRemoveCustomFacet}

@@ -36,6 +36,7 @@ import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
 import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
 import argusService, { ArgusSavedQuery } from '@/services/argusService';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
+import { useResizableSplit } from '@/hooks/useResizableSplit';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getOpColor } from './components/traceExplorerHelpers';
 import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
@@ -211,7 +212,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
   const MIN_FACET_WIDTH = 180;
   const MAX_FACET_WIDTH = 400;
   const DEFAULT_FACET_WIDTH = 220;
-  const FACET_WIDTH_KEY = 'argus-trace-facet-width';
 
   const [facetCollapsed, setFacetCollapsed] = useState(() => {
     try {
@@ -220,56 +220,17 @@ const ArgusTraceExplorerPage: React.FC = () => {
       return false;
     }
   });
-  const [facetWidth, setFacetWidth] = useState(() => {
-    try {
-      const saved = parseInt(localStorage.getItem(FACET_WIDTH_KEY) || '', 10);
-      return !isNaN(saved) &&
-        saved >= MIN_FACET_WIDTH &&
-        saved <= MAX_FACET_WIDTH
-        ? saved
-        : DEFAULT_FACET_WIDTH;
-    } catch {
-      return DEFAULT_FACET_WIDTH;
-    }
+  const {
+    splitWidth: facetWidth,
+    isDragging: isFacetDragging,
+    handleMouseDown: handleFacetSplitterMouseDown,
+    panelRef: facetPanelRef,
+  } = useResizableSplit({
+    storageKey: 'argus-trace-facet-width',
+    defaultWidth: DEFAULT_FACET_WIDTH,
+    minWidth: MIN_FACET_WIDTH,
+    maxWidth: MAX_FACET_WIDTH,
   });
-  const [isFacetDragging, setIsFacetDragging] = useState(false);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(FACET_WIDTH_KEY, String(facetWidth));
-    } catch {}
-  }, [facetWidth]);
-
-  const handleFacetSplitterMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setIsFacetDragging(true);
-      const startX = e.clientX;
-      const startWidth = facetWidth;
-
-      const onMouseMove = (ev: MouseEvent) => {
-        const delta = ev.clientX - startX;
-        setFacetWidth(
-          Math.min(
-            MAX_FACET_WIDTH,
-            Math.max(MIN_FACET_WIDTH, startWidth + delta)
-          )
-        );
-      };
-      const onMouseUp = () => {
-        setIsFacetDragging(false);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      };
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    },
-    [facetWidth]
-  );
 
   const handleToggleFacetCollapse = useCallback(() => {
     setFacetCollapsed((v) => {
@@ -282,61 +243,18 @@ const ArgusTraceExplorerPage: React.FC = () => {
   }, []);
 
   // Detail panel resize
-  const MIN_DETAIL_WIDTH = 280;
-  const MAX_DETAIL_WIDTH = 700;
-  const DEFAULT_DETAIL_WIDTH = 400;
-  const DETAIL_WIDTH_KEY = 'argus-trace-detail-width';
-
-  const [detailWidth, setDetailWidth] = useState(() => {
-    try {
-      const saved = parseInt(localStorage.getItem(DETAIL_WIDTH_KEY) || '', 10);
-      return !isNaN(saved) &&
-        saved >= MIN_DETAIL_WIDTH &&
-        saved <= MAX_DETAIL_WIDTH
-        ? saved
-        : DEFAULT_DETAIL_WIDTH;
-    } catch {
-      return DEFAULT_DETAIL_WIDTH;
-    }
+  const {
+    splitWidth: detailWidth,
+    isDragging: isDetailDragging,
+    handleMouseDown: handleDetailSplitterMouseDown,
+    panelRef: detailPanelRef,
+  } = useResizableSplit({
+    storageKey: 'argus-trace-detail-width',
+    defaultWidth: 400,
+    minWidth: 280,
+    maxWidth: 700,
+    invertDelta: true,
   });
-  const [isDetailDragging, setIsDetailDragging] = useState(false);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(DETAIL_WIDTH_KEY, String(detailWidth));
-    } catch {}
-  }, [detailWidth]);
-
-  const handleDetailSplitterMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      setIsDetailDragging(true);
-      const startX = e.clientX;
-      const startWidth = detailWidth;
-
-      const onMouseMove = (ev: MouseEvent) => {
-        const delta = startX - ev.clientX;
-        setDetailWidth(
-          Math.min(
-            MAX_DETAIL_WIDTH,
-            Math.max(MIN_DETAIL_WIDTH, startWidth + delta)
-          )
-        );
-      };
-      const onMouseUp = () => {
-        setIsDetailDragging(false);
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      };
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    },
-    [detailWidth]
-  );
 
   // Pagination
   const [spansHasMore, setSpansHasMore] = useState(false);
@@ -1169,7 +1087,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         onChange={handleFilterChange}
         onRefresh={fetchAll}
         loading={loading}
-        hideFilters={['browser', 'os']}
+        
         extraControls={
           <Box
             sx={{
@@ -1209,6 +1127,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
         }}
       >
         <FacetSidebar
+          ref={facetPanelRef as React.Ref<HTMLDivElement>}
           facets={spanFacets}
           discoveredFacets={discoveredFacets}
           onFilter={handleFacetFilter}
@@ -1323,7 +1242,7 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 },
               }}
             />
-            <Box sx={{ width: detailWidth, flexShrink: 0, overflow: 'auto' }}>
+            <Box ref={detailPanelRef as React.Ref<HTMLDivElement>} sx={{ width: detailWidth, flexShrink: 0, overflow: 'auto' }}>
               <SpanDetailPanel
                 span={selectedSpan}
                 onClose={() => {

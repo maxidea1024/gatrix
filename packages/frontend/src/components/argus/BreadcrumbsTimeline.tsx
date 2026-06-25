@@ -435,6 +435,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
     splitWidth: drawerWidth,
     isDragging: isDrawerDragging,
     handleMouseDown: handleDrawerResizeMouseDown,
+    panelRef: drawerPanelRef,
   } = useResizableSplit({
     storageKey: 'argus_breadcrumb_drawer_width',
     defaultWidth: 700,
@@ -1156,6 +1157,7 @@ const BreadcrumbsTimeline: React.FC<BreadcrumbsTimelineProps> = ({
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
           PaperProps={{
+            ref: drawerPanelRef as React.Ref<HTMLDivElement>,
             sx: {
               width: { xs: '100%', md: drawerWidth },
               maxWidth: '90vw',

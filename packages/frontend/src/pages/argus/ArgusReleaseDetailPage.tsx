@@ -36,12 +36,12 @@ import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import argusService, { ArgusIssue } from '@/services/argusService';
 import PageHeader from '@/components/common/PageHeader';
 import SimplePagination from '@/components/common/SimplePagination';
+import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { formatRelativeTime, formatDateTime } from '@/utils/dateFormat';
 import IssueListItem from '@/components/argus/IssueListItem';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import {
-  PAGE_SIZE_STORAGE_KEY,
   COLLAPSE_STORAGE_KEY,
   ISSUE_TABS,
   type IssueTabType,
@@ -75,11 +75,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const issueTab: IssueTabType = ISSUE_TABS.some((t) => t.key === rawTab)
     ? (rawTab as IssueTabType)
     : 'all';
-  const [rowsPerPage, setRowsPerPage] = useState<number>(() => {
-    const saved = localStorage.getItem(PAGE_SIZE_STORAGE_KEY);
-    const parsed = parseInt(saved || '', 10);
-    return !isNaN(parsed) && parsed > 0 ? parsed : 25;
-  });
+  const [rowsPerPage, setRowsPerPage] = useGlobalPageSize();
   const [totalIssues, setTotalIssues] = useState(0);
 
   // Collapsible sections - persisted in localStorage
@@ -100,9 +96,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
     });
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(rowsPerPage));
-  }, [rowsPerPage]);
+
 
   const decodedRelease = release ? decodeURIComponent(release) : '';
 

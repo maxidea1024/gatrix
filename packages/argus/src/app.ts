@@ -28,6 +28,14 @@ import cronsRoutes from './routes/crons';
 import uptimeRoutes from './routes/uptime';
 import analyticsRoutes from './routes/analytics';
 import lexiconRoutes from './routes/lexicon';
+import userProfileRoutes from './routes/user-profiles';
+import cohortsRoutes from './routes/cohorts';
+import realtimeRoutes from './routes/realtime';
+import impactRoutes from './routes/impact';
+import revenueRoutes from './routes/revenue';
+import lifecycleRoutes from './routes/lifecycle';
+import kpiAlertsRoutes from './routes/kpi-alerts';
+import dataGovernanceRoutes from './routes/data-governance';
 
 const logger = createLogger('app');
 
@@ -105,6 +113,14 @@ export async function createApp(): Promise<FastifyInstance> {
   await app.register(uptimeRoutes, { prefix: '/argus/api/projects' });
   await app.register(analyticsRoutes, { prefix: '/argus/api' });
   await app.register(lexiconRoutes, { prefix: '/argus/api' });
+  await app.register(userProfileRoutes, { prefix: '/argus/api' });
+  await app.register(cohortsRoutes, { prefix: '/argus/api' });
+  await app.register(realtimeRoutes, { prefix: '/argus/api' });
+  await app.register(impactRoutes, { prefix: '/argus/api' });
+  await app.register(revenueRoutes, { prefix: '/argus/api' });
+  await app.register(lifecycleRoutes, { prefix: '/argus/api' });
+  await app.register(kpiAlertsRoutes, { prefix: '/argus/api' });
+  await app.register(dataGovernanceRoutes, { prefix: '/argus/api' });
 
   // 404 handler
   app.setNotFoundHandler((request, reply) => {

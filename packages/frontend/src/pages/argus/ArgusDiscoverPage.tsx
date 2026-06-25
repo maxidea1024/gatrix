@@ -39,6 +39,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import PageHeader from '@/components/common/PageHeader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EditablePageTitle from '@/components/common/EditablePageTitle';
+import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 
 import ArgusFilterBar, {
   ArgusFilterState,
@@ -80,18 +81,6 @@ const ArgusDiscoverPage: React.FC = () => {
   const isDark = theme.palette.mode === 'dark';
   const { currentProject } = useOrgProject();
   const projectId = currentProject?.id || '1';
-
-  const fetchFieldValues = useCallback(
-    async (fieldKey: string): Promise<string[]> => {
-      try {
-        const data = await argusService.getAttributeFacet(projectId, fieldKey);
-        return data.map((d) => d.attr_value);
-      } catch {
-        return [];
-      }
-    },
-    [projectId]
-  );
 
   // ─── URL-driven state ───
   const URL_PARAMS = useMemo(
@@ -136,6 +125,23 @@ const ArgusDiscoverPage: React.FC = () => {
       dateRange: { type: 'preset', preset: urlState.period },
     }));
   }, [urlState.period]);
+
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      try {
+        const dateParams = argusDateRangeToApiParams(filters.dateRange);
+        const data = await argusService.getAttributeFacet(
+          projectId,
+          fieldKey,
+          dateParams
+        );
+        return data.map((d) => d.attr_value);
+      } catch {
+        return [];
+      }
+    },
+    [projectId, filters.dateRange]
+  );
 
   const [conditions, setConditions] = useState<string>(urlState.q || '');
   const lastSubmittedConditionsRef = useRef<string>(urlState.q || '');
@@ -901,7 +907,7 @@ const ArgusDiscoverPage: React.FC = () => {
         }}
         onRefresh={hasQueried ? runQuery : undefined}
         loading={loading}
-        hideFilters={['browser', 'os']}
+        
         extraControls={
           <Box
             sx={{
