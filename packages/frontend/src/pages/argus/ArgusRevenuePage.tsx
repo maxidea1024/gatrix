@@ -327,11 +327,10 @@ interface SidebarItemProps {
   isDark: boolean;
   onClick: () => void;
   t: (key: string) => string;
-  detail?: string;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = React.memo(
-  function SidebarItem({ item, active, isDark, onClick, t, detail }) {
+  function SidebarItem({ item, active, isDark, onClick, t }) {
     const theme = useTheme();
     return (
       <Box
@@ -367,11 +366,6 @@ const SidebarItem: React.FC<SidebarItemProps> = React.memo(
           <Typography sx={{ fontSize: '0.85rem', fontWeight: active ? 600 : 400 }}>
             {t(item.labelKey)}
           </Typography>
-          {detail && (
-            <Typography sx={{ fontSize: 10, fontWeight: 600, color: active ? alpha(theme.palette.primary.main, 0.7) : 'text.disabled', mt: -0.2 }}>
-              {detail}
-            </Typography>
-          )}
         </Box>
       </Box>
     );
@@ -3650,7 +3644,17 @@ const ArgusRevenuePage: React.FC = () => {
         actionsUpdateTrigger={JSON.stringify(dateRange)}
       />
 
-      <Box sx={{ display: 'flex', flex: 1, ml: -2, mr: -2, mb: -2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 2,
+          flex: 1,
+          mt: -2,
+          ml: -2,
+          mr: -2,
+          mb: -2,
+        }}
+      >
         {/* ══════ LEFT SIDEBAR ══════ */}
         <Box
           sx={{
@@ -3658,42 +3662,27 @@ const ArgusRevenuePage: React.FC = () => {
             flexShrink: 0,
             borderRight: '1px solid',
             borderColor: 'divider',
-            pt: 1,
+            bgcolor: 'background.paper',
+            pt: 2,
             pl: 2,
           }}
         >
           <Box sx={{ position: 'sticky', top: 2, pr: 1 }}>
-            {NAV_ITEMS.map((item) => {
-              // Compute detail string for each sidebar item
-              let detail: string | undefined;
-              if (!loading) {
-                switch (item.id) {
-                  case 'overview': detail = data ? fmt(data.total_revenue) : undefined; break;
-                  case 'ledger': detail = undefined; break;
-                  case 'discover': detail = undefined; break;
-                  case 'products': detail = products.length > 0 ? `${products.length} items` : undefined; break;
-                  case 'economy': detail = economy?.by_currency[0] ? `Ratio ${(economy.by_currency[0].sink > 0 ? economy.by_currency[0].source / economy.by_currency[0].sink : 0).toFixed(2)}` : undefined; break;
-                  case 'spenders': detail = spenders?.segments.find(s => s.segment === 'top_10pct') ? `Top10 ${spenders!.segments.find(s => s.segment === 'top_10pct')!.percentage.toFixed(0)}%` : undefined; break;
-                  case 'ltv': detail = ltv ? `D30 ${fmt(ltv.ltv_curve.find(c => c.day === 30)?.cumulative_revenue || ltv.ltv_curve[ltv.ltv_curve.length - 1]?.cumulative_revenue || 0)}` : undefined; break;
-                }
-              }
-              return (
-                <SidebarItem
-                  key={item.id}
-                  item={item}
-                  active={section === item.id}
-                  isDark={isDark}
-                  onClick={() => setSection(item.id)}
-                  t={t}
-                  detail={detail}
-                />
-              );
-            })}
+            {NAV_ITEMS.map((item) => (
+              <SidebarItem
+                key={item.id}
+                item={item}
+                active={section === item.id}
+                isDark={isDark}
+                onClick={() => setSection(item.id)}
+                t={t}
+              />
+            ))}
           </Box>
         </Box>
 
         {/* ══════ RIGHT CONTENT ══════ */}
-        <Box sx={{ flex: 1, minWidth: 0, pt: 1, pl: 3, pr: 2, pb: 6 }}>
+        <Box sx={{ flex: 1, minWidth: 0, pt: 2, pr: 2, pb: 6 }}>
           {renderContent()}
         </Box>
       </Box>
