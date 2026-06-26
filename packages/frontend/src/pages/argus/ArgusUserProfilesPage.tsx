@@ -82,29 +82,12 @@ import CohortChip from '@/components/argus/CohortChip';
 import type { CohortMembership } from '@/components/argus/CohortChip';
 import { downloadCsv, type CsvColumn } from '@/utils/csvExport';
 import { ARGUS_SEMANTIC } from './argusThemeTokens';
+import { formatRelativeTime, formatDuration } from '@/utils/dateFormat';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString();
-}
 
-function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}s`;
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  if (mins < 60) return `${mins}m ${secs}s`;
-  const hrs = Math.floor(mins / 60);
-  return `${hrs}h ${mins % 60}m`;
-}
+
 
 // ─── Insight Helpers ─────────────────────────────────────────────────────────
 
@@ -128,9 +111,9 @@ function computeChurnRisk(
 ): PurchaseChurnRisk {
   if (netRevenue > 0 && lastPurchase) {
     const days = Math.floor((Date.now() - new Date(lastPurchase).getTime()) / 86400000);
-    if (days > 30) return { kind: 'purchase', msg: `${days}일째 미구매 — 이탈 위험` };
+    if (days > 30) return { kind: 'purchase', msg: `${days}d` };
   }
-  if (refundRate > 0.2) return { kind: 'refund', msg: `환불율 ${(refundRate * 100).toFixed(0)}% — 결제 이슈 의심` };
+  if (refundRate > 0.2) return { kind: 'refund', msg: `${(refundRate * 100).toFixed(0)}%` };
   return null;
 }
 
@@ -173,12 +156,12 @@ function computeSessionStats(ss: ArgusUserSession[]): SessionStats {
 
 // ─── Churn UI Config ─────────────────────────────────────────────────────────
 
-const CHURN_CONFIG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
-  none:    { label: '활성',      color: '#4caf50', bg: 'rgba(76,175,80,0.12)',   desc: '정상 활동 중' },
-  low:     { label: '주의',      color: '#ff9800', bg: 'rgba(255,152,0,0.12)',   desc: '활동이 소폭 감소' },
-  medium:  { label: '위험',      color: '#f44336', bg: 'rgba(244,67,54,0.12)',   desc: '이탈 가능성 있음' },
-  high:    { label: '이탈 위험', color: '#b71c1c', bg: 'rgba(183,28,28,0.15)',   desc: '평균 주기 3배 이상 비활성' },
-  churned: { label: '이탈',      color: '#757575', bg: 'rgba(117,117,117,0.12)', desc: '60일 이상 비활성' },
+const CHURN_CONFIG: Record<string, { labelKey: string; descKey: string; color: string; bg: string }> = {
+  none:    { labelKey: 'argus.userProfiles.churnNone',    descKey: 'argus.userProfiles.churnNoneDesc',    color: '#4caf50', bg: 'rgba(76,175,80,0.12)'   },
+  low:     { labelKey: 'argus.userProfiles.churnLow',     descKey: 'argus.userProfiles.churnLowDesc',     color: '#ff9800', bg: 'rgba(255,152,0,0.12)'   },
+  medium:  { labelKey: 'argus.userProfiles.churnMedium',  descKey: 'argus.userProfiles.churnMediumDesc',  color: '#f44336', bg: 'rgba(244,67,54,0.12)'   },
+  high:    { labelKey: 'argus.userProfiles.churnHigh',    descKey: 'argus.userProfiles.churnHighDesc',    color: '#b71c1c', bg: 'rgba(183,28,28,0.15)'   },
+  churned: { labelKey: 'argus.userProfiles.churnchurned', descKey: 'argus.userProfiles.churnChurnedDesc', color: '#757575', bg: 'rgba(117,117,117,0.12)' },
 };
 
 /** 스파크라인 데이터에서 재활성화 패턴 감지
@@ -568,9 +551,15 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                 </Typography>
                 <Box>
                   <Typography sx={{ fontSize: 11, fontWeight: 700, color: churnRisk.kind === 'purchase' ? 'warning.main' : 'error.main' }}>
-                    {churnRisk.kind === 'purchase' ? '이탈 위험' : '결제 이슈 의심'}
+                    {churnRisk.kind === 'purchase'
+                      ? t('argus.userProfiles.churnLabelPurchase', '이탈 위험')
+                      : t('argus.userProfiles.churnLabelRefund', '결제 이슈 의심')}
                   </Typography>
-                  <Typography sx={{ fontSize: 11, color: 'text.secondary', mt: 0.2 }}>{churnRisk.msg}</Typography>
+                  <Typography sx={{ fontSize: 11, color: 'text.secondary', mt: 0.2 }}>
+                    {churnRisk.kind === 'purchase'
+                      ? t('argus.userProfiles.purchaseChurnMsg', '{{days}}일째 미구매 — 이탈 위험', { days: churnRisk.msg })
+                      : t('argus.userProfiles.refundChurnMsg', '환불율 {{rate}}% — 결제 이슈 의심', { rate: churnRisk.msg })}
+                  </Typography>
                 </Box>
               </Box>
             )}
@@ -662,7 +651,15 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
 
               {/* Activity Heatmap — hour × day-of-week */}
               {events.length > 0 && (() => {
-                const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+                const DAYS = [
+                  t('argus.userProfiles.daySun', '일'),
+                  t('argus.userProfiles.dayMon', '월'),
+                  t('argus.userProfiles.dayTue', '화'),
+                  t('argus.userProfiles.dayWed', '수'),
+                  t('argus.userProfiles.dayThu', '목'),
+                  t('argus.userProfiles.dayFri', '금'),
+                  t('argus.userProfiles.daySat', '토'),
+                ];
                 const HOUR_GROUPS = [
                   { label: '0–5', hours: [0,1,2,3,4,5] },
                   { label: '6–11', hours: [6,7,8,9,10,11] },
@@ -681,7 +678,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                 return (
                   <Box sx={{ mt: 1.5 }}>
                     <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: 'uppercase', fontSize: 9, letterSpacing: 0.4 }}>
-                      시간대별 활동 패턴
+                      {t('argus.userProfiles.activityHeatmap', '시간대별 활동 패턴')}
                     </Typography>
                     <Box sx={{ mt: 0.8, display: 'grid', gridTemplateColumns: 'auto repeat(7, 1fr)', gap: '2px', alignItems: 'center' }}>
                       {/* Header row: day labels */}
@@ -697,7 +694,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                             const val = grouped[`${di}-${hgi}`] ?? 0;
                             const intensity = val / maxVal;
                             return (
-                              <Tooltip key={di} title={`${DAYS[di]} ${hg.label}시: ${val}건`}>
+                              <Tooltip key={di} title={t('argus.userProfiles.heatmapTooltip', '{{day}} {{hour}}시: {{count}}건', { day: DAYS[di], hour: hg.label, count: val })}>
                                 <Box sx={{
                                   height: 10,
                                   borderRadius: '2px',
@@ -907,20 +904,20 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                   {sessions.length >= 2 && (() => {
                     const { avgDurSec, avgGapDays, trend } = sessionStats;
                     const trendIcon = trend === 'up' ? '📈' : trend === 'down' ? '📉' : trend === 'stable' ? '➡️' : null;
-                    const trendLabel = trend === 'up' ? '세션 증가 추세' : trend === 'down' ? '세션 단축 추세 (이탈 주의)' : trend === 'stable' ? '안정적' : null;
+                    const trendLabel = trend === 'up' ? t('argus.userProfiles.trendUp', '세션 증가 추세') : trend === 'down' ? t('argus.userProfiles.trendDown', '세션 단축 추세 (이탈 주의)') : trend === 'stable' ? t('argus.userProfiles.trendStable', '안정적') : null;
                     return (
                       <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
                         <Paper variant="outlined" sx={{ flex: 1, minWidth: 100, p: 1, borderRadius: 1.5, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
-                          <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>평균 세션</Typography>
-                          <Typography sx={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, mt: 0.3 }}>{formatDuration(Math.round(avgDurSec))}</Typography>
+                          <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>{t('argus.userProfiles.avgSession', '평균 세션')}</Typography>
+                          <Typography sx={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, mt: 0.3 }}>{formatDuration(Math.round(avgDurSec) * 1000)}</Typography>
                         </Paper>
                         <Paper variant="outlined" sx={{ flex: 1, minWidth: 100, p: 1, borderRadius: 1.5, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
-                          <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>평균 재방문</Typography>
-                          <Typography sx={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, mt: 0.3 }}>{avgGapDays < 1 ? '< 1일' : `${avgGapDays.toFixed(1)}일`}</Typography>
+                          <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>{t('argus.userProfiles.avgReturn', '평균 재방문')}</Typography>
+                          <Typography sx={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, mt: 0.3 }}>{avgGapDays < 1 ? t('argus.userProfiles.lessThan1Day', '< 1일') : t('argus.userProfiles.dayValue', '{{n}}일', { n: avgGapDays.toFixed(1) })}</Typography>
                         </Paper>
                         {trendIcon && (
                           <Paper variant="outlined" sx={{ flex: 1, minWidth: 100, p: 1, borderRadius: 1.5, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
-                            <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>트렌드</Typography>
+                            <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>{t('argus.userProfiles.trendLabel', '트렌드')}</Typography>
                             <Typography sx={{ fontSize: 12, fontWeight: 700, lineHeight: 1.4, mt: 0.3, color: trend === 'down' ? 'warning.main' : trend === 'up' ? 'success.main' : 'text.secondary' }}>
                               {trendIcon} {trendLabel}
                             </Typography>
@@ -951,7 +948,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                         <Typography variant="caption" fontWeight={600} sx={{ px: 1, py: 0.2, borderRadius: '4px', bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', flexShrink: 0 }}>
                           {s.duration_seconds === 0
                             ? t('argus.userProfiles.sessionSingleEvent', 'Single event')
-                            : t('argus.userProfiles.sessionDurationLabel', '{{duration}}', { duration: formatDuration(s.duration_seconds) })}
+                            : t('argus.userProfiles.sessionDurationLabel', '{{duration}}', { duration: formatDuration(s.duration_seconds * 1000) })}
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -1067,7 +1064,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                       return (
                         <Box sx={{ p: 1.5, borderRadius: 1.5, border: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fafafa' }}>
                           <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1 }}>
-                            선호 상품 Top {topProducts.length}
+                            {t('argus.userProfiles.topProducts', '선호 상품 Top {{n}}', { n: topProducts.length })}
                           </Typography>
                           {topProducts.map((p, i) => (
                             <Box key={p.name} sx={{ mb: i < topProducts.length - 1 ? 1 : 0 }}>
@@ -1076,7 +1073,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                                   #{i + 1} {p.name}
                                 </Typography>
                                 <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-                                  <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>{p.count}회</Typography>
+                                  <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>{t('argus.userProfiles.purchaseCount', '{{n}}회', { n: p.count })}</Typography>
                                   <Typography sx={{ fontSize: 11, fontWeight: 700 }}>{fmt(p.total)}</Typography>
                                 </Box>
                               </Box>
@@ -1422,6 +1419,7 @@ const ArgusUserProfilesPage: React.FC = () => {
                     {t('argus.userProfiles.sessions', 'Sessions')}
                   </TableSortLabel>
                 </TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: 'nowrap' }} align="right">{t('argus.userProfiles.inactive', 'Inactive')}</TableCell>
                 <TableCell sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{t('argus.userProfiles.churnRisk', 'Churn')}</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>{t('argus.userProfiles.platform', 'Platform')}</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>{t('argus.userProfiles.browser', 'Browser')}</TableCell>
@@ -1433,7 +1431,7 @@ const ArgusUserProfilesPage: React.FC = () => {
               {loading && users.length === 0
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={`skeleton-${i}`}>
-                      {Array.from({ length: 12 }).map((_, j) => (
+                      {Array.from({ length: 13 }).map((_, j) => (
                         <TableCell key={j}><Skeleton /></TableCell>
                       ))}
                     </TableRow>
@@ -1514,35 +1512,46 @@ const ArgusUserProfilesPage: React.FC = () => {
                             )}
                           </TableCell>
                           <TableCell align="right"><Typography variant="body2" fontSize={13}>{user.total_sessions}</Typography></TableCell>
+                          <TableCell align="right" sx={{ py: 0.5 }}>
+                            {(() => {
+                              const days = user.days_inactive ?? 0;
+                              const color =
+                                days === 0  ? '#4caf50' :
+                                days < 3   ? '#8bc34a' :
+                                days < 7   ? '#ff9800' :
+                                days < 21  ? '#f44336' :
+                                days < 60  ? '#b71c1c' : '#757575';
+                              return (
+                                <Typography sx={{ fontSize: 12, fontWeight: 600, color, fontVariantNumeric: 'tabular-nums' }}>
+                                  {days === 0 ? '0d' : `${days}d`}
+                                </Typography>
+                              );
+                            })()}
+                          </TableCell>
+                          {/* ── Churn (only when elevated) ── */}
                           <TableCell sx={{ py: 0.5 }}>
                             {(() => {
                               const risk = user.churn_risk ?? 'none';
                               const cfg = CHURN_CONFIG[risk];
+                              const days = user.days_inactive ?? 0;
                               const reactivated = detectReactivation(user.activity_sparkline ?? []);
                               if (risk === 'none' && !reactivated) return null;
+                              const tooltipText = `${t(cfg.descKey, '')} · ${t('argus.userProfiles.inactiveNDays', '비활성 {{n}}일', { n: days })}${user.avg_session_gap_days ? ` (${t('argus.userProfiles.avgGapNDays', '평균 주기 {{n}}일', { n: user.avg_session_gap_days.toFixed(1) })})` : ''}`;
                               return (
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4 }}>
                                   {risk !== 'none' && (
-                                    <Tooltip title={`${cfg.desc}${user.days_inactive != null ? ` (${user.days_inactive}일 비활성)` : ''}`} placement="top">
-                                      <Box sx={{
-                                        display: 'inline-flex', alignItems: 'center', gap: 0.5,
-                                        px: 0.8, py: 0.2, borderRadius: 1,
-                                        bgcolor: cfg.bg, width: 'fit-content',
-                                      }}>
+                                    <Tooltip title={tooltipText} placement="top">
+                                      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 0.8, py: 0.25, borderRadius: 1, bgcolor: cfg.bg, width: 'fit-content' }}>
                                         <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: cfg.color, flexShrink: 0 }} />
                                         <Typography sx={{ fontSize: 11, fontWeight: 700, color: cfg.color, lineHeight: 1, whiteSpace: 'nowrap' }}>
-                                          {cfg.label}
+                                          {t(cfg.labelKey, '')}
                                         </Typography>
                                       </Box>
                                     </Tooltip>
                                   )}
                                   {reactivated && (
                                     <Tooltip title={t('argus.userProfiles.reactivatedDesc', '비활성 후 복귀한 사용자')} placement="top">
-                                      <Box sx={{
-                                        display: 'inline-flex', alignItems: 'center', gap: 0.5,
-                                        px: 0.8, py: 0.2, borderRadius: 1,
-                                        bgcolor: 'rgba(33,150,243,0.12)', width: 'fit-content',
-                                      }}>
+                                      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 0.8, py: 0.25, borderRadius: 1, bgcolor: 'rgba(33,150,243,0.12)', width: 'fit-content' }}>
                                         <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#2196f3', flexShrink: 0 }} />
                                         <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#2196f3', lineHeight: 1, whiteSpace: 'nowrap' }}>
                                           {t('argus.userProfiles.reactivated', '재활성')}
