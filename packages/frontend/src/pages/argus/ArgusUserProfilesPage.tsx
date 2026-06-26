@@ -60,6 +60,7 @@ import DateRangeSelector, {
 import SimplePagination from '@/components/common/SimplePagination';
 import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import ArgusSparkline from '@/components/argus/ArgusSparkline';
 import {
   getUserProfiles,
   getUserProfile,
@@ -1463,23 +1464,16 @@ const ArgusUserProfilesPage: React.FC = () => {
                             <Typography variant="body2" fontWeight={600} fontSize={13} sx={{ lineHeight: 1.2 }}>
                               {user.total_events.toLocaleString()}
                             </Typography>
-                            {user.activity_sparkline && user.activity_sparkline.length > 0 ? (() => {
-                              const bars = user.activity_sparkline!;
-                              const peak = Math.max(...bars, 1);
-                              return (
-                                <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '1.5px', height: 14, mt: 0.5, width: 80 }}>
-                                  {bars.map((v, i) => (
-                                    <Box key={i} sx={{
-                                      flex: 1,
-                                      height: `${Math.max(Math.round((v / peak) * 14), 1)}px`,
-                                      bgcolor: theme.palette.primary.main,
-                                      borderRadius: '1px',
-                                      opacity: 0.55,
-                                    }} />
-                                  ))}
-                                </Box>
-                              );
-                            })() : (
+                            {user.activity_sparkline && user.activity_sparkline.length >= 2 ? (
+                              <ArgusSparkline
+                                data={user.activity_sparkline}
+                                width={80}
+                                height={20}
+                                color={theme.palette.primary.main}
+                                strokeWidth={1.5}
+                                showDot={false}
+                              />
+                            ) : (
                               <Box sx={{ mt: 0.5, height: 2, width: 80, borderRadius: 1, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
                                 <Box sx={{ height: '100%', width: `${(user.total_events / displayedRows.maxEvents) * 100}%`, bgcolor: theme.palette.primary.main, opacity: 0.4 }} />
                               </Box>
