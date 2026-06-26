@@ -1373,7 +1373,7 @@ const ArgusUserProfilesPage: React.FC = () => {
                     {t('argus.userProfiles.firstSeen', 'First Seen')}
                   </TableSortLabel>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700, width: 60 }} align="right">
+                <TableCell sx={{ fontWeight: 700, width: 60, whiteSpace: 'nowrap' }} align="right">
                   <TableSortLabel
                     active={sortField === 'total_events'}
                     direction={sortField === 'total_events' ? sortDir : 'desc'}
