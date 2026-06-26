@@ -27,11 +27,13 @@ export {
   PERFORMANCE_CONFIG,
   SESSIONS_CONFIG,
   RELEASES_CONFIG,
+  USER_PROFILES_CONFIG,
   pickFields,
   getFieldByKey,
   isFieldInDomain,
   resolveAlias,
 } from './fields';
+
 
 // UI Components
 export { QueryAQLEditor } from './QueryAQLEditor';

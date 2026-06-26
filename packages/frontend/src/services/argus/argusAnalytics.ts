@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Argus Product Analytics and Lexicon API.
  */
 import { argusApi, ARGUS_BASE } from './argusApi';
@@ -436,6 +436,10 @@ export async function getUserProfiles(
     period?: string;
     start?: string;
     end?: string;
+    platform?: string;
+    country?: string;
+    churn_risk?: string;
+    aql?: string;
   }
 ): Promise<{ data: ArgusUserProfile[]; total: number }> {
   const response = await argusApi.get(
@@ -446,6 +450,21 @@ export async function getUserProfiles(
     data: response.data?.data || [],
     total: response.data?.total || 0,
   };
+}
+
+export async function getUserProfileFacets(
+  projectId: number | string,
+  params?: {
+    period?: string;
+    start?: string;
+    end?: string;
+  }
+): Promise<Record<string, { value: string; count: number }[]>> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/projects/${projectId}/analytics/users/facets`,
+    { params }
+  );
+  return response.data?.data || {};
 }
 
 export async function getUserProfile(

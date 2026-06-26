@@ -362,6 +362,9 @@ const ArgusFlowsPage = React.lazy(() => import('./pages/argus/ArgusFlowsPage'));
 const ArgusUserProfilesPage = React.lazy(
   () => import('./pages/argus/ArgusUserProfilesPage')
 );
+const ArgusUserProfileDetailPage = React.lazy(
+  () => import('./pages/argus/ArgusUserProfileDetailPage')
+);
 const ArgusCohortPage = React.lazy(
   () => import('./pages/argus/ArgusCohortPage')
 );
@@ -1340,7 +1343,7 @@ const AppContent: React.FC = () => {
                                         />
                                         <Route
                                           path="analytics/users/:userId"
-                                          element={<ArgusUserProfilesPage />}
+                                          element={<ArgusUserProfileDetailPage />}
                                         />
                                         <Route
                                           path="analytics/cohorts"

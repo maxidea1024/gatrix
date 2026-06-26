@@ -704,6 +704,8 @@ export interface ArgusUserProfile {
   avg_session_gap_days?: number;
   churn_risk?: ChurnRisk;
   was_reactivated?: boolean; // derived client-side from sparkline
+  net_revenue?: number;
+  purchase_count?: number;
 }
 
 export interface ArgusUserEvent {

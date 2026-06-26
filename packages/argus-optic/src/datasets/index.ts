@@ -8,6 +8,7 @@ import { metricsDataset } from './metrics';
 import { feedbackDataset } from './feedback';
 import { cronCheckinsDataset, uptimeCheckinsDataset } from './monitor-checkins';
 import { activitiesDataset } from './activities';
+import { userProfilesDataset } from './user-profiles';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Dataset Registry — Central lookup for all ClickHouse datasets
@@ -33,6 +34,7 @@ register(feedbackDataset);
 register(cronCheckinsDataset);
 register(uptimeCheckinsDataset);
 register(activitiesDataset);
+register(userProfilesDataset);
 
 /**
  * Get a dataset by name. Throws if not found.
@@ -71,3 +73,5 @@ export { metricsDataset } from './metrics';
 export { feedbackDataset } from './feedback';
 export { cronCheckinsDataset, uptimeCheckinsDataset } from './monitor-checkins';
 export { activitiesDataset } from './activities';
+export { userProfilesDataset } from './user-profiles';
+
