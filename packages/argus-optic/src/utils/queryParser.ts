@@ -677,7 +677,12 @@ export class QueryParser {
 
           const clause = `${key} ${op} (${arrParams.join(', ')})`;
           if (needsMapFallback && !isAggregate) {
-            const mapClause = this.genMapCondition(key, op === 'IN' ? '=' : '!=', n.value, params);
+            const mapClause = this.genMapCondition(
+              key,
+              op === 'IN' ? '=' : '!=',
+              n.value,
+              params
+            );
             return { w: `(${clause} OR ${mapClause})`, h: '' };
           }
           return { w: isAggregate ? '' : clause, h: isAggregate ? clause : '' };

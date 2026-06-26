@@ -1087,7 +1087,6 @@ const ArgusTraceExplorerPage: React.FC = () => {
         onChange={handleFilterChange}
         onRefresh={fetchAll}
         loading={loading}
-        
         extraControls={
           <Box
             sx={{
@@ -1242,7 +1241,10 @@ const ArgusTraceExplorerPage: React.FC = () => {
                 },
               }}
             />
-            <Box ref={detailPanelRef as React.Ref<HTMLDivElement>} sx={{ width: detailWidth, flexShrink: 0, overflow: 'auto' }}>
+            <Box
+              ref={detailPanelRef as React.Ref<HTMLDivElement>}
+              sx={{ width: detailWidth, flexShrink: 0, overflow: 'auto' }}
+            >
               <SpanDetailPanel
                 span={selectedSpan}
                 onClose={() => {

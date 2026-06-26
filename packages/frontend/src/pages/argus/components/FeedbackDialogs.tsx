@@ -142,7 +142,9 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterListIcon sx={{ fontSize: 20, color: ARGUS_SEMANTIC.warning }} />
+          <FilterListIcon
+            sx={{ fontSize: 20, color: ARGUS_SEMANTIC.warning }}
+          />
           {t('argus.feedback.spamFilter')}
         </Box>
         <IconButton size="small" onClick={onClose}>
@@ -185,7 +187,9 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
                 backgroundColor: newKeywordRegex
                   ? alpha(ARGUS_SEMANTIC.warning, 0.15)
                   : 'transparent',
-                color: newKeywordRegex ? ARGUS_SEMANTIC.warning : 'text.disabled',
+                color: newKeywordRegex
+                  ? ARGUS_SEMANTIC.warning
+                  : 'text.disabled',
                 border: `1px solid ${newKeywordRegex ? ARGUS_SEMANTIC.warning : 'rgba(128,128,128,0.3)'}`,
               }}
             />

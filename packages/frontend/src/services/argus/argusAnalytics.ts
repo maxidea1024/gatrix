@@ -509,7 +509,9 @@ export async function getUserProperties(
 export async function getUserCohortMemberships(
   projectId: number | string,
   userIds: string[]
-): Promise<Record<string, { id: number; name: string; description: string | null }[]>> {
+): Promise<
+  Record<string, { id: number; name: string; description: string | null }[]>
+> {
   const response = await argusApi.post(
     `${ARGUS_BASE}/projects/${projectId}/analytics/users/cohort-memberships`,
     { userIds }
@@ -530,7 +532,11 @@ export async function getCohorts(
 
 export async function createCohort(
   projectId: number | string,
-  data: { name: string; description?: string; definition: ArgusCohortDefinition }
+  data: {
+    name: string;
+    description?: string;
+    definition: ArgusCohortDefinition;
+  }
 ): Promise<ArgusCohort> {
   const response = await argusApi.post(
     `${ARGUS_BASE}/projects/${projectId}/analytics/cohorts`,
@@ -542,7 +548,11 @@ export async function createCohort(
 export async function updateCohort(
   projectId: number | string,
   cohortId: number,
-  data: { name?: string; description?: string; definition?: ArgusCohortDefinition }
+  data: {
+    name?: string;
+    description?: string;
+    definition?: ArgusCohortDefinition;
+  }
 ): Promise<void> {
   await argusApi.put(
     `${ARGUS_BASE}/projects/${projectId}/analytics/cohorts/${cohortId}`,
@@ -690,12 +700,32 @@ export interface RevenueData {
   prev_arppu: number;
   prev_conversion_rate: number;
   // Breakdowns
-  revenue_by_country: { country: string; revenue: number; transactions: number }[];
-  revenue_by_platform: { platform: string; revenue: number; transactions: number }[];
-  prev_revenue_by_country: { country: string; revenue: number; transactions: number }[];
-  prev_revenue_by_platform: { platform: string; revenue: number; transactions: number }[];
+  revenue_by_country: {
+    country: string;
+    revenue: number;
+    transactions: number;
+  }[];
+  revenue_by_platform: {
+    platform: string;
+    revenue: number;
+    transactions: number;
+  }[];
+  prev_revenue_by_country: {
+    country: string;
+    revenue: number;
+    transactions: number;
+  }[];
+  prev_revenue_by_platform: {
+    platform: string;
+    revenue: number;
+    transactions: number;
+  }[];
   // Previous period trend for overlay
-  prev_revenue_over_time: { period: string; revenue: number; transactions: number }[];
+  prev_revenue_over_time: {
+    period: string;
+    revenue: number;
+    transactions: number;
+  }[];
   // Refund
   total_refunds: number;
   refund_count: number;
@@ -705,15 +735,29 @@ export interface RevenueData {
   prev_total_refunds: number;
   prev_refund_count: number;
   prev_net_revenue: number;
-  refunds_over_time: { period: string; refunds: number; refund_count: number }[];
+  refunds_over_time: {
+    period: string;
+    refunds: number;
+    refund_count: number;
+  }[];
   refund_reasons: { reason: string; count: number; amount: number }[];
   // Payment method
-  revenue_by_payment_method: { payment_method: string; revenue: number; transactions: number; users: number }[];
+  revenue_by_payment_method: {
+    payment_method: string;
+    revenue: number;
+    transactions: number;
+    users: number;
+  }[];
   // Grants
   total_granted: number;
   grant_count: number;
   grant_users: number;
-  grants_by_reason: { reason: string; total_granted: number; grant_count: number; grant_users: number }[];
+  grants_by_reason: {
+    reason: string;
+    total_granted: number;
+    grant_count: number;
+    grant_users: number;
+  }[];
   grants_over_time: { period: string; grants: number; grant_count: number }[];
   // Ad Revenue
   total_ad_revenue: number;
@@ -728,10 +772,30 @@ export interface RevenueData {
   ad_arpu: number;
   iap_share: number;
   ad_share: number;
-  ad_revenue_over_time: { period: string; ad_revenue: number; impressions: number; ecpm: number }[];
-  revenue_by_ad_type: { ad_type: string; revenue: number; impressions: number; ecpm: number }[];
-  revenue_by_placement: { placement: string; revenue: number; impressions: number; ecpm: number }[];
-  revenue_by_sdk: { sdk: string; revenue: number; impressions: number; ecpm: number }[];
+  ad_revenue_over_time: {
+    period: string;
+    ad_revenue: number;
+    impressions: number;
+    ecpm: number;
+  }[];
+  revenue_by_ad_type: {
+    ad_type: string;
+    revenue: number;
+    impressions: number;
+    ecpm: number;
+  }[];
+  revenue_by_placement: {
+    placement: string;
+    revenue: number;
+    impressions: number;
+    ecpm: number;
+  }[];
+  revenue_by_sdk: {
+    sdk: string;
+    revenue: number;
+    impressions: number;
+    ecpm: number;
+  }[];
   // Auto-generated insights (from backend)
   insights?: {
     severity: 'positive' | 'warning' | 'critical' | 'info';
@@ -739,20 +803,32 @@ export interface RevenueData {
     title: string;
     detail: string;
     action?: string;
-    drilldown?: { type: 'scroll' | 'ledger'; target?: string; ledgerFilter?: { type?: string; reason?: string } };
+    drilldown?: {
+      type: 'scroll' | 'ledger';
+      target?: string;
+      ledgerFilter?: { type?: string; reason?: string };
+    };
   }[];
   segment_verdicts?: {
     by_country: {
-      name: string; revenue: number; prevRevenue: number;
-      change: number; changePct: number;
+      name: string;
+      revenue: number;
+      prevRevenue: number;
+      change: number;
+      changePct: number;
       verdict: 'invest' | 'maintain' | 'opportunity' | 'review';
-      verdictLabel: string; verdictIcon: string;
+      verdictLabel: string;
+      verdictIcon: string;
     }[];
     by_platform: {
-      name: string; revenue: number; prevRevenue: number;
-      change: number; changePct: number;
+      name: string;
+      revenue: number;
+      prevRevenue: number;
+      change: number;
+      changePct: number;
       verdict: 'invest' | 'maintain' | 'opportunity' | 'review';
-      verdictLabel: string; verdictIcon: string;
+      verdictLabel: string;
+      verdictIcon: string;
     }[];
   };
 }
@@ -846,28 +922,64 @@ type RevenueParams = {
 
 const defaultRevenueData: RevenueData = {
   revenue_over_time: [],
-  total_revenue: 0, total_transactions: 0, total_paying_users: 0, total_users: 0,
-  avg_order_value: 0, arpu: 0, arppu: 0,
-  conversion_rate: 0, first_purchasers: 0, repeat_purchasers: 0,
-  prev_total_revenue: 0, prev_total_transactions: 0, prev_total_paying_users: 0,
-  prev_avg_order_value: 0, prev_arpu: 0, prev_arppu: 0, prev_conversion_rate: 0,
-  revenue_by_country: [], revenue_by_platform: [],
-  prev_revenue_by_country: [], prev_revenue_by_platform: [],
+  total_revenue: 0,
+  total_transactions: 0,
+  total_paying_users: 0,
+  total_users: 0,
+  avg_order_value: 0,
+  arpu: 0,
+  arppu: 0,
+  conversion_rate: 0,
+  first_purchasers: 0,
+  repeat_purchasers: 0,
+  prev_total_revenue: 0,
+  prev_total_transactions: 0,
+  prev_total_paying_users: 0,
+  prev_avg_order_value: 0,
+  prev_arpu: 0,
+  prev_arppu: 0,
+  prev_conversion_rate: 0,
+  revenue_by_country: [],
+  revenue_by_platform: [],
+  prev_revenue_by_country: [],
+  prev_revenue_by_platform: [],
   prev_revenue_over_time: [],
   // Refund
-  total_refunds: 0, refund_count: 0, refund_rate: 0, net_revenue: 0, refund_users: 0,
-  prev_total_refunds: 0, prev_refund_count: 0, prev_net_revenue: 0,
-  refunds_over_time: [], refund_reasons: [],
+  total_refunds: 0,
+  refund_count: 0,
+  refund_rate: 0,
+  net_revenue: 0,
+  refund_users: 0,
+  prev_total_refunds: 0,
+  prev_refund_count: 0,
+  prev_net_revenue: 0,
+  refunds_over_time: [],
+  refund_reasons: [],
   // Payment method
   revenue_by_payment_method: [],
   // Grants
-  total_granted: 0, grant_count: 0, grant_users: 0, grants_by_reason: [], grants_over_time: [],
+  total_granted: 0,
+  grant_count: 0,
+  grant_users: 0,
+  grants_by_reason: [],
+  grants_over_time: [],
   // Ad Revenue
-  total_ad_revenue: 0, prev_total_ad_revenue: 0,
-  total_impressions: 0, total_ad_clicks: 0, avg_ecpm: 0, ad_users: 0,
-  blended_revenue: 0, prev_blended_revenue: 0, blended_arpu: 0, ad_arpu: 0,
-  iap_share: 100, ad_share: 0,
-  ad_revenue_over_time: [], revenue_by_ad_type: [], revenue_by_placement: [], revenue_by_sdk: [],
+  total_ad_revenue: 0,
+  prev_total_ad_revenue: 0,
+  total_impressions: 0,
+  total_ad_clicks: 0,
+  avg_ecpm: 0,
+  ad_users: 0,
+  blended_revenue: 0,
+  prev_blended_revenue: 0,
+  blended_arpu: 0,
+  ad_arpu: 0,
+  iap_share: 100,
+  ad_share: 0,
+  ad_revenue_over_time: [],
+  revenue_by_ad_type: [],
+  revenue_by_placement: [],
+  revenue_by_sdk: [],
 };
 
 export async function getRevenueAnalytics(
@@ -913,7 +1025,10 @@ export interface AcquisitionResponse {
 
 export async function getRevenueAcquisition(
   projectId: number | string,
-  params?: RevenueParams & { groupBy?: 'source' | 'medium' | 'campaign' | 'platform'; attributionModel?: 'last' | 'first' | 'linear' }
+  params?: RevenueParams & {
+    groupBy?: 'source' | 'medium' | 'campaign' | 'platform';
+    attributionModel?: 'last' | 'first' | 'linear';
+  }
 ): Promise<AcquisitionResponse> {
   const response = await argusApi.get(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/acquisition`,
@@ -926,18 +1041,28 @@ export async function getRevenueAcquisition(
     total_paying_users: 0,
     conversion_rate: 0,
   };
-  return response.data?.data || {
-    summary: empty,
-    summary_prev: empty,
-    chart: [],
-    table: [],
-  };
+  return (
+    response.data?.data || {
+      summary: empty,
+      summary_prev: empty,
+      chart: [],
+      table: [],
+    }
+  );
 }
 
 export interface ProductsResponse {
   products: ProductRevenue[];
-  first_purchase_products: { product_name: string; first_purchase_count: number }[];
-  category_breakdown: { category: string; revenue: number; transactions: number; buyers: number }[];
+  first_purchase_products: {
+    product_name: string;
+    first_purchase_count: number;
+  }[];
+  category_breakdown: {
+    category: string;
+    revenue: number;
+    transactions: number;
+    buyers: number;
+  }[];
 }
 
 export async function getRevenueProducts(
@@ -950,8 +1075,19 @@ export async function getRevenueProducts(
   );
   const data = response.data?.data;
   // Support both old (array) and new ({products, first_purchase_products}) response shapes
-  if (Array.isArray(data)) return { products: data, first_purchase_products: [], category_breakdown: [] };
-  return data || { products: [], first_purchase_products: [], category_breakdown: [] };
+  if (Array.isArray(data))
+    return {
+      products: data,
+      first_purchase_products: [],
+      category_breakdown: [],
+    };
+  return (
+    data || {
+      products: [],
+      first_purchase_products: [],
+      category_breakdown: [],
+    }
+  );
 }
 
 export async function getRevenueProductsTrend(
@@ -966,21 +1102,43 @@ export async function getRevenueProductsTrend(
 }
 
 export interface ProductDetailData {
-  trend: { period: string; revenue: number; transactions: number; buyers: number }[];
+  trend: {
+    period: string;
+    revenue: number;
+    transactions: number;
+    buyers: number;
+  }[];
   summary: { total_revenue: number; total_transactions: number };
-  buyers: { user_id: string; total_spent: number; purchase_count: number; last_purchase: string; avatar_url: string | null }[];
+  buyers: {
+    user_id: string;
+    total_spent: number;
+    purchase_count: number;
+    last_purchase: string;
+    avatar_url: string | null;
+  }[];
   has_more: boolean;
 }
 
 export async function getRevenueProductDetail(
   projectId: number | string,
-  params: RevenueParams & { product_name: string; offset?: number; limit?: number }
+  params: RevenueParams & {
+    product_name: string;
+    offset?: number;
+    limit?: number;
+  }
 ): Promise<ProductDetailData> {
   const response = await argusApi.get(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/products/detail`,
     { params }
   );
-  return response.data?.data || { trend: [], summary: { total_revenue: 0, total_transactions: 0 }, buyers: [], has_more: false };
+  return (
+    response.data?.data || {
+      trend: [],
+      summary: { total_revenue: 0, total_transactions: 0 },
+      buyers: [],
+      has_more: false,
+    }
+  );
 }
 
 export async function getRevenueEconomy(
@@ -991,7 +1149,13 @@ export async function getRevenueEconomy(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/economy`,
     { params }
   );
-  return response.data?.data || { flow_over_time: [], by_currency: [], top_sinks: [] };
+  return (
+    response.data?.data || {
+      flow_over_time: [],
+      by_currency: [],
+      top_sinks: [],
+    }
+  );
 }
 
 export async function getRevenueTopSpenders(
@@ -1002,7 +1166,16 @@ export async function getRevenueTopSpenders(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/top-spenders`,
     { params }
   );
-  return response.data?.data || { segments: [], top_users: [], total_revenue: 0, total_spenders: 0, distribution: [], whale_trend: [] };
+  return (
+    response.data?.data || {
+      segments: [],
+      top_users: [],
+      total_revenue: 0,
+      total_spenders: 0,
+      distribution: [],
+      whale_trend: [],
+    }
+  );
 }
 
 export async function getRevenueLtv(
@@ -1013,7 +1186,15 @@ export async function getRevenueLtv(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/ltv`,
     { params }
   );
-  return response.data?.data || { ltv_curve: [], pltv_predictions: [], pltv_curve: [], pltv_confidence: 0, pltv_coefficients: { a: 0, b: 0 } };
+  return (
+    response.data?.data || {
+      ltv_curve: [],
+      pltv_predictions: [],
+      pltv_curve: [],
+      pltv_confidence: 0,
+      pltv_coefficients: { a: 0, b: 0 },
+    }
+  );
 }
 
 // --- Revenue Cohort ---
@@ -1060,7 +1241,11 @@ export interface CohortLtvData {
   cohorts: {
     label: string;
     total_users: number;
-    ltv_curve: { day: number; cumulative_revenue: number; user_count: number }[];
+    ltv_curve: {
+      day: number;
+      cumulative_revenue: number;
+      user_count: number;
+    }[];
   }[];
   cohort_by: string;
 }
@@ -1120,10 +1305,14 @@ export interface TransactionRow {
 }
 
 export interface TransactionSummary {
-  purchase_total: number; purchase_count: number;
-  refund_total: number; refund_count: number;
-  grant_total: number; grant_count: number;
-  ad_total: number; ad_count: number;
+  purchase_total: number;
+  purchase_count: number;
+  refund_total: number;
+  refund_count: number;
+  grant_total: number;
+  grant_count: number;
+  ad_total: number;
+  ad_count: number;
 }
 
 export interface TransactionResponse {
@@ -1153,16 +1342,30 @@ export interface TransactionGroupedResponse {
   has_more: boolean;
 }
 
-export type LedgerGroupBy = 'none' | 'product' | 'user' | 'day' | 'hour' | 'reason';
+export type LedgerGroupBy =
+  | 'none'
+  | 'product'
+  | 'user'
+  | 'day'
+  | 'hour'
+  | 'reason';
 
 export interface TransactionQueryParams extends RevenueParams {
-  type?: string; user_id?: string; product?: string; reason?: string;
-  min_amount?: number; max_amount?: number;
-  sort?: string; order?: string;
-  offset?: number; limit?: number;
+  type?: string;
+  user_id?: string;
+  product?: string;
+  reason?: string;
+  min_amount?: number;
+  max_amount?: number;
+  sort?: string;
+  order?: string;
+  offset?: number;
+  limit?: number;
   group_by?: LedgerGroupBy;
-  user_ids?: string; products?: string;
-  reasons?: string; payment_methods?: string;
+  user_ids?: string;
+  products?: string;
+  reasons?: string;
+  payment_methods?: string;
   search?: string;
 }
 
@@ -1174,10 +1377,30 @@ export async function getRevenueTransactions(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/transactions`,
     { params }
   );
-  return response.data?.data || { mode: 'flat', transactions: [], total_count: 0, summary: { purchase_total: 0, purchase_count: 0, refund_total: 0, refund_count: 0, grant_total: 0, grant_count: 0, ad_total: 0, ad_count: 0 }, has_more: false };
+  return (
+    response.data?.data || {
+      mode: 'flat',
+      transactions: [],
+      total_count: 0,
+      summary: {
+        purchase_total: 0,
+        purchase_count: 0,
+        refund_total: 0,
+        refund_count: 0,
+        grant_total: 0,
+        grant_count: 0,
+        ad_total: 0,
+        ad_count: 0,
+      },
+      has_more: false,
+    }
+  );
 }
 
-export interface FacetValue { value: string; count: number; }
+export interface FacetValue {
+  value: string;
+  count: number;
+}
 
 export async function getTransactionFacets(
   projectId: number | string,
@@ -1203,9 +1426,12 @@ export interface UserFinancialTransaction {
 }
 
 export interface UserFinancialSummary {
-  total_purchases: number; purchase_count: number;
-  total_refunds: number; refund_count: number;
-  total_grants: number; grant_count: number;
+  total_purchases: number;
+  purchase_count: number;
+  total_refunds: number;
+  refund_count: number;
+  total_grants: number;
+  grant_count: number;
   net_revenue: number;
   refund_rate: number;
   first_purchase: string | null;
@@ -1227,7 +1453,25 @@ export async function getRevenueUserSummary(
     `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/user-summary`,
     { params }
   );
-  return response.data?.data || { summary: { total_purchases: 0, purchase_count: 0, total_refunds: 0, refund_count: 0, total_grants: 0, grant_count: 0, net_revenue: 0, refund_rate: 0, first_purchase: null, last_purchase: null }, purchases: [], refunds: [], grants: [] };
+  return (
+    response.data?.data || {
+      summary: {
+        total_purchases: 0,
+        purchase_count: 0,
+        total_refunds: 0,
+        refund_count: 0,
+        total_grants: 0,
+        grant_count: 0,
+        net_revenue: 0,
+        refund_rate: 0,
+        first_purchase: null,
+        last_purchase: null,
+      },
+      purchases: [],
+      refunds: [],
+      grants: [],
+    }
+  );
 }
 
 // === Product Hourly Heatmap ===
@@ -1411,4 +1655,3 @@ export async function getDataGovernance(
     }
   );
 }
-

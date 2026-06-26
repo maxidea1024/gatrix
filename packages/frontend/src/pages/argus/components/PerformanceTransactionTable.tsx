@@ -27,8 +27,6 @@ import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { getMethodColor, parseTransaction } from './performanceHelpers';
 import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
-
-
 interface PerformanceTransactionTableProps {
   transactions: ArgusTransaction[];
   loading: boolean;
@@ -52,7 +50,10 @@ const PerformanceTransactionTable: React.FC<
   }, [transactions]);
 
   return (
-    <PageContentLoader loading={loading && transactions.length === 0} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+    <PageContentLoader
+      loading={loading && transactions.length === 0}
+      sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+    >
       {/* Performance Summary Stats */}
       {transactions.length > 0 && (
         <Box
@@ -113,7 +114,11 @@ const PerformanceTransactionTable: React.FC<
                 label: t('argus.performance.avgErrorRate', 'Avg. Error Rate'),
                 value: `${avgErr.toFixed(2)}%`,
                 color:
-                  avgErr > 5 ? ARGUS_SEMANTIC.negative : avgErr > 1 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.positive,
+                  avgErr > 5
+                    ? ARGUS_SEMANTIC.negative
+                    : avgErr > 1
+                      ? ARGUS_SEMANTIC.warning
+                      : ARGUS_SEMANTIC.positive,
                 icon: <SpeedIcon />,
               },
               {
@@ -560,7 +565,7 @@ const PerformanceTransactionTable: React.FC<
 
       {/* Pagination */}
       {transactions.length > 0 && (
-      <Box sx={{ mt: 2, flexShrink: 0 }}>
+        <Box sx={{ mt: 2, flexShrink: 0 }}>
           <SimplePagination
             count={transactions.length}
             page={perfPage}

@@ -1,7 +1,10 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
-import { buildSegmentConditions, type SegmentFilterQuery } from '../utils/segmentFilter';
+import {
+  buildSegmentConditions,
+  type SegmentFilterQuery,
+} from '../utils/segmentFilter';
 
 const logger = createLogger('overview-api');
 
@@ -28,8 +31,16 @@ export default async function overviewRoutes(app: FastifyInstance) {
     '/overview/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h', country, platform, app_version } = request.query as {
-        period?: string; country?: string; platform?: string; app_version?: string;
+      const {
+        period = '24h',
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        period?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       try {
@@ -39,7 +50,11 @@ export default async function overviewRoutes(app: FastifyInstance) {
         // Helper: merge segment conditions for a given dataset
         const withSeg = (dataset: string, existing?: any[]) => {
           const segConds = buildSegmentConditions(segQuery, dataset);
-          return existing ? [...existing, ...segConds] : segConds.length > 0 ? segConds : undefined;
+          return existing
+            ? [...existing, ...segConds]
+            : segConds.length > 0
+              ? segConds
+              : undefined;
         };
 
         const [batch, prevBatch] = await Promise.all([

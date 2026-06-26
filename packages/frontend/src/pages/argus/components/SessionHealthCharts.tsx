@@ -270,7 +270,11 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
         </Box>
         <Box sx={{ height: 220 }}>
           {loading ? (
-            <ArgusChartSkeleton type="line" height={220} color={ARGUS_SEMANTIC.positive} />
+            <ArgusChartSkeleton
+              type="line"
+              height={220}
+              color={ARGUS_SEMANTIC.positive}
+            />
           ) : (
             <InteractiveTimeSeriesChart
               labels={timelineLabels}
@@ -340,7 +344,10 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
               fontWeight={600}
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
-              <WarningIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.negative }} />
+              <WarningIcon
+                fontSize="small"
+                sx={{ color: ARGUS_SEMANTIC.negative }}
+              />
               {t('argus.sessions.crashRateByBrowser')}
             </Typography>
             <Tooltip title={t('argus.sessions.crashByBrowserDesc')} arrow>
@@ -386,7 +393,10 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
               fontWeight={600}
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
-              <WarningIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />
+              <WarningIcon
+                fontSize="small"
+                sx={{ color: ARGUS_SEMANTIC.warning }}
+              />
               {t('argus.sessions.crashRateByOS')}
             </Typography>
             <Tooltip title={t('argus.sessions.crashByOSDesc')} arrow>
@@ -453,7 +463,11 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
         </Box>
         <Box sx={{ height: 200 }}>
           {loading ? (
-            <ArgusChartSkeleton type="bar" height={200} color={ARGUS_SEMANTIC.negative} />
+            <ArgusChartSkeleton
+              type="bar"
+              height={200}
+              color={ARGUS_SEMANTIC.negative}
+            />
           ) : (
             <InteractiveTimeSeriesChart
               labels={timelineLabels}

@@ -56,7 +56,9 @@ import {
 } from './components/sessionHealthHelpers';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { ARGUS_SEMANTIC } from './argusThemeTokens';
-import ArgusSegmentFilter, { type SegmentFilterValues } from './components/ArgusSegmentFilter';
+import ArgusSegmentFilter, {
+  type SegmentFilterValues,
+} from './components/ArgusSegmentFilter';
 
 ChartJS.register(
   CategoryScale,
@@ -145,7 +147,13 @@ const ArgusSessionHealthPage: React.FC = () => {
     try {
       const ap = argusDateRangeToApiParams(filters.dateRange);
       const [healthResult, issuesResult] = await Promise.all([
-        argusService.getSessionHealth(projectId, ap.period, ap.start, ap.end, segmentFilter),
+        argusService.getSessionHealth(
+          projectId,
+          ap.period,
+          ap.start,
+          ap.end,
+          segmentFilter
+        ),
         argusService
           .listIssues(projectId, {
             sort: 'event_count',
@@ -215,7 +223,7 @@ const ArgusSessionHealthPage: React.FC = () => {
   const pp = data?.previous_period;
   const crashFreeRate = Number(s?.crash_free_rate || 0);
   const rateColor =
-     crashFreeRate >= 99
+    crashFreeRate >= 99
       ? ARGUS_SEMANTIC.positive
       : crashFreeRate >= 95
         ? ARGUS_SEMANTIC.warning
@@ -238,7 +246,12 @@ const ArgusSessionHealthPage: React.FC = () => {
             Number(s?.errored || 0),
             Number(s?.abnormal || 0),
           ],
-          backgroundColor: [ARGUS_SEMANTIC.positive, ARGUS_SEMANTIC.negative, ARGUS_SEMANTIC.warning, '#9e9e9e'],
+          backgroundColor: [
+            ARGUS_SEMANTIC.positive,
+            ARGUS_SEMANTIC.negative,
+            ARGUS_SEMANTIC.warning,
+            '#9e9e9e',
+          ],
           borderColor: isDark ? '#1a1a2e' : '#ffffff',
           borderWidth: 3,
           cutout: '72%',
@@ -433,15 +446,14 @@ const ArgusSessionHealthPage: React.FC = () => {
 
       {/* Segment Filter */}
       <Box sx={{ px: 0, pb: 1 }}>
-        <ArgusSegmentFilter
-          value={segmentFilter}
-          onChange={setSegmentFilter}
-        />
+        <ArgusSegmentFilter value={segmentFilter} onChange={setSegmentFilter} />
       </Box>
 
       <PageContentLoader loading={loading && !data}>
         {loading && !!data && (
-          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }} />
+          <LinearProgress
+            sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }}
+          />
         )}
         {/* Top Row: Donut + Stats */}
         <Box

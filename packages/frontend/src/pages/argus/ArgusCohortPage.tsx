@@ -164,7 +164,11 @@ const CohortBuilderDialog: React.FC<CohortBuilderDialogProps> = ({
     };
   }, [open, rules, combinator, projectId]);
 
-  const updateRule = (index: number, field: keyof ArgusCohortRule, value: any) => {
+  const updateRule = (
+    index: number,
+    field: keyof ArgusCohortRule,
+    value: any
+  ) => {
     setRules((prev) =>
       prev.map((r, i) => (i === index ? { ...r, [field]: value } : r))
     );
@@ -195,7 +199,9 @@ const CohortBuilderDialog: React.FC<CohortBuilderDialogProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle sx={{ fontWeight: 700 }}>{t('argus.cohorts.createCohort')}</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 700 }}>
+        {t('argus.cohorts.createCohort')}
+      </DialogTitle>
       <DialogContent dividers>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
           {/* Name & Description */}
@@ -222,7 +228,9 @@ const CohortBuilderDialog: React.FC<CohortBuilderDialogProps> = ({
 
           {/* Rules */}
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
+            >
               <Typography variant="subtitle2" fontWeight={700}>
                 {t('argus.cohorts.rules')}
               </Typography>
@@ -252,7 +260,9 @@ const CohortBuilderDialog: React.FC<CohortBuilderDialogProps> = ({
                   mb: 1.5,
                   p: 1.5,
                   borderRadius: 2,
-                  bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                  bgcolor: isDark
+                    ? 'rgba(255,255,255,0.03)'
+                    : 'rgba(0,0,0,0.02)',
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 }}
               >
@@ -279,9 +289,7 @@ const CohortBuilderDialog: React.FC<CohortBuilderDialogProps> = ({
                   <Select
                     value={rule.event}
                     label={t('argus.cohorts.event')}
-                    onChange={(e) =>
-                      updateRule(index, 'event', e.target.value)
-                    }
+                    onChange={(e) => updateRule(index, 'event', e.target.value)}
                   >
                     {eventNames.map((en) => (
                       <MenuItem key={en.name} value={en.name}>
@@ -313,13 +321,21 @@ const CohortBuilderDialog: React.FC<CohortBuilderDialogProps> = ({
                   size="small"
                   value={rule.count}
                   onChange={(e) =>
-                    updateRule(index, 'count', Math.max(0, parseInt(e.target.value) || 0))
+                    updateRule(
+                      index,
+                      'count',
+                      Math.max(0, parseInt(e.target.value) || 0)
+                    )
                   }
                   sx={{ width: 80 }}
                   inputProps={{ min: 0 }}
                 />
 
-                <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ whiteSpace: 'nowrap' }}
+                >
                   {t('argus.cohorts.timesIn')}
                 </Typography>
 
@@ -439,7 +455,9 @@ const ArgusCohortPage: React.FC = () => {
 
   useEffect(() => {
     loadCohorts();
-    getAnalyticsEventNames(projectId).then(setEventNames).catch(() => {});
+    getAnalyticsEventNames(projectId)
+      .then(setEventNames)
+      .catch(() => {});
   }, [loadCohorts, projectId]);
 
   const handleCreate = async (data: {
@@ -513,12 +531,18 @@ const ArgusCohortPage: React.FC = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>{t('argus.cohorts.name')}</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{t('argus.cohorts.rules')}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>
+                  {t('argus.cohorts.name')}
+                </TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>
+                  {t('argus.cohorts.rules')}
+                </TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="right">
                   {t('argus.cohorts.userCount')}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>{t('argus.cohorts.lastComputed')}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>
+                  {t('argus.cohorts.lastComputed')}
+                </TableCell>
                 <TableCell sx={{ fontWeight: 700 }} align="right">
                   {t('argus.kpiAlerts.actions')}
                 </TableCell>
@@ -553,7 +577,9 @@ const ArgusCohortPage: React.FC = () => {
                         </Box>
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        <Box
+                          sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+                        >
                           {cohort.definition.rules.map((rule, i) => (
                             <Chip
                               key={i}
@@ -579,7 +605,11 @@ const ArgusCohortPage: React.FC = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontSize={13} color="text.secondary">
+                        <Typography
+                          variant="body2"
+                          fontSize={13}
+                          color="text.secondary"
+                        >
                           {cohort.last_computed
                             ? new Date(cohort.last_computed).toLocaleString()
                             : '—'}
@@ -601,8 +631,12 @@ const ArgusCohortPage: React.FC = () => {
               {!loading && cohorts.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                    <CohortIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-                    <Typography color="text.secondary">{t('argus.cohorts.noCohorts')}</Typography>
+                    <CohortIcon
+                      sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }}
+                    />
+                    <Typography color="text.secondary">
+                      {t('argus.cohorts.noCohorts')}
+                    </Typography>
                   </TableCell>
                 </TableRow>
               )}
@@ -634,7 +668,9 @@ const ArgusCohortPage: React.FC = () => {
             handleMenuClose();
           }}
         >
-          <ListItemIcon><RefreshIcon fontSize="small" /></ListItemIcon>
+          <ListItemIcon>
+            <RefreshIcon fontSize="small" />
+          </ListItemIcon>
           <ListItemText>{t('argus.cohorts.compute', 'Recompute')}</ListItemText>
         </MenuItem>
         <MenuItem
@@ -644,7 +680,9 @@ const ArgusCohortPage: React.FC = () => {
           }}
           sx={{ color: 'error.main' }}
         >
-          <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" color="error" />
+          </ListItemIcon>
           <ListItemText>{t('argus.cohorts.delete', 'Delete')}</ListItemText>
         </MenuItem>
       </Menu>

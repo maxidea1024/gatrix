@@ -30,7 +30,10 @@ export const FEEDBACK_MESSAGES_EN = [
   'Session keeps expiring, have to re-login every 30 minutes.',
 ];
 
-export const FEEDBACK_MESSAGES = [...FEEDBACK_MESSAGES_KO, ...FEEDBACK_MESSAGES_EN];
+export const FEEDBACK_MESSAGES = [
+  ...FEEDBACK_MESSAGES_KO,
+  ...FEEDBACK_MESSAGES_EN,
+];
 
 export async function generateAndInsertFeedback(
   ch: any,
@@ -53,15 +56,29 @@ export async function generateAndInsertFeedback(
       name: user.name,
       email: user.email,
       comments: randomPick(FEEDBACK_MESSAGES),
-      url: randomPick(['/game/play', '/game/port', '/settings', '/guild', '/market']),
-      tags: { category: randomPick(['bug', 'feature', 'performance', 'ux', 'crash']) },
+      url: randomPick([
+        '/game/play',
+        '/game/port',
+        '/settings',
+        '/guild',
+        '/market',
+      ]),
+      tags: {
+        category: randomPick(['bug', 'feature', 'performance', 'ux', 'crash']),
+      },
       dsn_key_id: dsnKeyId,
     });
   }
   for (let offset = 0; offset < feedbackBatch.length; offset += CHUNK_SIZE) {
     const chunk = feedbackBatch.slice(offset, offset + CHUNK_SIZE);
-    await ch.insert({ table: `${chDatabase}.user_feedback`, values: chunk, format: 'JSONEachRow' });
+    await ch.insert({
+      table: `${chDatabase}.user_feedback`,
+      values: chunk,
+      format: 'JSONEachRow',
+    });
   }
-  console.log(`   ✓ ${feedbackBatch.length.toLocaleString()} feedback entries inserted`);
+  console.log(
+    `   ✓ ${feedbackBatch.length.toLocaleString()} feedback entries inserted`
+  );
   return feedbackBatch.length;
 }

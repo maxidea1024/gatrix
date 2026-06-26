@@ -120,10 +120,14 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
   // Auto-format labels from rawPeriods if provided
   const finalLabels = useMemo(() => {
     if (!rawPeriods || rawPeriods.length === 0) return labels;
-    const parse = (s: string) => new Date(s.includes('T') ? s : s.replace(' ', 'T')).getTime();
-    const isSubDaily = rawPeriods.length >= 2 &&
-      (parse(rawPeriods[1]) - parse(rawPeriods[0])) < 86400000;
-    return rawPeriods.map(p => formatWith(p, isSubDaily ? 'M/D HH:mm' : 'M/D'));
+    const parse = (s: string) =>
+      new Date(s.includes('T') ? s : s.replace(' ', 'T')).getTime();
+    const isSubDaily =
+      rawPeriods.length >= 2 &&
+      parse(rawPeriods[1]) - parse(rawPeriods[0]) < 86400000;
+    return rawPeriods.map((p) =>
+      formatWith(p, isSubDaily ? 'M/D HH:mm' : 'M/D')
+    );
   }, [rawPeriods, labels]);
 
   const chartHeight = compact ? CHART_HEIGHT_COMPACT : CHART_HEIGHT_NORMAL;

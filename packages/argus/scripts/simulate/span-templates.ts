@@ -305,4 +305,3 @@ export function getSpanTemplates(txnName: string): SpanTemplate[] {
 }
 
 // ═══════════════════ CONTEXTUAL LOG MESSAGES ═══════════════════
-

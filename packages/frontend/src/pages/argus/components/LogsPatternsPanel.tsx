@@ -688,7 +688,10 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                                 opacity: 0,
                                 transition: 'opacity 0.15s',
                                 'tr:hover &': { opacity: 0.7 },
-                                '&:hover': { opacity: 1, color: ARGUS_SEMANTIC.warning },
+                                '&:hover': {
+                                  opacity: 1,
+                                  color: ARGUS_SEMANTIC.warning,
+                                },
                               }}
                             >
                               <AlertIcon sx={{ fontSize: 13 }} />

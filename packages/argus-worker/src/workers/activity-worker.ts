@@ -16,9 +16,9 @@ const CONSUMER_NAME = `worker-${process.pid}`;
 
 const EXCHANGE_RATES_TO_USD: Record<string, number> = {
   USD: 1.0,
-  KRW: 0.00077,  // 1,300 KRW = 1 USD
-  EUR: 1.08,     // 1 EUR = 1.08 USD
-  JPY: 0.0064,   // 156 JPY = 1 USD
+  KRW: 0.00077, // 1,300 KRW = 1 USD
+  EUR: 1.08, // 1 EUR = 1.08 USD
+  JPY: 0.0064, // 156 JPY = 1 USD
 };
 
 function convertToUsd(amount: number, currency: string): number {
@@ -200,9 +200,12 @@ export class ActivityWorker {
   ): NormalizedActivity {
     const rawCurrency = event.currency || event.properties?.currency || 'USD';
     const rawAmount = event.amount_usd || event.numeric_properties?.amount || 0;
-    
+
     let amountUsd = 0;
-    if (event.event_name === 'purchase' || event.event_name === 'item_purchased') {
+    if (
+      event.event_name === 'purchase' ||
+      event.event_name === 'item_purchased'
+    ) {
       amountUsd = convertToUsd(rawAmount, rawCurrency);
     }
 

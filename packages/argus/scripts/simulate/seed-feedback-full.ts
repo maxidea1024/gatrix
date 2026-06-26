@@ -5,18 +5,55 @@
  * Creates feedback-issue links and feedback activity records.
  */
 import { PROJECT_ID, DAYS_BACK, CHUNK_SIZE } from './config';
-import { randomInt, randomPick, randomFloat, uuid, randomDateWeighted, formatDate } from './helpers';
+import {
+  randomInt,
+  randomPick,
+  randomFloat,
+  uuid,
+  randomDateWeighted,
+  formatDate,
+} from './helpers';
 import { USERS } from './user-pool';
 import { FEEDBACK_MESSAGES } from './feedback';
 import { SERVER_RELEASES } from './releases';
 
-const CATEGORIES = ['bug', 'feature', 'performance', 'ux', 'crash', 'payment', 'content'];
-const SENTIMENTS = ['negative', 'negative', 'neutral', 'neutral', 'positive', 'mixed'];
+const CATEGORIES = [
+  'bug',
+  'feature',
+  'performance',
+  'ux',
+  'crash',
+  'payment',
+  'content',
+];
+const SENTIMENTS = [
+  'negative',
+  'negative',
+  'neutral',
+  'neutral',
+  'positive',
+  'mixed',
+];
 const BROWSERS = ['Chrome', 'Firefox', 'Safari', 'Edge', 'GameClient'];
 const OSES = ['Windows', 'macOS', 'Android', 'iOS', 'Linux'];
-const DEVICES = ['PC', 'PC', 'PC', 'iPhone 15', 'Galaxy S24', 'iPad Pro', 'Steam Deck', ''];
+const DEVICES = [
+  'PC',
+  'PC',
+  'PC',
+  'iPhone 15',
+  'Galaxy S24',
+  'iPad Pro',
+  'Steam Deck',
+  '',
+];
 const SERVICES = ['game-client', 'web-dashboard', 'mobile-app', ''];
-const STATUSES = ['unresolved', 'unresolved', 'unresolved', 'resolved', 'ignored'];
+const STATUSES = [
+  'unresolved',
+  'unresolved',
+  'unresolved',
+  'resolved',
+  'ignored',
+];
 const ADMIN_NAMES = ['admin', 'dev_alice', 'qa_bob', 'support_carol'];
 
 const COMMENTS = [
@@ -42,7 +79,7 @@ export async function generateAndInsertEnrichedFeedback(
   chDatabase: string,
   totalFeedback: number,
   activeDsnKeys: number[],
-  allEvents: any[],
+  allEvents: any[]
 ): Promise<{ feedbackIds: string[]; count: number }> {
   console.log('\n💬 Generating enriched feedback...');
   const feedbackIds: string[] = [];
@@ -68,7 +105,9 @@ export async function generateAndInsertEnrichedFeedback(
         for (let a = 0; a < count; a++) {
           const w = randomPick([800, 1024, 1280, 1920]);
           const h = randomPick([600, 768, 720, 1080]);
-          attachments.push(`https://picsum.photos/seed/${uuid().substring(0, 8)}/${w}/${h}`);
+          attachments.push(
+            `https://picsum.photos/seed/${uuid().substring(0, 8)}/${w}/${h}`
+          );
         }
       }
 
@@ -81,17 +120,40 @@ export async function generateAndInsertEnrichedFeedback(
         email: user.email,
         message: randomPick(FEEDBACK_MESSAGES),
         contact_email: user.email,
-        url: randomPick(['/game/play', '/game/port', '/game/battle', '/settings', '/inventory', '/guild', '/market']),
-        environment: randomPick(['production', 'production', 'production', 'staging']),
+        url: randomPick([
+          '/game/play',
+          '/game/port',
+          '/game/battle',
+          '/settings',
+          '/inventory',
+          '/guild',
+          '/market',
+        ]),
+        environment: randomPick([
+          'production',
+          'production',
+          'production',
+          'staging',
+        ]),
         release: randomPick(SERVER_RELEASES),
         source: randomPick(['widget', 'dialog', 'api', 'sdk']),
         tags: { category: randomPick(CATEGORIES) },
         // Enriched columns
         status,
-        assigned_to: status === 'resolved' ? randomPick(ADMIN_NAMES) : (Math.random() < 0.2 ? randomPick(ADMIN_NAMES) : ''),
+        assigned_to:
+          status === 'resolved'
+            ? randomPick(ADMIN_NAMES)
+            : Math.random() < 0.2
+              ? randomPick(ADMIN_NAMES)
+              : '',
         is_spam: isSpam,
         attachments,
-        resolved_at: status === 'resolved' ? formatDate(new Date(ts.getTime() + randomInt(3600000, 7 * 86400000))) : null,
+        resolved_at:
+          status === 'resolved'
+            ? formatDate(
+                new Date(ts.getTime() + randomInt(3600000, 7 * 86400000))
+              )
+            : null,
         // Device context
         browser: randomPick(BROWSERS),
         browser_version: `${randomInt(90, 130)}.0.${randomInt(1000, 9999)}.${randomInt(10, 99)}`,
@@ -117,7 +179,9 @@ export async function generateAndInsertEnrichedFeedback(
     process.stdout.write(`\r   ⏳ ${inserted.toLocaleString()} feedback...`);
   }
 
-  console.log(`\n   ✓ ${inserted.toLocaleString()} enriched feedback entries inserted`);
+  console.log(
+    `\n   ✓ ${inserted.toLocaleString()} enriched feedback entries inserted`
+  );
   return { feedbackIds, count: inserted };
 }
 
@@ -128,7 +192,7 @@ export async function seedFeedbackLinksAndActivity(
   pool: any,
   ch: any,
   feedbackIds: string[],
-  _internalProjectId: number,
+  _internalProjectId: number
 ): Promise<void> {
   console.log('\n🔗 Seeding feedback-issue links & activity...');
 
@@ -179,9 +243,17 @@ export async function seedFeedbackLinksAndActivity(
 
   // Clear existing
   try {
-    await pool.query('DELETE FROM g_argus_feedback_issue_links WHERE project_id = ?', [PROJECT_ID]);
-    await pool.query('DELETE FROM g_argus_feedback_activity WHERE project_id = ?', [PROJECT_ID]);
-  } catch { /* tables might not exist yet */ }
+    await pool.query(
+      'DELETE FROM g_argus_feedback_issue_links WHERE project_id = ?',
+      [PROJECT_ID]
+    );
+    await pool.query(
+      'DELETE FROM g_argus_feedback_activity WHERE project_id = ?',
+      [PROJECT_ID]
+    );
+  } catch {
+    /* tables might not exist yet */
+  }
 
   // Link ~20% of feedbacks to issues
   const shuffled = [...feedbackIds].sort(() => Math.random() - 0.5);
@@ -190,15 +262,18 @@ export async function seedFeedbackLinksAndActivity(
   const BATCH = 100;
   for (let i = 0; i < toLink.length; i += BATCH) {
     const batch = toLink.slice(i, i + BATCH);
-    const values = batch.map(fid =>
-      `('${PROJECT_ID}', '${fid}', ${randomPick(issueIds)}, UTC_TIMESTAMP())`
+    const values = batch.map(
+      (fid) =>
+        `('${PROJECT_ID}', '${fid}', ${randomPick(issueIds)}, UTC_TIMESTAMP())`
     );
     try {
       await pool.query(
         `INSERT IGNORE INTO g_argus_feedback_issue_links
          (project_id, feedback_id, issue_id, created_at) VALUES ${values.join(',')}`
       );
-    } catch { /* ignore duplicates */ }
+    } catch {
+      /* ignore duplicates */
+    }
   }
   console.log(`   ✓ ${toLink.length} feedback-issue links created`);
 
@@ -244,7 +319,9 @@ export async function seedFeedbackLinksAndActivity(
            (project_id, feedback_id, user_name, action, data, created_at) VALUES ${values.join(',')}`
         );
       } catch (e: any) {
-        console.log(`   ⚠ Activity batch error: ${e.message?.substring(0, 80)}`);
+        console.log(
+          `   ⚠ Activity batch error: ${e.message?.substring(0, 80)}`
+        );
       }
     }
   }

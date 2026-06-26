@@ -83,7 +83,6 @@ import {
 import {
   PageContainer,
   TotalCountChip,
-
   SplitContainer,
   ListPanel,
   SplitterHandle,
@@ -118,8 +117,6 @@ const FACET_WIDTH_KEY = 'argus-feedback-facet-width';
 const DEFAULT_FACET_WIDTH = 220;
 const MIN_FACET_WIDTH = 150;
 const MAX_FACET_WIDTH = 400;
-
-
 
 // ─── Main Component ───
 const ArgusFeedbackPage: React.FC = () => {
@@ -768,8 +765,6 @@ const ArgusFeedbackPage: React.FC = () => {
     }
   }, [selectedItem?.issue_id, selectedItem?.feedback_id, projectId]);
 
-
-
   // ─── Trend Chart — transformed for ArgusVolumeChart ───
   const trendLabelsRaw = useMemo(
     () => data?.trend?.map((d) => d.day) || [],
@@ -969,8 +964,6 @@ const ArgusFeedbackPage: React.FC = () => {
         chartDatasets={chartDatasets}
         onZoom={handleChartZoom}
       />
-
-
 
       {/* Bulk Action Toolbar */}
       {selectedIds.size > 0 && (

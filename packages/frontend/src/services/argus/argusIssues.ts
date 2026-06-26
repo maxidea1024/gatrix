@@ -156,12 +156,9 @@ export async function subscribeIssue(
   issueId: number | string,
   subscribe: boolean
 ): Promise<void> {
-  await argusApi.put(
-    `${ARGUS_BASE}/${projectId}/issues/${issueId}/subscribe`,
-    {
-      is_subscribed: subscribe,
-    }
-  );
+  await argusApi.put(`${ARGUS_BASE}/${projectId}/issues/${issueId}/subscribe`, {
+    is_subscribed: subscribe,
+  });
 }
 
 export async function bookmarkIssue(
@@ -169,12 +166,9 @@ export async function bookmarkIssue(
   issueId: number | string,
   bookmark: boolean
 ): Promise<void> {
-  await argusApi.put(
-    `${ARGUS_BASE}/${projectId}/issues/${issueId}/bookmark`,
-    {
-      is_bookmarked: bookmark,
-    }
-  );
+  await argusApi.put(`${ARGUS_BASE}/${projectId}/issues/${issueId}/bookmark`, {
+    is_bookmarked: bookmark,
+  });
 }
 
 export async function deleteIssue(
@@ -196,10 +190,9 @@ export async function addIssueComment(
   issueId: number | string,
   text: string
 ): Promise<void> {
-  await argusApi.post(
-    `${ARGUS_BASE}/${projectId}/issues/${issueId}/comments`,
-    { text }
-  );
+  await argusApi.post(`${ARGUS_BASE}/${projectId}/issues/${issueId}/comments`, {
+    text,
+  });
 }
 
 export async function getIssueTags(
@@ -407,7 +400,5 @@ export async function deleteSavedQuery(
   projectId: number | string,
   queryId: number
 ): Promise<void> {
-  await argusApi.delete(
-    `${ARGUS_BASE}/${projectId}/discover/saved/${queryId}`
-  );
+  await argusApi.delete(`${ARGUS_BASE}/${projectId}/discover/saved/${queryId}`);
 }

@@ -7,30 +7,60 @@ import { PROJECT_ID } from './config';
 import { randomInt, randomPick } from './helpers';
 
 const ADMIN_NAMES = ['admin', 'dev_alice', 'qa_bob', 'carol', 'david', null];
-const PRIORITIES = ['critical', 'high', 'medium', 'medium', 'medium', 'low', 'low'];
+const PRIORITIES = [
+  'critical',
+  'high',
+  'medium',
+  'medium',
+  'medium',
+  'low',
+  'low',
+];
 
 const ACTIVITY_TEMPLATES = [
-  { action: 'status_change', dataFn: () => ({ from: 'unresolved', to: randomPick(['resolved', 'ignored']) }) },
-  { action: 'assign', dataFn: () => ({ assigned_to: randomPick(['admin', 'dev_alice', 'qa_bob', 'carol']) }) },
-  { action: 'priority_change', dataFn: () => ({ from: 'medium', to: randomPick(['critical', 'high', 'low']) }) },
-  { action: 'comment', dataFn: () => ({ text: randomPick([
-    'Investigating this issue',
-    'Confirmed on staging',
-    'Fix deployed in v3.13.1',
-    'Duplicate of #42',
-    'Cannot reproduce',
-    'Root cause identified in combat module',
-    'Adding regression test',
-    'Monitoring after hotfix',
-    'Reverting to previous behavior',
-    '재현 확인. 다음 패치에 수정 예정.',
-    'QA verified fix',
-  ]) }) },
+  {
+    action: 'status_change',
+    dataFn: () => ({
+      from: 'unresolved',
+      to: randomPick(['resolved', 'ignored']),
+    }),
+  },
+  {
+    action: 'assign',
+    dataFn: () => ({
+      assigned_to: randomPick(['admin', 'dev_alice', 'qa_bob', 'carol']),
+    }),
+  },
+  {
+    action: 'priority_change',
+    dataFn: () => ({
+      from: 'medium',
+      to: randomPick(['critical', 'high', 'low']),
+    }),
+  },
+  {
+    action: 'comment',
+    dataFn: () => ({
+      text: randomPick([
+        'Investigating this issue',
+        'Confirmed on staging',
+        'Fix deployed in v3.13.1',
+        'Duplicate of #42',
+        'Cannot reproduce',
+        'Root cause identified in combat module',
+        'Adding regression test',
+        'Monitoring after hotfix',
+        'Reverting to previous behavior',
+        '재현 확인. 다음 패치에 수정 예정.',
+        'QA verified fix',
+      ]),
+    }),
+  },
 ];
 
 export async function enrichIssues(
   pool: any,
-  _internalProjectId: number,
+  _internalProjectId: number
 ): Promise<void> {
   console.log('\n🐛 Enriching issues (status, assignee, priority)...');
 
@@ -51,10 +81,10 @@ export async function enrichIssues(
 
   // Distribute: ~40% unresolved, ~35% resolved, ~15% ignored, ~10% regressed
   const statusDist = [
-    { status: 'unresolved', ratio: 0.40 },
+    { status: 'unresolved', ratio: 0.4 },
     { status: 'resolved', ratio: 0.35 },
     { status: 'ignored', ratio: 0.15 },
-    { status: 'regressed', ratio: 0.10 },
+    { status: 'regressed', ratio: 0.1 },
   ];
 
   let idx = 0;
@@ -65,9 +95,12 @@ export async function enrichIssues(
 
     if (subset.length === 0) continue;
 
-    const assignee = status === 'unresolved'
-      ? (Math.random() < 0.3 ? randomPick(['admin', 'dev_alice', 'qa_bob']) : null)
-      : randomPick(['admin', 'dev_alice', 'qa_bob', 'carol', null]);
+    const assignee =
+      status === 'unresolved'
+        ? Math.random() < 0.3
+          ? randomPick(['admin', 'dev_alice', 'qa_bob'])
+          : null
+        : randomPick(['admin', 'dev_alice', 'qa_bob', 'carol', null]);
 
     const priority = randomPick(PRIORITIES);
 
@@ -112,7 +145,10 @@ export async function enrichIssues(
 
   // Clear existing
   try {
-    await pool.query('DELETE FROM g_argus_issue_activity WHERE project_id = ?', [PROJECT_ID]);
+    await pool.query(
+      'DELETE FROM g_argus_issue_activity WHERE project_id = ?',
+      [PROJECT_ID]
+    );
   } catch {}
 
   // ~50% of issues get 1-5 activity entries
@@ -146,7 +182,9 @@ export async function enrichIssues(
            (project_id, issue_id, user_name, action, data, created_at) VALUES ${values.join(',')}`
         );
       } catch (e: any) {
-        console.log(`   ⚠ Issue activity error: ${e.message?.substring(0, 80)}`);
+        console.log(
+          `   ⚠ Issue activity error: ${e.message?.substring(0, 80)}`
+        );
       }
     }
   }

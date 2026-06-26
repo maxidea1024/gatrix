@@ -437,11 +437,17 @@ export const ConnectedItem: React.FC<{
                 fontSize: '0.7rem',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                backgroundColor: alpha(active ? ARGUS_SEMANTIC.positive : '#9e9e9e', 0.12),
+                backgroundColor: alpha(
+                  active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
+                  0.12
+                ),
                 color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
                 border: 'none',
                 '&:hover': {
-                  backgroundColor: alpha(active ? ARGUS_SEMANTIC.positive : '#9e9e9e', 0.2),
+                  backgroundColor: alpha(
+                    active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
+                    0.2
+                  ),
                 },
               }}
             />
@@ -796,10 +802,15 @@ export const StatusBadge: React.FC<{ active: boolean; t: any }> = ({
       height: 22,
       fontWeight: 600,
       fontSize: '0.7rem',
-      backgroundColor: alpha(active ? ARGUS_SEMANTIC.positive : '#9e9e9e', 0.12),
+      backgroundColor: alpha(
+        active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
+        0.12
+      ),
       color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
       border: 'none',
-      '& .MuiChip-icon': { color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e' },
+      '& .MuiChip-icon': {
+        color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
+      },
     }}
   />
 );

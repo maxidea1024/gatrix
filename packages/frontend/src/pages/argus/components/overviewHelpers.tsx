@@ -28,8 +28,6 @@ export function formatHourLabel(hourStr: string): string {
   }
 }
 
-
-
 // ─── DistributionCard ───
 
 export const DistributionCard: React.FC<{

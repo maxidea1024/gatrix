@@ -440,7 +440,6 @@ const ArgusLogsPage: React.FC = () => {
         }}
         onRefresh={fetchAll}
         loading={loading}
-        
         extraControls={
           <Box
             sx={{

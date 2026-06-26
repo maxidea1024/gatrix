@@ -908,7 +908,6 @@ const ArgusDiscoverPage: React.FC = () => {
         }}
         onRefresh={hasQueried ? runQuery : undefined}
         loading={loading}
-        
         extraControls={
           <Box
             sx={{
@@ -1043,7 +1042,12 @@ const ArgusDiscoverPage: React.FC = () => {
           </Box>
 
           {error && (
-            <Box sx={{ p: 2, backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.04) }}>
+            <Box
+              sx={{
+                p: 2,
+                backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.04),
+              }}
+            >
               <Typography
                 variant="body2"
                 sx={{ color: ARGUS_SEMANTIC.negative, fontSize: '0.82rem' }}

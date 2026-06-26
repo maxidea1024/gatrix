@@ -121,9 +121,10 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                 const dates = Array.from(dateMap.keys()).sort();
                 const chartData = dates.map((d) => {
                   const bucket = d + (d.length === 10 ? 'T00:00:00Z' : 'Z');
-                  const label = d.length > 10
-                    ? formatWith(bucket, 'M/D HH:mm')
-                    : formatWith(bucket, 'M/D');
+                  const label =
+                    d.length > 10
+                      ? formatWith(bucket, 'M/D HH:mm')
+                      : formatWith(bucket, 'M/D');
                   return { label, count: dateMap.get(d) || 0 };
                 });
 
@@ -152,7 +153,9 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                   }}
                 >
-                  <WarningIcon sx={{ fontSize: 14, color: ARGUS_SEMANTIC.warning }} />
+                  <WarningIcon
+                    sx={{ fontSize: 14, color: ARGUS_SEMANTIC.warning }}
+                  />
                   <Box sx={{ flex: 1 }}>
                     <Typography sx={{ fontSize: '0.78rem', fontWeight: 500 }}>
                       {h.rule_name ||
@@ -183,7 +186,10 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                             h.status === 'success'
                               ? alpha(ARGUS_SEMANTIC.positive, 0.1)
                               : alpha(ARGUS_SEMANTIC.negative, 0.1),
-                          color: h.status === 'success' ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative,
+                          color:
+                            h.status === 'success'
+                              ? ARGUS_SEMANTIC.positive
+                              : ARGUS_SEMANTIC.negative,
                         }}
                       />
                     </Tooltip>

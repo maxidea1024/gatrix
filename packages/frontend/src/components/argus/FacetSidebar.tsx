@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useCallback,
+  useEffect,
+} from 'react';
 import {
   Box,
   Typography,
@@ -73,7 +79,9 @@ const FacetSection = React.memo<{
   }, []);
 
   useEffect(() => {
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, []);
 
   const totalCount = useMemo(
@@ -90,7 +98,8 @@ const FacetSection = React.memo<{
     return showAll ? vals : vals.slice(0, 10);
   }, [facet.values, debouncedSearch, showAll]);
 
-  const hasMore = facet.values.length > 10 && !showAll && !debouncedSearch.trim();
+  const hasMore =
+    facet.values.length > 10 && !showAll && !debouncedSearch.trim();
 
   return (
     <Box
@@ -390,318 +399,331 @@ const FacetSidebar = React.memo(
       }, [loading]);
 
       return (
-        <Box ref={ref} sx={{ position: 'relative', flexShrink: 0, height: '100%', width: collapsed ? undefined : width }}>
-        {/* Edge toggle button — circular, straddling the right border */}
         <Box
-          onClick={onToggleCollapse}
+          ref={ref}
           sx={{
-            position: 'absolute',
-            right: -12,
-            top: 6,
-            zIndex: 100,
-            width: 24,
-            height: 24,
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bgcolor: isDark ? '#1e1e1e' : '#ffffff',
-            border: `1px solid ${theme.palette.divider}`,
-            cursor: 'pointer',
-            color: 'text.secondary',
-            transition:
-              'background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
-            '&:hover': {
-              bgcolor: isDark ? '#252525' : '#f5f5f5',
-              boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
-              color: isDark ? 'primary.main' : 'text.primary',
-            },
+            position: 'relative',
+            flexShrink: 0,
+            height: '100%',
+            width: collapsed ? undefined : width,
           }}
         >
-          {collapsed ? (
-            <ExpandIcon sx={{ fontSize: 14, color: 'inherit' }} />
-          ) : (
-            <CollapseIcon sx={{ fontSize: 14, color: 'inherit' }} />
-          )}
-        </Box>
-
-        {/* Panel content */}
-        {collapsed ? (
+          {/* Edge toggle button — circular, straddling the right border */}
           <Box
+            onClick={onToggleCollapse}
             sx={{
-              width: 12,
-              borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-              height: '100%',
-            }}
-          />
-        ) : (
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              overflowY: 'auto',
-              overflowX: 'hidden',
-              borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-              '&::-webkit-scrollbar': { width: 4 },
-              '&::-webkit-scrollbar-thumb': {
-                backgroundColor: isDark
-                  ? 'rgba(255,255,255,0.1)'
-                  : 'rgba(0,0,0,0.1)',
-                borderRadius: 2,
+              position: 'absolute',
+              right: -12,
+              top: 6,
+              zIndex: 100,
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: isDark ? '#1e1e1e' : '#ffffff',
+              border: `1px solid ${theme.palette.divider}`,
+              cursor: 'pointer',
+              color: 'text.secondary',
+              transition:
+                'background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease',
+              '&:hover': {
+                bgcolor: isDark ? '#252525' : '#f5f5f5',
+                boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.1)}`,
+                color: isDark ? 'primary.main' : 'text.primary',
               },
             }}
           >
-            {/* Header */}
+            {collapsed ? (
+              <ExpandIcon sx={{ fontSize: 14, color: 'inherit' }} />
+            ) : (
+              <CollapseIcon sx={{ fontSize: 14, color: 'inherit' }} />
+            )}
+          </Box>
+
+          {/* Panel content */}
+          {collapsed ? (
             <Box
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                px: 1.5,
-                py: 1,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                width: 12,
+                borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+                height: '100%',
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+                borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+                '&::-webkit-scrollbar': { width: 4 },
+                '&::-webkit-scrollbar-thumb': {
+                  backgroundColor: isDark
+                    ? 'rgba(255,255,255,0.1)'
+                    : 'rgba(0,0,0,0.1)',
+                  borderRadius: 2,
+                },
               }}
             >
-              <Typography
-                sx={{
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.04em',
-                  color: 'text.secondary',
-                }}
-              >
-                {t('argus.logs.facet.facets', 'Facets')}
-              </Typography>
-            </Box>
-
-            {/* Compact loading animation directly under header */}
-            {facets.length > 0 && showLoading && (
+              {/* Header */}
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  py: 1.2,
+                  px: 1.5,
+                  py: 1,
                   borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-                  // Smooth bouncing dots animation
-                  '@keyframes bounceDotsCompact': {
-                    '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
-                    '50%': { transform: 'translateY(-4px)', opacity: 1 },
-                  },
-                }}
-              >
-                <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
-                  {[0, 1, 2].map((i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        backgroundColor: theme.palette.divider,
-                        animation: 'bounceDotsCompact 1.4s infinite ease-in-out',
-                        animationDelay: `${i * 0.16}s`,
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            )}
-
-            {/* Facet sections */}
-            {facets.map((facet) => (
-              <FacetSection
-                key={facet.key}
-                facet={facet}
-                onFilter={onFilter}
-                isDark={isDark}
-              />
-            ))}
-
-            {facets.length === 0 && showLoading && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  py: 8,
-                  width: '100%',
-                  // Smooth bouncing dots animation
-                  '@keyframes bounceDots': {
-                    '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
-                    '50%': { transform: 'translateY(-6px)', opacity: 1 },
-                  },
-                }}
-              >
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                  {[0, 1, 2].map((i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        backgroundColor: theme.palette.divider,
-                        animation: 'bounceDots 1.4s infinite ease-in-out',
-                        animationDelay: `${i * 0.16}s`,
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            )}
-
-            {facets.length === 0 && !loading && (
-              <Typography
-                sx={{
-                  px: 2,
-                  py: 3,
-                  fontSize: '0.72rem',
-                  color: 'text.disabled',
-                  textAlign: 'center',
-                }}
-              >
-                {t('argus.logs.facet.noFacets', 'No facets available')}
-              </Typography>
-            )}
-
-            {/* Custom Facets */}
-            {!(facets.length === 0 && loading) && customFacets && customFacets.length > 0 && (
-              <Box
-                sx={{
-                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-                  mt: 0.5,
                 }}
               >
                 <Typography
                   sx={{
-                    fontSize: '0.65rem',
+                    fontSize: '0.72rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
-                    color: 'text.disabled',
-                    px: 1.5,
-                    py: 0.6,
+                    color: 'text.secondary',
                   }}
                 >
-                  {t('argus.logs.customFacets.title', 'Custom Facets')}
+                  {t('argus.logs.facet.facets', 'Facets')}
                 </Typography>
-                {customFacets.map((facet) => (
-                  <Box key={facet.key} sx={{ position: 'relative' }}>
-                    <FacetSection
-                      facet={facet}
-                      onFilter={onFilter}
-                      isDark={isDark}
-                    />
-                    {onRemoveCustomFacet && (
-                      <IconButton
-                        size="small"
-                        onClick={() => onRemoveCustomFacet(facet.key)}
+              </Box>
+
+              {/* Compact loading animation directly under header */}
+              {facets.length > 0 && showLoading && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    py: 1.2,
+                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                    // Smooth bouncing dots animation
+                    '@keyframes bounceDotsCompact': {
+                      '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
+                      '50%': { transform: 'translateY(-4px)', opacity: 1 },
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', gap: 0.8, alignItems: 'center' }}>
+                    {[0, 1, 2].map((i) => (
+                      <Box
+                        key={i}
                         sx={{
-                          position: 'absolute',
-                          top: 4,
-                          right: 4,
-                          p: 0.2,
-                          opacity: 0.4,
-                          '&:hover': { opacity: 1 },
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: theme.palette.divider,
+                          animation:
+                            'bounceDotsCompact 1.4s infinite ease-in-out',
+                          animationDelay: `${i * 0.16}s`,
                         }}
-                      >
-                        <RemoveIcon sx={{ fontSize: 12 }} />
-                      </IconButton>
-                    )}
+                      />
+                    ))}
                   </Box>
-                ))}
-              </Box>
-            )}
+                </Box>
+              )}
 
-            {/* Discovered Facets */}
-            {!(facets.length === 0 && loading) && discoveredFacets && discoveredFacets.length > 0 && (
-              <Box
-                sx={{
-                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-                  mt: 0.5,
-                }}
-              >
-                <Typography
+              {/* Facet sections */}
+              {facets.map((facet) => (
+                <FacetSection
+                  key={facet.key}
+                  facet={facet}
+                  onFilter={onFilter}
+                  isDark={isDark}
+                />
+              ))}
+
+              {facets.length === 0 && showLoading && (
+                <Box
                   sx={{
-                    fontSize: '0.65rem',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    color: 'text.disabled',
-                    px: 1.5,
-                    py: 0.6,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    py: 8,
+                    width: '100%',
+                    // Smooth bouncing dots animation
+                    '@keyframes bounceDots': {
+                      '0%, 100%': { transform: 'translateY(0)', opacity: 0.3 },
+                      '50%': { transform: 'translateY(-6px)', opacity: 1 },
+                    },
                   }}
                 >
-                  {t('argus.logs.customFacets.discovered', 'Discovered')}
-                </Typography>
-                {discoveredFacets.map((facet) => (
-                  <FacetSection
-                    key={facet.key}
-                    facet={facet}
-                    onFilter={onFilter}
-                    isDark={isDark}
-                  />
-                ))}
-              </Box>
-            )}
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                    {[0, 1, 2].map((i) => (
+                      <Box
+                        key={i}
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          backgroundColor: theme.palette.divider,
+                          animation: 'bounceDots 1.4s infinite ease-in-out',
+                          animationDelay: `${i * 0.16}s`,
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
+              )}
 
-            {/* Add Custom Facet */}
-            {!(facets.length === 0 && loading) && onAddCustomFacet && (
-              <Box
-                sx={{
-                  px: 1,
-                  py: 0.5,
-                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <InputBase
-                    value={newFacetKey}
-                    onChange={(e) => setNewFacetKey(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && newFacetKey.trim()) {
-                        onAddCustomFacet(newFacetKey.trim());
-                        setNewFacetKey('');
-                      }
-                    }}
-                    placeholder={t(
-                      'argus.logs.customFacets.placeholder',
-                      'e.g. user_id, request_path'
-                    )}
+              {facets.length === 0 && !loading && (
+                <Typography
+                  sx={{
+                    px: 2,
+                    py: 3,
+                    fontSize: '0.72rem',
+                    color: 'text.disabled',
+                    textAlign: 'center',
+                  }}
+                >
+                  {t('argus.logs.facet.noFacets', 'No facets available')}
+                </Typography>
+              )}
+
+              {/* Custom Facets */}
+              {!(facets.length === 0 && loading) &&
+                customFacets &&
+                customFacets.length > 0 && (
+                  <Box
                     sx={{
-                      flex: 1,
-                      fontSize: '0.65rem',
-                      height: 24,
-                      px: 0.5,
-                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
-                      borderRadius: '4px',
+                      borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                      mt: 0.5,
                     }}
-                  />
-                  <SafeTooltip
-                    title={t('argus.logs.customFacets.add', 'Add Facet')}
                   >
-                    <IconButton
-                      size="small"
-                      onClick={() => {
-                        if (newFacetKey.trim()) {
+                    <Typography
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        color: 'text.disabled',
+                        px: 1.5,
+                        py: 0.6,
+                      }}
+                    >
+                      {t('argus.logs.customFacets.title', 'Custom Facets')}
+                    </Typography>
+                    {customFacets.map((facet) => (
+                      <Box key={facet.key} sx={{ position: 'relative' }}>
+                        <FacetSection
+                          facet={facet}
+                          onFilter={onFilter}
+                          isDark={isDark}
+                        />
+                        {onRemoveCustomFacet && (
+                          <IconButton
+                            size="small"
+                            onClick={() => onRemoveCustomFacet(facet.key)}
+                            sx={{
+                              position: 'absolute',
+                              top: 4,
+                              right: 4,
+                              p: 0.2,
+                              opacity: 0.4,
+                              '&:hover': { opacity: 1 },
+                            }}
+                          >
+                            <RemoveIcon sx={{ fontSize: 12 }} />
+                          </IconButton>
+                        )}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+              {/* Discovered Facets */}
+              {!(facets.length === 0 && loading) &&
+                discoveredFacets &&
+                discoveredFacets.length > 0 && (
+                  <Box
+                    sx={{
+                      borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                      mt: 0.5,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.04em',
+                        color: 'text.disabled',
+                        px: 1.5,
+                        py: 0.6,
+                      }}
+                    >
+                      {t('argus.logs.customFacets.discovered', 'Discovered')}
+                    </Typography>
+                    {discoveredFacets.map((facet) => (
+                      <FacetSection
+                        key={facet.key}
+                        facet={facet}
+                        onFilter={onFilter}
+                        isDark={isDark}
+                      />
+                    ))}
+                  </Box>
+                )}
+
+              {/* Add Custom Facet */}
+              {!(facets.length === 0 && loading) && onAddCustomFacet && (
+                <Box
+                  sx={{
+                    px: 1,
+                    py: 0.5,
+                    borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <InputBase
+                      value={newFacetKey}
+                      onChange={(e) => setNewFacetKey(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && newFacetKey.trim()) {
                           onAddCustomFacet(newFacetKey.trim());
                           setNewFacetKey('');
                         }
                       }}
-                      sx={{ p: 0.3 }}
+                      placeholder={t(
+                        'argus.logs.customFacets.placeholder',
+                        'e.g. user_id, request_path'
+                      )}
+                      sx={{
+                        flex: 1,
+                        fontSize: '0.65rem',
+                        height: 24,
+                        px: 0.5,
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
+                        borderRadius: '4px',
+                      }}
+                    />
+                    <SafeTooltip
+                      title={t('argus.logs.customFacets.add', 'Add Facet')}
                     >
-                      <AddIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
-                  </SafeTooltip>
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          if (newFacetKey.trim()) {
+                            onAddCustomFacet(newFacetKey.trim());
+                            setNewFacetKey('');
+                          }
+                        }}
+                        sx={{ p: 0.3 }}
+                      >
+                        <AddIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </SafeTooltip>
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </Box>
-        )}
-      </Box>
-    );
-  }
+              )}
+            </Box>
+          )}
+        </Box>
+      );
+    }
   )
 );
 

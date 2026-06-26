@@ -25,7 +25,13 @@ function extractMySQLFields(query: string): {
   fields: Record<string, string>;
   remaining: string;
 } {
-  const mysqlFieldNames = ['status', 'substatus', 'assigned_to', 'level', 'priority'];
+  const mysqlFieldNames = [
+    'status',
+    'substatus',
+    'assigned_to',
+    'level',
+    'priority',
+  ];
   const fields: Record<string, string> = {};
   let remaining = query;
 
@@ -211,7 +217,11 @@ export default async function issuesRoutes(app: FastifyInstance) {
 
           // AQL query filter — parse remaining structured query into ClickHouse SQL
           if (hasQueryFilter) {
-            const { where: searchCond } = parseSearchToSQL('errors', chQuery!, qp);
+            const { where: searchCond } = parseSearchToSQL(
+              'errors',
+              chQuery!,
+              qp
+            );
             if (searchCond) conditions.push(`(${searchCond})`);
           }
 

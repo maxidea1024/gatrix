@@ -1,7 +1,15 @@
 import { createClient } from '@clickhouse/client';
 import mysql from 'mysql2/promise';
 import { PROJECT_ID, CHUNK_SIZE, DAYS_BACK } from './config';
-import { md5, uuid, randomInt, randomPick, weightedPick, randomDateWeighted, formatDate } from './helpers';
+import {
+  md5,
+  uuid,
+  randomInt,
+  randomPick,
+  weightedPick,
+  randomDateWeighted,
+  formatDate,
+} from './helpers';
 import { USERS, BROWSERS, OS_LIST } from './user-pool';
 import { SCENARIOS, ErrorScenario } from './scenarios';
 import { dynamicTags, dynamicExtra } from './dynamic-tags';
@@ -75,8 +83,14 @@ export function generateErrorEvents(
     const env = randomPick(s.environments);
     const release = randomPick(s.releases);
     const server = randomPick(s.servers);
-    const browser = weightedPick(BROWSERS, BROWSERS.map((b) => b.w));
-    const os = weightedPick(OS_LIST, OS_LIST.map((o) => o.w));
+    const browser = weightedPick(
+      BROWSERS,
+      BROWSERS.map((b) => b.w)
+    );
+    const os = weightedPick(
+      OS_LIST,
+      OS_LIST.map((o) => o.w)
+    );
     const dsnKeyId = randomPick(activeDsnKeys);
 
     if (dsnKeyTimestamps.has(dsnKeyId)) {
@@ -102,8 +116,13 @@ export function generateErrorEvents(
       const tpl = randomPick(s.breadcrumbTemplates);
       breadcrumbs.push({
         ...tpl,
-        timestamp: formatDate(new Date(ts.getTime() - (numBreadcrumbs - b) * randomInt(500, 5000))),
-        data: Math.random() < 0.3 ? { request_id: uuid().substring(0, 12) } : undefined,
+        timestamp: formatDate(
+          new Date(ts.getTime() - (numBreadcrumbs - b) * randomInt(500, 5000))
+        ),
+        data:
+          Math.random() < 0.3
+            ? { request_id: uuid().substring(0, 12) }
+            : undefined,
       });
     }
 
@@ -141,7 +160,13 @@ export function generateErrorEvents(
       level: s.level,
       type: s.type,
       value: s.value,
-      mechanism: randomPick(['generic', 'onerror', 'onunhandledrejection', 'instrument', '']),
+      mechanism: randomPick([
+        'generic',
+        'onerror',
+        'onunhandledrejection',
+        'instrument',
+        '',
+      ]),
       fingerprint: [fingerprint],
       primary_hash: fingerprint,
       exception: exceptionJson,
@@ -159,7 +184,12 @@ export function generateErrorEvents(
       os_version: os.version,
       browser_name: browser.name,
       browser_version: browser.version,
-      runtime_name: s.runtime === 'nodejs' ? 'node' : s.runtime === 'lua' ? 'lua' : 'unreal',
+      runtime_name:
+        s.runtime === 'nodejs'
+          ? 'node'
+          : s.runtime === 'lua'
+            ? 'lua'
+            : 'unreal',
       runtime_version:
         s.runtime === 'nodejs'
           ? randomPick(['20.14.0', '20.12.2', '22.2.0'])
@@ -232,7 +262,9 @@ export async function insertIssuesIntoMySQL(
       fingerprintToId.set(row.primary_hash, row.id);
     }
   } catch {}
-  console.log(`   ✓ ${issueMap.size} issues inserted (${fingerprintToId.size} mapped)`);
+  console.log(
+    `   ✓ ${issueMap.size} issues inserted (${fingerprintToId.size} mapped)`
+  );
   return fingerprintToId;
 }
 
@@ -249,7 +281,9 @@ export async function insertEventsIntoClickHouse(
       values: chunk,
       format: 'JSONEachRow',
     });
-    process.stdout.write(`\r   ⏳ ${Math.min(offset + CHUNK_SIZE, allEvents.length).toLocaleString()} / ${allEvents.length.toLocaleString()}`);
+    process.stdout.write(
+      `\r   ⏳ ${Math.min(offset + CHUNK_SIZE, allEvents.length).toLocaleString()} / ${allEvents.length.toLocaleString()}`
+    );
   }
   console.log('\n   ✓ Done');
 }

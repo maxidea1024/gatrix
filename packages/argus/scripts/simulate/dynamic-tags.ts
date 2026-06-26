@@ -139,4 +139,3 @@ export function dynamicExtra(scenario: ErrorScenario): Record<string, string> {
 }
 
 // ═══════════════════ REALISTIC SPAN TEMPLATES ═══════════════════
-

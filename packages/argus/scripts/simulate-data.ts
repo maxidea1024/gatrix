@@ -121,8 +121,14 @@ async function main() {
 
   // ──────── 3. GENERATE ERROR EVENTS ────────
   console.log('\n🎲 Generating error events...');
-  const { allEvents, issueMap } = generateErrorEvents(activeDsnKeys, dsnKeyTimestamps, TOTAL_ERROR_EVENTS);
-  console.log(`   ✓ ${allEvents.length.toLocaleString()} error events generated`);
+  const { allEvents, issueMap } = generateErrorEvents(
+    activeDsnKeys,
+    dsnKeyTimestamps,
+    TOTAL_ERROR_EVENTS
+  );
+  console.log(
+    `   ✓ ${allEvents.length.toLocaleString()} error events generated`
+  );
   console.log(`   ✓ ${issueMap.size} unique issues`);
 
   // ──────── 4. INSERT ISSUES INTO MYSQL ────────
@@ -138,7 +144,9 @@ async function main() {
       mapped++;
     }
   }
-  console.log(`   ✓ ${mapped.toLocaleString()} / ${allEvents.length.toLocaleString()} events mapped to issue_id`);
+  console.log(
+    `   ✓ ${mapped.toLocaleString()} / ${allEvents.length.toLocaleString()} events mapped to issue_id`
+  );
 
   // ──────── 5. INSERT EVENTS INTO CLICKHOUSE ────────
   await insertEventsIntoClickHouse(ch, allEvents, CH_CONFIG.database);
@@ -147,14 +155,28 @@ async function main() {
   await generateAndInsertLogs(ch, CH_CONFIG.database, allEvents, issueMap);
 
   // ──────── 7. GENERATE & INSERT TRANSACTIONS & SPANS ────────
-  await generateAndInsertTransactions(ch, CH_CONFIG.database, TOTAL_TRANSACTIONS, activeDsnKeys);
+  await generateAndInsertTransactions(
+    ch,
+    CH_CONFIG.database,
+    TOTAL_TRANSACTIONS,
+    activeDsnKeys
+  );
 
   // ──────── 8. GENERATE & INSERT SESSIONS ────────
-  await generateAndInsertSessions(ch, CH_CONFIG.database, TOTAL_SESSIONS, activeDsnKeys);
+  await generateAndInsertSessions(
+    ch,
+    CH_CONFIG.database,
+    TOTAL_SESSIONS,
+    activeDsnKeys
+  );
 
   // ──────── 9. GENERATE & INSERT ENRICHED FEEDBACK ────────
   const { feedbackIds } = await generateAndInsertEnrichedFeedback(
-    ch, CH_CONFIG.database, TOTAL_FEEDBACK, activeDsnKeys, allEvents
+    ch,
+    CH_CONFIG.database,
+    TOTAL_FEEDBACK,
+    activeDsnKeys,
+    allEvents
   );
 
   // ──────── 10. GENERATE & INSERT METRICS ────────
@@ -186,7 +208,12 @@ async function main() {
   await seedFeedbackLinksAndActivity(pool, ch, feedbackIds, internalProjectId);
 
   // ──────── 16. SEED CRON & UPTIME MONITORS ────────
-  await generateAndInsertMonitors(pool, ch, CH_CONFIG.database, internalProjectId);
+  await generateAndInsertMonitors(
+    pool,
+    ch,
+    CH_CONFIG.database,
+    internalProjectId
+  );
 
   // ──────── DONE ────────
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
@@ -198,10 +225,16 @@ async function main() {
   console.log('   Refresh the Argus dashboard to see all data.');
   console.log('');
   console.log('   Summary:');
-  console.log(`   • ${TOTAL_ERROR_EVENTS.toLocaleString()} error events + ${issueMap.size} issues`);
-  console.log(`   • ${TOTAL_TRANSACTIONS.toLocaleString()} transactions with spans`);
+  console.log(
+    `   • ${TOTAL_ERROR_EVENTS.toLocaleString()} error events + ${issueMap.size} issues`
+  );
+  console.log(
+    `   • ${TOTAL_TRANSACTIONS.toLocaleString()} transactions with spans`
+  );
   console.log(`   • ${TOTAL_SESSIONS.toLocaleString()} sessions`);
-  console.log(`   • ${TOTAL_FEEDBACK.toLocaleString()} feedback (enriched + links + activity)`);
+  console.log(
+    `   • ${TOTAL_FEEDBACK.toLocaleString()} feedback (enriched + links + activity)`
+  );
   console.log(`   • Releases with commits`);
   console.log(`   • Cron & uptime monitors with check-ins`);
   console.log(`   • Product analytics activities`);

@@ -570,10 +570,14 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
                                   fontSize: '0.72rem',
                                   fontWeight: 600,
                                   backgroundColor: alpha(
-                                    intg.enabled ? ARGUS_SEMANTIC.positive : '#9e9e9e',
+                                    intg.enabled
+                                      ? ARGUS_SEMANTIC.positive
+                                      : '#9e9e9e',
                                     0.12
                                   ),
-                                  color: intg.enabled ? ARGUS_SEMANTIC.positive : '#9e9e9e',
+                                  color: intg.enabled
+                                    ? ARGUS_SEMANTIC.positive
+                                    : '#9e9e9e',
                                   border: 'none',
                                 }}
                               />

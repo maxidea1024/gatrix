@@ -364,7 +364,18 @@ export default async function discoverRoutes(app: FastifyInstance) {
         }
 
         // Dynamically build tag queries from lowCardinality string columns
-        const NUMERIC_TYPES = new Set(['UInt8', 'UInt16', 'UInt32', 'UInt64', 'Float32', 'Float64', 'Int8', 'Int16', 'Int32', 'Int64']);
+        const NUMERIC_TYPES = new Set([
+          'UInt8',
+          'UInt16',
+          'UInt32',
+          'UInt64',
+          'Float32',
+          'Float64',
+          'Int8',
+          'Int16',
+          'Int32',
+          'Int64',
+        ]);
         const lowCardCols = [...dsObj.columns.entries()]
           .filter(
             ([, def]) =>
@@ -566,7 +577,7 @@ export default async function discoverRoutes(app: FastifyInstance) {
           String(error?.message || '').includes("doesn't exist") ||
           String(error?.message || '').includes('no such table') ||
           String(error?.message || '').includes('does not exist') ||
-          String(error?.message || '').includes('relation') 
+          String(error?.message || '').includes('relation')
         ) {
           logger.warn('g_argus_saved_queries table not found, returning empty');
           return reply.send({ data: [] });

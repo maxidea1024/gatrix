@@ -34,7 +34,11 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
       const { country, platform, app_version } = request.query as any;
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country,
+        platform,
+        app_version,
+      });
       Object.assign(params, segmentParams);
 
       const sql = `
@@ -145,7 +149,11 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
       const { country, platform, app_version } = request.query as any;
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country,
+        platform,
+        app_version,
+      });
       Object.assign(params, segmentParams);
       const whereClause = conditions.join(' AND ');
 
@@ -278,7 +286,11 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
       const { country, platform, app_version } = request.query as any;
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country,
+        platform,
+        app_version,
+      });
       Object.assign(params, segmentParams);
 
       // Only filter by event_name when provided
@@ -363,7 +375,11 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
       const { country, platform, app_version } = request.query as any;
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country,
+        platform,
+        app_version,
+      });
       Object.assign(params, segmentParams);
 
       // Resolve column: builtin or custom property
@@ -748,8 +764,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
-      const { country: _fc, platform: _fp, app_version: _fv } = (body as any) || {};
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country: _fc, platform: _fp, app_version: _fv });
+      const {
+        country: _fc,
+        platform: _fp,
+        app_version: _fv,
+      } = (body as any) || {};
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country: _fc,
+        platform: _fp,
+        app_version: _fv,
+      });
       Object.assign(params, segmentParams);
 
       // Build windowFunnel conditions
@@ -1401,8 +1425,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
 
       params.projectId = projectId;
-      const { country: _rc, platform: _rp, app_version: _rv } = (body as any) || {};
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country: _rc, platform: _rp, app_version: _rv });
+      const {
+        country: _rc,
+        platform: _rp,
+        app_version: _rv,
+      } = (body as any) || {};
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country: _rc,
+        platform: _rp,
+        app_version: _rv,
+      });
       Object.assign(params, segmentParams);
       params.firstEvent = body.first_event.name;
       params.returnEvent = body.return_event.name;
@@ -1678,8 +1710,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       conditions.push('project_id = {projectId:String}');
       conditions.push("user_id != ''");
       params.projectId = projectId;
-      const { country: _fc, platform: _fp, app_version: _fv } = (body as any) || {};
-      const { segmentWhere, segmentParams } = buildSegmentFilter({ country: _fc, platform: _fp, app_version: _fv });
+      const {
+        country: _fc,
+        platform: _fp,
+        app_version: _fv,
+      } = (body as any) || {};
+      const { segmentWhere, segmentParams } = buildSegmentFilter({
+        country: _fc,
+        platform: _fp,
+        app_version: _fv,
+      });
       Object.assign(params, segmentParams);
       params.anchorEvent = body.anchor_event.name;
       params.seqLimit = depth + 1;

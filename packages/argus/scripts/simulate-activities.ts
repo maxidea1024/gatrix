@@ -1,9 +1,9 @@
 /**
  * Quick Activities-Only Simulator
- * 
+ *
  * Inserts product analytics activities data into ClickHouse
  * without touching other tables (errors, transactions, etc.)
- * 
+ *
  * Usage: npx tsx scripts/simulate-activities.ts
  */
 import { createClient } from '@clickhouse/client';
@@ -28,7 +28,9 @@ async function main() {
   // Truncate activities only
   console.log('\n🗑️  Truncating activities table...');
   try {
-    await ch.exec({ query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.activities` });
+    await ch.exec({
+      query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.activities`,
+    });
     console.log('   ✓ activities truncated');
   } catch {
     console.log('   ⚠ activities table not found (skip)');

@@ -70,10 +70,8 @@ export default async function dataGovernanceRoutes(app: FastifyInstance) {
           params,
         });
         // Group by event_name
-        const volumeByEvent: Record<
-          string,
-          { day: string; count: number }[]
-        > = {};
+        const volumeByEvent: Record<string, { day: string; count: number }[]> =
+          {};
         for (const r of (volumeResult.data as any[]) || []) {
           const name = r.event_name;
           if (!volumeByEvent[name]) volumeByEvent[name] = [];
@@ -150,9 +148,7 @@ export default async function dataGovernanceRoutes(app: FastifyInstance) {
         // Estimate: events with > 0 active_days in last 7
         const activeEvents = events.filter((e) => e.active_days >= 3).length;
         const qualityScore =
-          totalEvents > 0
-            ? Math.round((activeEvents / totalEvents) * 100)
-            : 0;
+          totalEvents > 0 ? Math.round((activeEvents / totalEvents) * 100) : 0;
 
         return reply.send({
           success: true,

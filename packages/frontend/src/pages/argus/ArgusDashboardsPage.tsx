@@ -473,151 +473,149 @@ const ArgusDashboardsPage: React.FC = () => {
         />
 
         <PageContentLoader loading={loading}>
-            {/* Custom Dashboards (shown first for accessibility) */}
-            <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
-              {t('argus.dashboards.custom', 'Custom Dashboards')}
-            </Typography>
-            {dashboards.length === 0 ? (
-              <EmptyPlaceholder
-                icon={<DashboardIcon sx={{ fontSize: 48 }} />}
-                message={t(
-                  'argus.dashboards.empty',
-                  'No custom dashboards yet. Create one or use a template below.'
-                )}
-                minHeight={200}
-              />
-            ) : (
-              <Grid container spacing={2}>
-                {dashboards.map((db: any) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={db.id}>
-                    <Card
-                      elevation={0}
-                      sx={{
-                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                        borderRadius: 2,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        height: 160,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        '&:hover': {
-                          borderColor: alpha('#7c4dff', 0.3),
-                          transform: 'translateY(-1px)',
-                        },
-                      }}
-                      onClick={() => {
-                        setActiveDashboard(db);
-                        navigate(`/argus/dashboards/${db.id}`);
-                      }}
-                    >
-                      {/* Header: title + star + more */}
-                      <CardContent sx={{ pb: 0, pt: 1.5, px: 2 }}>
+          {/* Custom Dashboards (shown first for accessibility) */}
+          <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+            {t('argus.dashboards.custom', 'Custom Dashboards')}
+          </Typography>
+          {dashboards.length === 0 ? (
+            <EmptyPlaceholder
+              icon={<DashboardIcon sx={{ fontSize: 48 }} />}
+              message={t(
+                'argus.dashboards.empty',
+                'No custom dashboards yet. Create one or use a template below.'
+              )}
+              minHeight={200}
+            />
+          ) : (
+            <Grid container spacing={2}>
+              {dashboards.map((db: any) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={db.id}>
+                  <Card
+                    elevation={0}
+                    sx={{
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                      borderRadius: 2,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      height: 160,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      '&:hover': {
+                        borderColor: alpha('#7c4dff', 0.3),
+                        transform: 'translateY(-1px)',
+                      },
+                    }}
+                    onClick={() => {
+                      setActiveDashboard(db);
+                      navigate(`/argus/dashboards/${db.id}`);
+                    }}
+                  >
+                    {/* Header: title + star + more */}
+                    <CardContent sx={{ pb: 0, pt: 1.5, px: 2 }}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                        }}
+                      >
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={700}
+                            sx={{ fontSize: '0.85rem' }}
+                            noWrap
+                          >
+                            {db.title}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '0.7rem',
+                              display: 'block',
+                            }}
+                            noWrap
+                          >
+                            {db.description ||
+                              t(
+                                'argus.dashboards.noDescription',
+                                'No description'
+                              )}
+                          </Typography>
+                        </Box>
                         <Box
                           sx={{
                             display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
+                            alignItems: 'center',
+                            ml: 0.5,
+                            flexShrink: 0,
                           }}
                         >
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography
-                              variant="subtitle2"
-                              fontWeight={700}
-                              sx={{ fontSize: '0.85rem' }}
-                              noWrap
-                            >
-                              {db.title}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: 'text.secondary',
-                                fontSize: '0.7rem',
-                                display: 'block',
-                              }}
-                              noWrap
-                            >
-                              {db.description ||
-                                t(
-                                  'argus.dashboards.noDescription',
-                                  'No description'
-                                )}
-                            </Typography>
-                          </Box>
-                          <Box
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleToggleFavorite(db, e)}
                             sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              ml: 0.5,
-                              flexShrink: 0,
+                              color: db.is_favorite
+                                ? '#ffc107'
+                                : 'text.disabled',
+                              '&:hover': { color: '#ffc107' },
                             }}
                           >
-                            <IconButton
-                              size="small"
-                              onClick={(e) => handleToggleFavorite(db, e)}
-                              sx={{
-                                color: db.is_favorite
-                                  ? '#ffc107'
-                                  : 'text.disabled',
-                                '&:hover': { color: '#ffc107' },
-                              }}
-                            >
-                              {db.is_favorite ? (
-                                <StarIcon sx={{ fontSize: 16 }} />
-                              ) : (
-                                <StarBorderIcon sx={{ fontSize: 16 }} />
-                              )}
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setCardMenuAnchor(e.currentTarget);
-                                setCardMenuDashboard(db);
-                              }}
-                              sx={{
-                                color: 'text.disabled',
-                                '&:hover': { color: 'text.primary' },
-                              }}
-                            >
-                              <MoreIcon sx={{ fontSize: 16 }} />
-                            </IconButton>
-                          </Box>
+                            {db.is_favorite ? (
+                              <StarIcon sx={{ fontSize: 16 }} />
+                            ) : (
+                              <StarBorderIcon sx={{ fontSize: 16 }} />
+                            )}
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCardMenuAnchor(e.currentTarget);
+                              setCardMenuDashboard(db);
+                            }}
+                            sx={{
+                              color: 'text.disabled',
+                              '&:hover': { color: 'text.primary' },
+                            }}
+                          >
+                            <MoreIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
                         </Box>
-                      </CardContent>
+                      </Box>
+                    </CardContent>
 
-                      {/* Footer: mini preview + widget count */}
-                      <Box
-                        sx={{
-                          px: 2,
-                          pb: 1.5,
-                          pt: 0.5,
-                          flex: 1,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          justifyContent: 'flex-end',
-                        }}
-                      >
-                        {(db.widgets_config || []).length > 0 ? (
-                          <Box
-                            sx={{
-                              height: 56,
-                              borderRadius: 1,
-                              backgroundColor: isDark
-                                ? 'rgba(255,255,255,0.02)'
-                                : 'rgba(0,0,0,0.02)',
-                              border: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
-                              position: 'relative',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            {(db.widgets_config || [])
-                              .slice(0, 12)
-                              .map((w: WidgetConfig) => {
-                                const ICON_MAP: Record<
-                                  string,
-                                  React.ReactNode
-                                > = {
+                    {/* Footer: mini preview + widget count */}
+                    <Box
+                      sx={{
+                        px: 2,
+                        pb: 1.5,
+                        pt: 0.5,
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                      }}
+                    >
+                      {(db.widgets_config || []).length > 0 ? (
+                        <Box
+                          sx={{
+                            height: 56,
+                            borderRadius: 1,
+                            backgroundColor: isDark
+                              ? 'rgba(255,255,255,0.02)'
+                              : 'rgba(0,0,0,0.02)',
+                            border: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+                            position: 'relative',
+                            overflow: 'hidden',
+                          }}
+                        >
+                          {(db.widgets_config || [])
+                            .slice(0, 12)
+                            .map((w: WidgetConfig) => {
+                              const ICON_MAP: Record<string, React.ReactNode> =
+                                {
                                   line: (
                                     <LineChartIcon
                                       sx={{
@@ -667,265 +665,264 @@ const ArgusDashboardsPage: React.FC = () => {
                                     />
                                   ),
                                 };
-                                return (
-                                  <Box
-                                    key={w.id}
-                                    sx={{
-                                      position: 'absolute',
-                                      left: `${(w.layout.x / 12) * 100}%`,
-                                      top: `${Math.min((w.layout.y / 8) * 100, 80)}%`,
-                                      width: `${(w.layout.w / 12) * 100}%`,
-                                      height: `${Math.min((w.layout.h / 8) * 100, 50)}%`,
-                                      minHeight: 8,
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      justifyContent: 'center',
-                                      borderRadius: 0.5,
-                                      backgroundColor: isDark
-                                        ? 'rgba(124,77,255,0.08)'
-                                        : 'rgba(124,77,255,0.06)',
-                                      border: `0.5px solid ${alpha('#7c4dff', 0.15)}`,
-                                    }}
-                                  >
-                                    {ICON_MAP[w.type] || null}
-                                  </Box>
-                                );
-                              })}
-                          </Box>
-                        ) : (
-                          <Box
-                            sx={{
-                              height: 56,
-                              borderRadius: 1,
-                              border: `1.5px dashed ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                            }}
-                          />
-                        )}
-                      </Box>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
+                              return (
+                                <Box
+                                  key={w.id}
+                                  sx={{
+                                    position: 'absolute',
+                                    left: `${(w.layout.x / 12) * 100}%`,
+                                    top: `${Math.min((w.layout.y / 8) * 100, 80)}%`,
+                                    width: `${(w.layout.w / 12) * 100}%`,
+                                    height: `${Math.min((w.layout.h / 8) * 100, 50)}%`,
+                                    minHeight: 8,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: 0.5,
+                                    backgroundColor: isDark
+                                      ? 'rgba(124,77,255,0.08)'
+                                      : 'rgba(124,77,255,0.06)',
+                                    border: `0.5px solid ${alpha('#7c4dff', 0.15)}`,
+                                  }}
+                                >
+                                  {ICON_MAP[w.type] || null}
+                                </Box>
+                              );
+                            })}
+                        </Box>
+                      ) : (
+                        <Box
+                          sx={{
+                            height: 56,
+                            borderRadius: 1,
+                            border: `1.5px dashed ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
 
-            {/* Card Context Menu */}
-            <Menu
-              anchorEl={cardMenuAnchor}
-              open={Boolean(cardMenuAnchor)}
-              onClose={() => {
+          {/* Card Context Menu */}
+          <Menu
+            anchorEl={cardMenuAnchor}
+            open={Boolean(cardMenuAnchor)}
+            onClose={() => {
+              setCardMenuAnchor(null);
+              setCardMenuDashboard(null);
+            }}
+            PaperProps={{ sx: { minWidth: 160, borderRadius: '8px' } }}
+          >
+            <MenuItem
+              onClick={() => {
+                if (cardMenuDashboard) {
+                  setActiveDashboard(cardMenuDashboard);
+                  navigate(
+                    `/argus/dashboards/${(cardMenuDashboard as any).id}`
+                  );
+                }
                 setCardMenuAnchor(null);
                 setCardMenuDashboard(null);
               }}
-              PaperProps={{ sx: { minWidth: 160, borderRadius: '8px' } }}
+              sx={{ fontSize: '0.8rem' }}
             >
-              <MenuItem
-                onClick={() => {
-                  if (cardMenuDashboard) {
-                    setActiveDashboard(cardMenuDashboard);
-                    navigate(
-                      `/argus/dashboards/${(cardMenuDashboard as any).id}`
-                    );
-                  }
-                  setCardMenuAnchor(null);
-                  setCardMenuDashboard(null);
-                }}
-                sx={{ fontSize: '0.8rem' }}
-              >
-                <ListItemIcon>
-                  <EditIcon sx={{ fontSize: 16 }} />
-                </ListItemIcon>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
-                  {t('argus.dashboards.editDashboard', 'Edit Dashboard')}
-                </ListItemText>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setSharingDashboard(cardMenuDashboard);
-                  setShareDialogOpen(true);
-                  setCardMenuAnchor(null);
-                  setCardMenuDashboard(null);
-                }}
-                sx={{ fontSize: '0.8rem' }}
-              >
-                <ListItemIcon>
-                  <ShareIcon sx={{ fontSize: 16 }} />
-                </ListItemIcon>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
-                  {t('argus.dashboards.sharing.title', 'Sharing Settings')}
-                </ListItemText>
-              </MenuItem>
-              <Divider />
-              <MenuItem
-                onClick={() => {
-                  setDeleteConfirmOpen(true);
-                  setDeletingDashboard(cardMenuDashboard);
-                  setCardMenuAnchor(null);
-                  setCardMenuDashboard(null);
-                }}
-                sx={{ fontSize: '0.8rem', color: 'error.main' }}
-              >
-                <ListItemIcon>
-                  <DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} />
-                </ListItemIcon>
-                <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
-                  {t('argus.dashboards.deleteDashboard', 'Delete Dashboard')}
-                </ListItemText>
-              </MenuItem>
-            </Menu>
-
-            {/* Delete Confirmation Dialog */}
-            <Dialog
-              open={deleteConfirmOpen}
-              onClose={() => {
-                setDeleteConfirmOpen(false);
-                setDeletingDashboard(null);
+              <ListItemIcon>
+                <EditIcon sx={{ fontSize: 16 }} />
+              </ListItemIcon>
+              <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
+                {t('argus.dashboards.editDashboard', 'Edit Dashboard')}
+              </ListItemText>
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setSharingDashboard(cardMenuDashboard);
+                setShareDialogOpen(true);
+                setCardMenuAnchor(null);
+                setCardMenuDashboard(null);
               }}
-              PaperProps={{ sx: { borderRadius: 2 } }}
+              sx={{ fontSize: '0.8rem' }}
             >
-              <DialogTitle sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
-                {t('argus.dashboards.confirmDeleteTitle', 'Delete Dashboard')}
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText sx={{ fontSize: '0.85rem' }}>
-                  {t(
-                    'argus.dashboards.confirmDeleteMessage',
-                    'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
-                    {
-                      name: deletingDashboard?.title || '',
-                    }
-                  )}
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  onClick={() => {
-                    setDeleteConfirmOpen(false);
-                    setDeletingDashboard(null);
-                  }}
-                  sx={{ textTransform: 'none' }}
-                >
-                  {t('common.cancel', 'Cancel')}
-                </Button>
-                <Button
-                  onClick={async () => {
-                    if (deletingDashboard?.id) {
-                      await handleDeleteDashboard(deletingDashboard.id);
-                    }
-                    setDeleteConfirmOpen(false);
-                    setDeletingDashboard(null);
-                  }}
-                  variant="contained"
-                  color="error"
-                  sx={{ textTransform: 'none', fontWeight: 700 }}
-                >
-                  {t('common.delete', 'Delete')}
-                </Button>
-              </DialogActions>
-            </Dialog>
+              <ListItemIcon>
+                <ShareIcon sx={{ fontSize: 16 }} />
+              </ListItemIcon>
+              <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
+                {t('argus.dashboards.sharing.title', 'Sharing Settings')}
+              </ListItemText>
+            </MenuItem>
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                setDeleteConfirmOpen(true);
+                setDeletingDashboard(cardMenuDashboard);
+                setCardMenuAnchor(null);
+                setCardMenuDashboard(null);
+              }}
+              sx={{ fontSize: '0.8rem', color: 'error.main' }}
+            >
+              <ListItemIcon>
+                <DeleteIcon sx={{ fontSize: 16, color: 'error.main' }} />
+              </ListItemIcon>
+              <ListItemText primaryTypographyProps={{ fontSize: '0.8rem' }}>
+                {t('argus.dashboards.deleteDashboard', 'Delete Dashboard')}
+              </ListItemText>
+            </MenuItem>
+          </Menu>
 
-            {/* Templates Section (below, collapsible) */}
-            {presets.length > 0 && (
-              <Box sx={{ mt: 4 }}>
-                <Button
-                  size="small"
-                  startIcon={
-                    <PresetIcon sx={{ fontSize: 16, color: ARGUS_SEMANTIC.warning }} />
+          {/* Delete Confirmation Dialog */}
+          <Dialog
+            open={deleteConfirmOpen}
+            onClose={() => {
+              setDeleteConfirmOpen(false);
+              setDeletingDashboard(null);
+            }}
+            PaperProps={{ sx: { borderRadius: 2 } }}
+          >
+            <DialogTitle sx={{ fontWeight: 700, fontSize: '0.95rem' }}>
+              {t('argus.dashboards.confirmDeleteTitle', 'Delete Dashboard')}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText sx={{ fontSize: '0.85rem' }}>
+                {t(
+                  'argus.dashboards.confirmDeleteMessage',
+                  'Are you sure you want to delete "{{name}}"? This action cannot be undone.',
+                  {
+                    name: deletingDashboard?.title || '',
                   }
-                  endIcon={
-                    templatesExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+                )}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setDeletingDashboard(null);
+                }}
+                sx={{ textTransform: 'none' }}
+              >
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (deletingDashboard?.id) {
+                    await handleDeleteDashboard(deletingDashboard.id);
                   }
-                  onClick={() => setTemplatesExpanded(!templatesExpanded)}
-                  sx={{
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    fontSize: '0.8rem',
-                    color: 'text.secondary',
-                    mb: 1,
-                  }}
-                >
-                  {t('argus.dashboards.presets', 'Dashboard Templates')}
-                </Button>
-                <Collapse in={templatesExpanded}>
-                  <Grid container spacing={2}>
-                    {presets.map((p) => (
-                      <Grid size={{ xs: 12, sm: 6, md: 3 }} key={p.id}>
-                        <Card
-                          elevation={0}
-                          sx={{
-                            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-                            borderRadius: 2,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            '&:hover': {
-                              borderColor: alpha('#7c4dff', 0.3),
-                              transform: 'translateY(-2px)',
-                              boxShadow: `0 4px 16px ${alpha('#7c4dff', 0.1)}`,
-                            },
-                          }}
-                          onClick={() => {
-                            setNewTitle(
-                              t(
-                                `argus.dashboards.preset.${p.id}.title`,
-                                p.title
-                              )
-                            );
-                            setNewDesc(
-                              t(
-                                `argus.dashboards.preset.${p.id}.description`,
-                                p.description
-                              )
-                            );
-                            setSelectedPreset(p.id);
-                            setCreateOpen(true);
-                          }}
-                        >
-                          <CardContent sx={{ pb: 1 }}>
-                            <Typography
-                              variant="subtitle2"
-                              fontWeight={700}
-                              sx={{ mb: 0.5, fontSize: '0.88rem' }}
-                            >
-                              {t(
-                                `argus.dashboards.preset.${p.id}.title`,
-                                p.title
-                              )}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: 'text.secondary',
-                                fontSize: '0.73rem',
-                                display: 'block',
-                                mb: 1,
-                              }}
-                            >
-                              {t(
-                                `argus.dashboards.preset.${p.id}.description`,
-                                p.description
-                              )}
-                            </Typography>
-                            <Chip
-                              label={t(
-                                'argus.dashboards.widgetCount',
-                                '{{count}} widgets',
-                                { count: p.widgetCount }
-                              )}
-                              size="small"
-                              sx={{
-                                height: 20,
-                                fontSize: '0.62rem',
-                                backgroundColor: alpha('#7c4dff', 0.08),
-                                color: '#7c4dff',
-                              }}
-                            />
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Collapse>
-              </Box>
-            )}
+                  setDeleteConfirmOpen(false);
+                  setDeletingDashboard(null);
+                }}
+                variant="contained"
+                color="error"
+                sx={{ textTransform: 'none', fontWeight: 700 }}
+              >
+                {t('common.delete', 'Delete')}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          {/* Templates Section (below, collapsible) */}
+          {presets.length > 0 && (
+            <Box sx={{ mt: 4 }}>
+              <Button
+                size="small"
+                startIcon={
+                  <PresetIcon
+                    sx={{ fontSize: 16, color: ARGUS_SEMANTIC.warning }}
+                  />
+                }
+                endIcon={
+                  templatesExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+                }
+                onClick={() => setTemplatesExpanded(!templatesExpanded)}
+                sx={{
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  color: 'text.secondary',
+                  mb: 1,
+                }}
+              >
+                {t('argus.dashboards.presets', 'Dashboard Templates')}
+              </Button>
+              <Collapse in={templatesExpanded}>
+                <Grid container spacing={2}>
+                  {presets.map((p) => (
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }} key={p.id}>
+                      <Card
+                        elevation={0}
+                        sx={{
+                          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                          borderRadius: 2,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            borderColor: alpha('#7c4dff', 0.3),
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 4px 16px ${alpha('#7c4dff', 0.1)}`,
+                          },
+                        }}
+                        onClick={() => {
+                          setNewTitle(
+                            t(`argus.dashboards.preset.${p.id}.title`, p.title)
+                          );
+                          setNewDesc(
+                            t(
+                              `argus.dashboards.preset.${p.id}.description`,
+                              p.description
+                            )
+                          );
+                          setSelectedPreset(p.id);
+                          setCreateOpen(true);
+                        }}
+                      >
+                        <CardContent sx={{ pb: 1 }}>
+                          <Typography
+                            variant="subtitle2"
+                            fontWeight={700}
+                            sx={{ mb: 0.5, fontSize: '0.88rem' }}
+                          >
+                            {t(
+                              `argus.dashboards.preset.${p.id}.title`,
+                              p.title
+                            )}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              color: 'text.secondary',
+                              fontSize: '0.73rem',
+                              display: 'block',
+                              mb: 1,
+                            }}
+                          >
+                            {t(
+                              `argus.dashboards.preset.${p.id}.description`,
+                              p.description
+                            )}
+                          </Typography>
+                          <Chip
+                            label={t(
+                              'argus.dashboards.widgetCount',
+                              '{{count}} widgets',
+                              { count: p.widgetCount }
+                            )}
+                            size="small"
+                            sx={{
+                              height: 20,
+                              fontSize: '0.62rem',
+                              backgroundColor: alpha('#7c4dff', 0.08),
+                              color: '#7c4dff',
+                            }}
+                          />
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Collapse>
+            </Box>
+          )}
         </PageContentLoader>
 
         {/* Create Dialog */}

@@ -349,7 +349,10 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               sx={{ fontSize: '0.8rem', py: 1 }}
             >
               <ListItemIcon>
-                <NextReleaseIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.info }} />
+                <NextReleaseIcon
+                  fontSize="small"
+                  sx={{ color: ARGUS_SEMANTIC.info }}
+                />
               </ListItemIcon>
               <ListItemText
                 primary={t('argus.detail.resolveInNextRelease')}
@@ -367,7 +370,10 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               sx={{ fontSize: '0.8rem', py: 1 }}
             >
               <ListItemIcon>
-                <IgnoreIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />
+                <IgnoreIcon
+                  fontSize="small"
+                  sx={{ color: ARGUS_SEMANTIC.warning }}
+                />
               </ListItemIcon>
               <ListItemText
                 primary={t('argus.issues.ignore')}
@@ -411,7 +417,8 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           icon={
             <PriorityDot
               dotColor={
-                PRIORITY_CONFIG[issue.priority || 'medium']?.color || ARGUS_SEMANTIC.warning
+                PRIORITY_CONFIG[issue.priority || 'medium']?.color ||
+                ARGUS_SEMANTIC.warning
               }
             />
           }

@@ -273,7 +273,9 @@ export async function deleteSpamKeyword(
   );
 }
 
-export async function runAutoSpam(projectId: number | string): Promise<{ matched: number }> {
+export async function runAutoSpam(
+  projectId: number | string
+): Promise<{ matched: number }> {
   const response = await argusApi.post(
     `${ARGUS_BASE}/feedback/${projectId}/auto-spam`
   );

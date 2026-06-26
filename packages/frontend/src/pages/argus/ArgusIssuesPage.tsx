@@ -559,8 +559,6 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
     assignedTo,
   ]);
 
-
-
   useEffect(() => {
     fetchIssues();
   }, [fetchIssues]);
@@ -762,9 +760,11 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
   // ─── Facet data (separate fetch without activeFilters) ───
   const [facetData, setFacetData] = useState<FacetCounts>(EMPTY_FACET_COUNTS);
-  const [discoveredTags, setDiscoveredTags] = useState<Record<string, { value: string; count: number }[]>>({});
+  const [discoveredTags, setDiscoveredTags] = useState<
+    Record<string, { value: string; count: number }[]>
+  >({});
 
-   const fetchFacets = useCallback(async () => {
+  const fetchFacets = useCallback(async () => {
     setFacetsLoading(true);
     try {
       const dateParams = argusDateRangeToApiParams(filters.dateRange);
@@ -786,7 +786,9 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
       const [result, chFacets, discoveredData] = await Promise.all([
         argusService.listIssues(projectId, params),
         argusService.getIssueFacets(projectId, dateParams).catch(() => ({})),
-        argusService.discoverTags(projectId, 'errors').catch(() => ({ tags: {} })),
+        argusService
+          .discoverTags(projectId, 'errors')
+          .catch(() => ({ tags: {} })),
       ]);
 
       const issueFacets = buildFacetCounts(result.data);
@@ -824,74 +826,78 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
   // Hardcoded facets (MySQL + ClickHouse columns)
   const baseFacetKeys = new Set([
-    'level', 'status', 'platform', 'assigned_to', 'priority',
-    'release', 'environment', 'browser_name', 'os_name',
+    'level',
+    'status',
+    'platform',
+    'assigned_to',
+    'priority',
+    'release',
+    'environment',
+    'browser_name',
+    'os_name',
   ]);
 
-  const facetGroups: FacetGroup[] = useMemo(
-    () => {
-      const base: FacetGroup[] = [
-        {
-          key: 'level',
-          label: t('argus.issues.level', 'Level'),
-          values: mappedFacets.level,
-        },
-        {
-          key: 'status',
-          label: t('argus.issues.status', 'Status'),
-          values: mappedFacets.status,
-        },
-        {
-          key: 'platform',
-          label: t('argus.issues.platform', 'Platform'),
-          values: mappedFacets.platform,
-        },
-        {
-          key: 'assigned_to',
-          label: t('argus.issues.assignee', 'Assignee'),
-          values: mappedFacets.assigned_to,
-        },
-        {
-          key: 'priority',
-          label: t('argus.issues.priority', 'Priority'),
-          values: mappedFacets.priority,
-        },
-        // ClickHouse event-level facets
-        {
-          key: 'release',
-          label: t('argus.issues.release', 'Release'),
-          values: mappedFacets.release,
-        },
-        {
-          key: 'environment',
-          label: t('argus.issues.environment', 'Environment'),
-          values: mappedFacets.environment,
-        },
-        {
-          key: 'browser_name',
-          label: t('argus.issues.browser', 'Browser'),
-          values: mappedFacets.browser_name,
-        },
-        {
-          key: 'os_name',
-          label: t('argus.issues.os', 'OS'),
-          values: mappedFacets.os_name,
-        },
-      ].filter((g) => g.values.length > 0);
+  const facetGroups: FacetGroup[] = useMemo(() => {
+    const base: FacetGroup[] = [
+      {
+        key: 'level',
+        label: t('argus.issues.level', 'Level'),
+        values: mappedFacets.level,
+      },
+      {
+        key: 'status',
+        label: t('argus.issues.status', 'Status'),
+        values: mappedFacets.status,
+      },
+      {
+        key: 'platform',
+        label: t('argus.issues.platform', 'Platform'),
+        values: mappedFacets.platform,
+      },
+      {
+        key: 'assigned_to',
+        label: t('argus.issues.assignee', 'Assignee'),
+        values: mappedFacets.assigned_to,
+      },
+      {
+        key: 'priority',
+        label: t('argus.issues.priority', 'Priority'),
+        values: mappedFacets.priority,
+      },
+      // ClickHouse event-level facets
+      {
+        key: 'release',
+        label: t('argus.issues.release', 'Release'),
+        values: mappedFacets.release,
+      },
+      {
+        key: 'environment',
+        label: t('argus.issues.environment', 'Environment'),
+        values: mappedFacets.environment,
+      },
+      {
+        key: 'browser_name',
+        label: t('argus.issues.browser', 'Browser'),
+        values: mappedFacets.browser_name,
+      },
+      {
+        key: 'os_name',
+        label: t('argus.issues.os', 'OS'),
+        values: mappedFacets.os_name,
+      },
+    ].filter((g) => g.values.length > 0);
 
-      // Append discovered tags from Map columns (skip if already in base facets)
-      const discovered: FacetGroup[] = Object.entries(discoveredTags)
-        .filter(([key, values]) => !baseFacetKeys.has(key) && values.length > 0)
-        .map(([key, values]) => ({
-          key,
-          label: t(`argus.facet.${key}`, key),
-          values: values.map((v) => ({ value: v.value, count: Number(v.count) })),
-        }));
+    // Append discovered tags from Map columns (skip if already in base facets)
+    const discovered: FacetGroup[] = Object.entries(discoveredTags)
+      .filter(([key, values]) => !baseFacetKeys.has(key) && values.length > 0)
+      .map(([key, values]) => ({
+        key,
+        label: t(`argus.facet.${key}`, key),
+        values: values.map((v) => ({ value: v.value, count: Number(v.count) })),
+      }));
 
-      return [...base, ...discovered];
-    },
-    [mappedFacets, discoveredTags, t]
-  );
+    return [...base, ...discovered];
+  }, [mappedFacets, discoveredTags, t]);
 
   // Merge discovered tag keys with base facets for AQL autocomplete
   const mergedFacets = useMemo(() => {
@@ -1222,7 +1228,12 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
 
             <PageContentLoader
               loading={loading && issues.length === 0}
-              sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+              sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 0,
+              }}
             >
               {issues.length === 0 ? (
                 <EmptyPlaceholder

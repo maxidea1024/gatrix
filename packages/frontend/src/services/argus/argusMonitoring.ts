@@ -11,7 +11,9 @@ import type {
 
 // --- Alert Rules ---
 
-export async function listAlertRules(projectId: number | string): Promise<ArgusAlertRule[]> {
+export async function listAlertRules(
+  projectId: number | string
+): Promise<ArgusAlertRule[]> {
   const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/alerts`);
   return response.data?.data || response.data || [];
 }
@@ -82,7 +84,7 @@ export async function getSessionHealth(
   period?: string,
   start?: string,
   end?: string,
-  segmentFilter?: { country?: string; platform?: string; app_version?: string },
+  segmentFilter?: { country?: string; platform?: string; app_version?: string }
 ): Promise<ArgusSessionHealth> {
   const response = await argusApi.get(`${ARGUS_BASE}/sessions/${projectId}`, {
     params: { period, start, end, ...segmentFilter },
@@ -138,7 +140,10 @@ export async function getCrons(projectId: number | string): Promise<any[]> {
   return response.data?.data || response.data || [];
 }
 
-export async function createCron(projectId: number | string, data: any): Promise<any> {
+export async function createCron(
+  projectId: number | string,
+  data: any
+): Promise<any> {
   const response = await argusApi.post(
     `${ARGUS_BASE}/projects/${projectId}/crons`,
     data
@@ -217,7 +222,10 @@ export async function getUptimes(projectId: number | string): Promise<any[]> {
   return response.data?.data || response.data || [];
 }
 
-export async function createUptime(projectId: number | string, data: any): Promise<any> {
+export async function createUptime(
+  projectId: number | string,
+  data: any
+): Promise<any> {
   const response = await argusApi.post(
     `${ARGUS_BASE}/projects/${projectId}/uptime`,
     data

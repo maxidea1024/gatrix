@@ -22,8 +22,14 @@ export default async function kpiAlertsRoutes(app: FastifyInstance) {
         // Parse JSON columns
         const alerts = (rows as any[]).map((r: any) => ({
           ...r,
-          metric_config: typeof r.metric_config === 'string' ? JSON.parse(r.metric_config) : r.metric_config,
-          notification_channels: typeof r.notification_channels === 'string' ? JSON.parse(r.notification_channels) : r.notification_channels,
+          metric_config:
+            typeof r.metric_config === 'string'
+              ? JSON.parse(r.metric_config)
+              : r.metric_config,
+          notification_channels:
+            typeof r.notification_channels === 'string'
+              ? JSON.parse(r.notification_channels)
+              : r.notification_channels,
         }));
         return reply.send({ success: true, data: alerts });
       } catch (error: any) {
@@ -41,22 +47,30 @@ export default async function kpiAlertsRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/kpi-alerts',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { name, metric_config, operator, threshold, check_interval, notification_channels } =
-        request.body as {
-          name: string;
-          metric_config: {
-            type: 'event_count' | 'unique_users' | 'dau' | 'revenue';
-            event_name?: string;
-            interval_seconds: number;
-          };
-          operator: 'less_than' | 'greater_than' | 'equals';
-          threshold: number;
-          check_interval?: number;
-          notification_channels?: { type: string; target: string }[];
+      const {
+        name,
+        metric_config,
+        operator,
+        threshold,
+        check_interval,
+        notification_channels,
+      } = request.body as {
+        name: string;
+        metric_config: {
+          type: 'event_count' | 'unique_users' | 'dau' | 'revenue';
+          event_name?: string;
+          interval_seconds: number;
         };
+        operator: 'less_than' | 'greater_than' | 'equals';
+        threshold: number;
+        check_interval?: number;
+        notification_channels?: { type: string; target: string }[];
+      };
 
       if (!name || !metric_config || !operator || threshold == null) {
-        return reply.code(400).send({ error: 'name, metric_config, operator, threshold required' });
+        return reply
+          .code(400)
+          .send({ error: 'name, metric_config, operator, threshold required' });
       }
 
       try {

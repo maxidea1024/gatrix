@@ -36,7 +36,8 @@ export default async function impactRoutes(app: FastifyInstance) {
       }
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
         const params: Record<string, any> = {
           projectId,

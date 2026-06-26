@@ -1,5 +1,12 @@
 import { PROJECT_ID, CHUNK_SIZE, DAYS_BACK } from './config';
-import { randomInt, randomPick, weightedPick, randomDateWeighted, formatDate, uuid } from './helpers';
+import {
+  randomInt,
+  randomPick,
+  weightedPick,
+  randomDateWeighted,
+  formatDate,
+  uuid,
+} from './helpers';
 import { USERS, BROWSERS, OS_LIST } from './user-pool';
 import { SERVER_RELEASES, CLIENT_RELEASES } from './releases';
 
@@ -18,16 +25,44 @@ export async function generateAndInsertSessions(
       const user = randomPick(USERS);
       const ts = randomDateWeighted(DAYS_BACK);
       const dur = randomInt(60, 7200);
-      const browser = weightedPick(BROWSERS, BROWSERS.map((b) => b.w));
-      const os = weightedPick(OS_LIST, OS_LIST.map((o) => o.w));
+      const browser = weightedPick(
+        BROWSERS,
+        BROWSERS.map((b) => b.w)
+      );
+      const os = weightedPick(
+        OS_LIST,
+        OS_LIST.map((o) => o.w)
+      );
       const dsnKeyId = randomPick(activeDsnKeys);
 
       const hasUtm = Math.random() < 0.65;
-      const utmSource = hasUtm ? randomPick(['google', 'facebook', 'unity', 'naver', 'youtube']) : null;
-      const utmMedium = hasUtm ? randomPick(['cpc', 'cpa', 'social', 'display', 'organic']) : null;
-      const utmCampaign = hasUtm ? randomPick(['summer_sale_2026', 'brand_awareness', 'pre_registration', 're_engagement']) : null;
-      const utmTerm = hasUtm && Math.random() < 0.5 ? randomPick(['best_rpg_game', 'free_to_play', 'strategy_rpg']) : null;
-      const utmContent = hasUtm && Math.random() < 0.5 ? randomPick(['banner_a', 'video_ad_30s', 'text_ad_v2', 'main_banner']) : null;
+      const utmSource = hasUtm
+        ? randomPick(['google', 'facebook', 'unity', 'naver', 'youtube'])
+        : null;
+      const utmMedium = hasUtm
+        ? randomPick(['cpc', 'cpa', 'social', 'display', 'organic'])
+        : null;
+      const utmCampaign = hasUtm
+        ? randomPick([
+            'summer_sale_2026',
+            'brand_awareness',
+            'pre_registration',
+            're_engagement',
+          ])
+        : null;
+      const utmTerm =
+        hasUtm && Math.random() < 0.5
+          ? randomPick(['best_rpg_game', 'free_to_play', 'strategy_rpg'])
+          : null;
+      const utmContent =
+        hasUtm && Math.random() < 0.5
+          ? randomPick([
+              'banner_a',
+              'video_ad_30s',
+              'text_ad_v2',
+              'main_banner',
+            ])
+          : null;
 
       sessBatch.push({
         session_id: uuid(),
@@ -35,7 +70,13 @@ export async function generateAndInsertSessions(
         user_id: user.id,
         started: formatDate(ts),
         duration: dur,
-        status: randomPick(['exited', 'exited', 'exited', 'crashed', 'abnormal']),
+        status: randomPick([
+          'exited',
+          'exited',
+          'exited',
+          'crashed',
+          'abnormal',
+        ]),
         errors: Math.random() < 0.15 ? randomInt(1, 5) : 0,
         environment: randomPick(['production', 'staging']),
         release: randomPick([...SERVER_RELEASES, ...CLIENT_RELEASES]),
@@ -52,7 +93,11 @@ export async function generateAndInsertSessions(
         utm_content: utmContent,
       });
     }
-    await ch.insert({ table: `${chDatabase}.sessions`, values: sessBatch, format: 'JSONEachRow' });
+    await ch.insert({
+      table: `${chDatabase}.sessions`,
+      values: sessBatch,
+      format: 'JSONEachRow',
+    });
     sessCount += sessBatch.length;
     process.stdout.write(`\r   ⏳ ${sessCount.toLocaleString()} sessions...`);
   }

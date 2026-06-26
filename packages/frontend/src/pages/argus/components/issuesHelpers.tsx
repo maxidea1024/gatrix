@@ -53,15 +53,27 @@ export const getStatusOptions = (t: any) => [
     label: t('argus.issues.unresolved'),
     color: ARGUS_SEMANTIC.negative,
   },
-  { value: 'resolved', label: t('argus.issues.resolved'), color: ARGUS_SEMANTIC.positive },
+  {
+    value: 'resolved',
+    label: t('argus.issues.resolved'),
+    color: ARGUS_SEMANTIC.positive,
+  },
   { value: 'ignored', label: t('argus.issues.ignored'), color: '#9e9e9e' },
 ];
 
 export const getLevelOptions = (t: any) => [
   { value: '', label: t('common.all') },
-  { value: 'fatal', label: t('argus.issues.fatal'), color: ARGUS_SEMANTIC.negative },
+  {
+    value: 'fatal',
+    label: t('argus.issues.fatal'),
+    color: ARGUS_SEMANTIC.negative,
+  },
   { value: 'error', label: t('argus.issues.error'), color: '#ff5722' },
-  { value: 'warning', label: t('argus.issues.warning'), color: ARGUS_SEMANTIC.warning },
+  {
+    value: 'warning',
+    label: t('argus.issues.warning'),
+    color: ARGUS_SEMANTIC.warning,
+  },
   { value: 'info', label: t('argus.issues.info'), color: ARGUS_SEMANTIC.info },
 ];
 

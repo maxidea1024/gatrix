@@ -43,40 +43,55 @@ export function buildSegmentFilter(
 
   // Country
   if (query.country) {
-    const values = query.country.split(',').map(v => v.trim()).filter(Boolean);
+    const values = query.country
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (values.length === 1) {
       conds.push('country = {filterCountry:String}');
       params.filterCountry = values[0];
     } else if (values.length > 1) {
       const placeholders = values.map((_, i) => `{fc${i}:String}`).join(', ');
       conds.push(`country IN (${placeholders})`);
-      values.forEach((v, i) => { params[`fc${i}`] = v; });
+      values.forEach((v, i) => {
+        params[`fc${i}`] = v;
+      });
     }
   }
 
   // Platform
   if (query.platform) {
-    const values = query.platform.split(',').map(v => v.trim()).filter(Boolean);
+    const values = query.platform
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (values.length === 1) {
       conds.push('platform = {filterPlatform:String}');
       params.filterPlatform = values[0];
     } else if (values.length > 1) {
       const placeholders = values.map((_, i) => `{fp${i}:String}`).join(', ');
       conds.push(`platform IN (${placeholders})`);
-      values.forEach((v, i) => { params[`fp${i}`] = v; });
+      values.forEach((v, i) => {
+        params[`fp${i}`] = v;
+      });
     }
   }
 
   // App Version
   if (query.app_version) {
-    const values = query.app_version.split(',').map(v => v.trim()).filter(Boolean);
+    const values = query.app_version
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (values.length === 1) {
       conds.push('app_version = {filterAppVersion:String}');
       params.filterAppVersion = values[0];
     } else if (values.length > 1) {
       const placeholders = values.map((_, i) => `{fv${i}:String}`).join(', ');
       conds.push(`app_version IN (${placeholders})`);
-      values.forEach((v, i) => { params[`fv${i}`] = v; });
+      values.forEach((v, i) => {
+        params[`fv${i}`] = v;
+      });
     }
   }
 
@@ -100,23 +115,39 @@ export function buildSegmentFilter(
  */
 
 // Column availability per dataset
-const DATASET_COLUMNS: Record<string, { country?: string; platform?: string; app_version?: string }> = {
-  activities:   { country: 'country',     platform: 'platform', app_version: 'app_version' },
-  errors:       { country: 'geo_country', platform: 'platform' },
-  transactions: {                         platform: 'platform' },
-  sessions:     { },
-  logs:         {                         platform: 'platform' },
+const DATASET_COLUMNS: Record<
+  string,
+  { country?: string; platform?: string; app_version?: string }
+> = {
+  activities: {
+    country: 'country',
+    platform: 'platform',
+    app_version: 'app_version',
+  },
+  errors: { country: 'geo_country', platform: 'platform' },
+  transactions: { platform: 'platform' },
+  sessions: {},
+  logs: { platform: 'platform' },
 };
 
 export function buildSegmentConditions(
   query: SegmentFilterQuery,
-  dataset?: string,
+  dataset?: string
 ): Array<{ field: string; op: '=' | 'IN'; value: string | string[] }> {
-  const conds: Array<{ field: string; op: '=' | 'IN'; value: string | string[] }> = [];
-  const cols = dataset ? (DATASET_COLUMNS[dataset] || DATASET_COLUMNS.activities) : DATASET_COLUMNS.activities;
+  const conds: Array<{
+    field: string;
+    op: '=' | 'IN';
+    value: string | string[];
+  }> = [];
+  const cols = dataset
+    ? DATASET_COLUMNS[dataset] || DATASET_COLUMNS.activities
+    : DATASET_COLUMNS.activities;
 
   if (query.country && cols.country) {
-    const values = query.country.split(',').map(v => v.trim()).filter(Boolean);
+    const values = query.country
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (values.length === 1) {
       conds.push({ field: cols.country, op: '=', value: values[0] });
     } else if (values.length > 1) {
@@ -125,7 +156,10 @@ export function buildSegmentConditions(
   }
 
   if (query.platform && cols.platform) {
-    const values = query.platform.split(',').map(v => v.trim()).filter(Boolean);
+    const values = query.platform
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (values.length === 1) {
       conds.push({ field: cols.platform, op: '=', value: values[0] });
     } else if (values.length > 1) {
@@ -134,7 +168,10 @@ export function buildSegmentConditions(
   }
 
   if (query.app_version && cols.app_version) {
-    const values = query.app_version.split(',').map(v => v.trim()).filter(Boolean);
+    const values = query.app_version
+      .split(',')
+      .map((v) => v.trim())
+      .filter(Boolean);
     if (values.length === 1) {
       conds.push({ field: cols.app_version, op: '=', value: values[0] });
     } else if (values.length > 1) {
@@ -144,4 +181,3 @@ export function buildSegmentConditions(
 
   return conds;
 }
-

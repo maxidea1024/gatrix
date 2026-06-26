@@ -332,7 +332,14 @@ const ArgusPerformancePage: React.FC = () => {
 
       {/* === TRANSACTION LIST === */}
       {viewMode === 'list' && (
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}
+        >
           <PerformanceTransactionTable
             transactions={transactions}
             loading={loading}

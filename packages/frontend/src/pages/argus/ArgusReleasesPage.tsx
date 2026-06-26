@@ -62,7 +62,6 @@ import PageHeader from '@/components/common/PageHeader';
 import { evaluateAST } from './components/releasesHelpers';
 import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
-
 const DEEP_LINK_KEYS = ['page', 'search', 'sort'];
 
 const ArgusReleasesPage: React.FC = () => {
@@ -502,9 +501,20 @@ const ArgusReleasesPage: React.FC = () => {
         ))}
       </Paper>
 
-      <PageContentLoader loading={loading && !hasLoaded.current} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <PageContentLoader
+        loading={loading && !hasLoaded.current}
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
+      >
         {loading && hasLoaded.current && (
-          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6, flexShrink: 0 }} />
+          <LinearProgress
+            sx={{
+              mb: 1,
+              borderRadius: 1,
+              height: 2,
+              opacity: 0.6,
+              flexShrink: 0,
+            }}
+          />
         )}
         {releases.length === 0 ? (
           <EmptyPlaceholder
@@ -513,9 +523,18 @@ const ArgusReleasesPage: React.FC = () => {
             minHeight={200}
           />
         ) : (
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'auto',
-            opacity: loading ? 0.55 : 1, transition: 'opacity 0.15s ease', pointerEvents: loading ? 'none' : 'auto',
-          }}>
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0,
+              overflow: 'auto',
+              opacity: loading ? 0.55 : 1,
+              transition: 'opacity 0.15s ease',
+              pointerEvents: loading ? 'none' : 'auto',
+            }}
+          >
             {filteredReleases.length === 0 ? (
               <Box sx={{ mt: 1 }}>
                 <EmptyPlaceholder
@@ -703,7 +722,10 @@ const ArgusReleasesPage: React.FC = () => {
                                 height: 18,
                                 fontSize: '0.6rem',
                                 fontWeight: 700,
-                                backgroundColor: alpha(ARGUS_SEMANTIC.warning, 0.15),
+                                backgroundColor: alpha(
+                                  ARGUS_SEMANTIC.warning,
+                                  0.15
+                                ),
                                 color: ARGUS_SEMANTIC.warning,
                                 border: 'none',
                               }}
@@ -712,7 +734,9 @@ const ArgusReleasesPage: React.FC = () => {
                           {(() => {
                             const stage = getAdoptionStage(r);
                             const stageColor =
-                              stage === 'adopted' ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.warning;
+                              stage === 'adopted'
+                                ? ARGUS_SEMANTIC.positive
+                                : ARGUS_SEMANTIC.warning;
                             const stageLabel =
                               stage === 'adopted'
                                 ? t('argus.releases.adopted', 'Adopted')
@@ -800,11 +824,15 @@ const ArgusReleasesPage: React.FC = () => {
                                 fontSize: '0.65rem',
                                 fontWeight: 700,
                                 backgroundColor: alpha(
-                                  crashFreeDelta >= 0 ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative,
+                                  crashFreeDelta >= 0
+                                    ? ARGUS_SEMANTIC.positive
+                                    : ARGUS_SEMANTIC.negative,
                                   0.1
                                 ),
                                 color:
-                                  crashFreeDelta >= 0 ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative,
+                                  crashFreeDelta >= 0
+                                    ? ARGUS_SEMANTIC.positive
+                                    : ARGUS_SEMANTIC.negative,
                                 border: 'none',
                                 '& .MuiChip-label': { px: 0.5 },
                               }}
@@ -908,10 +936,15 @@ const ArgusReleasesPage: React.FC = () => {
                               height: 22,
                               fontWeight: 700,
                               fontSize: '0.7rem',
-                              backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.1),
+                              backgroundColor: alpha(
+                                ARGUS_SEMANTIC.negative,
+                                0.1
+                              ),
                               color: ARGUS_SEMANTIC.negative,
                               border: 'none',
-                              '& .MuiChip-icon': { color: ARGUS_SEMANTIC.negative },
+                              '& .MuiChip-icon': {
+                                color: ARGUS_SEMANTIC.negative,
+                              },
                             }}
                           />
                         ) : (
@@ -973,7 +1006,10 @@ const ArgusReleasesPage: React.FC = () => {
                               minWidth: 0,
                               height: '100%',
                               width: `${(errorCount / maxErrorCount) * 100}%`,
-                              backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.6),
+                              backgroundColor: alpha(
+                                ARGUS_SEMANTIC.negative,
+                                0.6
+                              ),
                               borderRadius: 1,
                             }}
                           />

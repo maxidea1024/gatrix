@@ -165,7 +165,11 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
             elevation={0}
             isDark={isDark}
             accentColor={
-              isMuted ? '#9e9e9e' : rule.enabled ? ARGUS_SEMANTIC.warning : 'transparent'
+              isMuted
+                ? '#9e9e9e'
+                : rule.enabled
+                  ? ARGUS_SEMANTIC.warning
+                  : 'transparent'
             }
             dimmed={isMuted || !rule.enabled}
           >
@@ -360,7 +364,8 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                 );
                 const data = {
                   labels: sortedStats.map((s) => {
-                    const bucket = s.bucket + (s.bucket.length === 10 ? 'T00:00:00Z' : 'Z');
+                    const bucket =
+                      s.bucket + (s.bucket.length === 10 ? 'T00:00:00Z' : 'Z');
                     return s.bucket.length > 10
                       ? formatWith(bucket, 'M/D HH:mm')
                       : formatWith(bucket, 'M/D');

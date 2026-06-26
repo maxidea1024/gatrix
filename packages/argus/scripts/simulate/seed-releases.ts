@@ -50,7 +50,7 @@ const FILE_CHANGE_POOLS = [
 
 export async function generateAndInsertReleases(
   pool: any,
-  internalProjectId: number,
+  internalProjectId: number
 ): Promise<number> {
   console.log('\n📦 Generating releases & commits...');
 
@@ -61,7 +61,9 @@ export async function generateAndInsertReleases(
   for (let i = 0; i < allVersions.length; i++) {
     const version = allVersions[i];
     // Space releases over the last DAYS_BACK days
-    const daysAgo = Math.floor((DAYS_BACK / allVersions.length) * (allVersions.length - i));
+    const daysAgo = Math.floor(
+      (DAYS_BACK / allVersions.length) * (allVersions.length - i)
+    );
     const dateReleased = new Date(now - daysAgo * 86400000);
 
     const totalErrors = randomInt(50, 5000);
@@ -80,12 +82,19 @@ export async function generateAndInsertReleases(
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE total_errors = VALUES(total_errors)`,
         [
-          PROJECT_ID, version, version.split('-')[0],
-          totalErrors, newIssues,
-          crashFreeSessions.toFixed(4), crashFreeUsers.toFixed(4),
-          totalSessions, totalUsers,
-          randomInt(3, 25), randomInt(1, 5),
-          dateReleased, dateReleased,
+          PROJECT_ID,
+          version,
+          version.split('-')[0],
+          totalErrors,
+          newIssues,
+          crashFreeSessions.toFixed(4),
+          crashFreeUsers.toFixed(4),
+          totalSessions,
+          totalUsers,
+          randomInt(3, 25),
+          randomInt(1, 5),
+          dateReleased,
+          dateReleased,
         ]
       );
 

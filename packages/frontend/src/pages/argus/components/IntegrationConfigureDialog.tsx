@@ -261,7 +261,9 @@ export const IntegrationConfigureDialog: React.FC<
                             backgroundColor: intg.enabled
                               ? alpha(ARGUS_SEMANTIC.positive, 0.15)
                               : undefined,
-                            color: intg.enabled ? ARGUS_SEMANTIC.positive : undefined,
+                            color: intg.enabled
+                              ? ARGUS_SEMANTIC.positive
+                              : undefined,
                           }}
                         />
                         <Tooltip title={t('common.delete', 'Delete')}>
@@ -396,7 +398,10 @@ export const IntegrationConfigureDialog: React.FC<
                                 sx={{
                                   height: 24,
                                   fontSize: '0.75rem',
-                                  backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.1),
+                                  backgroundColor: alpha(
+                                    ARGUS_SEMANTIC.positive,
+                                    0.1
+                                  ),
                                   color: ARGUS_SEMANTIC.positive,
                                 }}
                               />

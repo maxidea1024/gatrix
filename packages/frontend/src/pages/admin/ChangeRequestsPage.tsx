@@ -853,10 +853,7 @@ const ChangeRequestsPage: React.FC = () => {
                     transition: 'all 0.1s ease-in-out',
                     '&:hover': {
                       backgroundColor: active
-                        ? alpha(
-                            theme.palette.primary.main,
-                            isDark ? 0.15 : 0.1
-                          )
+                        ? alpha(theme.palette.primary.main, isDark ? 0.15 : 0.1)
                         : isDark
                           ? 'rgba(255,255,255,0.05)'
                           : 'rgba(0,0,0,0.04)',
@@ -917,86 +914,87 @@ const ChangeRequestsPage: React.FC = () => {
 
         {/* ══════ RIGHT CONTENT ══════ */}
         <Box sx={{ flex: 1, minWidth: 0, pt: 2, pr: 2, pb: 6 }}>
-
-      <PageContentLoader loading={isLoading && !data}>
-        {/* Draft tab: auto-open the single draft CR in drawer instead of showing a list */}
-        {statusFilter === 'draft' && data?.items && data.items.length > 0 ? (
-          <DraftAutoOpen
-            draftCR={data.items[0]}
-            onOpenDrawer={handleOpenDrawer}
-            onRefresh={handleRefresh}
-            projectApiPath={projectApiPath}
-          />
-        ) : !data?.items || data.items.length === 0 ? (
-          <EmptyPlaceholder
-            message={t('changeRequest.noRequests')}
-            minHeight={200}
-          />
-        ) : (
-          <Card variant="outlined" sx={{ position: 'relative' }}>
-            <TableContainer
-              sx={{
-                opacity: isLoading ? 0.5 : 1,
-                transition: 'opacity 0.15s ease-in-out',
-                pointerEvents: isLoading ? 'none' : 'auto',
-              }}
-            >
-              <Table size="small" sx={{ tableLayout: 'auto' }}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>{t('changeRequest.status')}</TableCell>
-                    <TableCell>{t('changeRequest.titleField')}</TableCell>
-                    <TableCell>{t('changeRequest.requester')}</TableCell>
-
-                    <TableCell align="center">
-                      {t('changeRequest.items')}
-                    </TableCell>
-                    <TableCell align="center">
-                      {t('changeRequest.approvalProgress')}
-                    </TableCell>
-                    <TableCell align="center">
-                      {t('changeRequest.lastUpdated')}
-                    </TableCell>
-                    <TableCell align="center">
-                      {t('changeRequest.actions.label')}
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data?.items.map((cr, idx) => (
-                    <ChangeRequestRow
-                      key={cr.id}
-                      cr={cr}
-                      index={idx}
-                      onRefresh={handleRefresh}
-                      onOpenDrawer={handleOpenDrawer}
-                      projectApiPath={projectApiPath}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            {data && data.pagination && data.pagination.total > 0 && (
-              <SimplePagination
-                count={data.pagination.total}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
+          <PageContentLoader loading={isLoading && !data}>
+            {/* Draft tab: auto-open the single draft CR in drawer instead of showing a list */}
+            {statusFilter === 'draft' &&
+            data?.items &&
+            data.items.length > 0 ? (
+              <DraftAutoOpen
+                draftCR={data.items[0]}
+                onOpenDrawer={handleOpenDrawer}
+                onRefresh={handleRefresh}
+                projectApiPath={projectApiPath}
               />
-            )}
-          </Card>
-        )}
-      </PageContentLoader>
+            ) : !data?.items || data.items.length === 0 ? (
+              <EmptyPlaceholder
+                message={t('changeRequest.noRequests')}
+                minHeight={200}
+              />
+            ) : (
+              <Card variant="outlined" sx={{ position: 'relative' }}>
+                <TableContainer
+                  sx={{
+                    opacity: isLoading ? 0.5 : 1,
+                    transition: 'opacity 0.15s ease-in-out',
+                    pointerEvents: isLoading ? 'none' : 'auto',
+                  }}
+                >
+                  <Table size="small" sx={{ tableLayout: 'auto' }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t('changeRequest.status')}</TableCell>
+                        <TableCell>{t('changeRequest.titleField')}</TableCell>
+                        <TableCell>{t('changeRequest.requester')}</TableCell>
 
-      {/* Change Request Detail Drawer */}
-      <ChangeRequestDetailDrawer
-        open={drawerOpen}
-        onClose={handleCloseDrawer}
-        changeRequestId={selectedChangeRequestId}
-        onRefresh={handleRefresh}
-      />
+                        <TableCell align="center">
+                          {t('changeRequest.items')}
+                        </TableCell>
+                        <TableCell align="center">
+                          {t('changeRequest.approvalProgress')}
+                        </TableCell>
+                        <TableCell align="center">
+                          {t('changeRequest.lastUpdated')}
+                        </TableCell>
+                        <TableCell align="center">
+                          {t('changeRequest.actions.label')}
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data?.items.map((cr, idx) => (
+                        <ChangeRequestRow
+                          key={cr.id}
+                          cr={cr}
+                          index={idx}
+                          onRefresh={handleRefresh}
+                          onOpenDrawer={handleOpenDrawer}
+                          projectApiPath={projectApiPath}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+
+                {data && data.pagination && data.pagination.total > 0 && (
+                  <SimplePagination
+                    count={data.pagination.total}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={handlePageChange}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                  />
+                )}
+              </Card>
+            )}
+          </PageContentLoader>
+
+          {/* Change Request Detail Drawer */}
+          <ChangeRequestDetailDrawer
+            open={drawerOpen}
+            onClose={handleCloseDrawer}
+            changeRequestId={selectedChangeRequestId}
+            onRefresh={handleRefresh}
+          />
         </Box>
       </Box>
     </Box>
