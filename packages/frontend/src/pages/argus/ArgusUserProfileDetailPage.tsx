@@ -16,7 +16,6 @@ import {
   Event as EventIcon,
   Folder as SessionIcon,
   ShoppingCart as PurchaseIcon,
-  Settings as SettingsIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '@/components/common/PageHeader';
@@ -43,7 +42,6 @@ import UserProfileDetailLeft from '@/components/userProfiles/UserProfileDetailLe
 import UserProfileEventFeed from '@/components/userProfiles/UserProfileEventFeed';
 import UserProfileSessionsTab from '@/components/userProfiles/UserProfileSessionsTab';
 import UserProfileFinanceTab from '@/components/userProfiles/UserProfileFinanceTab';
-import UserProfilePropsTab from '@/components/userProfiles/UserProfilePropsTab';
 
 type LifecycleStage = { label: string; bg: string; fg: string };
 function computeLifecycleStage(profile: ArgusUserProfile, netRevenue: number): LifecycleStage {
@@ -65,7 +63,7 @@ function computeChurnRisk(
 ): PurchaseChurnRisk {
   if (netRevenue > 0 && lastPurchase) {
     const days = Math.floor((Date.now() - new Date(lastPurchase).getTime()) / 86400000);
-    if (days > 30) return { kind: 'purchase', msg: `${days}d` };
+    if (days > 30) return { kind: 'purchase', msg: String(days) };
   }
   if (refundRate > 0.2) return { kind: 'refund', msg: `${(refundRate * 100).toFixed(0)}%` };
   return null;
@@ -87,7 +85,6 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
     switch (tabParam) {
       case 'sessions': return 1;
       case 'finance': return 2;
-      case 'properties': return 3;
       case 'feed':
       default:
         return 0;
@@ -103,10 +100,6 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
         break;
       case 2:
         params.set('tab', 'finance');
-        break;
-      case 3:
-        params.set('tab', 'properties');
-        params.delete('subTab');
         break;
       case 0:
       default:
@@ -223,6 +216,8 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
             events={events}
             lifecycleStage={lifecycleStage}
             churnRisk={churnRisk}
+            properties={properties}
+            propertiesLoading={propertiesLoading}
           />
         </Box>
 
@@ -257,11 +252,6 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
                 icon={<PurchaseIcon sx={{ fontSize: 16 }} />}
                 iconPosition="start"
               />
-              <Tab
-                label={t('argus.userProfiles.userProperties', 'Properties', { count: properties.length })}
-                icon={<SettingsIcon sx={{ fontSize: 16 }} />}
-                iconPosition="start"
-              />
             </Tabs>
           </Box>
 
@@ -269,14 +259,6 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
             {tab === 0 && <UserProfileEventFeed userId={userId} projectId={projectId || ''} />}
             {tab === 1 && <UserProfileSessionsTab userId={userId} projectId={projectId || ''} />}
             {tab === 2 && <UserProfileFinanceTab userId={userId} projectId={projectId || ''} />}
-            {tab === 3 && (
-              <UserProfilePropsTab
-                userId={userId}
-                projectId={projectId || ''}
-                initialProperties={properties}
-                initialLoading={propertiesLoading}
-              />
-            )}
           </Box>
         </Box>
       </Box>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Box,
   Typography,
@@ -7,16 +7,48 @@ import {
   Tooltip,
   alpha,
   useTheme,
+  TextField,
+  InputAdornment,
+  IconButton,
+  CircularProgress,
 } from '@mui/material';
 import {
   Schedule as ScheduleIcon,
   Public as GlobeIcon,
   Devices as DevicesIcon,
+  Search as SearchIcon,
+  Close as CloseIcon,
+  ContentCopy as CopyIcon,
+  Check as CheckIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
-import type { ArgusUserProfile, ArgusUserEvent } from '@/services/argus/argusTypes';
+import type { ArgusUserProfile, ArgusUserEvent, ArgusUserProperty } from '@/services/argus/argusTypes';
 import CohortChip, { type CohortMembership } from '@/components/argus/CohortChip';
 import { formatRelativeTime } from '@/utils/dateFormat';
+
+const CopyButton: React.FC<{ value: string }> = ({ value }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(value).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 800);
+  };
+  if (!value) return null;
+  return (
+    <IconButton
+      size="small"
+      onClick={handleCopy}
+      sx={{ p: 0.25, flexShrink: 0, color: 'text.secondary', '&:hover': { color: 'text.primary' } }}
+    >
+      {copied ? (
+        <CheckIcon sx={{ fontSize: 12, color: 'success.main' }} />
+      ) : (
+        <CopyIcon sx={{ fontSize: 12 }} />
+      )}
+    </IconButton>
+  );
+};
 
 interface UserProfileDetailLeftProps {
   profile: ArgusUserProfile;
@@ -25,6 +57,8 @@ interface UserProfileDetailLeftProps {
   events: ArgusUserEvent[];
   lifecycleStage: { label: string; bg: string; fg: string } | null;
   churnRisk: { kind: 'purchase' | 'refund'; msg: string } | null;
+  properties: ArgusUserProperty[];
+  propertiesLoading?: boolean;
 }
 
 export const UserProfileDetailLeft: React.FC<UserProfileDetailLeftProps> = ({
@@ -34,10 +68,19 @@ export const UserProfileDetailLeft: React.FC<UserProfileDetailLeftProps> = ({
   events,
   lifecycleStage,
   churnRisk,
+  properties = [],
+  propertiesLoading = false,
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const filteredProperties = useMemo(() => {
+    if (!searchQuery.trim()) return properties;
+    const query = searchQuery.toLowerCase().trim();
+    return properties.filter((p) => p.key.toLowerCase().includes(query));
+  }, [properties, searchQuery]);
 
   // Compute Sparkline Daily Activity trend (last 30 days)
   const dailyActivity = useMemo(() => {
@@ -431,6 +474,91 @@ export const UserProfileDetailLeft: React.FC<UserProfileDetailLeftProps> = ({
           </Box>
         );
       })()}
+
+      {/* User Properties Section */}
+      <Box sx={{ borderTop: `1px solid ${theme.palette.divider}`, pt: 2, display: 'flex', flexDirection: 'column' }}>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          fontWeight={700}
+          display="block"
+          sx={{ mb: 1, textTransform: 'uppercase', letterSpacing: 0.5 }}
+        >
+          {t('argus.userProfiles.userProperties', 'User Properties', { count: properties.length })}
+        </Typography>
+
+        {properties.length > 5 && (
+          <TextField
+            placeholder={t('argus.userProfiles.searchPropertiesPlaceholder', 'Search...')}
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{
+              mb: 1.5,
+              width: '100%',
+              '& .MuiInputBase-root': {
+                height: 28,
+                fontSize: 11,
+              },
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 13 }} />
+                </InputAdornment>
+              ),
+              endAdornment: searchQuery ? (
+                <InputAdornment position="end">
+                  <IconButton
+                    size="small"
+                    onClick={() => setSearchQuery('')}
+                    sx={{ p: 0.25 }}
+                  >
+                    <CloseIcon sx={{ fontSize: 11 }} />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
+          />
+        )}
+
+        {propertiesLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+            <CircularProgress size={20} />
+          </Box>
+        ) : filteredProperties.length > 0 ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {filteredProperties.map((p) => (
+              <Box
+                key={p.key}
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  p: 1,
+                  borderRadius: 1,
+                  bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+                  border: '1px solid',
+                  borderColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                }}
+              >
+                <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.secondary', wordBreak: 'break-all' }}>
+                  {p.key}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, mt: 0.25 }}>
+                  <Typography sx={{ fontSize: 11, fontWeight: 500, wordBreak: 'break-all', flex: 1 }}>
+                    {p.value}
+                  </Typography>
+                  <CopyButton value={p.value} />
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        ) : (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center', py: 2 }}>
+            {t('argus.userProfiles.noPropertiesFound', 'No properties found')}
+          </Typography>
+        )}
+      </Box>
     </Box>
   );
 };
