@@ -43,6 +43,7 @@ import {
   Error as ErrorIcon,
   Login as LoginIcon,
   Star as StarIcon,
+  StarBorder as StarBorderIcon,
   ContentCopy as CopyIcon,
   Check as CheckIcon,
 } from '@mui/icons-material';
@@ -68,6 +69,7 @@ import {
   getUserCohortMemberships,
   getRevenueUserSummary,
   type UserFinancialResponse,
+  type UserFinancialTransaction,
 } from '@/services/argus/argusAnalytics';
 import type {
   ArgusUserProfile,
@@ -101,6 +103,71 @@ function formatDuration(seconds: number): string {
   if (mins < 60) return `${mins}m ${secs}s`;
   const hrs = Math.floor(mins / 60);
   return `${hrs}h ${mins % 60}m`;
+}
+
+// ─── Insight Helpers ─────────────────────────────────────────────────────────
+
+type LifecycleStage = { label: string; bg: string; fg: string };
+function computeLifecycleStage(profile: ArgusUserProfile, netRevenue: number): LifecycleStage {
+  const daysSinceFirst = (Date.now() - new Date(profile.first_seen).getTime()) / 86400000;
+  const daysSinceLast  = (Date.now() - new Date(profile.last_seen).getTime()) / 86400000;
+  const isVip = netRevenue >= 100;
+  if (daysSinceFirst < 7)   return { label: isVip ? 'NEW VIP' : 'NEW',     bg: '#1565c0', fg: '#90caf9' };
+  if (daysSinceLast > 30)   return { label: isVip ? 'DORMANT VIP' : 'DORMANT', bg: '#b71c1c', fg: '#ef9a9a' };
+  if (daysSinceLast > 14)   return { label: isVip ? 'AT RISK VIP' : 'AT RISK', bg: '#e65100', fg: '#ffcc80' };
+  if (daysSinceLast <= 7)   return { label: isVip ? 'ACTIVE VIP' : 'ACTIVE',  bg: '#1b5e20', fg: '#a5d6a7' };
+  return                           { label: isVip ? 'REGULAR VIP' : 'REGULAR', bg: '#37474f', fg: '#b0bec5' };
+}
+
+type ChurnRisk = { kind: 'purchase' | 'refund'; msg: string } | null;
+function computeChurnRisk(
+  lastPurchase: string | null,
+  refundRate: number,
+  netRevenue: number
+): ChurnRisk {
+  if (netRevenue > 0 && lastPurchase) {
+    const days = Math.floor((Date.now() - new Date(lastPurchase).getTime()) / 86400000);
+    if (days > 30) return { kind: 'purchase', msg: `${days}일째 미구매 — 이탈 위험` };
+  }
+  if (refundRate > 0.2) return { kind: 'refund', msg: `환불율 ${(refundRate * 100).toFixed(0)}% — 결제 이슈 의심` };
+  return null;
+}
+
+type HeatCell = { dow: number; hour: number; count: number };
+function computeHeatmap(evts: ArgusUserEvent[]): HeatCell[] {
+  const map: Record<string, HeatCell> = {};
+  for (let d = 0; d < 7; d++) for (let h = 0; h < 24; h++) map[`${d}-${h}`] = { dow: d, hour: h, count: 0 };
+  evts.forEach(e => { const dt = new Date(e.timestamp); const k = `${dt.getDay()}-${dt.getHours()}`; if (map[k]) map[k].count++; });
+  return Object.values(map);
+}
+
+type TopProduct = { name: string; count: number; total: number };
+function computeTopProducts(purchases: UserFinancialTransaction[]): TopProduct[] {
+  const m = new Map<string, TopProduct>();
+  purchases.forEach(p => {
+    const ex = m.get(p.product_name) ?? { name: p.product_name, count: 0, total: 0 };
+    m.set(p.product_name, { ...ex, count: ex.count + 1, total: ex.total + (p.amount || 0) });
+  });
+  return [...m.values()].sort((a, b) => b.count - a.count || b.total - a.total).slice(0, 5);
+}
+
+type SessionStats = { avgDurSec: number; avgGapDays: number; trend: 'up' | 'down' | 'stable' | 'none' };
+function computeSessionStats(ss: ArgusUserSession[]): SessionStats {
+  if (ss.length === 0) return { avgDurSec: 0, avgGapDays: 0, trend: 'none' };
+  const avgDurSec = ss.reduce((a, s) => a + s.duration_seconds, 0) / ss.length;
+  const sorted = [...ss].sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  let avgGapDays = 0;
+  if (sorted.length >= 2) {
+    const gaps = sorted.slice(1).map((s, i) => (new Date(s.start_time).getTime() - new Date(sorted[i].start_time).getTime()) / 86400000);
+    avgGapDays = gaps.reduce((a, b) => a + b, 0) / gaps.length;
+  }
+  let trend: SessionStats['trend'] = 'none';
+  if (ss.length >= 6) {
+    const recent = ss.slice(0, 3).reduce((a, s) => a + s.duration_seconds, 0) / 3;
+    const older  = ss.slice(3, 6).reduce((a, s) => a + s.duration_seconds, 0) / 3;
+    trend = recent > older * 1.1 ? 'up' : recent < older * 0.9 ? 'down' : 'stable';
+  }
+  return { avgDurSec, avgGapDays, trend };
 }
 
 // ─── Copyable Cell Helper ────────────────────────────────────────────────────
@@ -254,6 +321,24 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
     return Math.max(...dailyActivity.map((d) => d.count), 1);
   }, [dailyActivity]);
 
+  // ─── Insight computations ────────────────────────────────────────────────────
+  const lifecycleStage = useMemo(
+    () => profile ? computeLifecycleStage(profile, finData?.summary.net_revenue ?? 0) : null,
+    [profile, finData]
+  );
+
+  const churnRisk = useMemo(
+    () => finData ? computeChurnRisk(finData.summary.last_purchase, finData.summary.refund_rate, finData.summary.net_revenue) : null,
+    [finData]
+  );
+
+  const heatmap = useMemo(() => computeHeatmap(events), [events]);
+  const heatmapMax = useMemo(() => Math.max(...heatmap.map(c => c.count), 1), [heatmap]);
+
+  const topProducts = useMemo(() => finData ? computeTopProducts(finData.purchases) : [], [finData]);
+
+  const sessionStats = useMemo(() => computeSessionStats(sessions), [sessions]);
+
   // Filtering user properties
   const filteredProperties = useMemo(() => {
     if (!propertySearchDebounced.trim()) return properties;
@@ -384,11 +469,25 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
               gap: 2,
             }}
           >
-            {/* Identity Summary Card */}
+            {/* Identity Summary Card + Lifecycle Badge */}
             <Box>
-              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1, textTransform: 'uppercase' }}>
-                {t('argus.userProfiles.identitySummary', 'Identity Summary')}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: 'uppercase' }}>
+                  {t('argus.userProfiles.identitySummary', 'Identity Summary')}
+                </Typography>
+                {lifecycleStage && (
+                  <Chip
+                    label={lifecycleStage.label}
+                    size="small"
+                    sx={{
+                      height: 20, fontSize: 10, fontWeight: 800, letterSpacing: 0.6,
+                      bgcolor: lifecycleStage.bg,
+                      color: lifecycleStage.fg,
+                      border: 'none',
+                    }}
+                  />
+                )}
+              </Box>
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
                 {[
                   { icon: <ScheduleIcon fontSize="inherit" />, label: t('argus.userProfiles.firstSeenLabel', 'First seen'), value: formatRelativeTime(profile.first_seen) },
@@ -396,22 +495,12 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                   { icon: <GlobeIcon fontSize="inherit" />, label: t('argus.userProfiles.countryLabel', 'Country'), value: profile.country || '—' },
                   { icon: <DevicesIcon fontSize="inherit" />, label: t('argus.userProfiles.platformLabel', 'Platform'), value: profile.platform || '—' },
                 ].map((card) => (
-                  <Paper
-                    key={card.label}
-                    variant="outlined"
-                    sx={{
-                      p: 1,
-                      borderRadius: 1.5,
-                      bgcolor: 'background.paper',
-                    }}
-                  >
+                  <Paper key={card.label} variant="outlined" sx={{ p: 1, borderRadius: 1.5, bgcolor: 'background.paper' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.secondary', mb: 0.2 }}>
                       <Box sx={{ display: 'inline-flex', fontSize: 13 }}>{card.icon}</Box>
                       <Typography variant="caption" sx={{ fontSize: 10 }}>{card.label}</Typography>
                     </Box>
-                    <Typography variant="body2" fontWeight={600} sx={{ fontSize: 12 }}>
-                      {card.value}
-                    </Typography>
+                    <Typography variant="body2" fontWeight={600} sx={{ fontSize: 12 }}>{card.value}</Typography>
                   </Paper>
                 ))}
               </Box>
@@ -434,6 +523,29 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                   </Typography>
                 )}
               </Box>
+
+            {/* Churn Risk Warning */}
+            {churnRisk && (
+              <Box sx={{
+                p: 1.2, borderRadius: 1.5,
+                border: '1px solid',
+                borderColor: churnRisk.kind === 'purchase' ? 'warning.main' : 'error.main',
+                bgcolor: churnRisk.kind === 'purchase'
+                  ? (isDark ? 'rgba(255,152,0,0.08)' : 'rgba(255,152,0,0.06)')
+                  : (isDark ? 'rgba(244,67,54,0.08)' : 'rgba(244,67,54,0.06)'),
+                display: 'flex', alignItems: 'flex-start', gap: 1,
+              }}>
+                <Typography sx={{ fontSize: 16, lineHeight: 1, mt: 0.1 }}>
+                  {churnRisk.kind === 'purchase' ? '⚠️' : '🔴'}
+                </Typography>
+                <Box>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: churnRisk.kind === 'purchase' ? 'warning.main' : 'error.main' }}>
+                    {churnRisk.kind === 'purchase' ? '이탈 위험' : '결제 이슈 의심'}
+                  </Typography>
+                  <Typography sx={{ fontSize: 11, color: 'text.secondary', mt: 0.2 }}>{churnRisk.msg}</Typography>
+                </Box>
+              </Box>
+            )}
 
             {/* Properties Sidebar with Search */}
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 250 }}>
@@ -505,36 +617,78 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             
             {/* Sparkline Daily Activity chart */}
-            <Box
-              sx={{
-                p: 2,
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-                bgcolor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)',
-              }}
-            >
-              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1.5, textTransform: 'uppercase' }}>
-                {t('argus.userProfiles.engagementTrend', 'User Engagement Trend (Last 30 Days Event Frequency)')}
+            <Box sx={{ p: 2, borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`, bgcolor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.01)' }}>
+              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1, textTransform: 'uppercase' }}>
+                {t('argus.userProfiles.engagementTrend', 'Activity — Last 30 Days')}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: 40, px: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: 36, px: 1 }}>
                 {dailyActivity.map((d, idx) => (
-                  <Tooltip key={idx} title={t('argus.userProfiles.engagementTrendTooltip', '{{date}}: {{count}} events', { date: d.date.toLocaleDateString(), count: d.count })}>
-                    <Box
-                      sx={{
-                        flex: 1,
-                        height: `${Math.max((d.count / maxDailyCount) * 40, 2)}px`,
-                        bgcolor: d.count > 0 ? theme.palette.primary.main : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'),
-                        borderRadius: '2px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          bgcolor: theme.palette.primary.light,
-                          transform: 'scaleY(1.15)',
-                        },
-                      }}
-                    />
+                  <Tooltip key={idx} title={`${d.date.toLocaleDateString()}: ${d.count} events`}>
+                    <Box sx={{ flex: 1, height: `${Math.max((d.count / maxDailyCount) * 36, 2)}px`,
+                      bgcolor: d.count > 0 ? theme.palette.primary.main : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'),
+                      borderRadius: '2px', cursor: 'pointer', transition: 'all 0.2s ease',
+                      '&:hover': { bgcolor: theme.palette.primary.light, transform: 'scaleY(1.15)' } }} />
                   </Tooltip>
                 ))}
               </Box>
+
+              {/* Activity Heatmap — hour × day-of-week */}
+              {events.length > 0 && (() => {
+                const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+                const HOUR_GROUPS = [
+                  { label: '0–5', hours: [0,1,2,3,4,5] },
+                  { label: '6–11', hours: [6,7,8,9,10,11] },
+                  { label: '12–17', hours: [12,13,14,15,16,17] },
+                  { label: '18–23', hours: [18,19,20,21,22,23] },
+                ];
+                // Aggregate by dow × hour-group
+                const grouped: Record<string, number> = {};
+                heatmap.forEach(c => {
+                  const hg = HOUR_GROUPS.findIndex(g => g.hours.includes(c.hour));
+                  if (hg < 0) return;
+                  const k = `${c.dow}-${hg}`;
+                  grouped[k] = (grouped[k] ?? 0) + c.count;
+                });
+                const maxVal = Math.max(...Object.values(grouped), 1);
+                return (
+                  <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ textTransform: 'uppercase', fontSize: 9, letterSpacing: 0.4 }}>
+                      시간대별 활동 패턴
+                    </Typography>
+                    <Box sx={{ mt: 0.8, display: 'grid', gridTemplateColumns: 'auto repeat(7, 1fr)', gap: '2px', alignItems: 'center' }}>
+                      {/* Header row: day labels */}
+                      <Box />
+                      {DAYS.map(d => (
+                        <Typography key={d} sx={{ fontSize: 9, textAlign: 'center', color: 'text.disabled', fontWeight: 600 }}>{d}</Typography>
+                      ))}
+                      {/* Data rows: hour group × day */}
+                      {HOUR_GROUPS.map((hg, hgi) => (
+                        <React.Fragment key={hg.label}>
+                          <Typography sx={{ fontSize: 9, color: 'text.disabled', pr: 0.5, lineHeight: 1, textAlign: 'right' }}>{hg.label}</Typography>
+                          {DAYS.map((_, di) => {
+                            const val = grouped[`${di}-${hgi}`] ?? 0;
+                            const intensity = val / maxVal;
+                            return (
+                              <Tooltip key={di} title={`${DAYS[di]} ${hg.label}시: ${val}건`}>
+                                <Box sx={{
+                                  height: 10,
+                                  borderRadius: '2px',
+                                  bgcolor: val === 0
+                                    ? (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)')
+                                    : alpha(theme.palette.primary.main, 0.15 + intensity * 0.85),
+                                  cursor: 'default',
+                                  transition: 'opacity 0.15s',
+                                  '&:hover': { opacity: 0.7 },
+                                }} />
+                              </Tooltip>
+                            );
+                          })}
+                        </React.Fragment>
+                      ))}
+                    </Box>
+                  </Box>
+                );
+              })()}
             </Box>
 
             {/* Tabs for choosing display Mode */}
@@ -555,7 +709,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
               >
                 <Tab label={`${t('argus.userProfiles.activityFeed', 'Activity Feed')} (${profile?.total_events ?? events.length})`} icon={<EventIcon sx={{ fontSize: 14 }} />} iconPosition="start" />
                 <Tab label={`${t('argus.userProfiles.sessionsLogs', 'Sessions Logs')} (${profile?.total_sessions ?? sessions.length})`} icon={<SessionIcon sx={{ fontSize: 14 }} />} iconPosition="start" />
-                <Tab label={`💰 ${t('argus.userProfiles.finance', 'Finance')}`} icon={<PurchaseIcon sx={{ fontSize: 14 }} />} iconPosition="start" />
+                <Tab label={t('argus.userProfiles.finance', 'Finance')} icon={<PurchaseIcon sx={{ fontSize: 14 }} />} iconPosition="start" />
               </Tabs>
               
               {/* Event search bar */}
@@ -720,7 +874,35 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                     <Typography variant="body2">{t('argus.userProfiles.noSessionLogs', 'No session logs found for this user.')}</Typography>
                   </Box>
                 ) : (
-                  sessions.map((s, i) => (
+                  <>
+                  {/* Session Engagement Summary */}
+                  {sessions.length >= 2 && (() => {
+                    const { avgDurSec, avgGapDays, trend } = sessionStats;
+                    const trendIcon = trend === 'up' ? '📈' : trend === 'down' ? '📉' : trend === 'stable' ? '➡️' : null;
+                    const trendLabel = trend === 'up' ? '세션 증가 추세' : trend === 'down' ? '세션 단축 추세 (이탈 주의)' : trend === 'stable' ? '안정적' : null;
+                    return (
+                      <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
+                        <Paper variant="outlined" sx={{ flex: 1, minWidth: 100, p: 1, borderRadius: 1.5, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
+                          <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>평균 세션</Typography>
+                          <Typography sx={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, mt: 0.3 }}>{formatDuration(Math.round(avgDurSec))}</Typography>
+                        </Paper>
+                        <Paper variant="outlined" sx={{ flex: 1, minWidth: 100, p: 1, borderRadius: 1.5, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
+                          <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>평균 재방문</Typography>
+                          <Typography sx={{ fontSize: 14, fontWeight: 800, lineHeight: 1.2, mt: 0.3 }}>{avgGapDays < 1 ? '< 1일' : `${avgGapDays.toFixed(1)}일`}</Typography>
+                        </Paper>
+                        {trendIcon && (
+                          <Paper variant="outlined" sx={{ flex: 1, minWidth: 100, p: 1, borderRadius: 1.5, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
+                            <Typography sx={{ fontSize: 9, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.4 }}>트렌드</Typography>
+                            <Typography sx={{ fontSize: 12, fontWeight: 700, lineHeight: 1.4, mt: 0.3, color: trend === 'down' ? 'warning.main' : trend === 'up' ? 'success.main' : 'text.secondary' }}>
+                              {trendIcon} {trendLabel}
+                            </Typography>
+                          </Paper>
+                        )}
+                      </Box>
+                    );
+                  })()}
+                  <Box>
+                  {sessions.map((s, i) => (
                     <Box
                       key={`${s.session_id}-${i}`}
                       sx={{
@@ -762,38 +944,39 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                         </Box>
                       )}
                     </Box>
-                  ))
-                  .concat(
-                    sessionsHasMore ? [
-                      <Box key="load-more" sx={{ textAlign: 'center', mt: 1 }}>
-                        <Button
-                          size="small"
-                          disabled={sessionsLoadingMore}
-                          onClick={async () => {
-                            if (!userId) return;
-                            setSessionsLoadingMore(true);
-                            try {
-                              const more = await getUserSessions(projectId, userId, {
-                                limit: SESSIONS_PAGE_SIZE,
-                                offset: sessions.length,
-                              });
-                              setSessions(prev => [...prev, ...more]);
-                              setSessionsHasMore(more.length >= SESSIONS_PAGE_SIZE);
-                            } finally {
-                              setSessionsLoadingMore(false);
-                            }
-                          }}
-                          sx={{ fontSize: 11, textTransform: 'none', color: 'text.secondary' }}
-                        >
-                          {sessionsLoadingMore
-                            ? <CircularProgress size={14} sx={{ mr: 0.5 }} />
-                            : t('argus.userProfiles.loadMoreSessions', 'Load more sessions')}
-                        </Button>
-                      </Box>
-                    ] : []
-                  )
+                  ))}
+                  </Box>
+                  {sessionsHasMore && (
+                    <Box sx={{ textAlign: 'center', mt: 1 }}>
+                      <Button
+                        size="small"
+                        disabled={sessionsLoadingMore}
+                        onClick={async () => {
+                          if (!userId) return;
+                          setSessionsLoadingMore(true);
+                          try {
+                            const more = await getUserSessions(projectId, userId, {
+                              limit: SESSIONS_PAGE_SIZE,
+                              offset: sessions.length,
+                            });
+                            setSessions(prev => [...prev, ...more]);
+                            setSessionsHasMore(more.length >= SESSIONS_PAGE_SIZE);
+                          } finally {
+                            setSessionsLoadingMore(false);
+                          }
+                        }}
+                        sx={{ fontSize: 11, textTransform: 'none', color: 'text.secondary' }}
+                      >
+                        {sessionsLoadingMore
+                          ? <CircularProgress size={14} sx={{ mr: 0.5 }} />
+                          : t('argus.userProfiles.loadMoreSessions', 'Load more sessions')}
+                      </Button>
+                    </Box>
+                  )}
+                  </>
                 )
               )}
+
 
               {/* ─── Mode 2: Finance Tab ─── */}
               {rightTab === 2 && (() => {
@@ -849,6 +1032,34 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                         )}
                       </Paper>
                     </Box>
+
+                    {/* Top Products */}
+                    {topProducts.length > 0 && (() => {
+                      const maxCount = topProducts[0].count;
+                      return (
+                        <Box sx={{ p: 1.5, borderRadius: 1.5, border: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fafafa' }}>
+                          <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1 }}>
+                            선호 상품 Top {topProducts.length}
+                          </Typography>
+                          {topProducts.map((p, i) => (
+                            <Box key={p.name} sx={{ mb: i < topProducts.length - 1 ? 1 : 0 }}>
+                              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.3 }}>
+                                <Typography sx={{ fontSize: 11, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, mr: 1 }}>
+                                  #{i + 1} {p.name}
+                                </Typography>
+                                <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
+                                  <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>{p.count}회</Typography>
+                                  <Typography sx={{ fontSize: 11, fontWeight: 700 }}>{fmt(p.total)}</Typography>
+                                </Box>
+                              </Box>
+                              <Box sx={{ height: 4, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+                                <Box sx={{ height: '100%', width: `${(p.count / maxCount) * 100}%`, bgcolor: theme.palette.primary.main, borderRadius: 2, transition: 'width 0.4s ease' }} />
+                              </Box>
+                            </Box>
+                          ))}
+                        </Box>
+                      );
+                    })()}
 
                     {/* Sub-tabs */}
                     <Tabs value={finSubTab} onChange={(_, v) => setFinSubTab(v)} sx={{ minHeight: 28, '& .MuiTab-root': { minHeight: 28, fontSize: 11, textTransform: 'none', py: 0 } }}>
@@ -956,6 +1167,35 @@ const ArgusUserProfilesPage: React.FC = () => {
   const [pageSize, setPageSize] = useGlobalPageSize();
   const initialLoadDone = useRef(false);
 
+  // ─── Starred users (localStorage per project) ────────────────────────────────
+  const starStorageKey = `argus_starred_users_${projectId}`;
+  const [starredUsers, setStarredUsers] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem(`argus_starred_users_${projectId}`);
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch { return new Set(); }
+  });
+  const [showStarredOnly, setShowStarredOnly] = useState(false);
+
+  const toggleStar = (e: React.MouseEvent, userId: string) => {
+    e.stopPropagation();
+    setStarredUsers(prev => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      try { localStorage.setItem(starStorageKey, JSON.stringify([...next])); } catch {}
+      return next;
+    });
+  };
+
+  // Rows split: starred first (pinned), rest below
+  const displayedRows = useMemo(() => {
+    const base = showStarredOnly ? users.filter(u => starredUsers.has(u.user_id)) : users;
+    const starred = base.filter(u => starredUsers.has(u.user_id));
+    const rest = base.filter(u => !starredUsers.has(u.user_id));
+    return { starred, rest };
+  }, [users, starredUsers, showStarredOnly]);
+
   // Deep-link: auto-open drawer when URL contains userId
   useEffect(() => {
     if (urlUserId) {
@@ -1041,7 +1281,7 @@ const ArgusUserProfilesPage: React.FC = () => {
 
       <PageContentLoader loading={loading && !initialLoadDone.current} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         {/* Search bar */}
-        <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center', flexShrink: 0 }}>
+        <Box sx={{ mb: 2, display: 'flex', gap: 1.5, alignItems: 'center', flexShrink: 0 }}>
           <TextField
             size="small"
             placeholder={t('argus.userProfiles.searchPlaceholder', 'Search by user ID or property')}
@@ -1055,29 +1295,43 @@ const ArgusUserProfilesPage: React.FC = () => {
               ),
               endAdornment: search ? (
                 <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      setSearch('');
-                      setPage(0);
-                    }}
-                    sx={{ p: 0.25 }}
-                  >
+                  <IconButton size="small" onClick={() => { setSearch(''); setPage(0); }} sx={{ p: 0.25 }}>
                     <CloseIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </InputAdornment>
               ) : null,
             }}
-            sx={{ width: 340 }}
+            sx={{ width: 320 }}
           />
+          {/* Starred filter toggle */}
+          <Tooltip title={showStarredOnly ? t('argus.userProfiles.showAll', 'Show all users') : t('argus.userProfiles.showStarred', 'Show starred only')}>
+            <IconButton
+              size="small"
+              onClick={() => setShowStarredOnly(p => !p)}
+              sx={{
+                border: '1px solid',
+                borderColor: showStarredOnly ? 'warning.main' : 'divider',
+                borderRadius: 1.5,
+                color: showStarredOnly ? 'warning.main' : 'text.secondary',
+                bgcolor: showStarredOnly ? alpha('#ffa726', 0.08) : 'transparent',
+                '&:hover': { borderColor: 'warning.main', color: 'warning.main' },
+                transition: 'all 0.15s ease',
+                px: 1,
+                gap: 0.5,
+                display: 'flex',
+              }}
+            >
+              <StarIcon sx={{ fontSize: 16 }} />
+              {starredUsers.size > 0 && (
+                <Typography sx={{ fontSize: 11, fontWeight: 700, lineHeight: 1 }}>{starredUsers.size}</Typography>
+              )}
+            </IconButton>
+          </Tooltip>
           <Box sx={{ flex: 1 }} />
           <Typography variant="body2" color="text.secondary">
             {t('argus.userProfiles.usersCount', '{{count}} users', { count: total })}
           </Typography>
-          <DateRangeSelector
-            value={dateRange}
-            onChange={setDateRange}
-          />
+          <DateRangeSelector value={dateRange} onChange={setDateRange} />
         </Box>
 
         {/* Table */}
@@ -1097,7 +1351,8 @@ const ArgusUserProfilesPage: React.FC = () => {
           <Table stickyHeader sx={{ '& .MuiTableCell-root': { py: 1.2 }, '& .MuiTableHead-root .MuiTableCell-root': { zIndex: 2, bgcolor: isDark ? '#1e1e1e' : '#fff' } }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 700, width: 280 }}>{t('argus.userProfiles.userId', 'User ID')}</TableCell>
+                <TableCell sx={{ width: 36, p: '4px 8px' }} />
+                <TableCell sx={{ fontWeight: 700, width: 260 }}>{t('argus.userProfiles.userId', 'User ID')}</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>
                   <TableSortLabel
                     active={sortField === 'last_seen'}
@@ -1144,131 +1399,97 @@ const ArgusUserProfilesPage: React.FC = () => {
               {loading && users.length === 0
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={`skeleton-${i}`}>
-                      {Array.from({ length: 9 }).map((_, j) => (
-                        <TableCell key={j}>
-                          <Skeleton />
-                        </TableCell>
+                      {Array.from({ length: 10 }).map((_, j) => (
+                        <TableCell key={j}><Skeleton /></TableCell>
                       ))}
                     </TableRow>
                   ))
-                : users.map((user) => (
-                    <TableRow
-                      key={user.user_id}
-                      hover
-                      onClick={() => handleUserClick(user.user_id)}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          {user.avatar_url ? (
-                            <Box
-                              component="img"
-                              src={user.avatar_url}
-                              alt={user.user_id}
-                              sx={{
-                                width: 28,
-                                height: 28,
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                              }}
-                            />
-                          ) : (
-                            <Box
-                              sx={{
-                                width: 28,
-                                height: 28,
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: alpha(theme.palette.primary.main, 0.12),
-                                color: theme.palette.primary.main,
-                                fontSize: 12,
-                                fontWeight: 700,
-                              }}
-                            >
-                              {user.user_id[0]?.toUpperCase() || 'U'}
-                            </Box>
-                          )}
-                          <Box sx={{ minWidth: 0 }}>
-                            <Typography
-                              variant="body2"
-                              fontWeight={600}
-                              sx={{
-                                fontFamily: 'monospace',
-                                fontSize: 12,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                                maxWidth: 200,
-                              }}
-                            >
-                              {user.user_id}
-                            </Typography>
-                            {user.email && (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{
-                                  fontSize: 11,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  maxWidth: 200,
-                                  display: 'block',
-                                  lineHeight: 1.3,
-                                }}
+                : (() => {
+                    const renderRow = (user: ArgusUserProfile, isStarredSection: boolean) => {
+                      const isStarred = starredUsers.has(user.user_id);
+                      return (
+                        <TableRow
+                          key={user.user_id}
+                          hover
+                          onClick={() => handleUserClick(user.user_id)}
+                          sx={{
+                            cursor: 'pointer',
+                            ...(isStarredSection ? {
+                              bgcolor: isDark ? alpha('#ffa726', 0.04) : alpha('#ffa726', 0.03),
+                            } : {}),
+                          }}
+                        >
+                          {/* Star button */}
+                          <TableCell sx={{ p: '4px 8px', width: 36 }}>
+                            <Tooltip title={isStarred ? t('argus.userProfiles.unstar', 'Remove from starred') : t('argus.userProfiles.star', 'Star this user')}>
+                              <IconButton
+                                size="small"
+                                onClick={(e) => toggleStar(e, user.user_id)}
+                                sx={{ p: 0.4, color: isStarred ? 'warning.main' : 'text.disabled', '&:hover': { color: 'warning.main' } }}
                               >
-                                {user.email}
+                                {isStarred ? <StarIcon sx={{ fontSize: 15 }} /> : <StarBorderIcon sx={{ fontSize: 15 }} />}
+                              </IconButton>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              {user.avatar_url ? (
+                                <Box component="img" src={user.avatar_url} alt={user.user_id}
+                                  sx={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }} />
+                              ) : (
+                                <Box sx={{ width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.main, fontSize: 12, fontWeight: 700 }}>
+                                  {user.user_id[0]?.toUpperCase() || 'U'}
+                                </Box>
+                              )}
+                              <Box sx={{ minWidth: 0 }}>
+                                <Typography variant="body2" fontWeight={600}
+                                  sx={{ fontFamily: 'monospace', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
+                                  {user.user_id}
+                                </Typography>
+                                {user.email && (
+                                  <Typography variant="caption" color="text.secondary"
+                                    sx={{ fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200, display: 'block', lineHeight: 1.3 }}>
+                                    {user.email}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Box>
+                          </TableCell>
+                          <TableCell><Typography variant="body2" fontSize={13}>{formatRelativeTime(user.last_seen)}</Typography></TableCell>
+                          <TableCell><Typography variant="body2" fontSize={13}>{formatRelativeTime(user.first_seen)}</Typography></TableCell>
+                          <TableCell align="right"><Typography variant="body2" fontWeight={600} fontSize={13}>{user.total_events.toLocaleString()}</Typography></TableCell>
+                          <TableCell align="right"><Typography variant="body2" fontSize={13}>{user.total_sessions}</Typography></TableCell>
+                          <TableCell>{user.platform && <Chip label={user.platform} size="small" sx={{ height: 22, fontSize: 11 }} />}</TableCell>
+                          <TableCell><Typography variant="body2" fontSize={13}>{user.browser || '—'}</Typography></TableCell>
+                          <TableCell><Typography variant="body2" fontSize={13}>{user.country || '—'}</Typography></TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                              {(cohortMap[user.user_id] || []).map((c) => <CohortChip key={c.id} cohort={c} />)}
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    };
+                    return (
+                      <>
+                        {/* Starred section */}
+                        {displayedRows.starred.map(u => renderRow(u, true))}
+                        {/* Divider between starred and rest */}
+                        {displayedRows.starred.length > 0 && displayedRows.rest.length > 0 && (
+                          <TableRow>
+                            <TableCell colSpan={10} sx={{ py: 0.3, px: 2, bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderBottom: 'none' }}>
+                              <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                                {t('argus.userProfiles.otherUsers', 'Other users')}
                               </Typography>
-                            )}
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontSize={13}>
-                          {formatRelativeTime(user.last_seen)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontSize={13}>
-                          {formatRelativeTime(user.first_seen)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="body2" fontWeight={600} fontSize={13}>
-                          {user.total_events.toLocaleString()}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="body2" fontSize={13}>
-                          {user.total_sessions}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {user.platform && (
-                          <Chip label={user.platform} size="small" sx={{ height: 22, fontSize: 11 }} />
+                            </TableCell>
+                          </TableRow>
                         )}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontSize={13}>
-                          {user.browser || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2" fontSize={13}>
-                          {user.country || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                          {(cohortMap[user.user_id] || []).map((c) => (
-                            <CohortChip key={c.id} cohort={c} />
-                          ))}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        {/* Rest */}
+                        {displayedRows.rest.map(u => renderRow(u, false))}
+                      </>
+                    );
+                  })()}
               {!loading && users.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
