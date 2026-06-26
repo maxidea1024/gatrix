@@ -1373,15 +1373,16 @@ const ArgusUserProfilesPage: React.FC = () => {
                     {t('argus.userProfiles.firstSeen', 'First Seen')}
                   </TableSortLabel>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">
+                <TableCell sx={{ fontWeight: 700, width: 60 }} align="right">
                   <TableSortLabel
                     active={sortField === 'total_events'}
                     direction={sortField === 'total_events' ? sortDir : 'desc'}
                     onClick={() => handleSort('total_events')}
                   >
-                    {t('argus.userProfiles.eventCount', 'Event Count')}
+                    {t('argus.userProfiles.eventCount', 'Events')}
                   </TableSortLabel>
                 </TableCell>
+                <TableCell sx={{ fontWeight: 700, width: 88 }} />
                 <TableCell sx={{ fontWeight: 700 }} align="right">
                   <TableSortLabel
                     active={sortField === 'total_sessions'}
@@ -1401,7 +1402,7 @@ const ArgusUserProfilesPage: React.FC = () => {
               {loading && users.length === 0
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={`skeleton-${i}`}>
-                      {Array.from({ length: 10 }).map((_, j) => (
+                      {Array.from({ length: 11 }).map((_, j) => (
                         <TableCell key={j}><Skeleton /></TableCell>
                       ))}
                     </TableRow>
@@ -1460,21 +1461,23 @@ const ArgusUserProfilesPage: React.FC = () => {
                           </TableCell>
                           <TableCell><Typography variant="body2" fontSize={13}>{formatRelativeTime(user.last_seen)}</Typography></TableCell>
                           <TableCell><Typography variant="body2" fontSize={13}>{formatRelativeTime(user.first_seen)}</Typography></TableCell>
-                          <TableCell sx={{ width: 120 }}>
-                            <Typography variant="body2" fontWeight={600} fontSize={13} sx={{ lineHeight: 1.2 }}>
+                          <TableCell align="right" sx={{ width: 60 }}>
+                            <Typography variant="body2" fontWeight={700} fontSize={13}>
                               {user.total_events.toLocaleString()}
                             </Typography>
+                          </TableCell>
+                          <TableCell sx={{ width: 88, py: 0 }}>
                             {user.activity_sparkline && user.activity_sparkline.length >= 2 ? (
                               <ArgusSparkline
                                 data={user.activity_sparkline}
                                 width={80}
-                                height={20}
+                                height={24}
                                 color={theme.palette.primary.main}
                                 strokeWidth={1.5}
                                 showDot={false}
                               />
                             ) : (
-                              <Box sx={{ mt: 0.5, height: 2, width: 80, borderRadius: 1, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+                              <Box sx={{ width: 80, height: 3, borderRadius: 1, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
                                 <Box sx={{ height: '100%', width: `${(user.total_events / displayedRows.maxEvents) * 100}%`, bgcolor: theme.palette.primary.main, opacity: 0.4 }} />
                               </Box>
                             )}
