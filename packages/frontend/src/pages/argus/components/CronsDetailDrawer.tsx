@@ -474,11 +474,16 @@ fi`}
                     )}
                   </Box>
                   <Box>
-                    <code style={{ color: ARGUS_SEMANTIC.negative }}>error</code> —{' '}
-                    {t('argus.crons.statusErrorDesc', 'Job failed')}
+                    <code style={{ color: ARGUS_SEMANTIC.negative }}>
+                      error
+                    </code>{' '}
+                    — {t('argus.crons.statusErrorDesc', 'Job failed')}
                   </Box>
                   <Box>
-                    <code style={{ color: ARGUS_SEMANTIC.info }}>in_progress</code> —{' '}
+                    <code style={{ color: ARGUS_SEMANTIC.info }}>
+                      in_progress
+                    </code>{' '}
+                    —{' '}
                     {t(
                       'argus.crons.statusInProgressDesc',
                       'Job started (will timeout if no follow-up)'

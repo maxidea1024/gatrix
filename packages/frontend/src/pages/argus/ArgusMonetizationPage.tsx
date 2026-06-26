@@ -1,11 +1,37 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
-  Box, Typography, useTheme, alpha, Paper, Table, TableHead, TableRow,
-  TableCell, TableBody, Skeleton, Chip, LinearProgress, TextField, InputAdornment,
-  ToggleButton, ToggleButtonGroup, Button, CircularProgress, Avatar,
-  Select, MenuItem, Collapse, Tooltip, Slider, Autocomplete, Checkbox, FormControlLabel,
-  IconButton, TableSortLabel, TableContainer,
+  Box,
+  Typography,
+  useTheme,
+  alpha,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Skeleton,
+  Chip,
+  LinearProgress,
+  TextField,
+  InputAdornment,
+  ToggleButton,
+  ToggleButtonGroup,
+  Button,
+  CircularProgress,
+  Avatar,
+  Select,
+  MenuItem,
+  Collapse,
+  Tooltip,
+  Slider,
+  Autocomplete,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  TableSortLabel,
+  TableContainer,
 } from '@mui/material';
 import SimplePagination from '@/components/common/SimplePagination';
 import {
@@ -16,7 +42,10 @@ import {
   AccountBalance as EconomyIcon,
   Diamond as DiamondIcon,
   Timeline as LtvIcon,
-  ArrowDropUp, ArrowDropDown, ExpandMore, ExpandLess,
+  ArrowDropUp,
+  ArrowDropDown,
+  ExpandMore,
+  ExpandLess,
   OpenInNew as DrillIcon,
   Search as SearchIcon,
   ReceiptLong as LedgerIcon,
@@ -33,30 +62,62 @@ import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import DateRangeSelector, {
-  DateRangeValue, dateRangeToApiParams, presetToHours, DateRangePresetOption, DEFAULT_PRESETS,
+  DateRangeValue,
+  dateRangeToApiParams,
+  presetToHours,
+  DateRangePresetOption,
+  DEFAULT_PRESETS,
 } from '@/components/common/DateRangeSelector';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import FilterChipSelect from '@/components/common/FilterChipSelect';
-import ArgusSegmentFilter, { type SegmentFilterValues } from './components/ArgusSegmentFilter';
+import ArgusSegmentFilter, {
+  type SegmentFilterValues,
+} from './components/ArgusSegmentFilter';
 import ResizableDrawer from '@/components/common/ResizableDrawer';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { stringToColor, getInitials } from '@/utils/argusHelpers';
 import {
-  getRevenueAnalytics, getRevenueProducts, getRevenueProductsTrend,
-  getRevenueEconomy, getRevenueTopSpenders, getRevenueLtv,
-  getRevenueProductDetail, getRevenueCohort, getRevenueFunnel,
-  getRevenueLtvCohorts, getRevenueSegmentComparison,
-  getRevenueTransactions, getRevenueProductHourly, getTransactionFacets,
-  type RevenueData, type ProductRevenue, type ProductTrendData,
-  type EconomyData, type TopSpendersData, type LtvData,
-  type ProductDetailData, type ProductsResponse,
-  type CohortData, type FunnelData, type CohortLtvData, type SegmentComparisonData,
-  type TransactionRow, type TransactionResponse, type TransactionGroupedRow,
-  type TransactionGroupedResponse, type LedgerGroupBy, type FacetValue,
+  getRevenueAnalytics,
+  getRevenueProducts,
+  getRevenueProductsTrend,
+  getRevenueEconomy,
+  getRevenueTopSpenders,
+  getRevenueLtv,
+  getRevenueProductDetail,
+  getRevenueCohort,
+  getRevenueFunnel,
+  getRevenueLtvCohorts,
+  getRevenueSegmentComparison,
+  getRevenueTransactions,
+  getRevenueProductHourly,
+  getTransactionFacets,
+  type RevenueData,
+  type ProductRevenue,
+  type ProductTrendData,
+  type EconomyData,
+  type TopSpendersData,
+  type LtvData,
+  type ProductDetailData,
+  type ProductsResponse,
+  type CohortData,
+  type FunnelData,
+  type CohortLtvData,
+  type SegmentComparisonData,
+  type TransactionRow,
+  type TransactionResponse,
+  type TransactionGroupedRow,
+  type TransactionGroupedResponse,
+  type LedgerGroupBy,
+  type FacetValue,
   type HourlyHeatmapCell,
 } from '@/services/argus/argusAnalytics';
-import { generateInsights, buildSegmentMatrix, type Insight, type SegmentVerdict } from './monetizationInsights';
+import {
+  generateInsights,
+  buildSegmentMatrix,
+  type Insight,
+  type SegmentVerdict,
+} from './monetizationInsights';
 import { downloadCsv, type CsvColumn } from '@/utils/csvExport';
 import { Line } from 'react-chartjs-2';
 import {
@@ -80,9 +141,19 @@ import { ArgusSavedQuery } from '@/services/argus/argusTypes';
 import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 
 import {
-  type SectionId, type NavItem, NAV_ITEMS, MIN_HOURS_PER_SECTION, DEFAULT_PRESET_FOR_MIN,
-  getPresetsForSection, pctChange, fmt, fmtNum, CHART_COLORS,
-  BalanceGauge, KpiCard, SidebarItem,
+  type SectionId,
+  type NavItem,
+  NAV_ITEMS,
+  MIN_HOURS_PER_SECTION,
+  DEFAULT_PRESET_FOR_MIN,
+  getPresetsForSection,
+  pctChange,
+  fmt,
+  fmtNum,
+  CHART_COLORS,
+  BalanceGauge,
+  KpiCard,
+  SidebarItem,
 } from './components/monetization/MonetizationHelpers';
 import { ArgusMonetizationOverview } from './components/monetization/ArgusMonetizationOverview';
 import { ArgusMonetizationSpenders } from './components/monetization/ArgusMonetizationSpenders';
@@ -113,36 +184,61 @@ const ArgusMonetizationPage: React.FC = () => {
     const tab = searchParams.get('tab') as SectionId;
     return ALL_SECTION_IDS.includes(tab) ? tab : 'overview';
   }, [searchParams]);
-  const setSection = useCallback((id: SectionId) => {
-    setSearchParams({ tab: id }, { replace: true });
-    // Auto-clamp dateRange if it's shorter than the section's minimum
-    const minHours = MIN_HOURS_PER_SECTION[id];
-    if (minHours) {
-      setDateRange((prev) => {
-        if (prev.type === 'preset' && prev.preset) {
-          const h = presetToHours(prev.preset);
-          if (h !== undefined && h < minHours) {
-            return { type: 'preset', preset: DEFAULT_PRESET_FOR_MIN[minHours] || '24h' };
+  const setSection = useCallback(
+    (id: SectionId) => {
+      setSearchParams({ tab: id }, { replace: true });
+      // Auto-clamp dateRange if it's shorter than the section's minimum
+      const minHours = MIN_HOURS_PER_SECTION[id];
+      if (minHours) {
+        setDateRange((prev) => {
+          if (prev.type === 'preset' && prev.preset) {
+            const h = presetToHours(prev.preset);
+            if (h !== undefined && h < minHours) {
+              return {
+                type: 'preset',
+                preset: DEFAULT_PRESET_FOR_MIN[minHours] || '24h',
+              };
+            }
+          } else if (prev.type === 'custom' && prev.start && prev.end) {
+            const s =
+              typeof prev.start === 'string'
+                ? new Date(prev.start)
+                : prev.start;
+            const e =
+              typeof prev.end === 'string' ? new Date(prev.end) : prev.end;
+            const diffH = (e.getTime() - s.getTime()) / (1000 * 60 * 60);
+            if (diffH < minHours) {
+              return {
+                type: 'preset',
+                preset: DEFAULT_PRESET_FOR_MIN[minHours] || '24h',
+              };
+            }
           }
-        } else if (prev.type === 'custom' && prev.start && prev.end) {
-          const s = typeof prev.start === 'string' ? new Date(prev.start) : prev.start;
-          const e = typeof prev.end === 'string' ? new Date(prev.end) : prev.end;
-          const diffH = (e.getTime() - s.getTime()) / (1000 * 60 * 60);
-          if (diffH < minHours) {
-            return { type: 'preset', preset: DEFAULT_PRESET_FOR_MIN[minHours] || '24h' };
-          }
-        }
-        return prev;
-      });
-    }
-  }, [setSearchParams]);
-  const [dateRange, setDateRange] = useState<DateRangeValue>({ type: 'preset', preset: '30d' });
+          return prev;
+        });
+      }
+    },
+    [setSearchParams]
+  );
+  const [dateRange, setDateRange] = useState<DateRangeValue>({
+    type: 'preset',
+    preset: '30d',
+  });
 
   // Data states
   const [data, setData] = useState<RevenueData | null>(null);
   const [products, setProducts] = useState<ProductRevenue[]>([]);
-  const [firstPurchaseProducts, setFirstPurchaseProducts] = useState<{ product_name: string; first_purchase_count: number }[]>([]);
-  const [categoryBreakdown, setCategoryBreakdown] = useState<{ category: string; revenue: number; transactions: number; buyers: number }[]>([]);
+  const [firstPurchaseProducts, setFirstPurchaseProducts] = useState<
+    { product_name: string; first_purchase_count: number }[]
+  >([]);
+  const [categoryBreakdown, setCategoryBreakdown] = useState<
+    {
+      category: string;
+      revenue: number;
+      transactions: number;
+      buyers: number;
+    }[]
+  >([]);
   const [productTrend, setProductTrend] = useState<ProductTrendData[]>([]);
   const [economy, setEconomy] = useState<EconomyData | null>(null);
   const [spenders, setSpenders] = useState<TopSpendersData | null>(null);
@@ -150,7 +246,8 @@ const ArgusMonetizationPage: React.FC = () => {
   const [cohort, setCohort] = useState<CohortData | null>(null);
   const [funnel, setFunnel] = useState<FunnelData | null>(null);
   const [cohortLtv, setCohortLtv] = useState<CohortLtvData | null>(null);
-  const [segmentComparison, setSegmentComparison] = useState<SegmentComparisonData | null>(null);
+  const [segmentComparison, setSegmentComparison] =
+    useState<SegmentComparisonData | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Filter states
@@ -163,7 +260,9 @@ const ArgusMonetizationPage: React.FC = () => {
   const [showAllInsights, setShowAllInsights] = useState(false);
 
   // Transaction Ledger state
-  const [txData, setTxData] = useState<TransactionResponse | TransactionGroupedResponse | null>(null);
+  const [txData, setTxData] = useState<
+    TransactionResponse | TransactionGroupedResponse | null
+  >(null);
   const [txLoading, setTxLoading] = useState(false);
   const [txQuery, setTxQuery] = useState<string>('');
   const [txSort, setTxSort] = useState<'timestamp' | 'amount'>('timestamp');
@@ -176,14 +275,24 @@ const ArgusMonetizationPage: React.FC = () => {
 
   // Revenue Discover states
   const [discQuery, setDiscQuery] = useState<string>('event_name:purchase');
-  const [discFields, setDiscFields] = useState<string[]>(['event_id', 'timestamp', 'user_id', 'product_name', 'amount']);
+  const [discFields, setDiscFields] = useState<string[]>([
+    'event_id',
+    'timestamp',
+    'user_id',
+    'product_name',
+    'amount',
+  ]);
   const [discGroupBy, setDiscGroupBy] = useState<string[]>([]);
   const [discOrderBy, setDiscOrderBy] = useState<string>('-timestamp');
   const [discYAxis, setDiscYAxis] = useState<string>('sum(amount)');
   const [discHasQueried, setDiscHasQueried] = useState<boolean>(false);
   const [discResults, setDiscResults] = useState<Record<string, any>[]>([]);
-  const [discResultsMeta, setDiscResultsMeta] = useState<{ name: string; type: string }[]>([]);
-  const [discVolume, setDiscVolume] = useState<{ bucket: string; level: string; count: number }[]>([]);
+  const [discResultsMeta, setDiscResultsMeta] = useState<
+    { name: string; type: string }[]
+  >([]);
+  const [discVolume, setDiscVolume] = useState<
+    { bucket: string; level: string; count: number }[]
+  >([]);
   const [discOffset, setDiscOffset] = useState<number>(0);
   const discLimit = 50;
   const [discLoading, setDiscLoading] = useState<boolean>(false);
@@ -195,7 +304,9 @@ const ArgusMonetizationPage: React.FC = () => {
   const [queryName, setQueryName] = useState<string>('New Revenue Query');
   const [saveDialogOpen, setSaveDialogOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
-  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ArgusSavedQuery | null>(
+    null
+  );
   const [saveDialogMode, setSaveDialogMode] = useState<'new' | 'saveAs'>('new');
   const [savedQueriesOpen, setSavedQueriesOpen] = useState<boolean>(false);
   const ledgerDslEditorRef = React.useRef<QueryAQLEditorHandle>(null);
@@ -206,8 +317,12 @@ const ArgusMonetizationPage: React.FC = () => {
   const [heatmapLoadedFor, setHeatmapLoadedFor] = useState<string | null>(null);
 
   // Product detail drawer
-  const [selectedProduct, setSelectedProduct] = useState<ProductRevenue | null>(null);
-  const [productDetail, setProductDetail] = useState<ProductDetailData | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductRevenue | null>(
+    null
+  );
+  const [productDetail, setProductDetail] = useState<ProductDetailData | null>(
+    null
+  );
   const [productDetailLoading, setProductDetailLoading] = useState(false);
   const [loadingMoreBuyers, setLoadingMoreBuyers] = useState(false);
 
@@ -219,8 +334,10 @@ const ArgusMonetizationPage: React.FC = () => {
     // Merge segment filter values (remove undefined/empty)
     const merged = { ...base };
     if (segmentFilter.country) (merged as any).country = segmentFilter.country;
-    if (segmentFilter.platform) (merged as any).platform = segmentFilter.platform;
-    if (segmentFilter.app_version) (merged as any).app_version = segmentFilter.app_version;
+    if (segmentFilter.platform)
+      (merged as any).platform = segmentFilter.platform;
+    if (segmentFilter.app_version)
+      (merged as any).app_version = segmentFilter.app_version;
     return merged;
   }, [dateRange, segmentFilter]);
 
@@ -234,7 +351,9 @@ const ArgusMonetizationPage: React.FC = () => {
         let endDate = new Date(rawPeriods[ei]);
         // Include the last bucket's end
         if (rawPeriods.length > 1) {
-          const gap = new Date(rawPeriods[1]).getTime() - new Date(rawPeriods[0]).getTime();
+          const gap =
+            new Date(rawPeriods[1]).getTime() -
+            new Date(rawPeriods[0]).getTime();
           endDate = new Date(endDate.getTime() + gap);
         } else {
           endDate = new Date(endDate.getTime() + 86400000);
@@ -245,27 +364,30 @@ const ArgusMonetizationPage: React.FC = () => {
   }, []);
 
   // Open product detail drawer
-  const openProductDetail = useCallback(async (product: ProductRevenue) => {
-    setSelectedProduct(product);
-    setProductDetail(null);
-    // Reset heatmap for new product (#3)
-    setHeatmapData([]);
-    setHeatmapLoadedFor(null);
-    setProductDetailLoading(true);
-    try {
-      const detail = await getRevenueProductDetail(projectId, {
-        ...apiParams,
-        product_name: product.product_name,
-        offset: 0,
-        limit: 20,
-      });
-      setProductDetail(detail);
-    } catch {
-      // empty
-    } finally {
-      setProductDetailLoading(false);
-    }
-  }, [projectId, apiParams]);
+  const openProductDetail = useCallback(
+    async (product: ProductRevenue) => {
+      setSelectedProduct(product);
+      setProductDetail(null);
+      // Reset heatmap for new product (#3)
+      setHeatmapData([]);
+      setHeatmapLoadedFor(null);
+      setProductDetailLoading(true);
+      try {
+        const detail = await getRevenueProductDetail(projectId, {
+          ...apiParams,
+          product_name: product.product_name,
+          offset: 0,
+          limit: 20,
+        });
+        setProductDetail(detail);
+      } catch {
+        // empty
+      } finally {
+        setProductDetailLoading(false);
+      }
+    },
+    [projectId, apiParams]
+  );
 
   // Load more buyers
   const loadMoreBuyers = useCallback(async () => {
@@ -278,11 +400,15 @@ const ArgusMonetizationPage: React.FC = () => {
         offset: productDetail.buyers.length,
         limit: 20,
       });
-      setProductDetail((prev) => prev ? {
-        ...prev,
-        buyers: [...prev.buyers, ...more.buyers],
-        has_more: more.has_more,
-      } : prev);
+      setProductDetail((prev) =>
+        prev
+          ? {
+              ...prev,
+              buyers: [...prev.buyers, ...more.buyers],
+              has_more: more.has_more,
+            }
+          : prev
+      );
     } catch {
       // empty
     } finally {
@@ -292,11 +418,16 @@ const ArgusMonetizationPage: React.FC = () => {
 
   // Fix #1: Load heatmap via useEffect, not render body
   useEffect(() => {
-    if (!selectedProduct || heatmapLoadedFor === selectedProduct.product_name) return;
+    if (!selectedProduct || heatmapLoadedFor === selectedProduct.product_name)
+      return;
     setHeatmapLoading(true);
     setHeatmapLoadedFor(selectedProduct.product_name);
-    getRevenueProductHourly(projectId, { ...apiParams, product_name: selectedProduct.product_name, tz: Intl.DateTimeFormat().resolvedOptions().timeZone })
-      .then(res => setHeatmapData(res.heatmap))
+    getRevenueProductHourly(projectId, {
+      ...apiParams,
+      product_name: selectedProduct.product_name,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    })
+      .then((res) => setHeatmapData(res.heatmap))
       .catch(() => setHeatmapData([]))
       .finally(() => setHeatmapLoading(false));
   }, [selectedProduct, heatmapLoadedFor, projectId, apiParams]);
@@ -307,41 +438,45 @@ const ArgusMonetizationPage: React.FC = () => {
   }, [apiParams]);
 
   // Load transactions ledger data
-  const loadTx = useCallback(async (
-    offsetOverride?: number,
-    sortOverride?: string,
-    orderOverride?: string,
-    groupByOverride?: LedgerGroupBy,
-    limitOverride?: number
-  ) => {
-    setTxLoading(true);
-    try {
-      const activeGroupBy = groupByOverride !== undefined ? groupByOverride : txGroupBy;
-      const result = await getRevenueTransactions(projectId, {
-        ...apiParams,
-        search: txQuery || undefined,
-        sort: sortOverride ?? txSort,
-        order: orderOverride ?? txOrder,
-        offset: offsetOverride !== undefined ? offsetOverride : txOffset,
-        limit: limitOverride !== undefined ? limitOverride : txLimit,
-        group_by: activeGroupBy,
-      });
-      setTxData(result);
-    } catch (e) {
-      /* ignore */
-    } finally {
-      setTxLoading(false);
-    }
-  }, [
-    projectId,
-    apiParams,
-    txQuery,
-    txSort,
-    txOrder,
-    txOffset,
-    txLimit,
-    txGroupBy,
-  ]);
+  const loadTx = useCallback(
+    async (
+      offsetOverride?: number,
+      sortOverride?: string,
+      orderOverride?: string,
+      groupByOverride?: LedgerGroupBy,
+      limitOverride?: number
+    ) => {
+      setTxLoading(true);
+      try {
+        const activeGroupBy =
+          groupByOverride !== undefined ? groupByOverride : txGroupBy;
+        const result = await getRevenueTransactions(projectId, {
+          ...apiParams,
+          search: txQuery || undefined,
+          sort: sortOverride ?? txSort,
+          order: orderOverride ?? txOrder,
+          offset: offsetOverride !== undefined ? offsetOverride : txOffset,
+          limit: limitOverride !== undefined ? limitOverride : txLimit,
+          group_by: activeGroupBy,
+        });
+        setTxData(result);
+      } catch (e) {
+        /* ignore */
+      } finally {
+        setTxLoading(false);
+      }
+    },
+    [
+      projectId,
+      apiParams,
+      txQuery,
+      txSort,
+      txOrder,
+      txOffset,
+      txLimit,
+      txGroupBy,
+    ]
+  );
 
   // Automatically trigger fetch when filters or offsets change
   useEffect(() => {
@@ -365,20 +500,26 @@ const ArgusMonetizationPage: React.FC = () => {
   }, [loadSavedQueries]);
 
   // Handle saving a query
-  const handleSaveQuery = async (name: string, existingQueryId: number | null) => {
+  const handleSaveQuery = async (
+    name: string,
+    existingQueryId: number | null
+  ) => {
     try {
-      const config = section === 'discover' ? {
-        q: discQuery,
-        fields: discFields,
-        groupBy: discGroupBy,
-        orderBy: discOrderBy,
-        yAxis: discYAxis,
-      } : {
-        q: txQuery,
-        sort: txSort,
-        order: txOrder,
-        group_by: txGroupBy,
-      };
+      const config =
+        section === 'discover'
+          ? {
+              q: discQuery,
+              fields: discFields,
+              groupBy: discGroupBy,
+              orderBy: discOrderBy,
+              yAxis: discYAxis,
+            }
+          : {
+              q: txQuery,
+              sort: txSort,
+              order: txOrder,
+              group_by: txGroupBy,
+            };
 
       if (existingQueryId) {
         await updateSavedQuery(projectId, existingQueryId, {
@@ -414,85 +555,106 @@ const ArgusMonetizationPage: React.FC = () => {
   };
 
   // Handle loading a saved query configuration
-  const handleLoadSavedQuery = useCallback((sq: ArgusSavedQuery) => {
-    const config = sq.query_config || {};
-    if (sq.query_config?.q !== undefined) {
-      // It is a discover query
-      setDiscQuery(config.q || '');
-      setDiscFields(config.fields || ['event_id', 'timestamp', 'user_id', 'product_name', 'amount']);
-      setDiscGroupBy(config.groupBy || []);
-      setDiscOrderBy(config.orderBy || '-timestamp');
-      setDiscYAxis(config.yAxis || 'sum(amount)');
-      setSection('discover');
-      setCurrentQueryId(sq.id);
-      setQueryName(sq.name);
-      setDiscOffset(0);
-      setDiscHasQueried(false);
-    } else {
-      // It is a ledger query
-      setTxQuery(config.q || '');
-      setTxSort(config.sort || 'timestamp');
-      setTxOrder(config.order || 'desc');
-      setTxGroupBy(config.group_by || 'none');
-      setSection('ledger');
-      setTxOffset(0);
-    }
-  }, [setSection]);
+  const handleLoadSavedQuery = useCallback(
+    (sq: ArgusSavedQuery) => {
+      const config = sq.query_config || {};
+      if (sq.query_config?.q !== undefined) {
+        // It is a discover query
+        setDiscQuery(config.q || '');
+        setDiscFields(
+          config.fields || [
+            'event_id',
+            'timestamp',
+            'user_id',
+            'product_name',
+            'amount',
+          ]
+        );
+        setDiscGroupBy(config.groupBy || []);
+        setDiscOrderBy(config.orderBy || '-timestamp');
+        setDiscYAxis(config.yAxis || 'sum(amount)');
+        setSection('discover');
+        setCurrentQueryId(sq.id);
+        setQueryName(sq.name);
+        setDiscOffset(0);
+        setDiscHasQueried(false);
+      } else {
+        // It is a ledger query
+        setTxQuery(config.q || '');
+        setTxSort(config.sort || 'timestamp');
+        setTxOrder(config.order || 'desc');
+        setTxGroupBy(config.group_by || 'none');
+        setSection('ledger');
+        setTxOffset(0);
+      }
+    },
+    [setSection]
+  );
 
   // Discover autocompletion search suggestions resolver
-  const fetchFieldValues = useCallback(async (fieldKey: string): Promise<string[]> => {
-    try {
-      let facet = fieldKey;
-      if (fieldKey === 'product_name') facet = 'product';
-      else if (fieldKey === 'user_id') facet = 'user';
-      else if (fieldKey === 'reason') facet = 'reason';
-      else if (fieldKey === 'payment_method') facet = 'payment_method';
+  const fetchFieldValues = useCallback(
+    async (fieldKey: string): Promise<string[]> => {
+      try {
+        let facet = fieldKey;
+        if (fieldKey === 'product_name') facet = 'product';
+        else if (fieldKey === 'user_id') facet = 'user';
+        else if (fieldKey === 'reason') facet = 'reason';
+        else if (fieldKey === 'payment_method') facet = 'payment_method';
 
-      const data = await getTransactionFacets(projectId, { ...apiParams, facet });
-      return data.map(d => d.value);
-    } catch {
-      return [];
-    }
-  }, [projectId, apiParams]);
+        const data = await getTransactionFacets(projectId, {
+          ...apiParams,
+          facet,
+        });
+        return data.map((d) => d.value);
+      } catch {
+        return [];
+      }
+    },
+    [projectId, apiParams]
+  );
 
   // Run AQL query in discover mode
-  const runDiscoverQuery = useCallback(async (offsetOverride?: number) => {
-    setDiscLoading(true);
-    setDiscError(null);
-    setDiscHasQueried(true);
-    const targetOffset = offsetOverride !== undefined ? offsetOverride : discOffset;
-    try {
-      const result = await discoverQuery(projectId, {
-        fields: discFields,
-        conditions: discQuery,
-        groupBy: discGroupBy.length > 0 ? discGroupBy : undefined,
-        limit: discLimit,
-        offset: targetOffset,
-        period: apiParams.period,
-        start: apiParams.start,
-        end: apiParams.end,
-        dataset: 'activities',
-      });
-      setDiscResults(result.data || []);
-      setDiscResultsMeta(result.meta?.fields || []);
+  const runDiscoverQuery = useCallback(
+    async (offsetOverride?: number) => {
+      setDiscLoading(true);
+      setDiscError(null);
+      setDiscHasQueried(true);
+      const targetOffset =
+        offsetOverride !== undefined ? offsetOverride : discOffset;
+      try {
+        const result = await discoverQuery(projectId, {
+          fields: discFields,
+          conditions: discQuery,
+          groupBy: discGroupBy.length > 0 ? discGroupBy : undefined,
+          limit: discLimit,
+          offset: targetOffset,
+          period: apiParams.period,
+          start: apiParams.start,
+          end: apiParams.end,
+          dataset: 'activities',
+        });
+        setDiscResults(result.data || []);
+        setDiscResultsMeta(result.meta?.fields || []);
 
-      // Fetch volume for visual chart
-      const volData = await getDiscoverVolume(projectId, {
-        period: apiParams.period,
-        start: apiParams.start,
-        end: apiParams.end,
-        search: discQuery,
-        dataset: 'activities',
-      });
-      setDiscVolume(volData);
-    } catch (err: any) {
-      setDiscError(err?.message || 'Query execution failed');
-      setDiscResults([]);
-      setDiscVolume([]);
-    } finally {
-      setDiscLoading(false);
-    }
-  }, [projectId, apiParams, discQuery, discFields, discGroupBy, discOffset]);
+        // Fetch volume for visual chart
+        const volData = await getDiscoverVolume(projectId, {
+          period: apiParams.period,
+          start: apiParams.start,
+          end: apiParams.end,
+          search: discQuery,
+          dataset: 'activities',
+        });
+        setDiscVolume(volData);
+      } catch (err: any) {
+        setDiscError(err?.message || 'Query execution failed');
+        setDiscResults([]);
+        setDiscVolume([]);
+      } finally {
+        setDiscLoading(false);
+      }
+    },
+    [projectId, apiParams, discQuery, discFields, discGroupBy, discOffset]
+  );
 
   // Handle Search Input in Discover
   const handleSearchSubmit = useCallback((q: string) => {
@@ -509,7 +671,8 @@ const ArgusMonetizationPage: React.FC = () => {
   const loadData = useCallback(async () => {
     // Build a cache key that includes section-specific sub-params
     const cacheKey = JSON.stringify({
-      projectId, apiParams,
+      projectId,
+      apiParams,
       ...(section === 'economy' ? { economyCurrency } : {}),
       ...(section === 'ltv' ? { ltvCohortBy } : {}),
     });
@@ -520,20 +683,32 @@ const ArgusMonetizationPage: React.FC = () => {
     // Only show full skeleton if we have NO cached data at all for this section
     const hasCachedData = (() => {
       switch (section) {
-        case 'overview': return !!data;
-        case 'ledger': return true;
-        case 'discover': return true;
-        case 'products': return products.length > 0;
-        case 'economy': return !!economy;
-        case 'spenders': return !!spenders;
-        case 'ltv': return !!ltv;
-        default: return false;
+        case 'overview':
+          return !!data;
+        case 'ledger':
+          return true;
+        case 'discover':
+          return true;
+        case 'products':
+          return products.length > 0;
+        case 'economy':
+          return !!economy;
+        case 'spenders':
+          return !!spenders;
+        case 'ltv':
+          return !!ltv;
+        default:
+          return false;
       }
     })();
     if (!hasCachedData) setLoading(true);
 
     try {
-      if (section === 'overview' || section === 'ledger' || section === 'discover') {
+      if (
+        section === 'overview' ||
+        section === 'ledger' ||
+        section === 'discover'
+      ) {
         // Overview data (revenue_over_time etc.) is needed for all three sections
         const [rev, coh, fun] = await Promise.all([
           getRevenueAnalytics(projectId, apiParams),
@@ -554,9 +729,10 @@ const ArgusMonetizationPage: React.FC = () => {
         setProductTrend(trend);
       } else if (section === 'economy') {
         // Load both: unfiltered (for by_currency) and filtered (for flow chart)
-        const economyParams = economyCurrency !== 'all'
-          ? { ...apiParams, currency_type: economyCurrency }
-          : apiParams;
+        const economyParams =
+          economyCurrency !== 'all'
+            ? { ...apiParams, currency_type: economyCurrency }
+            : apiParams;
         setEconomy(await getRevenueEconomy(projectId, economyParams));
       } else if (section === 'spenders') {
         const [sp, seg] = await Promise.all([
@@ -568,7 +744,10 @@ const ArgusMonetizationPage: React.FC = () => {
       } else if (section === 'ltv') {
         const [ltvBase, ltvCoh] = await Promise.all([
           getRevenueLtv(projectId, apiParams),
-          getRevenueLtvCohorts(projectId, { ...apiParams, cohort_by: ltvCohortBy }),
+          getRevenueLtvCohorts(projectId, {
+            ...apiParams,
+            cohort_by: ltvCohortBy,
+          }),
         ]);
         setLtv(ltvBase);
         setCohortLtv(ltvCoh);
@@ -581,12 +760,16 @@ const ArgusMonetizationPage: React.FC = () => {
     }
   }, [projectId, section, apiParams, economyCurrency, ltvCohortBy]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   // Synchronize economy currency if selection becomes invalid or is empty
   useEffect(() => {
     if (section === 'economy' && economy && economy.by_currency.length > 0) {
-      const valid = economy.by_currency.some((c) => c.currency_type === economyCurrency);
+      const valid = economy.by_currency.some(
+        (c) => c.currency_type === economyCurrency
+      );
       if (!valid) {
         setEconomyCurrency(economy.by_currency[0].currency_type);
       }
@@ -614,14 +797,22 @@ const ArgusMonetizationPage: React.FC = () => {
     // Check if this section has cached data to show
     const hasSectionData = (() => {
       switch (section) {
-        case 'overview': return !!data;
-        case 'ledger': return true;
-        case 'discover': return true;
-        case 'products': return products.length > 0;
-        case 'economy': return !!economy;
-        case 'spenders': return !!spenders;
-        case 'ltv': return !!ltv;
-        default: return false;
+        case 'overview':
+          return !!data;
+        case 'ledger':
+          return true;
+        case 'discover':
+          return true;
+        case 'products':
+          return products.length > 0;
+        case 'economy':
+          return !!economy;
+        case 'spenders':
+          return !!spenders;
+        case 'ltv':
+          return !!ltv;
+        default:
+          return false;
       }
     })();
 
@@ -795,14 +986,29 @@ const ArgusMonetizationPage: React.FC = () => {
               handleChartZoom={handleChartZoom}
             />
           );
-        default: return null;
+        default:
+          return null;
       }
     })();
 
     return (
-      <PageContentLoader loading={loading && !hasSectionData} sx={(section === 'ledger' || section === 'acquisition') ? { flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 } : undefined}>
+      <PageContentLoader
+        loading={loading && !hasSectionData}
+        sx={
+          section === 'ledger' || section === 'acquisition'
+            ? {
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: 0,
+              }
+            : undefined
+        }
+      >
         {loading && hasSectionData && (
-          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }} />
+          <LinearProgress
+            sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }}
+          />
         )}
         {content}
       </PageContentLoader>
@@ -810,22 +1016,47 @@ const ArgusMonetizationPage: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', ...((section === 'ledger' || section === 'acquisition') ? { height: '100%' } : { flex: 1 }) }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        ...(section === 'ledger' || section === 'acquisition'
+          ? { height: '100%' }
+          : { flex: 1 }),
+      }}
+    >
       <PageHeader
         title={
-          <ArgusBreadcrumbs paths={[
-            { label: t('argus.analytics.title', 'Analytics'), to: '/argus/analytics' },
-            { label: t('argus.monetization', 'Monetization') },
-          ]} size="title" />
+          <ArgusBreadcrumbs
+            paths={[
+              {
+                label: t('argus.analytics.title', 'Analytics'),
+                to: '/argus/analytics',
+              },
+              { label: t('argus.monetization', 'Monetization') },
+            ]}
+            size="title"
+          />
         }
-        subtitle={t('argus.monetization.subtitle', 'Track purchase events and revenue metrics')}
+        subtitle={t(
+          'argus.monetization.subtitle',
+          'Track purchase events and revenue metrics'
+        )}
         actions={
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <ArgusSegmentFilter
               value={segmentFilter}
               onChange={setSegmentFilter}
-              countries={data?.revenue_by_country?.map((c: any) => c.country).filter(Boolean) || []}
-              platforms={data?.revenue_by_platform?.map((p: any) => p.platform).filter(Boolean) || []}
+              countries={
+                data?.revenue_by_country
+                  ?.map((c: any) => c.country)
+                  .filter(Boolean) || []
+              }
+              platforms={
+                data?.revenue_by_platform
+                  ?.map((p: any) => p.platform)
+                  .filter(Boolean) || []
+              }
             />
             <DateRangeSelector
               value={dateRange}
@@ -876,7 +1107,23 @@ const ArgusMonetizationPage: React.FC = () => {
         </Box>
 
         {/* ══════ RIGHT CONTENT ══════ */}
-        <Box sx={{ flex: 1, minWidth: 0, pt: 2, pr: 1, ...(section === 'ledger' ? { pb: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' } : { pb: 6 }) }}>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            pt: 2,
+            pr: 1,
+            ...(section === 'ledger'
+              ? {
+                  pb: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 0,
+                  overflow: 'hidden',
+                }
+              : { pb: 6 }),
+          }}
+        >
           {renderContent()}
         </Box>
       </Box>
@@ -896,7 +1143,10 @@ const ArgusMonetizationPage: React.FC = () => {
       <DeleteQueryConfirmDialog
         open={deleteDialogOpen}
         queryName={deleteTarget?.name || ''}
-        onClose={() => { setDeleteDialogOpen(false); setDeleteTarget(null); }}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setDeleteTarget(null);
+        }}
         onConfirm={handleDeleteQuery}
       />
 
@@ -906,7 +1156,7 @@ const ArgusMonetizationPage: React.FC = () => {
         savedQueries={savedQueries}
         onLoad={handleLoadSavedQuery}
         onDelete={(id) => {
-          const target = savedQueries.find(q => q.id === id);
+          const target = savedQueries.find((q) => q.id === id);
           if (target) {
             setDeleteTarget(target);
             setDeleteDialogOpen(true);

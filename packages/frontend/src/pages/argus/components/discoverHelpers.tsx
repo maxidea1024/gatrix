@@ -463,8 +463,6 @@ export const VolumeChart: React.FC<{
       a.localeCompare(b)
     );
 
-
-
     const LEVEL_COLORS: Record<string, string> = {
       fatal: '#d32f2f',
       error: ARGUS_SEMANTIC.negative,

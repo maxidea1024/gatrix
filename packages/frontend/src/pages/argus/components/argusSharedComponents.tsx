@@ -213,15 +213,15 @@ export const MetricRow: React.FC<MetricRowProps> = ({
         cursor: onClick ? 'pointer' : 'default',
         borderRadius: 1,
         transition: 'background 0.15s',
-        '&:hover': onClick
-          ? { backgroundColor: argusHoverBg(isDark) }
-          : {},
+        '&:hover': onClick ? { backgroundColor: argusHoverBg(isDark) } : {},
       }}
     >
       <Typography sx={{ ...METRIC_LABEL_SX, minWidth: 0, flex: 'none' }}>
         {label}
       </Typography>
-      <Typography sx={{ ...METRIC_VALUE_SX, fontSize: '1rem', fontWeight: 700 }}>
+      <Typography
+        sx={{ ...METRIC_VALUE_SX, fontSize: '1rem', fontWeight: 700 }}
+      >
         {value}
       </Typography>
       <ChangeIndicator value={change} invert={invertChange} variant="chip" />
@@ -273,9 +273,7 @@ export const MetricStrip: React.FC<MetricStripProps> = ({
         display: 'flex',
         flexWrap: 'wrap',
         gap: 0,
-        borderBottom: bordered
-          ? `1px solid ${argusBorder(isDark)}`
-          : 'none',
+        borderBottom: bordered ? `1px solid ${argusBorder(isDark)}` : 'none',
       }}
     >
       {items.map((item, idx) => (
@@ -375,24 +373,18 @@ export const BreakdownBar: React.FC<BreakdownBarProps> = ({
         px: 0.5,
         py: 0.3,
         transition: 'background 0.15s',
-        '&:hover': onClick
-          ? { backgroundColor: argusHoverBg(isDark) }
-          : {},
+        '&:hover': onClick ? { backgroundColor: argusHoverBg(isDark) } : {},
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.25 }}>
-        <Typography
-          sx={{ fontSize: '0.75rem', fontWeight: 600 }}
-        >
+        <Typography sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
           {label}
         </Typography>
         <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'baseline' }}>
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 700 }}>
             {value}
           </Typography>
-          <Typography
-            sx={{ fontSize: '0.625rem', color: 'text.secondary' }}
-          >
+          <Typography sx={{ fontSize: '0.625rem', color: 'text.secondary' }}>
             {percentage.toFixed(0)}%
           </Typography>
         </Box>

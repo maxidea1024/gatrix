@@ -141,21 +141,33 @@ const ResizableDrawer: React.FC<ResizableDrawerProps> = ({
       >
         <Box sx={{ flex: 1, minWidth: 0 }}>
           {typeof title === 'string' ? (
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{
+                fontWeight: 600,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
               {title}
             </Typography>
           ) : (
             title
           )}
-          {subtitle && (
-            typeof subtitle === 'string' ? (
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          {subtitle &&
+            (typeof subtitle === 'string' ? (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
                 {subtitle}
               </Typography>
             ) : (
               subtitle
-            )
-          )}
+            ))}
         </Box>
         <IconButton
           onClick={onClose}

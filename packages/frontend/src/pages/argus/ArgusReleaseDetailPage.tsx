@@ -97,8 +97,6 @@ const ArgusReleaseDetailPage: React.FC = () => {
     });
   }, []);
 
-
-
   const decodedRelease = release ? decodeURIComponent(release) : '';
 
   const fetchReleaseData = useCallback(async () => {
@@ -182,7 +180,11 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const r = releaseData;
   const crashFree = r ? Number(r.crash_free_rate) : 100;
   const statusColor =
-    crashFree >= 99 ? ARGUS_SEMANTIC.positive : crashFree >= 95 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.negative;
+    crashFree >= 99
+      ? ARGUS_SEMANTIC.positive
+      : crashFree >= 95
+        ? ARGUS_SEMANTIC.warning
+        : ARGUS_SEMANTIC.negative;
 
   return (
     <Box>
@@ -363,7 +365,9 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 '&:hover': { opacity: 0.8 },
               }}
             >
-              <CheckIcon sx={{ fontSize: 16, color: ARGUS_SEMANTIC.positive, mr: 0.5 }} />
+              <CheckIcon
+                sx={{ fontSize: 16, color: ARGUS_SEMANTIC.positive, mr: 0.5 }}
+              />
               <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1 }}>
                 {t('argus.releases.crashFreeRate', 'Crash Free Rate')}
               </Typography>
@@ -429,7 +433,9 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 backgroundColor: theme.palette.background.paper,
               }}
             >
-              <ErrorIcon sx={{ fontSize: 20, color: ARGUS_SEMANTIC.negative }} />
+              <ErrorIcon
+                sx={{ fontSize: 20, color: ARGUS_SEMANTIC.negative }}
+              />
               <Typography
                 variant="h6"
                 fontWeight={700}
@@ -497,7 +503,10 @@ const ArgusReleaseDetailPage: React.FC = () => {
                               minHeight: count > 0 ? 2 : 0,
                               backgroundColor:
                                 count > 0
-                                  ? alpha(ARGUS_SEMANTIC.negative, 0.5 + pct / 200)
+                                  ? alpha(
+                                      ARGUS_SEMANTIC.negative,
+                                      0.5 + pct / 200
+                                    )
                                   : alpha(theme.palette.text.disabled, 0.15),
                               transition: 'height 0.2s',
                             }}

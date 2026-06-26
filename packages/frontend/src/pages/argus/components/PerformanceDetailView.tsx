@@ -1,13 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Paper,
-  Chip,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Paper, Chip, useTheme, alpha } from '@mui/material';
 import {
   Speed as SpeedIcon,
   Schedule as ScheduleIcon,
@@ -189,9 +182,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
   );
 
   return (
-    <PageContentLoader
-      loading={detailLoading}
-    >
+    <PageContentLoader loading={detailLoading}>
       {/* Summary Cards */}
       {detail?.summary && (
         <Box
@@ -230,7 +221,9 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
               label: t('argus.performance.errorRate', 'Error Rate'),
               value: `${Number(detail.summary.error_rate).toFixed(2)}%`,
               color:
-                Number(detail.summary.error_rate) > 5 ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
+                Number(detail.summary.error_rate) > 5
+                  ? ARGUS_SEMANTIC.negative
+                  : ARGUS_SEMANTIC.positive,
               icon: <BugReportIcon />,
             },
           ].map((card, idx) => (
@@ -302,7 +295,11 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
           </Typography>
           <Box sx={{ height: 220 }}>
             {detailLoading ? (
-              <ArgusChartSkeleton type="bar" height={220} color={ARGUS_SEMANTIC.info} />
+              <ArgusChartSkeleton
+                type="bar"
+                height={220}
+                color={ARGUS_SEMANTIC.info}
+              />
             ) : (
               <Bar data={histogramData} options={barOpts} />
             )}
@@ -545,7 +542,11 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
           }}
         >
           {/* Slowest Spans */}
-          <DetailPaper elevation={0} isDark={isDark} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <DetailPaper
+            elevation={0}
+            isDark={isDark}
+            sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+          >
             <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1.5 }}>
               {t('argus.performance.slowestSpans')}
             </Typography>
@@ -659,7 +660,9 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                           width: 3,
                           height: 28,
                           borderRadius: 1,
-                          backgroundColor: isErr ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
+                          backgroundColor: isErr
+                            ? ARGUS_SEMANTIC.negative
+                            : ARGUS_SEMANTIC.positive,
                           flexShrink: 0,
                         }}
                       />

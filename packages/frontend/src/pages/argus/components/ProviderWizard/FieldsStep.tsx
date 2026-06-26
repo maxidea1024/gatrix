@@ -205,9 +205,13 @@ export const FieldsStep: React.FC<FieldsStepProps> = ({
                   : isDark
                     ? 'rgba(255,255,255,0.15)'
                     : 'rgba(0,0,0,0.12)',
-                color: testResult?.ok ? ARGUS_SEMANTIC.positive : 'text.secondary',
+                color: testResult?.ok
+                  ? ARGUS_SEMANTIC.positive
+                  : 'text.secondary',
                 '&:hover': {
-                  borderColor: testResult?.ok ? ARGUS_SEMANTIC.positive : accent,
+                  borderColor: testResult?.ok
+                    ? ARGUS_SEMANTIC.positive
+                    : accent,
                   backgroundColor: isDark
                     ? 'rgba(255,255,255,0.04)'
                     : 'rgba(0,0,0,0.03)',

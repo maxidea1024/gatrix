@@ -1075,7 +1075,6 @@ const ArgusMetricsExplorerPage: React.FC = () => {
           fetchMetricQueries();
         }}
         loading={loading || queryLoading}
-        
       />
 
       <MetricsQueryBuilder

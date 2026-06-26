@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  alpha,
-  useTheme,
-} from '@mui/material';
+import { Box, Typography, alpha, useTheme } from '@mui/material';
 import {
   TrendingUp as UpIcon,
   Warning as WarningIcon,
@@ -69,7 +64,7 @@ function pctChange(curr: number, prev: number): number | undefined {
  */
 export function detectAlerts(
   data: OverviewData,
-  t: (key: string, fallback: string, vars?: any) => string,
+  t: (key: string, fallback: string, vars?: any) => string
 ): AlertItem[] {
   const alerts: AlertItem[] = [];
   const es = data.error_summary;
@@ -84,8 +79,19 @@ export function detectAlerts(
       alerts.push({
         id: 'error-spike',
         severity: chg > 200 ? 'critical' : 'warning',
-        title: t('argus.overview.alertErrorSpike', 'Errors increased {{pct}}% vs previous period', { pct: Math.round(chg) }),
-        detail: t('argus.overview.alertErrorSpikeDetail', '{{errors}} errors affecting {{users}} users', { errors: formatCompactNumber(es.total_errors), users: formatCompactNumber(es.affected_users) }),
+        title: t(
+          'argus.overview.alertErrorSpike',
+          'Errors increased {{pct}}% vs previous period',
+          { pct: Math.round(chg) }
+        ),
+        detail: t(
+          'argus.overview.alertErrorSpikeDetail',
+          '{{errors}} errors affecting {{users}} users',
+          {
+            errors: formatCompactNumber(es.total_errors),
+            users: formatCompactNumber(es.affected_users),
+          }
+        ),
         href: '/argus/issues',
       });
     }
@@ -98,8 +104,19 @@ export function detectAlerts(
       alerts.push({
         id: 'crash-rate-drop',
         severity: diff < -5 ? 'critical' : 'warning',
-        title: t('argus.overview.alertCrashRate', 'Crash-free rate dropped {{diff}}%p', { diff: Math.abs(diff).toFixed(1) }),
-        detail: t('argus.overview.alertCrashRateDetail', '{{current}}% → was {{prev}}%', { current: ss.crash_free_rate.toFixed(1), prev: pp.crash_free_rate.toFixed(1) }),
+        title: t(
+          'argus.overview.alertCrashRate',
+          'Crash-free rate dropped {{diff}}%p',
+          { diff: Math.abs(diff).toFixed(1) }
+        ),
+        detail: t(
+          'argus.overview.alertCrashRateDetail',
+          '{{current}}% → was {{prev}}%',
+          {
+            current: ss.crash_free_rate.toFixed(1),
+            prev: pp.crash_free_rate.toFixed(1),
+          }
+        ),
         href: '/argus/issues',
       });
     }
@@ -110,8 +127,15 @@ export function detectAlerts(
     alerts.push({
       id: 'high-unhandled',
       severity: data.unhandled_rate > 60 ? 'critical' : 'warning',
-      title: t('argus.overview.alertUnhandled', '{{pct}}% of errors are unhandled', { pct: data.unhandled_rate.toFixed(0) }),
-      detail: t('argus.overview.alertUnhandledDetail', 'Unhandled errors crash the app and degrade user experience'),
+      title: t(
+        'argus.overview.alertUnhandled',
+        '{{pct}}% of errors are unhandled',
+        { pct: data.unhandled_rate.toFixed(0) }
+      ),
+      detail: t(
+        'argus.overview.alertUnhandledDetail',
+        'Unhandled errors crash the app and degrade user experience'
+      ),
       href: '/argus/issues?level=fatal',
     });
   }
@@ -121,7 +145,11 @@ export function detectAlerts(
     alerts.push({
       id: 'txn-error-rate',
       severity: ts.error_rate > 15 ? 'critical' : 'warning',
-      title: t('argus.overview.alertTxnErrorRate', 'Transaction error rate at {{pct}}%', { pct: ts.error_rate.toFixed(1) }),
+      title: t(
+        'argus.overview.alertTxnErrorRate',
+        'Transaction error rate at {{pct}}%',
+        { pct: ts.error_rate.toFixed(1) }
+      ),
       detail: `${formatCompactNumber(ts.total_transactions)} ${t('argus.overview.totalTransactions', 'total transactions')}`,
       href: '/argus/performance',
     });
@@ -134,7 +162,11 @@ export function detectAlerts(
       alerts.push({
         id: 'user-impact-spike',
         severity: 'warning',
-        title: t('argus.overview.alertUserSpike', 'Affected users increased {{pct}}%', { pct: Math.round(chg) }),
+        title: t(
+          'argus.overview.alertUserSpike',
+          'Affected users increased {{pct}}%',
+          { pct: Math.round(chg) }
+        ),
         detail: `${formatCompactNumber(es.affected_users)} ${t('argus.overview.usersAffected', 'users affected')}`,
         href: '/argus/issues',
       });
@@ -149,10 +181,17 @@ export function detectAlerts(
       alerts.push({
         id: 'release-hotspot',
         severity: 'warning',
-        title: t('argus.overview.alertRelease', 'Release "{{release}}" causing {{pct}}% of errors', {
-          release: topRelease.release.length > 20 ? topRelease.release.slice(0, 20) + '…' : topRelease.release,
-          pct: ((topRelease.count / totalErrors) * 100).toFixed(0),
-        }),
+        title: t(
+          'argus.overview.alertRelease',
+          'Release "{{release}}" causing {{pct}}% of errors',
+          {
+            release:
+              topRelease.release.length > 20
+                ? topRelease.release.slice(0, 20) + '…'
+                : topRelease.release,
+            pct: ((topRelease.count / totalErrors) * 100).toFixed(0),
+          }
+        ),
         detail: `${formatCompactNumber(topRelease.count)} ${t('argus.overview.errors', 'errors')}, ${formatCompactNumber(topRelease.users)} ${t('argus.overview.usersAffected', 'users affected')}`,
         href: '/argus/issues',
       });
@@ -179,7 +218,10 @@ interface AlertPanelProps {
   onNavigate: (href: string) => void;
 }
 
-export const AlertPanel: React.FC<AlertPanelProps> = ({ alerts, onNavigate }) => {
+export const AlertPanel: React.FC<AlertPanelProps> = ({
+  alerts,
+  onNavigate,
+}) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const { t } = useTranslation();
@@ -206,8 +248,14 @@ export const AlertPanel: React.FC<AlertPanelProps> = ({ alerts, onNavigate }) =>
             display: 'grid',
             gridTemplateColumns: {
               xs: '1fr',
-              sm: alerts.length <= 2 ? `repeat(${alerts.length}, 1fr)` : 'repeat(2, 1fr)',
-              md: alerts.length <= 4 ? `repeat(${alerts.length}, 1fr)` : 'repeat(4, 1fr)',
+              sm:
+                alerts.length <= 2
+                  ? `repeat(${alerts.length}, 1fr)`
+                  : 'repeat(2, 1fr)',
+              md:
+                alerts.length <= 4
+                  ? `repeat(${alerts.length}, 1fr)`
+                  : 'repeat(4, 1fr)',
             },
             gap: 2,
           }}
@@ -243,7 +291,13 @@ export const AlertPanel: React.FC<AlertPanelProps> = ({ alerts, onNavigate }) =>
                 }}
               >
                 {/* Icon + Arrow row */}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
                   <Box
                     sx={{
                       width: 32,
@@ -263,7 +317,9 @@ export const AlertPanel: React.FC<AlertPanelProps> = ({ alerts, onNavigate }) =>
                     <ArrowIcon
                       sx={{
                         fontSize: 14,
-                        color: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.15)',
+                        color: isDark
+                          ? 'rgba(255,255,255,0.15)'
+                          : 'rgba(0,0,0,0.15)',
                         transition: 'color 0.2s',
                       }}
                     />

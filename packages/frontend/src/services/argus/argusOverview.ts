@@ -17,7 +17,7 @@ export async function getOverview(
   period?: string,
   start?: string,
   end?: string,
-  segmentFilter?: { country?: string; platform?: string; app_version?: string },
+  segmentFilter?: { country?: string; platform?: string; app_version?: string }
 ): Promise<ArgusOverviewData> {
   const response = await argusApi.get(`${ARGUS_BASE}/overview/${projectId}`, {
     params: { period, start, end, ...segmentFilter },
@@ -47,7 +47,9 @@ export async function listProjects(): Promise<ArgusProject[]> {
   return response.data?.data || response.data || [];
 }
 
-export async function getProject(projectId: number | string): Promise<ArgusProject> {
+export async function getProject(
+  projectId: number | string
+): Promise<ArgusProject> {
   const response = await argusApi.get(`${ARGUS_BASE}/projects/${projectId}`);
   return response.data?.data || response.data;
 }

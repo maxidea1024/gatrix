@@ -20,9 +20,7 @@ import {
   useTheme,
   type SelectChangeEvent,
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
@@ -78,7 +76,11 @@ const MultiFilterSelect: React.FC<{
         value={selected}
         onChange={handleChange as any}
         renderValue={(sel) =>
-          sel.length === 0 ? 'All' : sel.length === 1 ? sel[0] : `${sel.length} selected`
+          sel.length === 0
+            ? 'All'
+            : sel.length === 1
+              ? sel[0]
+              : `${sel.length} selected`
         }
         sx={{
           fontSize: '0.75rem',
@@ -91,9 +93,20 @@ const MultiFilterSelect: React.FC<{
         }}
       >
         {options.map((opt) => (
-          <MenuItem key={opt} value={opt} sx={{ fontSize: '0.75rem', py: 0.25 }}>
-            <Checkbox checked={selected.includes(opt)} size="small" sx={{ p: 0.25, mr: 0.5 }} />
-            <ListItemText primary={opt} primaryTypographyProps={{ fontSize: '0.75rem' }} />
+          <MenuItem
+            key={opt}
+            value={opt}
+            sx={{ fontSize: '0.75rem', py: 0.25 }}
+          >
+            <Checkbox
+              checked={selected.includes(opt)}
+              size="small"
+              sx={{ p: 0.25, mr: 0.5 }}
+            />
+            <ListItemText
+              primary={opt}
+              primaryTypographyProps={{ fontSize: '0.75rem' }}
+            />
           </MenuItem>
         ))}
       </Select>
@@ -116,13 +129,23 @@ const ArgusSegmentFilter: React.FC<ArgusSegmentFilterProps> = ({
 
   const countryArr = useMemo(() => toArray(value.country), [value.country]);
   const platformArr = useMemo(() => toArray(value.platform), [value.platform]);
-  const versionArr = useMemo(() => toArray(value.app_version), [value.app_version]);
+  const versionArr = useMemo(
+    () => toArray(value.app_version),
+    [value.app_version]
+  );
 
   const activeChips = useMemo(() => {
-    const chips: { key: keyof SegmentFilterValues; label: string; values: string[] }[] = [];
-    if (countryArr.length > 0) chips.push({ key: 'country', label: 'Country', values: countryArr });
-    if (platformArr.length > 0) chips.push({ key: 'platform', label: 'Platform', values: platformArr });
-    if (versionArr.length > 0) chips.push({ key: 'app_version', label: 'Version', values: versionArr });
+    const chips: {
+      key: keyof SegmentFilterValues;
+      label: string;
+      values: string[];
+    }[] = [];
+    if (countryArr.length > 0)
+      chips.push({ key: 'country', label: 'Country', values: countryArr });
+    if (platformArr.length > 0)
+      chips.push({ key: 'platform', label: 'Platform', values: platformArr });
+    if (versionArr.length > 0)
+      chips.push({ key: 'app_version', label: 'Version', values: versionArr });
     return chips;
   }, [countryArr, platformArr, versionArr]);
 
@@ -132,11 +155,14 @@ const ArgusSegmentFilter: React.FC<ArgusSegmentFilterProps> = ({
     onChange({});
   }, [onChange]);
 
-  const handleRemoveChip = useCallback((key: keyof SegmentFilterValues, val: string) => {
-    const current = toArray(value[key]);
-    const next = current.filter(v => v !== val);
-    onChange({ ...value, [key]: toComma(next) });
-  }, [value, onChange]);
+  const handleRemoveChip = useCallback(
+    (key: keyof SegmentFilterValues, val: string) => {
+      const current = toArray(value[key]);
+      const next = current.filter((v) => v !== val);
+      onChange({ ...value, [key]: toComma(next) });
+    },
+    [value, onChange]
+  );
 
   return (
     <Box
@@ -147,8 +173,6 @@ const ArgusSegmentFilter: React.FC<ArgusSegmentFilterProps> = ({
         flexWrap: 'wrap',
       }}
     >
-
-
       {countries.length > 0 && (
         <MultiFilterSelect
           label={t('argus.filter.country', 'Country')}

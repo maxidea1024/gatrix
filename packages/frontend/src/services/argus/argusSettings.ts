@@ -12,7 +12,9 @@ import type {
 
 // === Dashboards ===
 
-export async function listDashboards(projectId: number | string): Promise<any[]> {
+export async function listDashboards(
+  projectId: number | string
+): Promise<any[]> {
   try {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/dashboards`
@@ -23,7 +25,9 @@ export async function listDashboards(projectId: number | string): Promise<any[]>
   }
 }
 
-export async function listDashboardPresets(projectId: number | string): Promise<any[]> {
+export async function listDashboardPresets(
+  projectId: number | string
+): Promise<any[]> {
   try {
     const response = await argusApi.get(
       `${ARGUS_BASE}/${projectId}/dashboards/presets`
@@ -70,9 +74,7 @@ export async function deleteDashboard(
   projectId: number | string,
   dashboardId: number
 ): Promise<void> {
-  await argusApi.delete(
-    `${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}`
-  );
+  await argusApi.delete(`${ARGUS_BASE}/${projectId}/dashboards/${dashboardId}`);
 }
 
 export async function toggleDashboardFavorite(
@@ -183,10 +185,10 @@ export async function saveGlobalIntegrationConfig(
   );
 }
 
-export async function deleteGlobalIntegrationConfig(provider: string): Promise<void> {
-  await argusApi.delete(
-    `${ARGUS_BASE}/global-integrations/${provider}/config`
-  );
+export async function deleteGlobalIntegrationConfig(
+  provider: string
+): Promise<void> {
+  await argusApi.delete(`${ARGUS_BASE}/global-integrations/${provider}/config`);
 }
 
 export async function testSlackConnection(botToken: string): Promise<{
@@ -260,7 +262,9 @@ export async function getGithubRepositories(): Promise<any[]> {
 
 // === Notification Channels ===
 
-export async function listNotificationChannels(projectId: number | string): Promise<any[]> {
+export async function listNotificationChannels(
+  projectId: number | string
+): Promise<any[]> {
   const response = await argusApi.get(
     `${ARGUS_BASE}/${projectId}/notification-channels`
   );
@@ -354,10 +358,7 @@ export async function updateOwnershipRule(
   ruleId: number,
   data: Partial<ArgusOwnershipRule>
 ): Promise<void> {
-  await argusApi.patch(
-    `${ARGUS_BASE}/${projectId}/ownership/${ruleId}`,
-    data
-  );
+  await argusApi.patch(`${ARGUS_BASE}/${projectId}/ownership/${ruleId}`, data);
 }
 
 export async function deleteOwnershipRule(

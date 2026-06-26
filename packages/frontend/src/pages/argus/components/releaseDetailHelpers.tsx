@@ -215,26 +215,32 @@ export const ReleaseHealthChart: React.FC<{
         })}
         {/* X-axis labels */}
         {(() => {
-          const parseTs = (s: string) => new Date(s.includes('T') ? s : s.replace(' ', 'T')).getTime();
-          const isSubDaily = trimmed.length >= 2 &&
-            (parseTs(trimmed[1].timestamp) - parseTs(trimmed[0].timestamp)) < 86400000;
+          const parseTs = (s: string) =>
+            new Date(s.includes('T') ? s : s.replace(' ', 'T')).getTime();
+          const isSubDaily =
+            trimmed.length >= 2 &&
+            parseTs(trimmed[1].timestamp) - parseTs(trimmed[0].timestamp) <
+              86400000;
           return xLabels.map((idx) => {
-          const p = dataPoints[idx as number];
-          if (!p) return null;
-          const label = formatWith(trimmed[idx as number].timestamp, isSubDaily ? 'M/D HH:mm' : 'M/D');
-          return (
-            <text
-              key={idx}
-              x={p.x}
-              y={chartHeight - 5}
-              textAnchor="middle"
-              fill={isDark ? '#888' : '#999'}
-              fontSize={10}
-            >
-              {label}
-            </text>
-          );
-        });
+            const p = dataPoints[idx as number];
+            if (!p) return null;
+            const label = formatWith(
+              trimmed[idx as number].timestamp,
+              isSubDaily ? 'M/D HH:mm' : 'M/D'
+            );
+            return (
+              <text
+                key={idx}
+                x={p.x}
+                y={chartHeight - 5}
+                textAnchor="middle"
+                fill={isDark ? '#888' : '#999'}
+                fontSize={10}
+              >
+                {label}
+              </text>
+            );
+          });
         })()}
         {/* Area fill */}
         <path d={areaPath} fill={alpha(lineColor, 0.08)} />

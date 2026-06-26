@@ -18,12 +18,12 @@ import { alpha, type Theme } from '@mui/material/styles';
 // Max 6 — if you need more, the chart should probably group "Other".
 
 export const ARGUS_SERIES = [
-  '#5B8FF9',  // blue
-  '#5AD8A6',  // teal
-  '#F6BD16',  // amber
-  '#E86452',  // salmon
-  '#6DC8EC',  // sky
-  '#945FB9',  // purple
+  '#5B8FF9', // blue
+  '#5AD8A6', // teal
+  '#F6BD16', // amber
+  '#E86452', // salmon
+  '#6DC8EC', // sky
+  '#945FB9', // purple
 ] as const;
 
 // ─── Semantic colours ────────────────────────────────────────────────────────
@@ -71,7 +71,7 @@ export function argusHoverBg(isDark: boolean) {
 
 /** Section header style — replaces inline sectionHeaderSx objects. */
 export const SECTION_LABEL_SX = {
-  fontSize: '0.6875rem',    // 11px
+  fontSize: '0.6875rem', // 11px
   fontWeight: 700,
   textTransform: 'uppercase' as const,
   letterSpacing: '0.06em',
@@ -81,7 +81,7 @@ export const SECTION_LABEL_SX = {
 
 /** KPI metric value */
 export const METRIC_VALUE_SX = {
-  fontSize: '1.5rem',       // 24px
+  fontSize: '1.5rem', // 24px
   fontWeight: 800,
   lineHeight: 1.15,
   letterSpacing: '-0.02em',
@@ -90,7 +90,7 @@ export const METRIC_VALUE_SX = {
 
 /** KPI metric label */
 export const METRIC_LABEL_SX = {
-  fontSize: '0.6875rem',    // 11px
+  fontSize: '0.6875rem', // 11px
   fontWeight: 600,
   textTransform: 'uppercase' as const,
   letterSpacing: '0.04em',
@@ -107,11 +107,11 @@ export const METRIC_LABEL_SX = {
 //         color: '#4caf50'          →    color: ARGUS_SEMANTIC.positive
 
 export const LEGACY = {
-  green:  '#4caf50',   // → ARGUS_SEMANTIC.positive
-  red:    '#f44336',   // → ARGUS_SEMANTIC.negative
-  orange: '#ff9800',   // → ARGUS_SEMANTIC.warning
-  blue:   '#2196f3',   // → ARGUS_SEMANTIC.info
-  purple: '#9c27b0',   // → ARGUS_SERIES[5]
+  green: '#4caf50', // → ARGUS_SEMANTIC.positive
+  red: '#f44336', // → ARGUS_SEMANTIC.negative
+  orange: '#ff9800', // → ARGUS_SEMANTIC.warning
+  blue: '#2196f3', // → ARGUS_SEMANTIC.info
+  purple: '#9c27b0', // → ARGUS_SERIES[5]
 } as const;
 
 // ─── Chart-level helpers ─────────────────────────────────────────────────────

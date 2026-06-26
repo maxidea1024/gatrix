@@ -33,13 +33,26 @@ const CITIES: Record<string, string[]> = {
 };
 
 const EMAIL_DOMAINS = [
-  'gmail.com', 'naver.com', 'yahoo.co.jp', 'outlook.com',
-  'daum.net', 'qq.com', 'hotmail.com',
+  'gmail.com',
+  'naver.com',
+  'yahoo.co.jp',
+  'outlook.com',
+  'daum.net',
+  'qq.com',
+  'hotmail.com',
 ];
 
 const NAMES_PREFIX = [
-  'Navigator', 'Captain', 'Admiral', 'Merchant', 'Explorer',
-  'Pirate', 'Corsair', 'Trader', 'Sailor', 'Buccaneer',
+  'Navigator',
+  'Captain',
+  'Admiral',
+  'Merchant',
+  'Explorer',
+  'Pirate',
+  'Corsair',
+  'Trader',
+  'Sailor',
+  'Buccaneer',
 ];
 
 // ═══════════════════ USER POOL ═══════════════════
@@ -54,25 +67,27 @@ export interface SimUser {
   avatarUrl?: string;
 }
 
-export const USERS: SimUser[] = Array.from({ length: USER_POOL_SIZE }, (_, i) => {
-  const country = weightedPick(
-    COUNTRIES_WEIGHTED.map((c) => c.code),
-    COUNTRIES_WEIGHTED.map((c) => c.weight)
-  );
-  const avatarUrl = (i % 5) < 2
-    ? `https://i.pravatar.cc/150?u=user_${10000 + i}`
-    : undefined;
+export const USERS: SimUser[] = Array.from(
+  { length: USER_POOL_SIZE },
+  (_, i) => {
+    const country = weightedPick(
+      COUNTRIES_WEIGHTED.map((c) => c.code),
+      COUNTRIES_WEIGHTED.map((c) => c.weight)
+    );
+    const avatarUrl =
+      i % 5 < 2 ? `https://i.pravatar.cc/150?u=user_${10000 + i}` : undefined;
 
-  return {
-    id: `user_${10000 + i}`,
-    email: `player${10000 + i}@${randomPick(EMAIL_DOMAINS)}`,
-    name: `${randomPick(NAMES_PREFIX)}_${10000 + i}`,
-    ip: `${randomInt(1, 223)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`,
-    country,
-    city: randomPick(CITIES[country] || ['Unknown']),
-    avatarUrl,
-  };
-});
+    return {
+      id: `user_${10000 + i}`,
+      email: `player${10000 + i}@${randomPick(EMAIL_DOMAINS)}`,
+      name: `${randomPick(NAMES_PREFIX)}_${10000 + i}`,
+      ip: `${randomInt(1, 223)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`,
+      country,
+      city: randomPick(CITIES[country] || ['Unknown']),
+      avatarUrl,
+    };
+  }
+);
 
 // ═══════════════════ BROWSER / OS ═══════════════════
 

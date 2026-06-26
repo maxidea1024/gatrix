@@ -2,7 +2,10 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
-import { buildSegmentConditions, type SegmentFilterQuery } from '../utils/segmentFilter';
+import {
+  buildSegmentConditions,
+  type SegmentFilterQuery,
+} from '../utils/segmentFilter';
 
 const logger = createLogger('sessions-api');
 
@@ -26,8 +29,12 @@ export default async function sessionsRoutes(app: FastifyInstance) {
         platform,
         app_version,
       } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
+        period?: string;
+        start?: string;
+        end?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       try {

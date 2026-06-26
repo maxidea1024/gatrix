@@ -286,7 +286,9 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                     key: 'crashed',
                     format: (v: number) => formatCompactNumber(Number(v)),
                     colorFn: (v: number) =>
-                      Number(v) > 0 ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
+                      Number(v) > 0
+                        ? ARGUS_SEMANTIC.negative
+                        : ARGUS_SEMANTIC.positive,
                   },
                 ].map((row) => (
                   <React.Fragment key={row.key}>
@@ -401,7 +403,11 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
           {data.by_release.map((r, idx) => {
             const rate = Number(r.crash_free_rate);
             const barColor =
-              rate >= 99 ? ARGUS_SEMANTIC.positive : rate >= 95 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.negative;
+              rate >= 99
+                ? ARGUS_SEMANTIC.positive
+                : rate >= 95
+                  ? ARGUS_SEMANTIC.warning
+                  : ARGUS_SEMANTIC.negative;
             return (
               <ReleaseRow
                 key={`${r.release}-${idx}`}
@@ -466,7 +472,10 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                       Number(r.crashed) > 0
                         ? alpha(ARGUS_SEMANTIC.negative, 0.1)
                         : alpha(ARGUS_SEMANTIC.positive, 0.1),
-                    color: Number(r.crashed) > 0 ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
+                    color:
+                      Number(r.crashed) > 0
+                        ? ARGUS_SEMANTIC.negative
+                        : ARGUS_SEMANTIC.positive,
                     border: 'none',
                   }}
                 />

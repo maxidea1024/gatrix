@@ -9,7 +9,13 @@
  * - Cohorts page: behavioral segmentation
  */
 import { PROJECT_ID, DAYS_BACK, NOW, CH_CONFIG, CHUNK_SIZE } from './config';
-import { uuid, randomInt, randomPick, weightedPick, formatDate } from './helpers';
+import {
+  uuid,
+  randomInt,
+  randomPick,
+  weightedPick,
+  formatDate,
+} from './helpers';
 import { USERS, BROWSERS } from './user-pool';
 
 const EXCHANGE_RATES_TO_USD: Record<string, number> = {
@@ -46,8 +52,12 @@ export const ACTIVITY_EVENT_DEFS = {
     props: () => ({
       properties: {
         url: randomPick([
-          '/game/play', '/game/port', '/game/battle',
-          '/settings', '/inventory', '/guild',
+          '/game/play',
+          '/game/port',
+          '/game/battle',
+          '/settings',
+          '/inventory',
+          '/guild',
         ]),
       },
     }),
@@ -57,7 +67,10 @@ export const ACTIVITY_EVENT_DEFS = {
     props: () => ({
       properties: {
         target: randomPick([
-          'button#play', 'button#shop', 'tab#inventory', 'button#settings',
+          'button#play',
+          'button#shop',
+          'tab#inventory',
+          'button#settings',
         ]),
       },
     }),
@@ -167,17 +180,23 @@ export const ACTIVITY_EVENT_DEFS = {
       let amount = product.price;
 
       if (currency === 'KRW') {
-        amount = Math.round(product.price * 1300 / 100) * 100;
+        amount = Math.round((product.price * 1300) / 100) * 100;
       } else if (currency === 'EUR') {
         amount = parseFloat((product.price * 0.93).toFixed(2));
       } else if (currency === 'JPY') {
-        amount = Math.round(product.price * 156 / 10) * 10;
+        amount = Math.round((product.price * 156) / 10) * 10;
       }
 
       return {
         properties: {
           product_name: product.name,
-          payment_method: randomPick(['credit_card', 'paypal', 'steam_wallet', 'apple_pay', 'google_pay']),
+          payment_method: randomPick([
+            'credit_card',
+            'paypal',
+            'steam_wallet',
+            'apple_pay',
+            'google_pay',
+          ]),
           currency,
         },
         numeric_properties: {
@@ -223,8 +242,12 @@ export const ACTIVITY_EVENT_DEFS = {
     props: () => ({
       properties: {
         guild_name: randomPick([
-          'Dragon Slayers', 'Night Watch', 'Iron Legion',
-          'Shadow Council', 'Phoenix Order', 'Storm Riders',
+          'Dragon Slayers',
+          'Night Watch',
+          'Iron Legion',
+          'Shadow Council',
+          'Phoenix Order',
+          'Storm Riders',
         ]),
         guild_size: String(randomInt(5, 200)),
       },
@@ -237,9 +260,15 @@ export const ACTIVITY_EVENT_DEFS = {
       properties: {
         achievement_id: `ach_${randomInt(1, 100)}`,
         achievement_name: randomPick([
-          'First Blood', 'Dragon Slayer', 'Master Crafter',
-          'Social Butterfly', 'Speed Runner', 'Completionist',
-          'PvP Champion', 'Dungeon Master', 'Treasure Hunter',
+          'First Blood',
+          'Dragon Slayer',
+          'Master Crafter',
+          'Social Butterfly',
+          'Speed Runner',
+          'Completionist',
+          'PvP Champion',
+          'Dungeon Master',
+          'Treasure Hunter',
         ]),
         rarity: randomPick(['common', 'uncommon', 'rare', 'epic', 'legendary']),
       },
@@ -269,7 +298,12 @@ export const ACTIVITY_EVENT_DEFS = {
     props: () => {
       const isGold = Math.random() < 0.8;
       const currency = isGold ? 'gold' : 'diamond';
-      const source = randomPick(['battle_reward', 'quest_clear', 'daily_login', 'gacha_compensation']);
+      const source = randomPick([
+        'battle_reward',
+        'quest_clear',
+        'daily_login',
+        'gacha_compensation',
+      ]);
       const amount = isGold ? randomInt(100, 5000) : randomInt(10, 500);
       return {
         properties: {
@@ -288,8 +322,12 @@ export const ACTIVITY_EVENT_DEFS = {
       const isGold = Math.random() < 0.8;
       const currency = isGold ? 'gold' : 'diamond';
       const product = randomPick([
-        'Health Potion', 'Gacha Scroll', 'Epic Weapon Box',
-        'Skill Book Upgrade', 'Revive Token', 'Cosmetic Pack',
+        'Health Potion',
+        'Gacha Scroll',
+        'Epic Weapon Box',
+        'Skill Book Upgrade',
+        'Revive Token',
+        'Cosmetic Pack',
       ]);
       const amount = isGold ? randomInt(80, 4000) : randomInt(8, 400);
       return {
@@ -314,17 +352,31 @@ export const ACTIVITY_EVENT_DEFS = {
         { type: 'banner', ecpm: [0.3, 3] },
       ] as const;
       const adType = weightedPick(
-        adTypes.map(a => a),
+        adTypes.map((a) => a),
         [50, 35, 15]
       );
-      const placements = adType.type === 'rewarded_video'
-        ? ['extra_life', 'double_rewards', 'free_gacha', 'daily_bonus', 'skip_wait']
-        : adType.type === 'interstitial'
-        ? ['level_complete', 'menu_transition', 'shop_exit', 'game_over']
-        : ['bottom_banner', 'top_banner', 'sidebar'];
-      const sdks = ['admob', 'applovin', 'unity_ads', 'ironsource', 'meta_audience'];
+      const placements =
+        adType.type === 'rewarded_video'
+          ? [
+              'extra_life',
+              'double_rewards',
+              'free_gacha',
+              'daily_bonus',
+              'skip_wait',
+            ]
+          : adType.type === 'interstitial'
+            ? ['level_complete', 'menu_transition', 'shop_exit', 'game_over']
+            : ['bottom_banner', 'top_banner', 'sidebar'];
+      const sdks = [
+        'admob',
+        'applovin',
+        'unity_ads',
+        'ironsource',
+        'meta_audience',
+      ];
       // eCPM in USD — divide by 1000 for per-impression revenue
-      const ecpm = adType.ecpm[0] + Math.random() * (adType.ecpm[1] - adType.ecpm[0]);
+      const ecpm =
+        adType.ecpm[0] + Math.random() * (adType.ecpm[1] - adType.ecpm[0]);
       const revenue = ecpm / 1000; // per-impression revenue
 
       return {
@@ -334,7 +386,7 @@ export const ACTIVITY_EVENT_DEFS = {
           ad_sdk_name: randomPick(sdks),
         },
         numeric_properties: {
-          ad_revenue: Math.round(revenue * 10000) / 10000,  // 4 decimal places
+          ad_revenue: Math.round(revenue * 10000) / 10000, // 4 decimal places
           ad_ecpm: Math.round(ecpm * 100) / 100,
           ad_duration_ms: adType.type === 'banner' ? 0 : randomInt(5000, 30000),
         },
@@ -350,10 +402,18 @@ export const ACTIVITY_EVENT_DEFS = {
         properties: {
           ad_type: adType,
           ad_placement: randomPick([
-            'extra_life', 'double_rewards', 'level_complete',
-            'bottom_banner', 'shop_exit',
+            'extra_life',
+            'double_rewards',
+            'level_complete',
+            'bottom_banner',
+            'shop_exit',
           ]),
-          ad_sdk_name: randomPick(['admob', 'applovin', 'unity_ads', 'ironsource']),
+          ad_sdk_name: randomPick([
+            'admob',
+            'applovin',
+            'unity_ads',
+            'ironsource',
+          ]),
         },
       };
     },
@@ -425,11 +485,13 @@ export type ActivityEventName = keyof typeof ACTIVITY_EVENT_DEFS;
 
 export async function generateAndInsertActivities(ch: any): Promise<number> {
   console.log('\n📊 Generating Product Analytics Activities...');
-  
+
   // Truncate sessions first to keep consistent IDs
   console.log('   🗑️  Truncating sessions table for alignment...');
   try {
-    await ch.exec({ query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.sessions` });
+    await ch.exec({
+      query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.sessions`,
+    });
   } catch {}
 
   const activeUsers = USERS.slice(0, 3000);
@@ -439,14 +501,26 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
 
   // Expanded gameplay pool with new events
   const gameplayPool: ActivityEventName[] = [
-    '$page_view', '$click', '$error', '$feedback',
-    'battle_started', 'battle_won', 'item_purchased',
-    'purchase', 'level_up', 'quest_completed',
-    'guild_joined', 'achievement_unlocked',
-    'chat_message', 'friend_added',
-    'resource_source', 'resource_sink',
-    'ad_impression', 'ad_click',
-    'refund', 'grant',
+    '$page_view',
+    '$click',
+    '$error',
+    '$feedback',
+    'battle_started',
+    'battle_won',
+    'item_purchased',
+    'purchase',
+    'level_up',
+    'quest_completed',
+    'guild_joined',
+    'achievement_unlocked',
+    'chat_message',
+    'friend_added',
+    'resource_source',
+    'resource_sink',
+    'ad_impression',
+    'ad_click',
+    'refund',
+    'grant',
   ];
   const gameplayWeights = gameplayPool.map(
     (n) => ACTIVITY_EVENT_DEFS[n].weight
@@ -462,16 +536,26 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
 
     let activeDays: number;
     switch (retentionClass) {
-      case 'churned': activeDays = randomInt(1, 2); break;
-      case 'casual': activeDays = randomInt(3, 6); break;
-      case 'regular': activeDays = randomInt(7, 11); break;
-      case 'core': activeDays = DAYS_BACK - joinDay; break;
+      case 'churned':
+        activeDays = randomInt(1, 2);
+        break;
+      case 'casual':
+        activeDays = randomInt(3, 6);
+        break;
+      case 'regular':
+        activeDays = randomInt(7, 11);
+        break;
+      case 'core':
+        activeDays = DAYS_BACK - joinDay;
+        break;
     }
 
     const daysToPlay = new Set<number>();
     daysToPlay.add(joinDay);
     for (let d = 1; d < activeDays; d++) {
-      const day = joinDay + randomInt(1, Math.min(activeDays + 2, DAYS_BACK - joinDay - 1));
+      const day =
+        joinDay +
+        randomInt(1, Math.min(activeDays + 2, DAYS_BACK - joinDay - 1));
       if (day < DAYS_BACK) daysToPlay.add(day);
     }
 
@@ -479,20 +563,47 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
     let isFirstSession = true;
 
     for (const day of sortedDays) {
-      const sessionsToday = retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
+      const sessionsToday =
+        retentionClass === 'core' ? randomInt(2, 4) : randomInt(1, 2);
 
       for (let s = 0; s < sessionsToday; s++) {
         const sessionId = uuid();
         const dayStart = new Date(NOW.getTime() - (DAYS_BACK - day) * 86400000);
-        dayStart.setUTCHours(randomInt(9, 18), randomInt(0, 59), randomInt(0, 59));
+        dayStart.setUTCHours(
+          randomInt(9, 18),
+          randomInt(0, 59),
+          randomInt(0, 59)
+        );
         let ts = dayStart.getTime();
 
         const hasUtm = Math.random() < 0.65;
-        const utmSource = hasUtm ? randomPick(['google', 'facebook', 'unity', 'naver', 'youtube']) : null;
-        const utmMedium = hasUtm ? randomPick(['cpc', 'cpa', 'social', 'display', 'organic']) : null;
-        const utmCampaign = hasUtm ? randomPick(['summer_sale_2026', 'brand_awareness', 'pre_registration', 're_engagement']) : null;
-        const utmTerm = hasUtm && Math.random() < 0.5 ? randomPick(['best_rpg_game', 'free_to_play', 'strategy_rpg']) : null;
-        const utmContent = hasUtm && Math.random() < 0.5 ? randomPick(['banner_a', 'video_ad_30s', 'text_ad_v2', 'main_banner']) : null;
+        const utmSource = hasUtm
+          ? randomPick(['google', 'facebook', 'unity', 'naver', 'youtube'])
+          : null;
+        const utmMedium = hasUtm
+          ? randomPick(['cpc', 'cpa', 'social', 'display', 'organic'])
+          : null;
+        const utmCampaign = hasUtm
+          ? randomPick([
+              'summer_sale_2026',
+              'brand_awareness',
+              'pre_registration',
+              're_engagement',
+            ])
+          : null;
+        const utmTerm =
+          hasUtm && Math.random() < 0.5
+            ? randomPick(['best_rpg_game', 'free_to_play', 'strategy_rpg'])
+            : null;
+        const utmContent =
+          hasUtm && Math.random() < 0.5
+            ? randomPick([
+                'banner_a',
+                'video_ad_30s',
+                'text_ad_v2',
+                'main_banner',
+              ])
+            : null;
 
         sessionsBuffer.push({
           session_id: sessionId,
@@ -500,7 +611,13 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
           timestamp: formatDate(new Date(ts)),
           started: formatDate(new Date(ts)),
           duration: randomInt(60, 7200),
-          status: randomPick(['exited', 'exited', 'exited', 'crashed', 'abnormal']),
+          status: randomPick([
+            'exited',
+            'exited',
+            'exited',
+            'crashed',
+            'abnormal',
+          ]),
           errors: Math.random() < 0.15 ? randomInt(1, 5) : 0,
           environment: randomPick(['production', 'staging']),
           release: randomPick(['1.14.0', '1.13.2']),
@@ -528,7 +645,8 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
         }
 
         // More events per session for richer data
-        const numGameplay = retentionClass === 'core' ? randomInt(8, 18) : randomInt(3, 9);
+        const numGameplay =
+          retentionClass === 'core' ? randomInt(8, 18) : randomInt(3, 9);
         for (let g = 0; g < numGameplay; g++) {
           sessionEvents.push(weightedPick(gameplayPool, gameplayWeights));
         }
@@ -548,7 +666,10 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
           batchBuffer.push({
             event_id: uuid(),
             project_id: PROJECT_ID,
-            timestamp: new Date(ts).toISOString().replace('T', ' ').replace('Z', ''),
+            timestamp: new Date(ts)
+              .toISOString()
+              .replace('T', ' ')
+              .replace('Z', ''),
             event_name: eventName,
             user_id: user.id,
             device_id: `device_${user.id}`,
@@ -564,7 +685,13 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
               ...((generated as any).properties || {}),
               ...(user.avatarUrl ? { avatar_url: user.avatarUrl } : {}),
               email: user.email,
-              browser: (() => { const b = weightedPick(BROWSERS.map(b => b.name), BROWSERS.map(b => b.w)); return b; })(),
+              browser: (() => {
+                const b = weightedPick(
+                  BROWSERS.map((b) => b.name),
+                  BROWSERS.map((b) => b.w)
+                );
+                return b;
+              })(),
             },
             numeric_properties: (generated as any).numeric_properties || {},
             dsn_key_id: 0,
@@ -590,7 +717,9 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
         sessionsBuffer = [];
       }
       activityCount += batchBuffer.length;
-      process.stdout.write(`\r   ⏳ ${activityCount.toLocaleString()} activities...`);
+      process.stdout.write(
+        `\r   ⏳ ${activityCount.toLocaleString()} activities...`
+      );
       batchBuffer = [];
     }
   }
@@ -676,7 +805,10 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
         ...((generated as any).properties || {}),
         ...(user.avatarUrl ? { avatar_url: user.avatarUrl } : {}),
         email: user.email,
-        browser: weightedPick(BROWSERS.map(b => b.name), BROWSERS.map(b => b.w)),
+        browser: weightedPick(
+          BROWSERS.map((b) => b.name),
+          BROWSERS.map((b) => b.w)
+        ),
       },
       numeric_properties: (generated as any).numeric_properties || {},
       dsn_key_id: 0,
@@ -701,6 +833,8 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
     });
   }
 
-  console.log(`   ✓ ${activityCount.toLocaleString()} activities inserted (incl. ${realtimeBatch.length} realtime)`);
+  console.log(
+    `   ✓ ${activityCount.toLocaleString()} activities inserted (incl. ${realtimeBatch.length} realtime)`
+  );
   return activityCount;
 }

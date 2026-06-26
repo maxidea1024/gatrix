@@ -1,9 +1,15 @@
 ﻿import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
-import { buildTimeRangeConditions, PERIOD_TO_SECONDS } from '../utils/timeBucket';
+import {
+  buildTimeRangeConditions,
+  PERIOD_TO_SECONDS,
+} from '../utils/timeBucket';
 import { buildSegmentFilter } from '../utils/segmentFilter';
-import { generateInsights, buildSegmentMatrix } from '../utils/monetizationInsights';
+import {
+  generateInsights,
+  buildSegmentMatrix,
+} from '../utils/monetizationInsights';
 
 const TABLE = 'argus.activities';
 const logger = createLogger('monetization-api');
@@ -54,14 +60,11 @@ function buildPreviousPeriodConditions(
   return { conditions, params };
 }
 
-
-
 // ?????????????????????????????????????????????????????????????????????????????
 // Route Registration
 // ?????????????????????????????????????????????????????????????????????????????
 
 export default async function monetizationRoutes(app: FastifyInstance) {
-
   // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
   // 1. GET /projects/:projectId/analytics/monetization ??Main Revenue Dashboard
   // ?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧?먥븧??
@@ -69,15 +72,33 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, granularity, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string; granularity?: string;
-        country?: string; platform?: string; app_version?: string;
+      const {
+        period,
+        start,
+        end,
+        granularity,
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        period?: string;
+        start?: string;
+        end?: string;
+        granularity?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
         const params: Record<string, any> = {
           projectId,
           purchaseEvent: PURCHASE_EVENT,
@@ -141,14 +162,21 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const totalUsers = Number((totalUsersResult.data as any[])?.[0]?.total_users) || 1;
+        const totalUsers =
+          Number((totalUsersResult.data as any[])?.[0]?.total_users) || 1;
         const totalRevenue = Number(summary.total_revenue) || 0;
         const payingUsers = Number(summary.total_paying_users) || 1;
 
         // ?? Previous period: Summary KPIs ??
-        const { conditions: prevConds, params: prevParams } = buildPreviousPeriodConditions(period, start, end);
+        const { conditions: prevConds, params: prevParams } =
+          buildPreviousPeriodConditions(period, start, end);
         const prevWhere = prevConds.join(' AND ');
-        const prevKpiParams = { projectId, purchaseEvent: PURCHASE_EVENT, ...prevParams, ...segmentParams };
+        const prevKpiParams = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...prevParams,
+          ...segmentParams,
+        };
 
         const prevSummaryResult = await optic.rawQuery({
           query: `
@@ -176,7 +204,8 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: prevKpiParams,
         });
-        const prevTotalUsers = Number((prevTotalUsersResult.data as any[])?.[0]?.total_users) || 1;
+        const prevTotalUsers =
+          Number((prevTotalUsersResult.data as any[])?.[0]?.total_users) || 1;
         const prevTotalRevenue = Number(prevSummary.total_revenue) || 0;
         const prevPayingUsers = Number(prevSummary.total_paying_users) || 1;
 
@@ -195,7 +224,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const firstPurchasers = Number((firstPurchasersResult.data as any[])?.[0]?.first_purchasers) || 0;
+        const firstPurchasers =
+          Number(
+            (firstPurchasersResult.data as any[])?.[0]?.first_purchasers
+          ) || 0;
         const realPayingUsers = Number(summary.total_paying_users) || 0;
 
         // ?? ARPDAU: daily active users for ARPDAU calculation ??
@@ -221,7 +253,7 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         const enrichedRevenueOverTime = revenueOverTime.map((r) => ({
           ...r,
           dau: dauMap.get(r.period) || 0,
-          arpdau: round2((r.revenue) / (dauMap.get(r.period) || 1)),
+          arpdau: round2(r.revenue / (dauMap.get(r.period) || 1)),
         }));
 
         // ?? Revenue by country ??
@@ -242,11 +274,13 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const revenueByCountry = ((countryResult.data as any[]) || []).map((r: any) => ({
-          country: r.country || 'Unknown',
-          revenue: round2(Number(r.revenue) || 0),
-          transactions: Number(r.transactions) || 0,
-        }));
+        const revenueByCountry = ((countryResult.data as any[]) || []).map(
+          (r: any) => ({
+            country: r.country || 'Unknown',
+            revenue: round2(Number(r.revenue) || 0),
+            transactions: Number(r.transactions) || 0,
+          })
+        );
 
         // ?? Revenue by platform ??
         const platformResult = await optic.rawQuery({
@@ -265,11 +299,13 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const revenueByPlatform = ((platformResult.data as any[]) || []).map((r: any) => ({
-          platform: r.platform || 'Unknown',
-          revenue: round2(Number(r.revenue) || 0),
-          transactions: Number(r.transactions) || 0,
-        }));
+        const revenueByPlatform = ((platformResult.data as any[]) || []).map(
+          (r: any) => ({
+            platform: r.platform || 'Unknown',
+            revenue: round2(Number(r.revenue) || 0),
+            transactions: Number(r.transactions) || 0,
+          })
+        );
 
         // ?? Previous period: Revenue by country ??
         const prevCountryResult = await optic.rawQuery({
@@ -289,7 +325,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: prevKpiParams,
         });
-        const prevRevenueByCountry = ((prevCountryResult.data as any[]) || []).map((r: any) => ({
+        const prevRevenueByCountry = (
+          (prevCountryResult.data as any[]) || []
+        ).map((r: any) => ({
           country: r.country || 'Unknown',
           revenue: round2(Number(r.revenue) || 0),
           transactions: Number(r.transactions) || 0,
@@ -312,7 +350,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: prevKpiParams,
         });
-        const prevRevenueByPlatform = ((prevPlatformResult.data as any[]) || []).map((r: any) => ({
+        const prevRevenueByPlatform = (
+          (prevPlatformResult.data as any[]) || []
+        ).map((r: any) => ({
           platform: r.platform || 'Unknown',
           revenue: round2(Number(r.revenue) || 0),
           transactions: Number(r.transactions) || 0,
@@ -334,16 +374,20 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: prevKpiParams,
         });
-        const prevRevenueOverTime = ((prevRevenueResult.data as any[]) || []).map(
-          (r: any) => ({
-            period: r.period,
-            revenue: Number(r.revenue) || 0,
-            transactions: Number(r.transactions) || 0,
-          })
-        );
+        const prevRevenueOverTime = (
+          (prevRevenueResult.data as any[]) || []
+        ).map((r: any) => ({
+          period: r.period,
+          revenue: Number(r.revenue) || 0,
+          transactions: Number(r.transactions) || 0,
+        }));
 
         // ?? Refund: Current period summary ??
-        const refundParams = { projectId, refundEvent: REFUND_EVENT, ...timeParams };
+        const refundParams = {
+          projectId,
+          refundEvent: REFUND_EVENT,
+          ...timeParams,
+        };
         const refundSummaryResult = await optic.rawQuery({
           query: `
             SELECT
@@ -362,7 +406,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         const refundCount = Number(refundSummary.refund_count) || 0;
         const refundUsers = Number(refundSummary.refund_users) || 0;
         const totalTransactions = Number(summary.total_transactions) || 0;
-        const refundRate = totalTransactions > 0 ? round2((refundCount / totalTransactions) * 100) : 0;
+        const refundRate =
+          totalTransactions > 0
+            ? round2((refundCount / totalTransactions) * 100)
+            : 0;
         const netRevenue = round2(totalRevenue - totalRefunds);
 
         // ?? Refund: Over time ??
@@ -381,14 +428,20 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: refundParams,
         });
-        const refundsOverTime = ((refundTimeResult.data as any[]) || []).map((r: any) => ({
-          period: r.period,
-          refunds: round2(Number(r.refunds) || 0),
-          refund_count: Number(r.refund_count) || 0,
-        }));
+        const refundsOverTime = ((refundTimeResult.data as any[]) || []).map(
+          (r: any) => ({
+            period: r.period,
+            refunds: round2(Number(r.refunds) || 0),
+            refund_count: Number(r.refund_count) || 0,
+          })
+        );
 
         // ?? Refund: Previous period summary ??
-        const prevRefundParams = { projectId, refundEvent: REFUND_EVENT, ...prevParams };
+        const prevRefundParams = {
+          projectId,
+          refundEvent: REFUND_EVENT,
+          ...prevParams,
+        };
         const prevRefundResult = await optic.rawQuery({
           query: `
             SELECT
@@ -402,7 +455,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           params: prevRefundParams,
         });
         const prevRefundSummary = (prevRefundResult.data as any[])?.[0] || {};
-        const prevTotalRefunds = round2(Number(prevRefundSummary.total_refunds) || 0);
+        const prevTotalRefunds = round2(
+          Number(prevRefundSummary.total_refunds) || 0
+        );
         const prevRefundCount = Number(prevRefundSummary.refund_count) || 0;
         const prevNetRevenue = round2(prevTotalRevenue - prevTotalRefunds);
 
@@ -423,11 +478,13 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: refundParams,
         });
-        const refundReasons = ((refundReasonResult.data as any[]) || []).map((r: any) => ({
-          reason: r.reason,
-          count: Number(r.cnt) || 0,
-          amount: round2(Number(r.amount) || 0),
-        }));
+        const refundReasons = ((refundReasonResult.data as any[]) || []).map(
+          (r: any) => ({
+            reason: r.reason,
+            count: Number(r.cnt) || 0,
+            amount: round2(Number(r.amount) || 0),
+          })
+        );
 
         // ?? Payment Method breakdown ??
         const paymentMethodResult = await optic.rawQuery({
@@ -446,7 +503,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const revenueByPaymentMethod = ((paymentMethodResult.data as any[]) || []).map((r: any) => ({
+        const revenueByPaymentMethod = (
+          (paymentMethodResult.data as any[]) || []
+        ).map((r: any) => ({
           payment_method: r.payment_method,
           revenue: round2(Number(r.revenue) || 0),
           transactions: Number(r.transactions) || 0,
@@ -454,7 +513,11 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         }));
 
         // ?? Grants summary ??
-        const grantParams = { projectId, grantEvent: GRANT_EVENT, ...timeParams };
+        const grantParams = {
+          projectId,
+          grantEvent: GRANT_EVENT,
+          ...timeParams,
+        };
         const grantResult = await optic.rawQuery({
           query: `
             SELECT
@@ -471,19 +534,41 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: grantParams,
         });
-        const grantsByReason = ((grantResult.data as any[]) || []).map((r: any) => ({
-          reason: r.reason,
-          total_granted: round2(Number(r.total_granted) || 0),
-          grant_count: Number(r.grant_count) || 0,
-          grant_users: Number(r.grant_users) || 0,
-        }));
-        const totalGranted = round2(grantsByReason.reduce((s, g) => s + g.total_granted, 0));
-        const grantCount = grantsByReason.reduce((s, g) => s + g.grant_count, 0);
-        const grantUsers = grantsByReason.reduce((s, g) => s + g.grant_users, 0);
+        const grantsByReason = ((grantResult.data as any[]) || []).map(
+          (r: any) => ({
+            reason: r.reason,
+            total_granted: round2(Number(r.total_granted) || 0),
+            grant_count: Number(r.grant_count) || 0,
+            grant_users: Number(r.grant_users) || 0,
+          })
+        );
+        const totalGranted = round2(
+          grantsByReason.reduce((s, g) => s + g.total_granted, 0)
+        );
+        const grantCount = grantsByReason.reduce(
+          (s, g) => s + g.grant_count,
+          0
+        );
+        const grantUsers = grantsByReason.reduce(
+          (s, g) => s + g.grant_users,
+          0
+        );
 
         // ?? Ad Revenue: Summary (current period) ??
-        const adParams = { projectId, adEvent: AD_IMPRESSION_EVENT, adClickEvent: AD_CLICK_EVENT, ...timeParams };
-        const [adSummaryResult, prevAdSummaryResult, adTimeResult, adTypeResult, adPlacementResult, adSdkResult] = await Promise.all([
+        const adParams = {
+          projectId,
+          adEvent: AD_IMPRESSION_EVENT,
+          adClickEvent: AD_CLICK_EVENT,
+          ...timeParams,
+        };
+        const [
+          adSummaryResult,
+          prevAdSummaryResult,
+          adTimeResult,
+          adTypeResult,
+          adPlacementResult,
+          adSdkResult,
+        ] = await Promise.all([
           optic.rawQuery({
             query: `
               SELECT
@@ -597,44 +682,64 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         const adSummary = (adSummaryResult.data as any[])?.[0] || {};
         const prevAdSummary = (prevAdSummaryResult.data as any[])?.[0] || {};
         const totalAdRevenue = round2(Number(adSummary.total_ad_revenue) || 0);
-        const prevTotalAdRevenue = round2(Number(prevAdSummary.total_ad_revenue) || 0);
+        const prevTotalAdRevenue = round2(
+          Number(prevAdSummary.total_ad_revenue) || 0
+        );
         const totalImpressions = Number(adSummary.total_impressions) || 0;
         const avgEcpm = round2(Number(adSummary.avg_ecpm) || 0);
         const adUserCount = Number(adSummary.ad_users) || 0;
-        const totalAdClicks = Number((adClickResult.data as any[])?.[0]?.total_clicks) || 0;
+        const totalAdClicks =
+          Number((adClickResult.data as any[])?.[0]?.total_clicks) || 0;
 
         // Blended metrics
         const blendedRevenue = round2(totalRevenue + totalAdRevenue);
-        const prevBlendedRevenue = round2(prevTotalRevenue + prevTotalAdRevenue);
-        const blendedArpu = totalUsers > 0 ? round2(blendedRevenue / totalUsers) : 0;
+        const prevBlendedRevenue = round2(
+          prevTotalRevenue + prevTotalAdRevenue
+        );
+        const blendedArpu =
+          totalUsers > 0 ? round2(blendedRevenue / totalUsers) : 0;
         const adArpu = totalUsers > 0 ? round2(totalAdRevenue / totalUsers) : 0;
-        const iapShare = blendedRevenue > 0 ? round2((totalRevenue / blendedRevenue) * 100) : 100;
-        const adShare = blendedRevenue > 0 ? round2((totalAdRevenue / blendedRevenue) * 100) : 0;
+        const iapShare =
+          blendedRevenue > 0
+            ? round2((totalRevenue / blendedRevenue) * 100)
+            : 100;
+        const adShare =
+          blendedRevenue > 0
+            ? round2((totalAdRevenue / blendedRevenue) * 100)
+            : 0;
 
-        const adRevenueOverTime = ((adTimeResult.data as any[]) || []).map((r: any) => ({
-          period: r.period,
-          ad_revenue: round2(Number(r.ad_revenue) || 0),
-          impressions: Number(r.impressions) || 0,
-          ecpm: round2(Number(r.ecpm) || 0),
-        }));
-        const revenueByAdType = ((adTypeResult.data as any[]) || []).map((r: any) => ({
-          ad_type: r.ad_type || 'unknown',
-          revenue: round2(Number(r.revenue) || 0),
-          impressions: Number(r.impressions) || 0,
-          ecpm: round2(Number(r.ecpm) || 0),
-        }));
-        const revenueByPlacement = ((adPlacementResult.data as any[]) || []).map((r: any) => ({
+        const adRevenueOverTime = ((adTimeResult.data as any[]) || []).map(
+          (r: any) => ({
+            period: r.period,
+            ad_revenue: round2(Number(r.ad_revenue) || 0),
+            impressions: Number(r.impressions) || 0,
+            ecpm: round2(Number(r.ecpm) || 0),
+          })
+        );
+        const revenueByAdType = ((adTypeResult.data as any[]) || []).map(
+          (r: any) => ({
+            ad_type: r.ad_type || 'unknown',
+            revenue: round2(Number(r.revenue) || 0),
+            impressions: Number(r.impressions) || 0,
+            ecpm: round2(Number(r.ecpm) || 0),
+          })
+        );
+        const revenueByPlacement = (
+          (adPlacementResult.data as any[]) || []
+        ).map((r: any) => ({
           placement: r.placement || 'unknown',
           revenue: round2(Number(r.revenue) || 0),
           impressions: Number(r.impressions) || 0,
           ecpm: round2(Number(r.ecpm) || 0),
         }));
-        const revenueBySdk = ((adSdkResult.data as any[]) || []).map((r: any) => ({
-          sdk: r.sdk || 'unknown',
-          revenue: round2(Number(r.revenue) || 0),
-          impressions: Number(r.impressions) || 0,
-          ecpm: round2(Number(r.ecpm) || 0),
-        }));
+        const revenueBySdk = ((adSdkResult.data as any[]) || []).map(
+          (r: any) => ({
+            sdk: r.sdk || 'unknown',
+            revenue: round2(Number(r.revenue) || 0),
+            impressions: Number(r.impressions) || 0,
+            ecpm: round2(Number(r.ecpm) || 0),
+          })
+        );
 
         return reply.send({
           success: true,
@@ -652,12 +757,19 @@ export default async function monetizationRoutes(app: FastifyInstance) {
             repeat_purchasers: realPayingUsers - firstPurchasers,
             // Previous period comparison
             prev_total_revenue: round2(prevTotalRevenue),
-            prev_total_transactions: Number(prevSummary.total_transactions) || 0,
-            prev_total_paying_users: Number(prevSummary.total_paying_users) || 0,
-            prev_avg_order_value: round2(Number(prevSummary.avg_order_value) || 0),
+            prev_total_transactions:
+              Number(prevSummary.total_transactions) || 0,
+            prev_total_paying_users:
+              Number(prevSummary.total_paying_users) || 0,
+            prev_avg_order_value: round2(
+              Number(prevSummary.avg_order_value) || 0
+            ),
             prev_arpu: round2(prevTotalRevenue / prevTotalUsers),
             prev_arppu: round2(prevTotalRevenue / prevPayingUsers),
-            prev_conversion_rate: round2((Number(prevSummary.total_paying_users) || 0) / prevTotalUsers * 100),
+            prev_conversion_rate: round2(
+              ((Number(prevSummary.total_paying_users) || 0) / prevTotalUsers) *
+                100
+            ),
             // Breakdowns
             revenue_by_country: revenueByCountry,
             revenue_by_platform: revenueByPlatform,
@@ -705,15 +817,22 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               total_revenue: round2(totalRevenue),
               prev_total_revenue: round2(prevTotalRevenue),
               total_transactions: totalTransactions,
-              prev_total_transactions: Number(prevSummary.total_transactions) || 0,
+              prev_total_transactions:
+                Number(prevSummary.total_transactions) || 0,
               total_paying_users: realPayingUsers,
               total_users: totalUsers,
               arppu: round2(totalRevenue / payingUsers),
               prev_arppu: round2(prevTotalRevenue / prevPayingUsers),
               conversion_rate: round2((realPayingUsers / totalUsers) * 100),
-              prev_conversion_rate: round2((Number(prevSummary.total_paying_users) || 0) / prevTotalUsers * 100),
+              prev_conversion_rate: round2(
+                ((Number(prevSummary.total_paying_users) || 0) /
+                  prevTotalUsers) *
+                  100
+              ),
               avg_order_value: round2(Number(summary.avg_order_value) || 0),
-              prev_avg_order_value: round2(Number(prevSummary.avg_order_value) || 0),
+              prev_avg_order_value: round2(
+                Number(prevSummary.avg_order_value) || 0
+              ),
               first_purchasers: firstPurchasers,
               refund_rate: refundRate,
               refund_count: refundCount,
@@ -733,8 +852,18 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               revenue_over_time: enrichedRevenueOverTime,
             }),
             segment_verdicts: {
-              by_country: buildSegmentMatrix(revenueByCountry, prevRevenueByCountry, round2(totalRevenue), 'country'),
-              by_platform: buildSegmentMatrix(revenueByPlatform, prevRevenueByPlatform, round2(totalRevenue), 'platform'),
+              by_country: buildSegmentMatrix(
+                revenueByCountry,
+                prevRevenueByCountry,
+                round2(totalRevenue),
+                'country'
+              ),
+              by_platform: buildSegmentMatrix(
+                revenueByPlatform,
+                prevRevenueByPlatform,
+                round2(totalRevenue),
+                'platform'
+              ),
             },
           },
         });
@@ -754,16 +883,31 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/products',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         const result = await optic.rawQuery({
           query: `
@@ -817,7 +961,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const firstPurchaseProducts = ((firstPurchaseResult.data as any[]) || []).map((r: any) => ({
+        const firstPurchaseProducts = (
+          (firstPurchaseResult.data as any[]) || []
+        ).map((r: any) => ({
           product_name: r.product_name,
           first_purchase_count: Number(r.first_purchase_count) || 0,
         }));
@@ -839,12 +985,14 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const categoryBreakdown = ((categoryResult.data as any[]) || []).map((r: any) => ({
-          category: r.category,
-          revenue: round2(Number(r.revenue) || 0),
-          transactions: Number(r.transactions) || 0,
-          buyers: Number(r.buyers) || 0,
-        }));
+        const categoryBreakdown = ((categoryResult.data as any[]) || []).map(
+          (r: any) => ({
+            category: r.category,
+            revenue: round2(Number(r.revenue) || 0),
+            transactions: Number(r.transactions) || 0,
+            buyers: Number(r.buyers) || 0,
+          })
+        );
 
         // ?? Per-product refund data ??
         const refundByProductResult = await optic.rawQuery({
@@ -862,7 +1010,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: { projectId, refundEvent: REFUND_EVENT, ...timeParams },
         });
-        const refundByProduct = new Map<string, { refund_count: number; refund_amount: number }>();
+        const refundByProduct = new Map<
+          string,
+          { refund_count: number; refund_amount: number }
+        >();
         for (const r of (refundByProductResult.data as any[]) || []) {
           refundByProduct.set(r.product_name, {
             refund_count: Number(r.refund_count) || 0,
@@ -877,10 +1028,16 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               const refundData = refundByProduct.get(p.product_name);
               const refund_count = refundData?.refund_count || 0;
               const refund_amount = refundData?.refund_amount || 0;
-              const refund_rate = p.transactions > 0 ? round2((refund_count / p.transactions) * 100) : 0;
+              const refund_rate =
+                p.transactions > 0
+                  ? round2((refund_count / p.transactions) * 100)
+                  : 0;
               return {
                 ...p,
-                percentage: totalProductRevenue > 0 ? round2((p.revenue / totalProductRevenue) * 100) : 0,
+                percentage:
+                  totalProductRevenue > 0
+                    ? round2((p.revenue / totalProductRevenue) * 100)
+                    : 0,
                 refund_count,
                 refund_amount,
                 refund_rate,
@@ -906,17 +1063,40 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/products/trend',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, granularity, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string; granularity?: string;
-        country?: string; platform?: string; app_version?: string;
+      const {
+        period,
+        start,
+        end,
+        granularity,
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        period?: string;
+        start?: string;
+        end?: string;
+        granularity?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
         const grain = granularity === 'hour' ? 'toStartOfHour' : 'toDate';
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // Get top 5 products by revenue
         const top5Result = await optic.rawQuery({
@@ -933,7 +1113,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const topProducts = ((top5Result.data as any[]) || []).map((r: any) => r.product_name);
+        const topProducts = ((top5Result.data as any[]) || []).map(
+          (r: any) => r.product_name
+        );
         if (topProducts.length === 0) {
           return reply.send({ success: true, data: [] });
         }
@@ -953,22 +1135,32 @@ export default async function monetizationRoutes(app: FastifyInstance) {
             GROUP BY period, product_name
             ORDER BY period ASC
           `,
-          params: { ...params, ...Object.fromEntries(topProducts.map((p, i) => [`p${i}`, p])) },
+          params: {
+            ...params,
+            ...Object.fromEntries(topProducts.map((p, i) => [`p${i}`, p])),
+          },
         });
 
         // Group by product
-        const byProduct: Record<string, { period: string; revenue: number }[]> = {};
+        const byProduct: Record<string, { period: string; revenue: number }[]> =
+          {};
         for (const p of topProducts) byProduct[p] = [];
         for (const r of (trendResult.data as any[]) || []) {
           const pn = r.product_name;
           if (byProduct[pn]) {
-            byProduct[pn].push({ period: r.period, revenue: round2(Number(r.revenue) || 0) });
+            byProduct[pn].push({
+              period: r.period,
+              revenue: round2(Number(r.revenue) || 0),
+            });
           }
         }
 
         return reply.send({
           success: true,
-          data: topProducts.map((p) => ({ product_name: p, trend: byProduct[p] })),
+          data: topProducts.map((p) => ({
+            product_name: p,
+            trend: byProduct[p],
+          })),
         });
       } catch (err) {
         logger.error('Product trend query failed', {
@@ -986,10 +1178,28 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/products/detail',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, granularity, product_name, offset, limit, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string; granularity?: string;
-        product_name?: string; offset?: string; limit?: string;
-        country?: string; platform?: string; app_version?: string;
+      const {
+        period,
+        start,
+        end,
+        granularity,
+        product_name,
+        offset,
+        limit,
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        period?: string;
+        start?: string;
+        end?: string;
+        granularity?: string;
+        product_name?: string;
+        offset?: string;
+        limit?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       if (!product_name) {
@@ -997,12 +1207,18 @@ export default async function monetizationRoutes(app: FastifyInstance) {
       }
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
         const grain = granularity === 'hour' ? 'toStartOfHour' : 'toDate';
         const params = {
-          projectId, purchaseEvent: PURCHASE_EVENT,
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
           productName: product_name,
           ...timeParams,
           ...segmentParams,
@@ -1060,13 +1276,15 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: { ...params, off, lim: lim + 1 },
         });
-        const buyerRows = ((buyersResult.data as any[]) || []).map((r: any) => ({
-          user_id: r.user_id,
-          total_spent: round2(Number(r.total_spent) || 0),
-          purchase_count: Number(r.purchase_count) || 0,
-          last_purchase: r.last_purchase,
-          avatar_url: null as string | null,
-        }));
+        const buyerRows = ((buyersResult.data as any[]) || []).map(
+          (r: any) => ({
+            user_id: r.user_id,
+            total_spent: round2(Number(r.total_spent) || 0),
+            purchase_count: Number(r.purchase_count) || 0,
+            last_purchase: r.last_purchase,
+            avatar_url: null as string | null,
+          })
+        );
         const hasMore = buyerRows.length > lim;
         const buyers = hasMore ? buyerRows.slice(0, lim) : buyerRows;
 
@@ -1082,7 +1300,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
             `,
             params: {
               projectId,
-              ...Object.fromEntries(buyers.map((b, i) => [`uid${i}`, b.user_id])),
+              ...Object.fromEntries(
+                buyers.map((b, i) => [`uid${i}`, b.user_id])
+              ),
             },
           });
           const avatarMap = new Map<string, string>();
@@ -1098,7 +1318,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           success: true,
           data: {
             trend,
-            summary: { total_revenue: round2(totalRevenue), total_transactions: totalTransactions },
+            summary: {
+              total_revenue: round2(totalRevenue),
+              total_transactions: totalTransactions,
+            },
             buyers,
             has_more: hasMore,
           },
@@ -1119,15 +1342,35 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/economy',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, granularity, currency_type, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string; granularity?: string; currency_type?: string;
-        country?: string; platform?: string; app_version?: string;
+      const {
+        period,
+        start,
+        end,
+        granularity,
+        currency_type,
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        period?: string;
+        start?: string;
+        end?: string;
+        granularity?: string;
+        currency_type?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
         const grain = granularity === 'hour' ? 'toStartOfHour' : 'toDate';
         const params = {
           projectId,
@@ -1138,8 +1381,12 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         };
 
         // ?? Source/Sink over time (filtered by currency if specified) ??
-        const currencyFilter = currency_type ? `AND properties['currency_type'] = {currencyType:String}` : '';
-        const flowParams = currency_type ? { ...params, currencyType: currency_type } : params;
+        const currencyFilter = currency_type
+          ? `AND properties['currency_type'] = {currencyType:String}`
+          : '';
+        const flowParams = currency_type
+          ? { ...params, currencyType: currency_type }
+          : params;
 
         const flowResult = await optic.rawQuery({
           query: `
@@ -1157,11 +1404,13 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params: flowParams,
         });
-        const flow_over_time = ((flowResult.data as any[]) || []).map((r: any) => ({
-          period: r.period,
-          source: round2(Number(r.source_total) || 0),
-          sink: round2(Number(r.sink_total) || 0),
-        }));
+        const flow_over_time = ((flowResult.data as any[]) || []).map(
+          (r: any) => ({
+            period: r.period,
+            source: round2(Number(r.source_total) || 0),
+            sink: round2(Number(r.sink_total) || 0),
+          })
+        );
 
         // ?? Summary by currency type ??
         const byCurrencyResult = await optic.rawQuery({
@@ -1181,14 +1430,18 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const by_currency = ((byCurrencyResult.data as any[]) || []).map((r: any) => ({
-          currency_type: r.currency_type || 'unknown',
-          source: round2(Number(r.source_total) || 0),
-          sink: round2(Number(r.sink_total) || 0),
-          source_count: Number(r.source_count) || 0,
-          sink_count: Number(r.sink_count) || 0,
-          net_flow: round2((Number(r.source_total) || 0) - (Number(r.sink_total) || 0)),
-        }));
+        const by_currency = ((byCurrencyResult.data as any[]) || []).map(
+          (r: any) => ({
+            currency_type: r.currency_type || 'unknown',
+            source: round2(Number(r.source_total) || 0),
+            sink: round2(Number(r.sink_total) || 0),
+            source_count: Number(r.source_count) || 0,
+            sink_count: Number(r.sink_count) || 0,
+            net_flow: round2(
+              (Number(r.source_total) || 0) - (Number(r.sink_total) || 0)
+            ),
+          })
+        );
 
         // ?? Top sinks by item ??
         const topSinksResult = await optic.rawQuery({
@@ -1209,12 +1462,14 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const top_sinks = ((topSinksResult.data as any[]) || []).map((r: any) => ({
-          item_name: r.item_name,
-          currency_type: r.currency_type || 'unknown',
-          total_spent: round2(Number(r.total_spent) || 0),
-          transaction_count: Number(r.transaction_count) || 0,
-        }));
+        const top_sinks = ((topSinksResult.data as any[]) || []).map(
+          (r: any) => ({
+            item_name: r.item_name,
+            currency_type: r.currency_type || 'unknown',
+            total_spent: round2(Number(r.total_spent) || 0),
+            transaction_count: Number(r.transaction_count) || 0,
+          })
+        );
 
         // Compute source/sink ratio over time from flow data
         const ratio_trend = flow_over_time.map((f: any) => ({
@@ -1248,16 +1503,31 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/top-spenders',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // Per-user spending
         const userSpendResult = await optic.rawQuery({
@@ -1276,11 +1546,13 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const allSpenders = ((userSpendResult.data as any[]) || []).map((r: any) => ({
-          user_id: r.user_id,
-          total_spent: Number(r.total_spent) || 0,
-          purchase_count: Number(r.purchase_count) || 0,
-        }));
+        const allSpenders = ((userSpendResult.data as any[]) || []).map(
+          (r: any) => ({
+            user_id: r.user_id,
+            total_spent: Number(r.total_spent) || 0,
+            purchase_count: Number(r.purchase_count) || 0,
+          })
+        );
 
         const totalRev = allSpenders.reduce((s, u) => s + u.total_spent, 0);
         const count = allSpenders.length;
@@ -1289,27 +1561,36 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         const top1Pct = Math.max(1, Math.ceil(count * 0.01));
         const top10Pct = Math.max(1, Math.ceil(count * 0.1));
 
-        const top1Revenue = allSpenders.slice(0, top1Pct).reduce((s, u) => s + u.total_spent, 0);
-        const top10Revenue = allSpenders.slice(0, top10Pct).reduce((s, u) => s + u.total_spent, 0);
+        const top1Revenue = allSpenders
+          .slice(0, top1Pct)
+          .reduce((s, u) => s + u.total_spent, 0);
+        const top10Revenue = allSpenders
+          .slice(0, top10Pct)
+          .reduce((s, u) => s + u.total_spent, 0);
 
         const segments = [
           {
             segment: 'top_1_pct',
             user_count: top1Pct,
             revenue: round2(top1Revenue),
-            percentage: totalRev > 0 ? round2((top1Revenue / totalRev) * 100) : 0,
+            percentage:
+              totalRev > 0 ? round2((top1Revenue / totalRev) * 100) : 0,
           },
           {
             segment: 'top_10_pct',
             user_count: top10Pct,
             revenue: round2(top10Revenue),
-            percentage: totalRev > 0 ? round2((top10Revenue / totalRev) * 100) : 0,
+            percentage:
+              totalRev > 0 ? round2((top10Revenue / totalRev) * 100) : 0,
           },
           {
             segment: 'bottom_90_pct',
             user_count: count - top10Pct,
             revenue: round2(totalRev - top10Revenue),
-            percentage: totalRev > 0 ? round2(((totalRev - top10Revenue) / totalRev) * 100) : 0,
+            percentage:
+              totalRev > 0
+                ? round2(((totalRev - top10Revenue) / totalRev) * 100)
+                : 0,
           },
         ];
 
@@ -1317,12 +1598,17 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         const top_users = allSpenders.slice(0, 10).map((u) => ({
           ...u,
           total_spent: round2(u.total_spent),
-          percentage: totalRev > 0 ? round2((u.total_spent / totalRev) * 100) : 0,
+          percentage:
+            totalRev > 0 ? round2((u.total_spent / totalRev) * 100) : 0,
         }));
 
         // ?? Spending distribution (histogram buckets) ??
-        const maxSpend = allSpenders.length > 0 ? allSpenders[0].total_spent : 0;
-        const bucketSize = maxSpend > 0 ? Math.pow(10, Math.floor(Math.log10(maxSpend / 5))) : 10;
+        const maxSpend =
+          allSpenders.length > 0 ? allSpenders[0].total_spent : 0;
+        const bucketSize =
+          maxSpend > 0
+            ? Math.pow(10, Math.floor(Math.log10(maxSpend / 5)))
+            : 10;
         const distributionMap: Record<number, number> = {};
         for (const u of allSpenders) {
           const bucket = Math.floor(u.total_spent / bucketSize) * bucketSize;
@@ -1372,18 +1658,27 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const whale_trend = ((whaleTrendResult.data as any[]) || []).map((r: any) => {
-          const topRev = Number(r.top_revenue) || 0;
-          const totRev = Number(r.total_revenue) || 1;
-          return {
-            period: r.period,
-            top10_pct_share: round2((topRev / totRev) * 100),
-          };
-        });
+        const whale_trend = ((whaleTrendResult.data as any[]) || []).map(
+          (r: any) => {
+            const topRev = Number(r.top_revenue) || 0;
+            const totRev = Number(r.total_revenue) || 1;
+            return {
+              period: r.period,
+              top10_pct_share: round2((topRev / totRev) * 100),
+            };
+          }
+        );
 
         return reply.send({
           success: true,
-          data: { segments, top_users, total_revenue: round2(totalRev), total_spenders: count, distribution, whale_trend },
+          data: {
+            segments,
+            top_users,
+            total_revenue: round2(totalRev),
+            total_spenders: count,
+            distribution,
+            whale_trend,
+          },
         });
       } catch (err) {
         logger.error('Top spenders query failed', {
@@ -1401,16 +1696,31 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/ltv',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // Cumulative revenue per user by day-since-first-seen
         const ltvResult = await optic.rawQuery({
@@ -1474,11 +1784,14 @@ export default async function monetizationRoutes(app: FastifyInstance) {
 
         if (ltv_curve.length >= 5) {
           // Prepare data points: x_i = ln(day+1), y_i = cumulative_revenue
-          const points = ltv_curve.filter(p => p.day >= 1);
+          const points = ltv_curve.filter((p) => p.day >= 1);
           const n = points.length;
 
           if (n >= 5) {
-            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            let sumX = 0,
+              sumY = 0,
+              sumXY = 0,
+              sumX2 = 0;
             for (const p of points) {
               const x = Math.log(p.day + 1);
               const y = p.cumulative_revenue;
@@ -1496,7 +1809,8 @@ export default async function monetizationRoutes(app: FastifyInstance) {
 
               // R짼 calculation
               const yMean = sumY / n;
-              let ssTot = 0, ssRes = 0;
+              let ssTot = 0,
+                ssRes = 0;
               for (const p of points) {
                 const x = Math.log(p.day + 1);
                 const yPred = a * x + b;
@@ -1507,10 +1821,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
 
               // Predict at key milestones
               const predictionDays = [30, 60, 90, 120, 180, 365];
-              const maxActualDay = Math.max(...ltv_curve.map(p => p.day));
+              const maxActualDay = Math.max(...ltv_curve.map((p) => p.day));
               pltv_predictions = predictionDays
-                .filter(d => d > maxActualDay) // Only predict beyond observed data
-                .map(day => ({
+                .filter((d) => d > maxActualDay) // Only predict beyond observed data
+                .map((day) => ({
                   day,
                   predicted_ltv: round2(Math.max(0, a * Math.log(day + 1) + b)),
                 }));
@@ -1522,13 +1836,19 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         }
 
         // Build smooth predicted curve for chart overlay (one point per day, beyond actual data)
-        const maxDay = ltv_curve.length > 0 ? Math.max(...ltv_curve.map(p => p.day)) : 0;
+        const maxDay =
+          ltv_curve.length > 0 ? Math.max(...ltv_curve.map((p) => p.day)) : 0;
         const pltv_curve: { day: number; predicted_ltv: number }[] = [];
         if (pltv_coefficients.a !== 0 && maxDay > 0) {
           for (let d = 0; d <= Math.min(365, maxDay * 4); d++) {
             pltv_curve.push({
               day: d,
-              predicted_ltv: round2(Math.max(0, pltv_coefficients.a * Math.log(d + 1) + pltv_coefficients.b)),
+              predicted_ltv: round2(
+                Math.max(
+                  0,
+                  pltv_coefficients.a * Math.log(d + 1) + pltv_coefficients.b
+                )
+              ),
             });
           }
         }
@@ -1559,15 +1879,33 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/cohort',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { params: timeParams } = buildTimeRangeConditions(period, start, end);
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const { params: timeParams } = buildTimeRangeConditions(
+          period,
+          start,
+          end
+        );
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // Group users by first-purchase week, track cumulative revenue at Day 0,7,14,30,60,90
         const result = await optic.rawQuery({
@@ -1610,7 +1948,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         });
 
         // Build cohort matrix
-        type CohortRow = { cohort_week: string; buckets: Record<number, { revenue: number; users: number }> };
+        type CohortRow = {
+          cohort_week: string;
+          buckets: Record<number, { revenue: number; users: number }>;
+        };
         const cohortMap = new Map<string, CohortRow>();
         for (const r of (result.data as any[]) || []) {
           const week = String(r.cohort_week);
@@ -1634,12 +1975,19 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               data: BUCKET_DAYS.map((d) => {
                 const b = c.buckets[d];
                 cumulative += b?.revenue || 0;
-                return { day: d, cumulative_revenue: round2(cumulative), users: b?.users || 0 };
+                return {
+                  day: d,
+                  cumulative_revenue: round2(cumulative),
+                  users: b?.users || 0,
+                };
               }),
             };
           });
 
-        return reply.send({ success: true, data: { cohorts, bucket_days: BUCKET_DAYS } });
+        return reply.send({
+          success: true,
+          data: { cohorts, bucket_days: BUCKET_DAYS },
+        });
       } catch (err) {
         logger.error('Revenue cohort query failed', {
           error: err instanceof Error ? err.message : String(err),
@@ -1656,29 +2004,44 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/funnel',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
         const params = { projectId, ...timeParams, ...segmentParams };
 
         // Funnel stages: all_users ??view_shop ??view_product ??add_to_cart ??purchase
         const STAGES = [
           { name: 'all_users', event: null, label: 'All Active Users' },
           { name: 'view_shop', event: 'view_shop', label: 'Viewed Shop' },
-          { name: 'view_product', event: 'view_product', label: 'Viewed Product' },
+          {
+            name: 'view_product',
+            event: 'view_product',
+            label: 'Viewed Product',
+          },
           { name: 'add_to_cart', event: 'add_to_cart', label: 'Added to Cart' },
           { name: 'purchase', event: PURCHASE_EVENT, label: 'Purchased' },
           { name: 'repeat_purchase', event: null, label: 'Repeat Purchase' },
         ];
 
         // Count unique users at each stage
-        const stageResults: { name: string; label: string; users: number }[] = [];
+        const stageResults: { name: string; label: string; users: number }[] =
+          [];
 
         // All active users
         const allResult = await optic.rawQuery({
@@ -1717,15 +2080,21 @@ export default async function monetizationRoutes(app: FastifyInstance) {
 
         // Filter out stages with 0 users (events not instrumented)
         // Keep all_users and purchase always, filter middle stages only if ALL middle are 0
-        const middleStages = stageResults.filter((s) =>
-          s.name !== 'all_users' && s.name !== 'purchase' && s.name !== 'repeat_purchase'
+        const middleStages = stageResults.filter(
+          (s) =>
+            s.name !== 'all_users' &&
+            s.name !== 'purchase' &&
+            s.name !== 'repeat_purchase'
         );
         const hasMiddleData = middleStages.some((s) => s.users > 0);
 
         const funnel = hasMiddleData
           ? stageResults
-          : stageResults.filter((s) =>
-              s.name === 'all_users' || s.name === 'purchase' || s.name === 'repeat_purchase'
+          : stageResults.filter(
+              (s) =>
+                s.name === 'all_users' ||
+                s.name === 'purchase' ||
+                s.name === 'repeat_purchase'
             );
 
         return reply.send({ success: true, data: { stages: funnel } });
@@ -1745,16 +2114,32 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/ltv-cohorts',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, cohort_by, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string; cohort_by?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, cohort_by, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          cohort_by?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         const result = await optic.rawQuery({
           query: `
@@ -1794,7 +2179,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         });
 
         // Group by cohort_label and build LTV curves
-        const cohortMap = new Map<string, { day: number; avg_revenue: number; user_count: number }[]>();
+        const cohortMap = new Map<
+          string,
+          { day: number; avg_revenue: number; user_count: number }[]
+        >();
         for (const r of (result.data as any[]) || []) {
           const label = String(r.cohort_label);
           if (!cohortMap.has(label)) cohortMap.set(label, []);
@@ -1815,7 +2203,11 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               total_users: totalUsers,
               ltv_curve: data.map((d) => {
                 cumulative += d.avg_revenue;
-                return { day: d.day, cumulative_revenue: round2(cumulative), user_count: d.user_count };
+                return {
+                  day: d.day,
+                  cumulative_revenue: round2(cumulative),
+                  user_count: d.user_count,
+                };
               }),
             };
           })
@@ -1842,16 +2234,31 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/segment-comparison',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params = { projectId, purchaseEvent: PURCHASE_EVENT, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params = {
+          projectId,
+          purchaseEvent: PURCHASE_EVENT,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // First: get per-user spend
         const userSpendResult = await optic.rawQuery({
@@ -1874,14 +2281,16 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           params,
         });
 
-        const allUsers = ((userSpendResult.data as any[]) || []).map((r: any) => ({
-          user_id: r.user_id,
-          total_spent: Number(r.total_spent) || 0,
-          purchase_count: Number(r.purchase_count) || 0,
-          active_days: Number(r.active_days) || 0,
-          first_purchase: r.first_purchase,
-          last_purchase: r.last_purchase,
-        }));
+        const allUsers = ((userSpendResult.data as any[]) || []).map(
+          (r: any) => ({
+            user_id: r.user_id,
+            total_spent: Number(r.total_spent) || 0,
+            purchase_count: Number(r.purchase_count) || 0,
+            active_days: Number(r.active_days) || 0,
+            first_purchase: r.first_purchase,
+            last_purchase: r.last_purchase,
+          })
+        );
 
         if (allUsers.length === 0) {
           return reply.send({ success: true, data: { segments: [] } });
@@ -1895,15 +2304,21 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         const buildSegment = (users: typeof allUsers, name: string) => {
           if (users.length === 0) return null;
           const totalSpent = users.reduce((s, u) => s + u.total_spent, 0);
-          const totalPurchases = users.reduce((s, u) => s + u.purchase_count, 0);
-          const avgActiveDays = users.reduce((s, u) => s + u.active_days, 0) / users.length;
+          const totalPurchases = users.reduce(
+            (s, u) => s + u.purchase_count,
+            0
+          );
+          const avgActiveDays =
+            users.reduce((s, u) => s + u.active_days, 0) / users.length;
           return {
             segment: name,
             user_count: users.length,
             total_revenue: round2(totalSpent),
             avg_spend: round2(totalSpent / users.length),
             avg_purchases: round2(totalPurchases / users.length),
-            avg_order_value: round2(totalPurchases > 0 ? totalSpent / totalPurchases : 0),
+            avg_order_value: round2(
+              totalPurchases > 0 ? totalSpent / totalPurchases : 0
+            ),
             avg_active_days: round2(avgActiveDays),
           };
         };
@@ -1936,13 +2351,26 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         };
 
         const [whaleProducts, normalProducts] = await Promise.all([
-          getTopProducts(whales.slice(0, 50).map((u) => u.user_id), 5),
-          getTopProducts(normals.slice(0, 200).map((u) => u.user_id), 5),
+          getTopProducts(
+            whales.slice(0, 50).map((u) => u.user_id),
+            5
+          ),
+          getTopProducts(
+            normals.slice(0, 200).map((u) => u.user_id),
+            5
+          ),
         ]);
 
         const segments = [
           { ...buildSegment(whales, 'whales')!, top_products: whaleProducts },
-          ...(normals.length > 0 ? [{ ...buildSegment(normals, 'normal')!, top_products: normalProducts }] : []),
+          ...(normals.length > 0
+            ? [
+                {
+                  ...buildSegment(normals, 'normal')!,
+                  top_products: normalProducts,
+                },
+              ]
+            : []),
         ];
 
         return reply.send({ success: true, data: { segments } });
@@ -1950,7 +2378,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         logger.error('Segment comparison query failed', {
           error: err instanceof Error ? err.message : String(err),
         });
-        return reply.code(500).send({ error: 'Segment comparison query failed' });
+        return reply
+          .code(500)
+          .send({ error: 'Segment comparison query failed' });
       }
     }
   );
@@ -1963,96 +2393,203 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       const {
-        period, start, end, type, user_id, product, reason,
-        min_amount, max_amount, sort, order, offset, limit,
-        group_by, user_ids, products, reasons, payment_methods, country, platform, app_version,
+        period,
+        start,
+        end,
+        type,
+        user_id,
+        product,
+        reason,
+        min_amount,
+        max_amount,
+        sort,
+        order,
+        offset,
+        limit,
+        group_by,
+        user_ids,
+        products,
+        reasons,
+        payment_methods,
+        country,
+        platform,
+        app_version,
       } = request.query as {
-        period?: string; start?: string; end?: string;
-        type?: string; user_id?: string; product?: string; reason?: string;
-        min_amount?: string; max_amount?: string;
-        sort?: string; order?: string;
-        offset?: string; limit?: string;
-        group_by?: string; user_ids?: string; products?: string;
-        reasons?: string; payment_methods?: string;
-        country?: string; platform?: string; app_version?: string;
+        period?: string;
+        start?: string;
+        end?: string;
+        type?: string;
+        user_id?: string;
+        product?: string;
+        reason?: string;
+        min_amount?: string;
+        max_amount?: string;
+        sort?: string;
+        order?: string;
+        offset?: string;
+        limit?: string;
+        group_by?: string;
+        user_ids?: string;
+        products?: string;
+        reasons?: string;
+        payment_methods?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params: Record<string, any> = { projectId, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params: Record<string, any> = {
+          projectId,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // Event type filter
         const eventTypes: string[] = [];
         if (!type || type === 'all') {
-          eventTypes.push(PURCHASE_EVENT, REFUND_EVENT, GRANT_EVENT, AD_IMPRESSION_EVENT);
+          eventTypes.push(
+            PURCHASE_EVENT,
+            REFUND_EVENT,
+            GRANT_EVENT,
+            AD_IMPRESSION_EVENT
+          );
         } else {
           for (const t of type.split(',')) {
             if (t === 'purchase') eventTypes.push(PURCHASE_EVENT);
             else if (t === 'refund') eventTypes.push(REFUND_EVENT);
             else if (t === 'grant') eventTypes.push(GRANT_EVENT);
-            else if (t === 'ad_impression') eventTypes.push(AD_IMPRESSION_EVENT);
+            else if (t === 'ad_impression')
+              eventTypes.push(AD_IMPRESSION_EVENT);
           }
         }
-        const eventFilter = eventTypes.map((e, i) => { params[`evt${i}`] = e; return `{evt${i}:String}`; }).join(',');
+        const eventFilter = eventTypes
+          .map((e, i) => {
+            params[`evt${i}`] = e;
+            return `{evt${i}:String}`;
+          })
+          .join(',');
 
         // Build extra conditions
         const extraConds: string[] = [];
-        if (user_id) { extraConds.push(`user_id = {filterUserId:String}`); params.filterUserId = user_id; }
+        if (user_id) {
+          extraConds.push(`user_id = {filterUserId:String}`);
+          params.filterUserId = user_id;
+        }
         if (user_ids) {
           const uids = user_ids.split(',').filter(Boolean);
           if (uids.length > 0) {
-            const uidPh = uids.map((u, i) => { params[`uid${i}`] = u; return `{uid${i}:String}`; }).join(',');
+            const uidPh = uids
+              .map((u, i) => {
+                params[`uid${i}`] = u;
+                return `{uid${i}:String}`;
+              })
+              .join(',');
             extraConds.push(`user_id IN (${uidPh})`);
           }
         }
         if (product) {
-          const escapedProduct = product.replace(/%/g, '\\%').replace(/_/g, '\\_');
-          extraConds.push(`properties['product_name'] ILIKE {filterProduct:String}`);
+          const escapedProduct = product
+            .replace(/%/g, '\\%')
+            .replace(/_/g, '\\_');
+          extraConds.push(
+            `properties['product_name'] ILIKE {filterProduct:String}`
+          );
           params.filterProduct = `%${escapedProduct}%`;
         }
         if (products) {
           const prods = products.split(',').filter(Boolean);
           if (prods.length > 0) {
-            const prodPh = prods.map((p, i) => { params[`prod${i}`] = p; return `{prod${i}:String}`; }).join(',');
+            const prodPh = prods
+              .map((p, i) => {
+                params[`prod${i}`] = p;
+                return `{prod${i}:String}`;
+              })
+              .join(',');
             extraConds.push(`properties['product_name'] IN (${prodPh})`);
           }
         }
-        if (reason) { extraConds.push(`properties['reason'] = {filterReason:String}`); params.filterReason = reason; }
+        if (reason) {
+          extraConds.push(`properties['reason'] = {filterReason:String}`);
+          params.filterReason = reason;
+        }
         if (reasons) {
           const rsns = reasons.split(',').filter(Boolean);
           if (rsns.length > 0) {
-            const rsnPh = rsns.map((r, i) => { params[`rsn${i}`] = r; return `{rsn${i}:String}`; }).join(',');
+            const rsnPh = rsns
+              .map((r, i) => {
+                params[`rsn${i}`] = r;
+                return `{rsn${i}:String}`;
+              })
+              .join(',');
             extraConds.push(`properties['reason'] IN (${rsnPh})`);
           }
         }
         if (payment_methods) {
           const pms = payment_methods.split(',').filter(Boolean);
           if (pms.length > 0) {
-            const pmPh = pms.map((pm, i) => { params[`pm${i}`] = pm; return `{pm${i}:String}`; }).join(',');
+            const pmPh = pms
+              .map((pm, i) => {
+                params[`pm${i}`] = pm;
+                return `{pm${i}:String}`;
+              })
+              .join(',');
             extraConds.push(`properties['payment_method'] IN (${pmPh})`);
           }
         }
-        if (min_amount) { extraConds.push(`numeric_properties['${AMOUNT_PROP}'] >= {minAmt:Float64}`); params.minAmt = parseFloat(min_amount); }
-        if (max_amount) { extraConds.push(`numeric_properties['${AMOUNT_PROP}'] <= {maxAmt:Float64}`); params.maxAmt = parseFloat(max_amount); }
-        const extraWhere = extraConds.length > 0 ? ' AND ' + extraConds.join(' AND ') : '';
+        if (min_amount) {
+          extraConds.push(
+            `numeric_properties['${AMOUNT_PROP}'] >= {minAmt:Float64}`
+          );
+          params.minAmt = parseFloat(min_amount);
+        }
+        if (max_amount) {
+          extraConds.push(
+            `numeric_properties['${AMOUNT_PROP}'] <= {maxAmt:Float64}`
+          );
+          params.maxAmt = parseFloat(max_amount);
+        }
+        const extraWhere =
+          extraConds.length > 0 ? ' AND ' + extraConds.join(' AND ') : '';
         const baseWhere = `project_id = {projectId:String} AND event_name IN (${eventFilter}) AND ${timeWhere} ${segmentWhere}${extraWhere}`;
 
         // ??? GROUP BY mode ???
         const groupMode = group_by || 'none';
         if (groupMode !== 'none') {
-          const groupMap: Record<string, { col: string; sortDefault: string }> = {
-            product: { col: `properties['product_name']`, sortDefault: 'total_amount' },
-            user: { col: 'user_id', sortDefault: 'total_amount' },
-            day: { col: 'toDate(timestamp)', sortDefault: 'group_key' },
-            hour: { col: 'toStartOfHour(timestamp)', sortDefault: 'group_key' },
-            reason: { col: `properties['reason']`, sortDefault: 'cnt' },
-          };
+          const groupMap: Record<string, { col: string; sortDefault: string }> =
+            {
+              product: {
+                col: `properties['product_name']`,
+                sortDefault: 'total_amount',
+              },
+              user: { col: 'user_id', sortDefault: 'total_amount' },
+              day: { col: 'toDate(timestamp)', sortDefault: 'group_key' },
+              hour: {
+                col: 'toStartOfHour(timestamp)',
+                sortDefault: 'group_key',
+              },
+              reason: { col: `properties['reason']`, sortDefault: 'cnt' },
+            };
           const gm = groupMap[groupMode];
-          if (!gm) return reply.code(400).send({ error: `Invalid group_by: ${groupMode}` });
+          if (!gm)
+            return reply
+              .code(400)
+              .send({ error: `Invalid group_by: ${groupMode}` });
 
-          const sortField = sort === 'amount' ? 'total_amount' : sort === 'count' ? 'cnt' : gm.sortDefault;
+          const sortField =
+            sort === 'amount'
+              ? 'total_amount'
+              : sort === 'count'
+                ? 'cnt'
+                : gm.sortDefault;
           const sortDirection = order === 'asc' ? 'ASC' : 'DESC';
           const gOff = parseInt(offset || '0', 10) || 0;
           const gLim = Math.min(parseInt(limit || '50', 10) || 50, 500);
@@ -2061,7 +2598,8 @@ export default async function monetizationRoutes(app: FastifyInstance) {
             query: `SELECT count(DISTINCT ${gm.col}) AS total FROM ${TABLE} WHERE ${baseWhere}`,
             params,
           });
-          const totalGroups = Number(((countResult.data as any[])?.[0])?.total) || 0;
+          const totalGroups =
+            Number((countResult.data as any[])?.[0]?.total) || 0;
 
           const groupResult = await optic.rawQuery({
             query: `
@@ -2099,7 +2637,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           });
           const summary: Record<string, { count: number; total: number }> = {};
           for (const r of (summaryResult.data as any[]) || []) {
-            summary[r.event_name] = { count: Number(r.cnt) || 0, total: round2(Number(r.total_amount) || 0) };
+            summary[r.event_name] = {
+              count: Number(r.cnt) || 0,
+              total: round2(Number(r.total_amount) || 0),
+            };
           }
 
           return reply.send({
@@ -2126,7 +2667,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
 
         // ??? Normal (non-grouped) mode ???
         // Sort
-        const sortCol = sort === 'amount' ? `numeric_properties['${AMOUNT_PROP}']` : 'timestamp';
+        const sortCol =
+          sort === 'amount'
+            ? `numeric_properties['${AMOUNT_PROP}']`
+            : 'timestamp';
         const sortDir = order === 'asc' ? 'ASC' : 'DESC';
 
         const off = parseInt(offset || '0', 10) || 0;
@@ -2137,7 +2681,7 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           query: `SELECT count() AS total FROM ${TABLE} WHERE ${baseWhere}`,
           params,
         });
-        const totalCount = Number(((countResult.data as any[])?.[0])?.total) || 0;
+        const totalCount = Number((countResult.data as any[])?.[0]?.total) || 0;
 
         // Summary query
         const summaryResult = await optic.rawQuery({
@@ -2177,26 +2721,29 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           params: { ...params, lim: lim + 1, off },
         });
 
-        const rows = ((txResult.data as any[]) || []).slice(0, lim).map((r: any) => {
-          const evtName = r.event_name;
-          const amt = evtName === AD_IMPRESSION_EVENT
-            ? round2(Number(r.ad_revenue) || 0)
-            : round2(Number(r.amount) || 0);
-          return {
-            event_id: r.event_id || '',
-            event_type: evtName,
-            timestamp: r.timestamp,
-            user_id: r.user_id || '',
-            product_name: r.product_name || '',
-            amount: amt,
-            currency: r.currency || 'USD',
-            reason: r.reason || '',
-            payment_method: r.payment_method || '',
-            ad_type: r.ad_type || '',
-            ad_sdk: r.ad_sdk || '',
-            ad_ecpm: round2(Number(r.ad_ecpm) || 0),
-          };
-        });
+        const rows = ((txResult.data as any[]) || [])
+          .slice(0, lim)
+          .map((r: any) => {
+            const evtName = r.event_name;
+            const amt =
+              evtName === AD_IMPRESSION_EVENT
+                ? round2(Number(r.ad_revenue) || 0)
+                : round2(Number(r.amount) || 0);
+            return {
+              event_id: r.event_id || '',
+              event_type: evtName,
+              timestamp: r.timestamp,
+              user_id: r.user_id || '',
+              product_name: r.product_name || '',
+              amount: amt,
+              currency: r.currency || 'USD',
+              reason: r.reason || '',
+              payment_method: r.payment_method || '',
+              ad_type: r.ad_type || '',
+              ad_sdk: r.ad_sdk || '',
+              ad_ecpm: round2(Number(r.ad_ecpm) || 0),
+            };
+          });
         const hasMore = ((txResult.data as any[]) || []).length > lim;
 
         return reply.send({
@@ -2222,7 +2769,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         logger.error('Transaction ledger query failed', {
           error: err instanceof Error ? err.message : String(err),
         });
-        return reply.code(500).send({ error: 'Transaction ledger query failed' });
+        return reply
+          .code(500)
+          .send({ error: 'Transaction ledger query failed' });
       }
     }
   );
@@ -2234,19 +2783,34 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/transactions/facets',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, facet, country, platform, app_version } = request.query as {
-        period?: string; start?: string; end?: string;
-        facet?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { period, start, end, facet, country, platform, app_version } =
+        request.query as {
+          period?: string;
+          start?: string;
+          end?: string;
+          facet?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
-      if (!facet) return reply.code(400).send({ error: 'facet param required' });
+      if (!facet)
+        return reply.code(400).send({ error: 'facet param required' });
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params: Record<string, any> = { projectId, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params: Record<string, any> = {
+          projectId,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         const colMap: Record<string, string> = {
           product: `properties['product_name']`,
@@ -2255,7 +2819,8 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           user: 'user_id',
         };
         const col = colMap[facet];
-        if (!col) return reply.code(400).send({ error: `Invalid facet: ${facet}` });
+        if (!col)
+          return reply.code(400).send({ error: `Invalid facet: ${facet}` });
 
         const result = await optic.rawQuery({
           query: `
@@ -2293,20 +2858,36 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/user-summary',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { user_id, period, start, end, country, platform, app_version } = request.query as {
-        user_id?: string; period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
-      };
+      const { user_id, period, start, end, country, platform, app_version } =
+        request.query as {
+          user_id?: string;
+          period?: string;
+          start?: string;
+          end?: string;
+          country?: string;
+          platform?: string;
+          app_version?: string;
+        };
 
       if (!user_id) {
         return reply.code(400).send({ error: 'user_id is required' });
       }
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
-        const params: Record<string, any> = { projectId, userId: user_id, ...timeParams, ...segmentParams };
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
+        const params: Record<string, any> = {
+          projectId,
+          userId: user_id,
+          ...timeParams,
+          ...segmentParams,
+        };
 
         // Summary aggregates
         const summaryResult = await optic.rawQuery({
@@ -2326,7 +2907,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
           `,
           params,
         });
-        const sums: Record<string, { count: number; total: number; first: string; last: string }> = {};
+        const sums: Record<
+          string,
+          { count: number; total: number; first: string; last: string }
+        > = {};
         for (const r of (summaryResult.data as any[]) || []) {
           sums[r.event_name] = {
             count: Number(r.cnt) || 0,
@@ -2389,7 +2973,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               total_grants: grantTotal,
               grant_count: sums[GRANT_EVENT]?.count || 0,
               net_revenue: round2(purchaseTotal - refundTotal),
-              refund_rate: purchaseTotal > 0 ? round2((refundTotal / purchaseTotal) * 100) : 0,
+              refund_rate:
+                purchaseTotal > 0
+                  ? round2((refundTotal / purchaseTotal) * 100)
+                  : 0,
               first_purchase: sums[PURCHASE_EVENT]?.first || null,
               last_purchase: sums[PURCHASE_EVENT]?.last || null,
             },
@@ -2402,7 +2989,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         logger.error('User financial summary query failed', {
           error: err instanceof Error ? err.message : String(err),
         });
-        return reply.code(500).send({ error: 'User financial summary query failed' });
+        return reply
+          .code(500)
+          .send({ error: 'User financial summary query failed' });
       }
     }
   );
@@ -2414,9 +3003,22 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/products/hourly',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { product_name, period, start, end, country, platform, app_version } = request.query as {
-        product_name?: string; period?: string; start?: string; end?: string;
-        country?: string; platform?: string; app_version?: string;
+      const {
+        product_name,
+        period,
+        start,
+        end,
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        product_name?: string;
+        period?: string;
+        start?: string;
+        end?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
       };
 
       if (!product_name) {
@@ -2424,11 +3026,17 @@ export default async function monetizationRoutes(app: FastifyInstance) {
       }
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
         const params: Record<string, any> = {
-          projectId, productName: product_name,
+          projectId,
+          productName: product_name,
           purchaseEvent: PURCHASE_EVENT,
           tz: (request.query as any).tz || 'UTC',
           ...timeParams,
@@ -2465,7 +3073,9 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         logger.error('Product hourly heatmap query failed', {
           error: err instanceof Error ? err.message : String(err),
         });
-        return reply.code(500).send({ error: 'Product hourly heatmap query failed' });
+        return reply
+          .code(500)
+          .send({ error: 'Product hourly heatmap query failed' });
       }
     }
   );
@@ -2477,10 +3087,23 @@ export default async function monetizationRoutes(app: FastifyInstance) {
     '/projects/:projectId/analytics/monetization/acquisition',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period, start, end, groupBy, country, platform, app_version, attributionModel } = request.query as {
-        period?: string; start?: string; end?: string;
+      const {
+        period,
+        start,
+        end,
+        groupBy,
+        country,
+        platform,
+        app_version,
+        attributionModel,
+      } = request.query as {
+        period?: string;
+        start?: string;
+        end?: string;
         groupBy?: string;
-        country?: string; platform?: string; app_version?: string;
+        country?: string;
+        platform?: string;
+        app_version?: string;
         attributionModel?: 'last' | 'first' | 'linear';
       };
 
@@ -2495,9 +3118,14 @@ export default async function monetizationRoutes(app: FastifyInstance) {
       const dim = dimMap[groupMode] || dimMap.source;
 
       try {
-        const { conditions: timeConds, params: timeParams } = buildTimeRangeConditions(period, start, end);
+        const { conditions: timeConds, params: timeParams } =
+          buildTimeRangeConditions(period, start, end);
         const timeWhere = timeConds.join(' AND ');
-        const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+        const { segmentWhere, segmentParams } = buildSegmentFilter({
+          country,
+          platform,
+          app_version,
+        });
 
         // Get POSIX timestamps for sessions started time constraint
         const isCustom = start && end;
@@ -2800,7 +3428,8 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         }
 
         // Build previous-period summary query (mirrors the current summaryQuery but for the previous period)
-        const { conditions: prevConds, params: prevParams } = buildPreviousPeriodConditions(period, start, end);
+        const { conditions: prevConds, params: prevParams } =
+          buildPreviousPeriodConditions(period, start, end);
         const prevTimeWhere = prevConds.join(' AND ');
         // For previous period we always use 'last touch' style on sessions to keep it simple
         const prevSummaryQuery = `
@@ -2844,17 +3473,20 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         });
 
         // 4. Previous-period Summary Query (for PoP)
-        const prevSummaryPromise = optic.rawQuery({
-          query: prevSummaryQuery,
-          params: { ...params, ...prevParams },
-        }).catch(() => ({ data: [] }));
+        const prevSummaryPromise = optic
+          .rawQuery({
+            query: prevSummaryQuery,
+            params: { ...params, ...prevParams },
+          })
+          .catch(() => ({ data: [] }));
 
-        const [summaryRes, chartRes, tableRes, prevSummaryRes] = await Promise.all([
-          summaryPromise,
-          chartPromise,
-          tablePromise,
-          prevSummaryPromise,
-        ]);
+        const [summaryRes, chartRes, tableRes, prevSummaryRes] =
+          await Promise.all([
+            summaryPromise,
+            chartPromise,
+            tablePromise,
+            prevSummaryPromise,
+          ]);
 
         const summary = (summaryRes.data as any[])?.[0] || {
           total_sessions: 0,
@@ -2888,18 +3520,29 @@ export default async function monetizationRoutes(app: FastifyInstance) {
               total_users: Number(summary.total_users) || 0,
               total_revenue: round2(Number(summary.total_revenue) || 0),
               total_paying_users: Number(summary.total_paying_users) || 0,
-              conversion_rate: summary.total_users > 0
-                ? round2((Number(summary.total_paying_users) / Number(summary.total_users)) * 100)
-                : 0,
+              conversion_rate:
+                summary.total_users > 0
+                  ? round2(
+                      (Number(summary.total_paying_users) /
+                        Number(summary.total_users)) *
+                        100
+                    )
+                  : 0,
             },
             summary_prev: {
               total_sessions: Number(prevSummaryRaw.total_sessions) || 0,
               total_users: Number(prevSummaryRaw.total_users) || 0,
               total_revenue: round2(Number(prevSummaryRaw.total_revenue) || 0),
-              total_paying_users: Number(prevSummaryRaw.total_paying_users) || 0,
-              conversion_rate: Number(prevSummaryRaw.total_users) > 0
-                ? round2((Number(prevSummaryRaw.total_paying_users) / Number(prevSummaryRaw.total_users)) * 100)
-                : 0,
+              total_paying_users:
+                Number(prevSummaryRaw.total_paying_users) || 0,
+              conversion_rate:
+                Number(prevSummaryRaw.total_users) > 0
+                  ? round2(
+                      (Number(prevSummaryRaw.total_paying_users) /
+                        Number(prevSummaryRaw.total_users)) *
+                        100
+                    )
+                  : 0,
             },
             chart,
             table,
@@ -2909,9 +3552,10 @@ export default async function monetizationRoutes(app: FastifyInstance) {
         logger.error('Acquisition metrics query failed', {
           error: err instanceof Error ? err.message : String(err),
         });
-        return reply.code(500).send({ error: 'Acquisition metrics query failed' });
+        return reply
+          .code(500)
+          .send({ error: 'Acquisition metrics query failed' });
       }
     }
   );
 }
-

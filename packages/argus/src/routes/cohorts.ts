@@ -116,7 +116,6 @@ function buildCohortQuery(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default async function cohortsRoutes(app: FastifyInstance) {
-
   // ─── GET /projects/:projectId/analytics/cohorts ─────────────────────────
   app.get(
     '/projects/:projectId/analytics/cohorts',
@@ -168,8 +167,7 @@ export default async function cohortsRoutes(app: FastifyInstance) {
         const { sql, params } = buildCohortQuery(definition, projectId);
         const countSql = `SELECT count() AS cnt FROM (${sql})`;
         const result = await optic.rawQuery({ query: countSql, params });
-        const userCount =
-          Number((result.data as any[])?.[0]?.cnt) || 0;
+        const userCount = Number((result.data as any[])?.[0]?.cnt) || 0;
 
         const [insertResult] = await db.raw(
           `INSERT INTO g_argus_cohorts (project_id, name, description, definition, user_count, last_computed)
@@ -295,8 +293,7 @@ export default async function cohortsRoutes(app: FastifyInstance) {
         const { sql, params } = buildCohortQuery(definition, projectId);
         const countSql = `SELECT count() AS cnt FROM (${sql})`;
         const result = await optic.rawQuery({ query: countSql, params });
-        const userCount =
-          Number((result.data as any[])?.[0]?.cnt) || 0;
+        const userCount = Number((result.data as any[])?.[0]?.cnt) || 0;
 
         await db.raw(
           'UPDATE g_argus_cohorts SET user_count = ?, last_computed = NOW() WHERE id = ? AND project_id = ?',
@@ -320,9 +317,8 @@ export default async function cohortsRoutes(app: FastifyInstance) {
         projectId: string;
         id: string;
       };
-      const { limit: limitStr, offset: offsetStr } = (
-        request.query as any
-      ) || {};
+      const { limit: limitStr, offset: offsetStr } =
+        (request.query as any) || {};
       const limit = Math.min(parseInt(limitStr || '50', 10), 200);
       const offset = parseInt(offsetStr || '0', 10);
 
@@ -349,9 +345,7 @@ export default async function cohortsRoutes(app: FastifyInstance) {
           OFFSET ${offset}
         `;
         const result = await optic.rawQuery({ query: usersSql, params });
-        const users = ((result.data as any[]) || []).map(
-          (r: any) => r.user_id
-        );
+        const users = ((result.data as any[]) || []).map((r: any) => r.user_id);
 
         return reply.send({ success: true, data: users });
       } catch (error: any) {
@@ -379,8 +373,7 @@ export default async function cohortsRoutes(app: FastifyInstance) {
         const { sql, params } = buildCohortQuery(definition, projectId);
         const countSql = `SELECT count() AS cnt FROM (${sql})`;
         const result = await optic.rawQuery({ query: countSql, params });
-        const userCount =
-          Number((result.data as any[])?.[0]?.cnt) || 0;
+        const userCount = Number((result.data as any[])?.[0]?.cnt) || 0;
 
         return reply.send({ success: true, data: { user_count: userCount } });
       } catch (error: any) {

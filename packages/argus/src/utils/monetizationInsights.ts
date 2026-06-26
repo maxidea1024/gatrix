@@ -60,19 +60,37 @@ export interface MonetizationInsightData {
   avg_ecpm: number;
   iap_share: number;
   ad_share: number;
-  revenue_by_country: { country: string; revenue: number; transactions: number }[];
-  prev_revenue_by_country: { country: string; revenue: number; transactions: number }[];
-  revenue_by_platform: { platform: string; revenue: number; transactions: number }[];
-  prev_revenue_by_platform: { platform: string; revenue: number; transactions: number }[];
+  revenue_by_country: {
+    country: string;
+    revenue: number;
+    transactions: number;
+  }[];
+  prev_revenue_by_country: {
+    country: string;
+    revenue: number;
+    transactions: number;
+  }[];
+  revenue_by_platform: {
+    platform: string;
+    revenue: number;
+    transactions: number;
+  }[];
+  prev_revenue_by_platform: {
+    platform: string;
+    revenue: number;
+    transactions: number;
+  }[];
   revenue_over_time: { period: string; revenue: number; arpdau?: number }[];
 }
 
 // -- Helpers --
 
 const fmt = (n: number) =>
-  n >= 1000000 ? `$${(n / 1000000).toFixed(1)}M`
-    : n >= 1000 ? `$${(n / 1000).toFixed(1)}K`
-    : `$${n.toFixed(2)}`;
+  n >= 1000000
+    ? `$${(n / 1000000).toFixed(1)}M`
+    : n >= 1000
+      ? `$${(n / 1000).toFixed(1)}K`
+      : `$${n.toFixed(2)}`;
 
 function pctChange(current: number, previous: number): number | undefined {
   if (!previous || previous === 0) return undefined;
@@ -82,21 +100,29 @@ function pctChange(current: number, previous: number): number | undefined {
 function findBiggestContributor(
   current: { country?: string; platform?: string; revenue: number }[],
   previous: { country?: string; platform?: string; revenue: number }[],
-  key: 'country' | 'platform',
+  key: 'country' | 'platform'
 ): { name: string; change: number } | null {
   if (current.length === 0) return null;
   let maxChange = 0;
   let maxName = '';
   for (const c of current) {
-    const name = (c as Record<string, unknown>)[key] as string || 'Unknown';
-    const prev = previous.find(p => (p as Record<string, unknown>)[key] === name);
+    const name = ((c as Record<string, unknown>)[key] as string) || 'Unknown';
+    const prev = previous.find(
+      (p) => (p as Record<string, unknown>)[key] === name
+    );
     const change = c.revenue - (prev?.revenue || 0);
-    if (Math.abs(change) > Math.abs(maxChange)) { maxChange = change; maxName = name; }
+    if (Math.abs(change) > Math.abs(maxChange)) {
+      maxChange = change;
+      maxName = name;
+    }
   }
   for (const p of previous) {
-    const name = (p as Record<string, unknown>)[key] as string || 'Unknown';
-    if (!current.find(c => (c as Record<string, unknown>)[key] === name)) {
-      if (Math.abs(-p.revenue) > Math.abs(maxChange)) { maxChange = -p.revenue; maxName = name; }
+    const name = ((p as Record<string, unknown>)[key] as string) || 'Unknown';
+    if (!current.find((c) => (c as Record<string, unknown>)[key] === name)) {
+      if (Math.abs(-p.revenue) > Math.abs(maxChange)) {
+        maxChange = -p.revenue;
+        maxName = name;
+      }
     }
   }
   return maxName ? { name: maxName, change: maxChange } : null;
@@ -104,9 +130,7 @@ function findBiggestContributor(
 
 // -- generateInsights --
 
-export function generateInsights(
-  data: MonetizationInsightData,
-): Insight[] {
+export function generateInsights(data: MonetizationInsightData): Insight[] {
   const insights: Insight[] = [];
 
   const revChange = pctChange(data.total_revenue, data.prev_total_revenue);
@@ -114,7 +138,9 @@ export function generateInsights(
     if (Math.abs(revChange) >= 5) {
       const isUp = revChange > 0;
       const countryContrib = findBiggestContributor(
-        data.revenue_by_country, data.prev_revenue_by_country || [], 'country',
+        data.revenue_by_country,
+        data.prev_revenue_by_country || [],
+        'country'
       );
       insights.push({
         severity: isUp ? 'positive' : 'critical',
@@ -137,7 +163,10 @@ export function generateInsights(
   }
 
   const arppuChange = pctChange(data.arppu, data.prev_arppu);
-  const txnChange = pctChange(data.total_transactions, data.prev_total_transactions);
+  const txnChange = pctChange(
+    data.total_transactions,
+    data.prev_total_transactions
+  );
   if (arppuChange !== undefined && txnChange !== undefined) {
     if (arppuChange < -5 && txnChange > 5) {
       insights.push({
@@ -168,7 +197,10 @@ export function generateInsights(
   }
 
   if (data.total_ad_revenue > 0) {
-    const adRevChange = pctChange(data.total_ad_revenue, data.prev_total_ad_revenue);
+    const adRevChange = pctChange(
+      data.total_ad_revenue,
+      data.prev_total_ad_revenue
+    );
     if (adRevChange !== undefined && Math.abs(adRevChange) >= 30) {
       const isUp = adRevChange > 0;
       insights.push({
@@ -182,24 +214,36 @@ export function generateInsights(
     }
   }
 
-
   return insights.slice(0, 8);
 }
 
 // -- buildSegmentMatrix --
 
 export function buildSegmentMatrix(
-  current: { country?: string; platform?: string; revenue: number; transactions: number }[],
-  previous: { country?: string; platform?: string; revenue: number; transactions: number }[],
+  current: {
+    country?: string;
+    platform?: string;
+    revenue: number;
+    transactions: number;
+  }[],
+  previous: {
+    country?: string;
+    platform?: string;
+    revenue: number;
+    transactions: number;
+  }[],
   totalRevenue: number,
-  key: 'country' | 'platform',
+  key: 'country' | 'platform'
 ): SegmentVerdict[] {
   return current.map((c) => {
-    const name = (c as Record<string, unknown>)[key] as string || 'Unknown';
-    const prev = previous.find(p => (p as Record<string, unknown>)[key] === name);
+    const name = ((c as Record<string, unknown>)[key] as string) || 'Unknown';
+    const prev = previous.find(
+      (p) => (p as Record<string, unknown>)[key] === name
+    );
     const prevRev = prev?.revenue || 0;
     const change = c.revenue - prevRev;
-    const changePct = prevRev > 0 ? ((change / prevRev) * 100) : (c.revenue > 0 ? 100 : 0);
+    const changePct =
+      prevRev > 0 ? (change / prevRev) * 100 : c.revenue > 0 ? 100 : 0;
     const share = totalRevenue > 0 ? (c.revenue / totalRevenue) * 100 : 0;
 
     let verdict: SegmentVerdict['verdict'];
@@ -207,15 +251,32 @@ export function buildSegmentMatrix(
     let verdictIcon: string;
 
     if (share >= 15 && changePct > 10) {
-      verdict = 'invest'; verdictLabel = 'Invest'; verdictIcon = 'rocket';
+      verdict = 'invest';
+      verdictLabel = 'Invest';
+      verdictIcon = 'rocket';
     } else if (share >= 15 && changePct >= -5) {
-      verdict = 'maintain'; verdictLabel = 'Maintain'; verdictIcon = 'check';
+      verdict = 'maintain';
+      verdictLabel = 'Maintain';
+      verdictIcon = 'check';
     } else if (share < 15 && changePct > 15) {
-      verdict = 'opportunity'; verdictLabel = 'Opportunity'; verdictIcon = 'star';
+      verdict = 'opportunity';
+      verdictLabel = 'Opportunity';
+      verdictIcon = 'star';
     } else {
-      verdict = 'review'; verdictLabel = 'Review'; verdictIcon = 'warning';
+      verdict = 'review';
+      verdictLabel = 'Review';
+      verdictIcon = 'warning';
     }
 
-    return { name, revenue: c.revenue, prevRevenue: prevRev, change, changePct, verdict, verdictLabel, verdictIcon };
+    return {
+      name,
+      revenue: c.revenue,
+      prevRevenue: prevRev,
+      change,
+      changePct,
+      verdict,
+      verdictLabel,
+      verdictIcon,
+    };
   });
 }

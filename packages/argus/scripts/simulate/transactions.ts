@@ -2,7 +2,14 @@
  * Simulate Data — Transaction Templates
  */
 import { PROJECT_ID, CHUNK_SIZE, DAYS_BACK } from './config';
-import { randomInt, randomPick, randomFloat, uuid, randomDateWeighted, formatDate } from './helpers';
+import {
+  randomInt,
+  randomPick,
+  randomFloat,
+  uuid,
+  randomDateWeighted,
+  formatDate,
+} from './helpers';
 import { USERS } from './user-pool';
 import { SERVER_RELEASES } from './releases';
 import { getSpanTemplates } from './span-templates';
@@ -149,7 +156,16 @@ export async function generateAndInsertTransactions(
         duration: Math.round(dur),
         transaction: tpl.name,
         transaction_op: tpl.op,
-        transaction_status: randomPick(['ok', 'ok', 'ok', 'ok', 'ok', 'internal_error', 'deadline_exceeded', 'not_found']),
+        transaction_status: randomPick([
+          'ok',
+          'ok',
+          'ok',
+          'ok',
+          'ok',
+          'internal_error',
+          'deadline_exceeded',
+          'not_found',
+        ]),
         http_method: tpl.name.split(' ')[0] || 'GET',
         http_status_code: randomPick([200, 200, 200, 201, 400, 500]),
         platform: 'node',
@@ -174,7 +190,9 @@ export async function generateAndInsertTransactions(
           parent_span_id: txnSpanId,
           transaction_id: txnEventId,
           project_id: PROJECT_ID,
-          timestamp: formatDate(new Date(ts.getTime() + offset + Math.round(sDur))),
+          timestamp: formatDate(
+            new Date(ts.getTime() + offset + Math.round(sDur))
+          ),
           start_timestamp: formatDate(new Date(ts.getTime() + offset)),
           duration: Math.round(sDur),
           op: st.op,
@@ -189,9 +207,17 @@ export async function generateAndInsertTransactions(
       }
     }
 
-    await ch.insert({ table: `${chDatabase}.transactions`, values: txnBatch, format: 'JSONEachRow' });
+    await ch.insert({
+      table: `${chDatabase}.transactions`,
+      values: txnBatch,
+      format: 'JSONEachRow',
+    });
     if (spanBatch.length > 0) {
-      await ch.insert({ table: `${chDatabase}.spans`, values: spanBatch, format: 'JSONEachRow' });
+      await ch.insert({
+        table: `${chDatabase}.spans`,
+        values: spanBatch,
+        format: 'JSONEachRow',
+      });
     }
     txnCount += txnBatch.length;
     process.stdout.write(`\r   ⏳ ${txnCount.toLocaleString()} txns...`);

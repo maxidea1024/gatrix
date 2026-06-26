@@ -2,7 +2,14 @@
  * Simulate Data — Metrics Templates & Log Event Generator
  */
 import { PROJECT_ID, CHUNK_SIZE, DAYS_BACK } from './config';
-import { randomFloat, randomPick, randomDateWeighted, formatDate, uuid, randomInt } from './helpers';
+import {
+  randomFloat,
+  randomPick,
+  randomDateWeighted,
+  formatDate,
+  uuid,
+  randomInt,
+} from './helpers';
 import { SERVER_RELEASES } from './releases';
 import { ErrorScenario } from './scenarios';
 import { k8sPodName, GAME_SHARDS } from './dynamic-tags';
@@ -130,12 +137,19 @@ export async function generateAndInsertMetrics(
         type: tpl.type,
         value: randomFloat(tpl.valMin, tpl.valMax),
         unit: tpl.unit,
-        tags: tpl.name === 'game.concurrent_players' ? { server_shard: randomPick(GAME_SHARDS) } : {},
+        tags:
+          tpl.name === 'game.concurrent_players'
+            ? { server_shard: randomPick(GAME_SHARDS) }
+            : {},
         environment: randomPick(['production', 'staging']),
         release: randomPick(SERVER_RELEASES),
       });
     }
-    await ch.insert({ table: `${chDatabase}.metrics`, values: metricBatch, format: 'JSONEachRow' });
+    await ch.insert({
+      table: `${chDatabase}.metrics`,
+      values: metricBatch,
+      format: 'JSONEachRow',
+    });
     metricsCount += metricBatch.length;
   }
   console.log(`   ✓ ${metricsCount.toLocaleString()} metrics inserted`);

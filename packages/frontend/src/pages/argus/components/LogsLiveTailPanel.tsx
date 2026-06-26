@@ -621,7 +621,9 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    backgroundColor: liveTailPaused ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.positive,
+                    backgroundColor: liveTailPaused
+                      ? ARGUS_SEMANTIC.warning
+                      : ARGUS_SEMANTIC.positive,
                     animation: liveTailPaused ? 'none' : 'pulse 1.5s infinite',
                     '@keyframes pulse': {
                       '0%,100%': { opacity: 1 },

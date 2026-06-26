@@ -94,7 +94,10 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({ items, color }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
       {items.map((item) => (
-        <Box key={item.label} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box
+          key={item.label}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+        >
           <Typography
             variant="caption"
             sx={{
@@ -123,13 +126,21 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({ items, color }) => {
               }}
             />
           </Box>
-          <Typography variant="caption" fontWeight={700} sx={{ minWidth: 40, textAlign: 'right' }}>
+          <Typography
+            variant="caption"
+            fontWeight={700}
+            sx={{ minWidth: 40, textAlign: 'right' }}
+          >
             {item.count.toLocaleString()}
           </Typography>
         </Box>
       ))}
       {items.length === 0 && (
-        <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ py: 2, textAlign: 'center' }}
+        >
           No data
         </Typography>
       )}
@@ -268,11 +279,13 @@ const ArgusRealtimePage: React.FC = () => {
             labels={(data?.events_per_minute || []).map((d) =>
               formatWith(d.minute, 'HH:mm')
             )}
-            datasets={[{
-              label: t('argus.realtime.eventsPerMin'),
-              data: (data?.events_per_minute || []).map((d) => d.count),
-              color: primary,
-            }]}
+            datasets={[
+              {
+                label: t('argus.realtime.eventsPerMin'),
+                data: (data?.events_per_minute || []).map((d) => d.count),
+                color: primary,
+              },
+            ]}
             loading={!data}
             storagePrefix="argus_realtime_epm"
             showCompactToggle={false}
@@ -283,7 +296,11 @@ const ArgusRealtimePage: React.FC = () => {
           {/* Top Events */}
           <Paper
             variant="outlined"
-            sx={{ p: 2, borderRadius: 3, bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+            }}
           >
             <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
               {t('argus.realtime.topEvents')}
@@ -309,9 +326,15 @@ const ArgusRealtimePage: React.FC = () => {
           {/* Top Countries */}
           <Paper
             variant="outlined"
-            sx={{ p: 2, borderRadius: 3, bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}
+            sx={{
+              p: 2,
+              borderRadius: 3,
+              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+            }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
+            >
               <GlobeIcon fontSize="small" color="action" />
               <Typography variant="subtitle2" fontWeight={700}>
                 {t('argus.realtime.topCountries')}
@@ -337,7 +360,9 @@ const ArgusRealtimePage: React.FC = () => {
               overflow: 'auto',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}
+            >
               <LiveDot />
               <Typography variant="subtitle2" fontWeight={700}>
                 {t('argus.realtime.recentEvents')}
@@ -378,11 +403,19 @@ const ArgusRealtimePage: React.FC = () => {
                   </Typography>
                 )}
                 {evt.country && (
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontSize: 11 }}
+                  >
                     {evt.country}
                   </Typography>
                 )}
-                <Typography variant="caption" color="text.disabled" sx={{ fontSize: 10, minWidth: 55 }}>
+                <Typography
+                  variant="caption"
+                  color="text.disabled"
+                  sx={{ fontSize: 10, minWidth: 55 }}
+                >
                   {new Date(evt.timestamp).toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -392,7 +425,11 @@ const ArgusRealtimePage: React.FC = () => {
               </Box>
             ))}
             {(!data?.recent_events || data.recent_events.length === 0) && (
-              <Typography variant="body2" color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ py: 3, textAlign: 'center' }}
+              >
                 {t('argus.realtime.noData')}
               </Typography>
             )}
@@ -401,7 +438,11 @@ const ArgusRealtimePage: React.FC = () => {
 
         {/* Last update */}
         {lastUpdate && (
-          <Typography variant="caption" color="text.disabled" sx={{ mt: 2, display: 'block', textAlign: 'right' }}>
+          <Typography
+            variant="caption"
+            color="text.disabled"
+            sx={{ mt: 2, display: 'block', textAlign: 'right' }}
+          >
             {t('argus.realtime.lastUpdated')}: {lastUpdate.toLocaleTimeString()}
           </Typography>
         )}

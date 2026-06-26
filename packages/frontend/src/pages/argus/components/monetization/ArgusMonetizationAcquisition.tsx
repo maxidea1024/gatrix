@@ -1,8 +1,32 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import {
-  Box, Typography, Button, Paper, Table, TableHead, TableRow, TableCell, TableBody,
-  TableContainer, ToggleButton, ToggleButtonGroup, LinearProgress, useTheme,
-  Select, MenuItem, TextField, InputAdornment, Chip, alpha, IconButton,
+  Box,
+  Typography,
+  Button,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
+  ToggleButton,
+  ToggleButtonGroup,
+  LinearProgress,
+  useTheme,
+  Select,
+  MenuItem,
+  TextField,
+  InputAdornment,
+  Chip,
+  alpha,
+  IconButton,
 } from '@mui/material';
 import {
   Campaign as CampaignIcon,
@@ -74,11 +98,24 @@ interface MiniDonutProps {
 }
 
 const DONUT_COLORS = [
-  '#6C63FF', '#FF6584', '#43D9AD', '#FFB347', '#4ECDC4',
-  '#A8E6CF', '#FF8B94', '#9B59B6', '#3498DB', '#E74C3C',
+  '#6C63FF',
+  '#FF6584',
+  '#43D9AD',
+  '#FFB347',
+  '#4ECDC4',
+  '#A8E6CF',
+  '#FF8B94',
+  '#9B59B6',
+  '#3498DB',
+  '#E74C3C',
 ];
 
-const MiniDonut: React.FC<MiniDonutProps> = ({ label, data, isDark, formatter }) => {
+const MiniDonut: React.FC<MiniDonutProps> = ({
+  label,
+  data,
+  isDark,
+  formatter,
+}) => {
   const theme = useTheme();
 
   const topItems = useMemo(() => {
@@ -93,14 +130,16 @@ const MiniDonut: React.FC<MiniDonutProps> = ({ label, data, isDark, formatter })
 
   const chartData = {
     labels: topItems.map((r) => r.dimension),
-    datasets: [{
-      data: topItems.map((r) => r.value),
-      backgroundColor: DONUT_COLORS.slice(0, topItems.length),
-      borderWidth: 2,
-      borderColor: isDark ? '#1e1e2e' : '#ffffff',
-      hoverBorderWidth: 0,
-      hoverOffset: 4,
-    }],
+    datasets: [
+      {
+        data: topItems.map((r) => r.value),
+        backgroundColor: DONUT_COLORS.slice(0, topItems.length),
+        borderWidth: 2,
+        borderColor: isDark ? '#1e1e2e' : '#ffffff',
+        hoverBorderWidth: 0,
+        hoverOffset: 4,
+      },
+    ],
   };
 
   const options: any = {
@@ -131,42 +170,96 @@ const MiniDonut: React.FC<MiniDonutProps> = ({ label, data, isDark, formatter })
         minWidth: 0,
       }}
     >
-      <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
+      <Typography
+        variant="caption"
+        fontWeight={700}
+        color="text.secondary"
+        sx={{ textTransform: 'uppercase', letterSpacing: 0.5 }}
+      >
         {label}
       </Typography>
 
-      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+      <Box
+        sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}
+      >
         {/* Donut */}
-        <Box sx={{ position: 'relative', width: 110, height: 110, flexShrink: 0 }}>
+        <Box
+          sx={{ position: 'relative', width: 110, height: 110, flexShrink: 0 }}
+        >
           <Doughnut data={chartData} options={options} />
           <Box
             sx={{
-              position: 'absolute', top: '50%', left: '50%',
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
               transform: 'translate(-50%, -50%)',
-              textAlign: 'center', pointerEvents: 'none',
+              textAlign: 'center',
+              pointerEvents: 'none',
             }}
           >
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, lineHeight: 1.1 }}>
+            <Typography
+              sx={{ fontSize: '0.75rem', fontWeight: 800, lineHeight: 1.1 }}
+            >
               {formatter ? formatter(total) : fmtNum(total)}
             </Typography>
-            <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>Total</Typography>
+            <Typography sx={{ fontSize: '0.6rem', color: 'text.secondary' }}>
+              Total
+            </Typography>
           </Box>
         </Box>
 
         {/* Legend */}
-        <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 0.6 }}>
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 0.6,
+          }}
+        >
           {topItems.map((item, i) => {
             const pct = total > 0 ? (item.value / total) * 100 : 0;
             return (
-              <Box key={item.dimension} sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
-                <Box sx={{ width: 8, height: 8, borderRadius: '50%', flexShrink: 0, bgcolor: DONUT_COLORS[i] }} />
+              <Box
+                key={item.dimension}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.75,
+                  minWidth: 0,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    flexShrink: 0,
+                    bgcolor: DONUT_COLORS[i],
+                  }}
+                />
                 <Typography
-                  sx={{ fontSize: '0.72rem', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  sx={{
+                    fontSize: '0.72rem',
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
                   title={item.dimension}
                 >
                   {item.dimension}
                 </Typography>
-                <Typography sx={{ fontSize: '0.72rem', fontWeight: 600, flexShrink: 0, color: 'text.secondary' }}>
+                <Typography
+                  sx={{
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    flexShrink: 0,
+                    color: 'text.secondary',
+                  }}
+                >
                   {pct.toFixed(1)}%
                 </Typography>
               </Box>
@@ -185,21 +278,20 @@ interface ArgusMonetizationAcquisitionProps {
   apiParams: any;
   isDark: boolean;
   t: any;
-  handleChartZoom: (rawPeriods: string[]) => (startIdx: number, endIdx: number) => void;
+  handleChartZoom: (
+    rawPeriods: string[]
+  ) => (startIdx: number, endIdx: number) => void;
 }
 
-export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisitionProps> = ({
-  projectId,
-  apiParams,
-  isDark,
-  t,
-  handleChartZoom,
-}) => {
+export const ArgusMonetizationAcquisition: React.FC<
+  ArgusMonetizationAcquisitionProps
+> = ({ projectId, apiParams, isDark, t, handleChartZoom }) => {
   const theme = useTheme();
 
   // ── State ──────────────────────────────────────────────────────────────────
   const [groupBy, setGroupBy] = useState<GroupBy>('source');
-  const [attributionModel, setAttributionModel] = useState<AttributionModel>('last');
+  const [attributionModel, setAttributionModel] =
+    useState<AttributionModel>('last');
   const [data, setData] = useState<AcquisitionResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [adSpend, setAdSpend] = useState<AdSpendData>({});
@@ -248,8 +340,14 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
 
   // ── Table Data ─────────────────────────────────────────────────────────────
   const rows = useMemo(() => data?.table || [], [data]);
-  const totalRevenue = useMemo(() => rows.reduce((s, r) => s + r.revenue, 0), [rows]);
-  const totalUsers = useMemo(() => rows.reduce((s, r) => s + r.users, 0), [rows]);
+  const totalRevenue = useMemo(
+    () => rows.reduce((s, r) => s + r.revenue, 0),
+    [rows]
+  );
+  const totalUsers = useMemo(
+    () => rows.reduce((s, r) => s + r.users, 0),
+    [rows]
+  );
 
   const paginatedRows = useMemo(() => {
     const startIdx = page * pageSize;
@@ -273,12 +371,12 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
   }
 
   // ── Donut chart data ───────────────────────────────────────────────────────
-  const revenueDonutData = useMemo(() =>
-    rows.map((r) => ({ dimension: r.dimension, value: r.revenue })),
+  const revenueDonutData = useMemo(
+    () => rows.map((r) => ({ dimension: r.dimension, value: r.revenue })),
     [rows]
   );
-  const usersDonutData = useMemo(() =>
-    rows.map((r) => ({ dimension: r.dimension, value: r.users })),
+  const usersDonutData = useMemo(
+    () => rows.map((r) => ({ dimension: r.dimension, value: r.users })),
     [rows]
   );
 
@@ -303,7 +401,9 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
   }, [chartPoints, hasChartData, theme, t]);
 
   // ── Ad Spend helpers ──────────────────────────────────────────────────────
-  function getSpend(dim: string) { return adSpend[dim] ?? 0; }
+  function getSpend(dim: string) {
+    return adSpend[dim] ?? 0;
+  }
 
   function commitEdit(dim: string) {
     const val = parseFloat(editValue) || 0;
@@ -336,42 +436,95 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
     { key: 'sessions', label: 'Sessions', formatter: (v) => fmtNum(Number(v)) },
     { key: 'users', label: 'Users', formatter: (v) => fmtNum(Number(v)) },
     { key: 'revenue', label: 'Revenue', formatter: (v) => fmt(Number(v)) },
-    { key: 'paying_users', label: 'Paying Users', formatter: (v) => fmtNum(Number(v)) },
+    {
+      key: 'paying_users',
+      label: 'Paying Users',
+      formatter: (v) => fmtNum(Number(v)),
+    },
     {
       key: 'revenue',
       label: 'Purchase CR',
       formatter: (_, row) => {
         const cr = row.users > 0 ? (row.paying_users / row.users) * 100 : 0;
         return `${cr.toFixed(2)}%`;
-      }
+      },
     },
-    { key: 'avg_duration', label: 'Avg Duration', formatter: (v) => `${(Number(v) || 0).toFixed(0)}s` },
-    { key: 'revenue' as keyof AcquisitionTableRow, label: 'Ad Spend', formatter: (_: any, row: AcquisitionTableRow) => `$${getSpend(row.dimension).toFixed(2)}` },
-    { key: 'revenue' as keyof AcquisitionTableRow, label: 'ROAS', formatter: (_: any, row: AcquisitionTableRow) => { const r = computeRoas(row); return r != null ? `${r.toFixed(2)}x` : '-'; } },
-    { key: 'revenue' as keyof AcquisitionTableRow, label: 'CPA', formatter: (_: any, row: AcquisitionTableRow) => { const c = computeCpa(row); return c != null ? fmt(c) : '-'; } },
+    {
+      key: 'avg_duration',
+      label: 'Avg Duration',
+      formatter: (v) => `${(Number(v) || 0).toFixed(0)}s`,
+    },
+    {
+      key: 'revenue' as keyof AcquisitionTableRow,
+      label: 'Ad Spend',
+      formatter: (_: any, row: AcquisitionTableRow) =>
+        `$${getSpend(row.dimension).toFixed(2)}`,
+    },
+    {
+      key: 'revenue' as keyof AcquisitionTableRow,
+      label: 'ROAS',
+      formatter: (_: any, row: AcquisitionTableRow) => {
+        const r = computeRoas(row);
+        return r != null ? `${r.toFixed(2)}x` : '-';
+      },
+    },
+    {
+      key: 'revenue' as keyof AcquisitionTableRow,
+      label: 'CPA',
+      formatter: (_: any, row: AcquisitionTableRow) => {
+        const c = computeCpa(row);
+        return c != null ? fmt(c) : '-';
+      },
+    },
   ];
 
   const handleExport = () => {
     if (!rows.length) return;
-    downloadCsv(rows, csvColumns, `acquisition_${groupBy}_${new Date().toISOString().slice(0, 10)}`);
+    downloadCsv(
+      rows,
+      csvColumns,
+      `acquisition_${groupBy}_${new Date().toISOString().slice(0, 10)}`
+    );
   };
 
   // ── Render ─────────────────────────────────────────────────────────────────
   const pageCount = rows.length;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: 3 }}>
-
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1,
+        minHeight: 0,
+        gap: 3,
+      }}
+    >
       {/* ── Header ── */}
-      <Box sx={{ flexShrink: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+      <Box
+        sx={{
+          flexShrink: 0,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+        }}
+      >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <CampaignIcon sx={{ color: 'text.secondary', fontSize: 24 }} />
           <Box>
             <Typography variant="h6" fontWeight={700}>
-              {t('argus.monetization.acquisitionTitle', 'User Acquisition Analysis')}
+              {t(
+                'argus.monetization.acquisitionTitle',
+                'User Acquisition Analysis'
+              )}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {t('argus.monetization.acquisitionDesc', 'Analyze marketing traffic sources, campaign conversions, and customer acquisition costs')}
+              {t(
+                'argus.monetization.acquisitionDesc',
+                'Analyze marketing traffic sources, campaign conversions, and customer acquisition costs'
+              )}
             </Typography>
           </Box>
         </Box>
@@ -442,29 +595,42 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
           label={t('argus.monetization.payingUsers', 'Paying Users')}
           value={fmtNum(summary.total_paying_users)}
           sub={t('argus.monetization.vsLastPeriod', 'vs last period')}
-          change={popChange(summary.total_paying_users, prev?.total_paying_users)}
+          change={popChange(
+            summary.total_paying_users,
+            prev?.total_paying_users
+          )}
         />
         {(() => {
-          const totalSpend = rows.reduce((s, r) => s + getSpend(r.dimension), 0);
-          const totalRoas = totalSpend > 0 ? summary.total_revenue / totalSpend : null;
+          const totalSpend = rows.reduce(
+            (s, r) => s + getSpend(r.dimension),
+            0
+          );
+          const totalRoas =
+            totalSpend > 0 ? summary.total_revenue / totalSpend : null;
           return (
             <KpiCard
               icon={<CampaignIcon sx={{ fontSize: 18 }} />}
               color="#FF6584"
               label={t('argus.monetization.roas', 'ROAS')}
               value={totalRoas != null ? `${totalRoas.toFixed(2)}x` : '—'}
-              sub={totalSpend > 0 ? `${t('argus.monetization.adSpend', 'Ad Spend')}: ${fmt(totalSpend)}` : t('argus.monetization.adSpendHint', 'Enter ad spend below')}
+              sub={
+                totalSpend > 0
+                  ? `${t('argus.monetization.adSpend', 'Ad Spend')}: ${fmt(totalSpend)}`
+                  : t('argus.monetization.adSpendHint', 'Enter ad spend below')
+              }
             />
           );
         })()}
       </Paper>
 
-
       {/* ── Donut Charts ── */}
       {rows.length > 0 && !loading && (
         <Box sx={{ flexShrink: 0, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <MiniDonut
-            label={t('argus.monetization.revenueBreakdown', 'Revenue by Channel')}
+            label={t(
+              'argus.monetization.revenueBreakdown',
+              'Revenue by Channel'
+            )}
             data={revenueDonutData}
             isDark={isDark}
             formatter={fmt}
@@ -484,7 +650,10 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
           <ArgusChartSkeleton height={240} />
         ) : hasChartData ? (
           <ArgusVolumeChart
-            title={t('argus.monetization.acquisitionTrend', 'Traffic & Revenue Trend')}
+            title={t(
+              'argus.monetization.acquisitionTrend',
+              'Traffic & Revenue Trend'
+            )}
             rawPeriods={chartRawPeriods}
             labels={[]}
             datasets={chartDatasets}
@@ -494,8 +663,19 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
             onZoom={handleChartZoom(chartRawPeriods)}
           />
         ) : (
-          <Paper variant="outlined" sx={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'transparent' }}>
-            <Typography color="text.secondary">{t('common.noData', 'No data available')}</Typography>
+          <Paper
+            variant="outlined"
+            sx={{
+              height: 240,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              bgcolor: 'transparent',
+            }}
+          >
+            <Typography color="text.secondary">
+              {t('common.noData', 'No data available')}
+            </Typography>
           </Paper>
         )}
       </Box>
@@ -514,8 +694,27 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
         }}
       >
         {/* Table Toolbar */}
-        <Box sx={{ p: 2, flexShrink: 0, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+        <Box
+          sx={{
+            p: 2,
+            flexShrink: 0,
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              flexWrap: 'wrap',
+            }}
+          >
             {/* GroupBy */}
             <ToggleButtonGroup
               value={groupBy}
@@ -523,84 +722,182 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
               onChange={(_, val) => val && setGroupBy(val)}
               size="small"
             >
-              <ToggleButton value="source" sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}>
+              <ToggleButton
+                value="source"
+                sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}
+              >
                 {t('argus.monetization.source', 'Source')}
               </ToggleButton>
-              <ToggleButton value="medium" sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}>
+              <ToggleButton
+                value="medium"
+                sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}
+              >
                 {t('argus.monetization.medium', 'Medium')}
               </ToggleButton>
-              <ToggleButton value="campaign" sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}>
+              <ToggleButton
+                value="campaign"
+                sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}
+              >
                 {t('argus.monetization.campaign', 'Campaign')}
               </ToggleButton>
-              <ToggleButton value="platform" sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}>
+              <ToggleButton
+                value="platform"
+                sx={{ textTransform: 'none', px: 1.5, fontSize: 12 }}
+              >
                 {t('argus.monetization.platform', 'Platform')}
               </ToggleButton>
             </ToggleButtonGroup>
 
             {/* Attribution model */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ fontSize: 12 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ fontSize: 12 }}
+              >
                 {t('argus.monetization.attributionModel', 'Attribution')}:
               </Typography>
               <Select
                 value={attributionModel}
-                onChange={(e) => setAttributionModel(e.target.value as AttributionModel)}
+                onChange={(e) =>
+                  setAttributionModel(e.target.value as AttributionModel)
+                }
                 size="small"
                 sx={{ minWidth: 120, height: 30, fontSize: 12 }}
               >
-                <MenuItem value="last" sx={{ fontSize: 12 }}>{t('argus.monetization.lastTouch', 'Last Touch')}</MenuItem>
-                <MenuItem value="first" sx={{ fontSize: 12 }}>{t('argus.monetization.firstTouch', 'First Touch')}</MenuItem>
-                <MenuItem value="linear" sx={{ fontSize: 12 }}>{t('argus.monetization.linear', 'Linear')}</MenuItem>
+                <MenuItem value="last" sx={{ fontSize: 12 }}>
+                  {t('argus.monetization.lastTouch', 'Last Touch')}
+                </MenuItem>
+                <MenuItem value="first" sx={{ fontSize: 12 }}>
+                  {t('argus.monetization.firstTouch', 'First Touch')}
+                </MenuItem>
+                <MenuItem value="linear" sx={{ fontSize: 12 }}>
+                  {t('argus.monetization.linear', 'Linear')}
+                </MenuItem>
               </Select>
             </Box>
           </Box>
 
           <Typography variant="caption" color="text.secondary">
-            {t('argus.monetization.totalRows', 'Total channels: {{count}}', { count: pageCount })}
+            {t('argus.monetization.totalRows', 'Total channels: {{count}}', {
+              count: pageCount,
+            })}
           </Typography>
         </Box>
 
         {loading && <LinearProgress sx={{ flexShrink: 0 }} />}
 
         {/* Table body */}
-        <TableContainer sx={{ flex: 1, overflow: 'auto', opacity: loading ? 0.55 : 1, transition: 'opacity 0.15s ease', pointerEvents: loading ? 'none' : 'auto' }}>
+        <TableContainer
+          sx={{
+            flex: 1,
+            overflow: 'auto',
+            opacity: loading ? 0.55 : 1,
+            transition: 'opacity 0.15s ease',
+            pointerEvents: loading ? 'none' : 'auto',
+          }}
+        >
           {pageCount === 0 && !loading ? (
             <Box sx={{ py: 8 }}>
               <EmptyPlaceholder
-                message={t('argus.monetization.noChannels', 'No acquisition channels found')}
-                description={t('argus.monetization.noChannelsDesc', 'Make sure UTM parameters are correctly tagged on incoming SDK links.')}
+                message={t(
+                  'argus.monetization.noChannels',
+                  'No acquisition channels found'
+                )}
+                description={t(
+                  'argus.monetization.noChannelsDesc',
+                  'Make sure UTM parameters are correctly tagged on incoming SDK links.'
+                )}
               />
             </Box>
           ) : (
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.acquisitionDimension', 'Channel / Source')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.sessions', 'Sessions')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.users', 'Users')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.revenue', 'Revenue')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12, minWidth: 100 }}>{t('argus.monetization.revenueShare', 'Rev. Share')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.payingUsers', 'Paying Users')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.conversionRate', 'CR')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>{t('argus.monetization.avgDuration', 'Duration')}</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12, color: theme.palette.primary.main }}>
+                  <TableCell sx={{ fontWeight: 700, fontSize: 12 }}>
+                    {t(
+                      'argus.monetization.acquisitionDimension',
+                      'Channel / Source'
+                    )}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
+                    {t('argus.monetization.sessions', 'Sessions')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
+                    {t('argus.monetization.users', 'Users')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
+                    {t('argus.monetization.revenue', 'Revenue')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12, minWidth: 100 }}
+                  >
+                    {t('argus.monetization.revenueShare', 'Rev. Share')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
+                    {t('argus.monetization.payingUsers', 'Paying Users')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
+                    {t('argus.monetization.conversionRate', 'CR')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
+                    {t('argus.monetization.avgDuration', 'Duration')}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 12,
+                      color: theme.palette.primary.main,
+                    }}
+                  >
                     {t('argus.monetization.adSpend', '광고비')}
                   </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12, color: '#43D9AD' }}>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12, color: '#43D9AD' }}
+                  >
                     {t('argus.monetization.roas', 'ROAS')}
                   </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12, color: '#FF6584' }}>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12, color: '#FF6584' }}
+                  >
                     {t('argus.monetization.cpa', 'CPA')}
                   </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12, color: '#FFB347' }}>
+                  <TableCell
+                    align="right"
+                    sx={{ fontWeight: 700, fontSize: 12, color: '#FFB347' }}
+                  >
                     {t('argus.monetization.roi', 'ROI')}
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {paginatedRows.map((row) => {
-                  const cr = row.users > 0 ? (row.paying_users / row.users) * 100 : 0;
-                  const revShare = totalRevenue > 0 ? (row.revenue / totalRevenue) * 100 : 0;
+                  const cr =
+                    row.users > 0 ? (row.paying_users / row.users) * 100 : 0;
+                  const revShare =
+                    totalRevenue > 0 ? (row.revenue / totalRevenue) * 100 : 0;
                   const roas = computeRoas(row);
                   const cpa = computeCpa(row);
                   const roi = computeRoi(row);
@@ -609,31 +906,74 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
 
                   return (
                     <TableRow key={row.dimension} hover>
-                      <TableCell sx={{ fontWeight: 600, fontSize: 12 }}>{row.dimension}</TableCell>
-                      <TableCell align="right" sx={{ fontSize: 12 }}>{fmtNum(row.sessions)}</TableCell>
-                      <TableCell align="right" sx={{ fontSize: 12 }}>{fmtNum(row.users)}</TableCell>
-                      <TableCell align="right" sx={{ fontSize: 12, fontWeight: 600 }}>{fmt(row.revenue)}</TableCell>
+                      <TableCell sx={{ fontWeight: 600, fontSize: 12 }}>
+                        {row.dimension}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontSize: 12 }}>
+                        {fmtNum(row.sessions)}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontSize: 12 }}>
+                        {fmtNum(row.users)}
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{ fontSize: 12, fontWeight: 600 }}
+                      >
+                        {fmt(row.revenue)}
+                      </TableCell>
                       {/* Revenue Share bar */}
                       <TableCell align="right">
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.75 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: 0.75,
+                          }}
+                        >
                           <LinearProgress
                             variant="determinate"
                             value={Math.min(revShare, 100)}
                             sx={{
-                              width: 52, height: 5, borderRadius: 3,
-                              bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)',
-                              '& .MuiLinearProgress-bar': { bgcolor: theme.palette.success.main, borderRadius: 3 },
+                              width: 52,
+                              height: 5,
+                              borderRadius: 3,
+                              bgcolor: isDark
+                                ? 'rgba(255,255,255,0.08)'
+                                : 'rgba(0,0,0,0.07)',
+                              '& .MuiLinearProgress-bar': {
+                                bgcolor: theme.palette.success.main,
+                                borderRadius: 3,
+                              },
                             }}
                           />
-                          <Typography variant="caption" sx={{ fontSize: 11, minWidth: 32, textAlign: 'right' }}>
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: 11,
+                              minWidth: 32,
+                              textAlign: 'right',
+                            }}
+                          >
                             {revShare.toFixed(1)}%
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell align="right" sx={{ fontSize: 12 }}>{fmtNum(row.paying_users)}</TableCell>
+                      <TableCell align="right" sx={{ fontSize: 12 }}>
+                        {fmtNum(row.paying_users)}
+                      </TableCell>
                       <TableCell align="right">
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
-                          <Typography variant="caption" sx={{ fontSize: 11 }}>{cr.toFixed(2)}%</Typography>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            gap: 0.5,
+                          }}
+                        >
+                          <Typography variant="caption" sx={{ fontSize: 11 }}>
+                            {cr.toFixed(2)}%
+                          </Typography>
                           {cr > 0 && (
                             <LinearProgress
                               variant="determinate"
@@ -644,68 +984,137 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
                           )}
                         </Box>
                       </TableCell>
-                      <TableCell align="right" sx={{ fontSize: 12 }}>{row.avg_duration.toFixed(0)}s</TableCell>
+                      <TableCell align="right" sx={{ fontSize: 12 }}>
+                        {row.avg_duration.toFixed(0)}s
+                      </TableCell>
 
                       {/* Ad Spend editable cell */}
                       <TableCell align="right" sx={{ minWidth: 110 }}>
                         {isEditing ? (
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              justifyContent: 'flex-end',
+                            }}
+                          >
                             <TextField
                               inputRef={editRef}
                               value={editValue}
                               onChange={(e) => setEditValue(e.target.value)}
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter') commitEdit(row.dimension);
-                                if (e.key === 'Escape') { setEditingRow(null); setEditValue(''); }
+                                if (e.key === 'Enter')
+                                  commitEdit(row.dimension);
+                                if (e.key === 'Escape') {
+                                  setEditingRow(null);
+                                  setEditValue('');
+                                }
                               }}
                               onBlur={() => commitEdit(row.dimension)}
                               size="small"
                               type="number"
                               placeholder="0"
-                              sx={{ width: 88, '& input': { fontSize: 11, py: 0.5, px: 1 } }}
+                              sx={{
+                                width: 88,
+                                '& input': { fontSize: 11, py: 0.5, px: 1 },
+                              }}
                               InputProps={{
-                                startAdornment: <InputAdornment position="start"><Typography sx={{ fontSize: 11 }}>$</Typography></InputAdornment>,
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <Typography sx={{ fontSize: 11 }}>
+                                      $
+                                    </Typography>
+                                  </InputAdornment>
+                                ),
                               }}
                             />
-                            <IconButton size="small" onClick={() => commitEdit(row.dimension)} sx={{ p: 0.3 }}>
-                              <SaveIcon sx={{ fontSize: 14, color: 'success.main' }} />
+                            <IconButton
+                              size="small"
+                              onClick={() => commitEdit(row.dimension)}
+                              sx={{ p: 0.3 }}
+                            >
+                              <SaveIcon
+                                sx={{ fontSize: 14, color: 'success.main' }}
+                              />
                             </IconButton>
                           </Box>
                         ) : spend > 0 ? (
                           <Box
                             sx={{
-                              display: 'inline-flex', alignItems: 'center', gap: 0.5,
-                              cursor: 'pointer', px: 1, py: 0.3, borderRadius: 1,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              cursor: 'pointer',
+                              px: 1,
+                              py: 0.3,
+                              borderRadius: 1,
                               border: `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
-                              bgcolor: alpha(theme.palette.primary.main, isDark ? 0.08 : 0.04),
-                              '&:hover': { bgcolor: alpha(theme.palette.primary.main, isDark ? 0.15 : 0.08) },
+                              bgcolor: alpha(
+                                theme.palette.primary.main,
+                                isDark ? 0.08 : 0.04
+                              ),
+                              '&:hover': {
+                                bgcolor: alpha(
+                                  theme.palette.primary.main,
+                                  isDark ? 0.15 : 0.08
+                                ),
+                              },
                               transition: 'background 0.15s',
                             }}
-                            onClick={() => { setEditingRow(row.dimension); setEditValue(String(spend)); }}
+                            onClick={() => {
+                              setEditingRow(row.dimension);
+                              setEditValue(String(spend));
+                            }}
                           >
-                            <Typography sx={{ fontSize: 11, fontWeight: 600, color: theme.palette.primary.main }}>
+                            <Typography
+                              sx={{
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: theme.palette.primary.main,
+                              }}
+                            >
                               {fmt(spend)}
                             </Typography>
-                            <EditIcon sx={{ fontSize: 11, color: theme.palette.primary.main, opacity: 0.6 }} />
+                            <EditIcon
+                              sx={{
+                                fontSize: 11,
+                                color: theme.palette.primary.main,
+                                opacity: 0.6,
+                              }}
+                            />
                           </Box>
                         ) : (
                           <Box
                             sx={{
-                              display: 'inline-flex', alignItems: 'center', gap: 0.4,
-                              cursor: 'pointer', px: 1, py: 0.3, borderRadius: 1,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 0.4,
+                              cursor: 'pointer',
+                              px: 1,
+                              py: 0.3,
+                              borderRadius: 1,
                               border: `1px dashed ${isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.22)'}`,
                               color: 'text.secondary',
                               '&:hover': {
                                 borderColor: theme.palette.primary.main,
                                 color: theme.palette.primary.main,
-                                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                                bgcolor: alpha(
+                                  theme.palette.primary.main,
+                                  0.06
+                                ),
                               },
                               transition: 'all 0.15s',
                             }}
-                            onClick={() => { setEditingRow(row.dimension); setEditValue(''); }}
+                            onClick={() => {
+                              setEditingRow(row.dimension);
+                              setEditValue('');
+                            }}
                           >
                             <EditIcon sx={{ fontSize: 11 }} />
-                            <Typography sx={{ fontSize: 10, fontWeight: 600 }}>입력</Typography>
+                            <Typography sx={{ fontSize: 10, fontWeight: 600 }}>
+                              입력
+                            </Typography>
                           </Box>
                         )}
                       </TableCell>
@@ -716,33 +1125,63 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
                             label={`${roas.toFixed(2)}x`}
                             size="small"
                             sx={{
-                              height: 20, fontSize: 10, fontWeight: 700,
-                              bgcolor: alpha(roas >= 1 ? '#43D9AD' : '#FF6584', 0.15),
+                              height: 20,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              bgcolor: alpha(
+                                roas >= 1 ? '#43D9AD' : '#FF6584',
+                                0.15
+                              ),
                               color: roas >= 1 ? '#43D9AD' : '#FF6584',
                               border: `1px solid ${alpha(roas >= 1 ? '#43D9AD' : '#FF6584', 0.3)}`,
                             }}
                           />
                         ) : (
-                          <Typography variant="caption" sx={{ fontSize: 11, color: 'text.disabled' }}>—</Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontSize: 11, color: 'text.disabled' }}
+                          >
+                            —
+                          </Typography>
                         )}
                       </TableCell>
                       {/* CPA */}
                       <TableCell align="right">
-                        <Typography variant="caption" sx={{ fontSize: 11, color: cpa != null ? '#FF6584' : 'text.disabled', fontWeight: cpa != null ? 600 : 400 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            fontSize: 11,
+                            color: cpa != null ? '#FF6584' : 'text.disabled',
+                            fontWeight: cpa != null ? 600 : 400,
+                          }}
+                        >
                           {cpa != null ? fmt(cpa) : '—'}
                         </Typography>
                       </TableCell>
                       {/* ROI */}
                       <TableCell align="right">
                         {roi != null ? (
-                          <Typography variant="caption" sx={{
-                            fontSize: 11, fontWeight: 700,
-                            color: roi >= 0 ? theme.palette.success.main : theme.palette.error.main,
-                          }}>
-                            {roi >= 0 ? '+' : ''}{roi.toFixed(1)}%
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color:
+                                roi >= 0
+                                  ? theme.palette.success.main
+                                  : theme.palette.error.main,
+                            }}
+                          >
+                            {roi >= 0 ? '+' : ''}
+                            {roi.toFixed(1)}%
                           </Typography>
                         ) : (
-                          <Typography variant="caption" sx={{ fontSize: 11, color: 'text.disabled' }}>—</Typography>
+                          <Typography
+                            variant="caption"
+                            sx={{ fontSize: 11, color: 'text.disabled' }}
+                          >
+                            —
+                          </Typography>
                         )}
                       </TableCell>
                     </TableRow>
@@ -755,7 +1194,14 @@ export const ArgusMonetizationAcquisition: React.FC<ArgusMonetizationAcquisition
 
         {/* Pagination */}
         {pageCount > 0 && (
-          <Box sx={{ p: 1.5, borderTop: '1px solid', borderColor: 'divider', flexShrink: 0 }}>
+          <Box
+            sx={{
+              p: 1.5,
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              flexShrink: 0,
+            }}
+          >
             <SimplePagination
               count={pageCount}
               page={page}

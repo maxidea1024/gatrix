@@ -1270,7 +1270,10 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                             height: 16,
                             fontSize: '0.58rem',
                             fontWeight: 700,
-                            backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.1),
+                            backgroundColor: alpha(
+                              ARGUS_SEMANTIC.negative,
+                              0.1
+                            ),
                             color: ARGUS_SEMANTIC.negative,
                             border: 'none',
                             flexShrink: 0,
@@ -1322,7 +1325,12 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
       {/* ═══ Extra Data ═══ */}
       <CollapsibleSection
         title={t('argus.issues.extraData', 'Additional Data')}
-        icon={<DataObjectIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />}
+        icon={
+          <DataObjectIcon
+            fontSize="small"
+            sx={{ color: ARGUS_SEMANTIC.warning }}
+          />
+        }
         storageKey="extra"
         hidden={!extraData}
       >

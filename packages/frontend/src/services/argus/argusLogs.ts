@@ -282,9 +282,7 @@ export function createLiveTailConnection(
 export async function listSourcemapReleases(
   projectId: number | string
 ): Promise<ArgusSourcemapRelease[]> {
-  const response = await argusApi.get(
-    `${ARGUS_BASE}/${projectId}/sourcemaps`
-  );
+  const response = await argusApi.get(`${ARGUS_BASE}/${projectId}/sourcemaps`);
   return response.data?.data || response.data || [];
 }
 

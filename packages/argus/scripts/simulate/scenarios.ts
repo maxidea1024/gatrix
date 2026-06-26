@@ -2485,4 +2485,3 @@ export const SCENARIOS: ErrorScenario[] = [
     servers: ['client'],
   },
 ];
-

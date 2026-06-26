@@ -68,7 +68,9 @@ import {
 } from './components/overviewHelpers';
 import { ARGUS_SEMANTIC, ARGUS_SERIES } from './argusThemeTokens';
 import { detectAlerts, AlertPanel } from './components/overviewAlerts';
-import ArgusSegmentFilter, { type SegmentFilterValues } from './components/ArgusSegmentFilter';
+import ArgusSegmentFilter, {
+  type SegmentFilterValues,
+} from './components/ArgusSegmentFilter';
 
 ChartJS.register(
   CategoryScale,
@@ -168,7 +170,7 @@ const ArgusOverviewPage: React.FC = () => {
         apiParams.period,
         apiParams.start,
         apiParams.end,
-        segmentFilter,
+        segmentFilter
       );
       setData(result);
     } catch (error) {
@@ -458,16 +460,15 @@ const ArgusOverviewPage: React.FC = () => {
 
       {/* Segment Filter (country / platform / version) */}
       <Box sx={{ px: 0, pb: 1 }}>
-        <ArgusSegmentFilter
-          value={segmentFilter}
-          onChange={setSegmentFilter}
-        />
+        <ArgusSegmentFilter value={segmentFilter} onChange={setSegmentFilter} />
       </Box>
 
       <PageContentLoader loading={loading && !data}>
         {/* Re-fetch overlay: thin progress bar while keeping existing content */}
         {loading && !!data && (
-          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }} />
+          <LinearProgress
+            sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }}
+          />
         )}
         {/* Onboarding Banner — 트래커 미연동 시 표시 */}
         {!bannerDismissed && onboardingLoaded && trackerCount === 0 && (
@@ -543,40 +544,40 @@ const ArgusOverviewPage: React.FC = () => {
                       alignItems: 'baseline',
                       gap: 0.8,
                       flexWrap: 'wrap',
-                      }}
+                    }}
+                  >
+                    <Tooltip
+                      title={
+                        typeof card.value === 'number' && card.value >= 1000
+                          ? card.value.toLocaleString()
+                          : ''
+                      }
+                      arrow
                     >
-                      <Tooltip
-                        title={
-                          typeof card.value === 'number' && card.value >= 1000
-                            ? card.value.toLocaleString()
-                            : ''
-                        }
-                        arrow
+                      <Typography
+                        variant="h6"
+                        fontWeight={800}
+                        noWrap
+                        sx={{
+                          lineHeight: 1.2,
+                          color: isDark ? '#fff' : '#1a1a2e',
+                          maxWidth: '100%',
+                        }}
                       >
-                        <Typography
-                          variant="h6"
-                          fontWeight={800}
-                          noWrap
-                          sx={{
-                            lineHeight: 1.2,
-                            color: isDark ? '#fff' : '#1a1a2e',
-                            maxWidth: '100%',
-                          }}
-                        >
-                          {typeof card.value === 'number'
-                            ? formatCompactNumber(card.value)
-                            : (card.value ?? '-')}
-                        </Typography>
-                      </Tooltip>
-                      {card.change != null && (
-                        <Box sx={{ flexShrink: 0 }}>
-                          <ChangeIndicator
-                            value={card.change}
-                            invert={card.invertChange}
-                          />
-                        </Box>
-                      )}
-                    </Box>
+                        {typeof card.value === 'number'
+                          ? formatCompactNumber(card.value)
+                          : (card.value ?? '-')}
+                      </Typography>
+                    </Tooltip>
+                    {card.change != null && (
+                      <Box sx={{ flexShrink: 0 }}>
+                        <ChangeIndicator
+                          value={card.change}
+                          invert={card.invertChange}
+                        />
+                      </Box>
+                    )}
+                  </Box>
                   <Typography
                     variant="caption"
                     noWrap
@@ -607,7 +608,10 @@ const ArgusOverviewPage: React.FC = () => {
         </Box>
 
         {/* Alert Panel — auto-detected anomalies */}
-        <AlertPanel alerts={overviewAlerts} onNavigate={(href) => navigate(href)} />
+        <AlertPanel
+          alerts={overviewAlerts}
+          onNavigate={(href) => navigate(href)}
+        />
 
         {/* Charts Row */}
         <Box
@@ -655,18 +659,18 @@ const ArgusOverviewPage: React.FC = () => {
                     if (!trend) return;
                     const startHour = trend[si]?.hour;
                     const endHour = trend[ei]?.hour;
-                      if (startHour && endHour) {
-                        const start = new Date(startHour).toISOString();
-                        const end = new Date(
-                          new Date(endHour).getTime() + 3600000
-                        ).toISOString();
-                        navigate(
-                          `/argus/issues?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
-                        );
-                      }
-                    }),
-                  ]}
-                />
+                    if (startHour && endHour) {
+                      const start = new Date(startHour).toISOString();
+                      const end = new Date(
+                        new Date(endHour).getTime() + 3600000
+                      ).toISOString();
+                      navigate(
+                        `/argus/issues?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
+                      );
+                    }
+                  }),
+                ]}
+              />
             </Box>
           </Paper>
 
@@ -706,18 +710,18 @@ const ArgusOverviewPage: React.FC = () => {
                     if (!trend) return;
                     const startHour = trend[si]?.hour;
                     const endHour = trend[ei]?.hour;
-                      if (startHour && endHour) {
-                        const start = new Date(startHour).toISOString();
-                        const end = new Date(
-                          new Date(endHour).getTime() + 3600000
-                        ).toISOString();
-                        navigate(
-                          `/argus/issues?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
-                        );
-                      }
-                    }),
-                  ]}
-                />
+                    if (startHour && endHour) {
+                      const start = new Date(startHour).toISOString();
+                      const end = new Date(
+                        new Date(endHour).getTime() + 3600000
+                      ).toISOString();
+                      navigate(
+                        `/argus/issues?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`
+                      );
+                    }
+                  }),
+                ]}
+              />
             </Box>
           </Paper>
         </Box>
@@ -761,137 +765,136 @@ const ArgusOverviewPage: React.FC = () => {
             {t('argus.overview.heatmapDesc')}
           </Typography>
           <Box sx={{ overflowX: 'auto' }}>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '48px repeat(24, 1fr)',
-                  gap: '2px',
-                  minWidth: 600,
-                }}
-              >
-                {/* Hour labels header */}
-                <Box />
-                {Array.from({ length: 24 }, (_, h) => (
-                  <Typography
-                    key={`h-${h}`}
-                    variant="caption"
-                    sx={{
-                      textAlign: 'center',
-                      fontSize: '0.6rem',
-                      color: isDark ? '#555' : '#bbb',
-                    }}
-                  >
-                    {h.toString().padStart(2, '0')}
-                  </Typography>
-                ))}
-                {/* Rows: each day */}
-                {DAY_KEYS.map((dayKey, dayIdx) => {
-                  const dayLabel = t(dayKey);
-                  return (
-                    <React.Fragment key={dayKey}>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          fontSize: '0.68rem',
-                          color: isDark ? '#777' : '#999',
-                          display: 'flex',
-                          alignItems: 'center',
-                          pr: 0.5,
-                        }}
-                      >
-                        {dayLabel}
-                      </Typography>
-                      {Array.from({ length: 24 }, (_, h) => {
-                        const cell = data?.error_heatmap?.find(
-                          (c) =>
-                            Number(c.day) === dayIdx + 1 && Number(c.hour) === h
-                        );
-                        const count = Number(cell?.count || 0);
-                        const intensity =
-                          heatmapMax > 0 ? count / heatmapMax : 0;
-                        return (
-                          <Tooltip
-                            key={`${dayIdx}-${h}`}
-                            title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count.toLocaleString()} ${t('argus.overview.errorEvents')}`}
-                            arrow
-                          >
-                            <Box
-                              sx={{
-                                minWidth: 0,
-                                height: 20,
-                                borderRadius: 0.5,
-                                backgroundColor:
-                                  count === 0
-                                    ? isDark
-                                      ? 'rgba(255,255,255,0.03)'
-                                      : 'rgba(0,0,0,0.03)'
-                                    : alpha(
-                                        ARGUS_SEMANTIC.negative,
-                                        Math.max(0.1, Math.min(intensity, 1))
-                                      ),
-                                transition: 'all 0.15s',
-                                cursor: 'pointer',
-                                '&:hover': {
-                                  transform: 'scale(1.2)',
-                                  zIndex: 1,
-                                  outline: '1px solid rgba(244,67,54,0.5)',
-                                },
-                              }}
-                              onClick={() =>
-                                navigate(
-                                  `/argus/issues?dayOfWeek=${dayIdx + 1}&hour=${h}`
-                                )
-                              }
-                            />
-                          </Tooltip>
-                        );
-                      })}
-                    </React.Fragment>
-                  );
-                })}
-              </Box>
-              {/* Legend */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  mt: 1,
-                  justifyContent: 'flex-end',
-                }}
-              >
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: '48px repeat(24, 1fr)',
+                gap: '2px',
+                minWidth: 600,
+              }}
+            >
+              {/* Hour labels header */}
+              <Box />
+              {Array.from({ length: 24 }, (_, h) => (
                 <Typography
+                  key={`h-${h}`}
                   variant="caption"
                   sx={{
+                    textAlign: 'center',
                     fontSize: '0.6rem',
                     color: isDark ? '#555' : '#bbb',
-                    mr: 0.5,
                   }}
                 >
-                  {t('argus.overview.less')}
+                  {h.toString().padStart(2, '0')}
                 </Typography>
-                {[0.05, 0.2, 0.4, 0.6, 0.8, 1].map((v) => (
-                  <Box
-                    key={v}
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 0.3,
-                      backgroundColor: alpha(ARGUS_SEMANTIC.negative, v),
-                    }}
-                  />
-                ))}
-                <Typography
-                  variant="caption"
+              ))}
+              {/* Rows: each day */}
+              {DAY_KEYS.map((dayKey, dayIdx) => {
+                const dayLabel = t(dayKey);
+                return (
+                  <React.Fragment key={dayKey}>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontSize: '0.68rem',
+                        color: isDark ? '#777' : '#999',
+                        display: 'flex',
+                        alignItems: 'center',
+                        pr: 0.5,
+                      }}
+                    >
+                      {dayLabel}
+                    </Typography>
+                    {Array.from({ length: 24 }, (_, h) => {
+                      const cell = data?.error_heatmap?.find(
+                        (c) =>
+                          Number(c.day) === dayIdx + 1 && Number(c.hour) === h
+                      );
+                      const count = Number(cell?.count || 0);
+                      const intensity = heatmapMax > 0 ? count / heatmapMax : 0;
+                      return (
+                        <Tooltip
+                          key={`${dayIdx}-${h}`}
+                          title={`${dayLabel} ${h.toString().padStart(2, '0')}:00 — ${count.toLocaleString()} ${t('argus.overview.errorEvents')}`}
+                          arrow
+                        >
+                          <Box
+                            sx={{
+                              minWidth: 0,
+                              height: 20,
+                              borderRadius: 0.5,
+                              backgroundColor:
+                                count === 0
+                                  ? isDark
+                                    ? 'rgba(255,255,255,0.03)'
+                                    : 'rgba(0,0,0,0.03)'
+                                  : alpha(
+                                      ARGUS_SEMANTIC.negative,
+                                      Math.max(0.1, Math.min(intensity, 1))
+                                    ),
+                              transition: 'all 0.15s',
+                              cursor: 'pointer',
+                              '&:hover': {
+                                transform: 'scale(1.2)',
+                                zIndex: 1,
+                                outline: '1px solid rgba(244,67,54,0.5)',
+                              },
+                            }}
+                            onClick={() =>
+                              navigate(
+                                `/argus/issues?dayOfWeek=${dayIdx + 1}&hour=${h}`
+                              )
+                            }
+                          />
+                        </Tooltip>
+                      );
+                    })}
+                  </React.Fragment>
+                );
+              })}
+            </Box>
+            {/* Legend */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.5,
+                mt: 1,
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '0.6rem',
+                  color: isDark ? '#555' : '#bbb',
+                  mr: 0.5,
+                }}
+              >
+                {t('argus.overview.less')}
+              </Typography>
+              {[0.05, 0.2, 0.4, 0.6, 0.8, 1].map((v) => (
+                <Box
+                  key={v}
                   sx={{
-                    fontSize: '0.6rem',
-                    color: isDark ? '#555' : '#bbb',
-                    ml: 0.5,
+                    width: 12,
+                    height: 12,
+                    borderRadius: 0.3,
+                    backgroundColor: alpha(ARGUS_SEMANTIC.negative, v),
                   }}
-                >
-                  {t('argus.overview.more')}
-                </Typography>
-              </Box>
+                />
+              ))}
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '0.6rem',
+                  color: isDark ? '#555' : '#bbb',
+                  ml: 0.5,
+                }}
+              >
+                {t('argus.overview.more')}
+              </Typography>
+            </Box>
           </Box>
         </Paper>
 
@@ -922,7 +925,9 @@ const ArgusOverviewPage: React.FC = () => {
           />
           <DistributionCard
             title={t('argus.overview.errorByBrowser')}
-            icon={<DevicesIcon fontSize="small" sx={{ color: ARGUS_SERIES[0] }} />}
+            icon={
+              <DevicesIcon fontSize="small" sx={{ color: ARGUS_SERIES[0] }} />
+            }
             data={
               data?.error_by_browser?.map((d) => ({
                 label: d.browser,
@@ -938,7 +943,12 @@ const ArgusOverviewPage: React.FC = () => {
           />
           <DistributionCard
             title={t('argus.overview.errorByOS')}
-            icon={<DevicesIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />}
+            icon={
+              <DevicesIcon
+                fontSize="small"
+                sx={{ color: ARGUS_SEMANTIC.warning }}
+              />
+            }
             data={
               data?.error_by_os?.map((d) => ({
                 label: d.os,

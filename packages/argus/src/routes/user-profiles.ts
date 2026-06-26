@@ -1,9 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import db from '../config/knex';
-import {
-  buildTimeRangeConditions,
-} from '../utils/timeBucket';
+import { buildTimeRangeConditions } from '../utils/timeBucket';
 import { buildCohortQuery, CohortDefinition } from './cohorts';
 
 const TABLE = 'argus.activities';
@@ -46,12 +44,14 @@ export default async function userProfileRoutes(app: FastifyInstance) {
       const limit = Math.min(parseInt(limitStr || '50', 10), 200);
       const offset = parseInt(offsetStr || '0', 10);
 
-      const sortColumn =
-        ['last_seen', 'first_seen', 'total_events', 'total_sessions'].includes(
-          sort.replace('-', '')
-        )
-          ? sort.replace('-', '')
-          : 'last_seen';
+      const sortColumn = [
+        'last_seen',
+        'first_seen',
+        'total_events',
+        'total_sessions',
+      ].includes(sort.replace('-', ''))
+        ? sort.replace('-', '')
+        : 'last_seen';
       const sortDir = sort.startsWith('-') ? 'ASC' : 'DESC';
 
       const conditions: string[] = ['project_id = {projectId:String}'];
@@ -66,7 +66,7 @@ export default async function userProfileRoutes(app: FastifyInstance) {
 
       // Search by user_id prefix
       if (search) {
-        conditions.push("user_id LIKE {search:String}");
+        conditions.push('user_id LIKE {search:String}');
         params.search = `%${search}%`;
       }
 
@@ -131,12 +131,20 @@ export default async function userProfileRoutes(app: FastifyInstance) {
             `,
             params: {
               projectId: params.projectId,
-              ...Object.fromEntries(users.map((u, i) => [`uid${i}`, u.user_id])),
+              ...Object.fromEntries(
+                users.map((u, i) => [`uid${i}`, u.user_id])
+              ),
             },
           });
-          const profileMap = new Map<string, { avatar_url: string; email: string }>();
+          const profileMap = new Map<
+            string,
+            { avatar_url: string; email: string }
+          >();
           for (const r of (profileResult.data as any[]) || []) {
-            profileMap.set(r.user_id, { avatar_url: r.avatar_url || '', email: r.email || '' });
+            profileMap.set(r.user_id, {
+              avatar_url: r.avatar_url || '',
+              email: r.email || '',
+            });
           }
           for (const u of users) {
             const profile = profileMap.get(u.user_id);
@@ -284,8 +292,13 @@ export default async function userProfileRoutes(app: FastifyInstance) {
       reply: FastifyReply
     ) => {
       const { projectId, userId } = request.params;
-      const { limit: limitStr, offset: offsetStr, period, start, end } =
-        request.query;
+      const {
+        limit: limitStr,
+        offset: offsetStr,
+        period,
+        start,
+        end,
+      } = request.query;
 
       const limit = Math.min(parseInt(limitStr || '50', 10), 200);
       const offset = parseInt(offsetStr || '0', 10);
@@ -374,10 +387,7 @@ export default async function userProfileRoutes(app: FastifyInstance) {
       reply: FastifyReply
     ) => {
       const { projectId, userId } = request.params;
-      const limit = Math.min(
-        parseInt(request.query.limit || '20', 10),
-        100
-      );
+      const limit = Math.min(parseInt(request.query.limit || '20', 10), 100);
       const offset = parseInt(request.query.offset || '0', 10);
 
       try {
@@ -515,7 +525,10 @@ export default async function userProfileRoutes(app: FastifyInstance) {
         }
 
         // 2. For each cohort, run query filtered to the given userIds
-        const memberships: Record<string, { id: number; name: string; description: string | null }[]> = {};
+        const memberships: Record<
+          string,
+          { id: number; name: string; description: string | null }[]
+        > = {};
 
         for (const cohort of cohortRows) {
           const definition: CohortDefinition =
@@ -538,10 +551,16 @@ export default async function userProfileRoutes(app: FastifyInstance) {
             params: { ...params, filterUserIds: userIds },
           });
 
-          const matchedUsers = ((result.data as any[]) || []).map((r: any) => r.user_id);
+          const matchedUsers = ((result.data as any[]) || []).map(
+            (r: any) => r.user_id
+          );
           for (const uid of matchedUsers) {
             if (!memberships[uid]) memberships[uid] = [];
-            memberships[uid].push({ id: cohort.id, name: cohort.name, description: cohort.description || null });
+            memberships[uid].push({
+              id: cohort.id,
+              name: cohort.name,
+              description: cohort.description || null,
+            });
           }
         }
 
