@@ -697,6 +697,7 @@ export interface ArgusUserProfile {
   avatar_url?: string | null;
   email?: string | null;
   browser?: string | null;
+  activity_sparkline?: number[] | null;
 }
 
 export interface ArgusUserEvent {

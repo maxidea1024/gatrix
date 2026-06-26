@@ -118,6 +118,7 @@ export default async function userProfileRoutes(app: FastifyInstance) {
           avatar_url: null as string | null,
           email: null as string | null,
           browser: r.browser || null,
+          activity_sparkline: null as number[] | null,
         }));
 
         // Enrich with profile data from argus.profiles (efficient lookup)
@@ -152,6 +153,47 @@ export default async function userProfileRoutes(app: FastifyInstance) {
               u.avatar_url = profile.avatar_url || null;
               u.email = profile.email || null;
             }
+          }
+        }
+
+        // Batch sparkline: daily event counts per user within the same time range
+        if (users.length > 0) {
+          const spParams: Record<string, any> = {
+            projectId: params.projectId,
+            ...Object.fromEntries(users.map((u, i) => [`sp${i}`, u.user_id])),
+          };
+          const timeCondition = conditions.slice(1).join(' AND ') || '1=1';
+          const spSql = `
+            SELECT
+              user_id,
+              toDate(timestamp) AS day,
+              count()           AS cnt
+            FROM ${TABLE}
+            WHERE project_id = {projectId:String}
+              AND user_id IN (${users.map((_, i) => `{sp${i}:String}`).join(',')})
+              AND ${timeCondition}
+            GROUP BY user_id, day
+            ORDER BY user_id, day
+          `;
+          try {
+            const spResult = await optic.rawQuery({ query: spSql, params: spParams });
+            const spMap = new Map<string, { day: string; cnt: number }[]>();
+            for (const r of (spResult.data as any[]) || []) {
+              const uid = r.user_id as string;
+              if (!spMap.has(uid)) spMap.set(uid, []);
+              spMap.get(uid)!.push({ day: String(r.day), cnt: Number(r.cnt) });
+            }
+            for (const u of users) {
+              const rows = spMap.get(u.user_id);
+              if (rows && rows.length > 0) {
+                rows.sort((a, b) => a.day.localeCompare(b.day));
+                u.activity_sparkline = rows.map(r => r.cnt);
+              } else {
+                u.activity_sparkline = [];
+              }
+            }
+          } catch {
+            // sparkline is best-effort — don't fail the whole request
           }
         }
 

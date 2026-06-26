@@ -1,13 +1,13 @@
 name: Auto Format
 
 on:
-  push:
-    branches: [main, develop]
+  workflow_dispatch: # manual only — disabled automatic trigger to prevent conflict commits
 
 jobs:
   format:
     name: Prettier Format
     runs-on: ubuntu-latest
+    if: false # disabled: auto-format commits conflict with local development
 
     permissions:
       contents: write
