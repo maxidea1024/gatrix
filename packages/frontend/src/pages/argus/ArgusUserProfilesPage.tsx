@@ -1382,7 +1382,10 @@ const ArgusUserProfilesPage: React.FC = () => {
                     {t('argus.userProfiles.eventCount', 'Events')}
                   </TableSortLabel>
                 </TableCell>
-                <TableCell sx={{ fontWeight: 700, width: 88 }} />
+                <TableCell sx={{ fontWeight: 700, width: 88, whiteSpace: 'nowrap', color: 'text.secondary', fontSize: 12 }}>
+                  {t('argus.userProfiles.activityTrend', 'Activity')}
+                </TableCell>
+
                 <TableCell sx={{ fontWeight: 700 }} align="right">
                   <TableSortLabel
                     active={sortField === 'total_sessions'}
