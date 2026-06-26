@@ -1581,7 +1581,7 @@ const ArgusUserProfilesPage: React.FC = () => {
                         {/* Divider between starred and rest */}
                         {displayedRows.starred.length > 0 && displayedRows.rest.length > 0 && (
                           <TableRow>
-                            <TableCell colSpan={10} sx={{ py: 0.3, px: 2, bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderBottom: 'none' }}>
+                            <TableCell colSpan={13} sx={{ py: 0.3, px: 2, bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)', borderBottom: 'none' }}>
                               <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: 0.8 }}>
                                 {t('argus.userProfiles.otherUsers', 'Other users')}
                               </Typography>
@@ -1595,7 +1595,7 @@ const ArgusUserProfilesPage: React.FC = () => {
                   })()}
               {!loading && users.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={13} align="center" sx={{ py: 6 }}>
                     <PersonIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
                     <Typography color="text.secondary">{t('argus.userProfiles.noUsers', 'No user profiles')}</Typography>
                   </TableCell>
