@@ -355,7 +355,7 @@ const ArgusUserProfilesPage: React.FC = () => {
 
       <PageContentLoader
         loading={loading && !initialLoadDone.current}
-        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, px: 2, pb: 2 }}
+        sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
       >
         {/* AQL filter bar */}
         <Box
