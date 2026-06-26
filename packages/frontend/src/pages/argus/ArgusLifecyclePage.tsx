@@ -16,6 +16,7 @@ import DateRangeSelector, {
 } from '@/components/common/DateRangeSelector';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getLifecycleAnalytics, type LifecycleData } from '@/services/argus/argusAnalytics';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from './argusThemeTokens';
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
@@ -31,11 +32,11 @@ const ArgusLifecyclePage: React.FC = () => {
   const [dateRange, setDateRange] = useState<DateRangeValue>({ type: 'preset', preset: '30d' });
 
   const STAGE_CONFIG: Record<string, { color: string; icon: React.ReactElement; labelKey: string }> = {
-    new: { color: '#4caf50', icon: <NewIcon />, labelKey: 'argus.lifecycle.new' },
-    active: { color: '#2196f3', icon: <ActiveIcon />, labelKey: 'argus.lifecycle.active' },
-    returning: { color: '#9c27b0', icon: <ReturningIcon />, labelKey: 'argus.lifecycle.returning' },
-    dormant: { color: '#ff9800', icon: <DormantIcon />, labelKey: 'argus.lifecycle.dormant' },
-    churned: { color: '#f44336', icon: <ChurnedIcon />, labelKey: 'argus.lifecycle.churned' },
+    new: { color: ARGUS_SEMANTIC.positive, icon: <NewIcon />, labelKey: 'argus.lifecycle.new' },
+    active: { color: ARGUS_SEMANTIC.info, icon: <ActiveIcon />, labelKey: 'argus.lifecycle.active' },
+    returning: { color: ARGUS_SERIES[4], icon: <ReturningIcon />, labelKey: 'argus.lifecycle.returning' },
+    dormant: { color: ARGUS_SEMANTIC.warning, icon: <DormantIcon />, labelKey: 'argus.lifecycle.dormant' },
+    churned: { color: ARGUS_SEMANTIC.negative, icon: <ChurnedIcon />, labelKey: 'argus.lifecycle.churned' },
   };
 
   const loadData = useCallback(async () => {

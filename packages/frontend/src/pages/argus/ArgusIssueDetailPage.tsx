@@ -49,6 +49,7 @@ import IssueContextSection from './components/IssueContextSection';
 import SpanEvidenceSection from '@/components/argus/SpanEvidenceSection';
 import IssueDetailSidebar from './components/IssueDetailSidebar';
 import PageHeader from '@/components/common/PageHeader';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 const MIN_SPLIT_WIDTH = 250;
 const MAX_SPLIT_WIDTH = 800;
@@ -451,7 +452,7 @@ const ArgusIssueDetailPage: React.FC = () => {
                 icon={
                   <SpanEvidenceIcon
                     fontSize="small"
-                    sx={{ color: '#ff9800' }}
+                    sx={{ color: ARGUS_SEMANTIC.warning }}
                   />
                 }
                 storageKey="span_evidence"

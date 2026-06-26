@@ -27,6 +27,7 @@ import argusService, {
   type SavedQueryType,
 } from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
+import { ARGUS_SEMANTIC } from '../../argusThemeTokens';
 
 export interface SavedQueriesSidePanelProps {
   projectId: string | number;
@@ -383,7 +384,7 @@ const SavedQueriesSidePanel: React.FC<SavedQueriesSidePanelProps> = ({
                       onClick={(e) => handleDelete(query.id, e)}
                       sx={{
                         p: 0.25,
-                        '&:hover': { color: '#f44336' },
+                        '&:hover': { color: ARGUS_SEMANTIC.negative },
                       }}
                     >
                       <DeleteIcon

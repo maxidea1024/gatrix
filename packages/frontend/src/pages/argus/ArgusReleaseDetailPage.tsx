@@ -50,6 +50,7 @@ import {
   CommitAuthorBreakdown,
   DeployHistory,
 } from './components/releaseDetailHelpers';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 const ArgusReleaseDetailPage: React.FC = () => {
   const theme = useTheme();
@@ -181,7 +182,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
   const r = releaseData;
   const crashFree = r ? Number(r.crash_free_rate) : 100;
   const statusColor =
-    crashFree >= 99 ? '#4caf50' : crashFree >= 95 ? '#ff9800' : '#f44336';
+    crashFree >= 99 ? ARGUS_SEMANTIC.positive : crashFree >= 95 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.negative;
 
   return (
     <Box>
@@ -250,7 +251,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
               {[
                 {
                   icon: <BugReportIcon />,
-                  color: '#f44336',
+                  color: ARGUS_SEMANTIC.negative,
                   label: t('argus.releases.errors', 'Errors'),
                   value: Number(r.error_count),
                 },
@@ -262,13 +263,13 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 },
                 {
                   icon: <PeopleIcon />,
-                  color: '#ff9800',
+                  color: ARGUS_SEMANTIC.warning,
                   label: t('argus.releases.affectedUsers', 'Users'),
                   value: Number(r.affected_users),
                 },
                 {
                   icon: <BugReportIcon />,
-                  color: '#2196f3',
+                  color: ARGUS_SEMANTIC.info,
                   label: t('argus.releases.issues', 'Issues'),
                   value: Number(r.issue_count),
                 },
@@ -362,7 +363,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 '&:hover': { opacity: 0.8 },
               }}
             >
-              <CheckIcon sx={{ fontSize: 16, color: '#4caf50', mr: 0.5 }} />
+              <CheckIcon sx={{ fontSize: 16, color: ARGUS_SEMANTIC.positive, mr: 0.5 }} />
               <Typography variant="subtitle2" fontWeight={700} sx={{ flex: 1 }}>
                 {t('argus.releases.crashFreeRate', 'Crash Free Rate')}
               </Typography>
@@ -428,7 +429,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
                 backgroundColor: theme.palette.background.paper,
               }}
             >
-              <ErrorIcon sx={{ fontSize: 20, color: '#f44336' }} />
+              <ErrorIcon sx={{ fontSize: 20, color: ARGUS_SEMANTIC.negative }} />
               <Typography
                 variant="h6"
                 fontWeight={700}
@@ -443,8 +444,8 @@ const ArgusReleaseDetailPage: React.FC = () => {
                   height: 20,
                   fontSize: '0.7rem',
                   fontWeight: 700,
-                  backgroundColor: alpha('#f44336', 0.1),
-                  color: '#f44336',
+                  backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.1),
+                  color: ARGUS_SEMANTIC.negative,
                 }}
               />
 
@@ -496,7 +497,7 @@ const ArgusReleaseDetailPage: React.FC = () => {
                               minHeight: count > 0 ? 2 : 0,
                               backgroundColor:
                                 count > 0
-                                  ? alpha('#f44336', 0.5 + pct / 200)
+                                  ? alpha(ARGUS_SEMANTIC.negative, 0.5 + pct / 200)
                                   : alpha(theme.palette.text.disabled, 0.15),
                               transition: 'height 0.2s',
                             }}

@@ -1,5 +1,6 @@
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Button, Typography, Chip, Menu } from '@mui/material';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 /* ────────────────────────────────────────────
  * Constants
@@ -97,7 +98,7 @@ export const StatusText = styled('span')(() => ({
 export const SubstatusText = styled('span')(() => ({
   fontSize: '0.62rem',
   fontWeight: 600,
-  color: '#ff9800',
+  color: ARGUS_SEMANTIC.warning,
 }));
 
 /* ────────────────────────────────────────────

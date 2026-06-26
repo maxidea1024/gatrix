@@ -16,6 +16,7 @@ import {
   NotificationsActive as PagerDutyIcon,
 } from '@mui/icons-material';
 import { ArgusAlertCondition, ArgusAlertAction } from '@/services/argusService';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from '../argusThemeTokens';
 
 export const getConditionTypes = (
   t: (key: string) => string
@@ -31,28 +32,28 @@ export const getConditionTypes = (
     label: t('argus.alerts.condNewIssue'),
     desc: t('argus.alerts.condNewIssueDesc'),
     icon: <BugIcon sx={{ fontSize: 18 }} />,
-    color: '#f44336',
+    color: ARGUS_SEMANTIC.negative,
   },
   {
     value: 'event_frequency',
     label: t('argus.alerts.condEventFreq'),
     desc: t('argus.alerts.condEventFreqDesc'),
     icon: <FrequencyIcon sx={{ fontSize: 18 }} />,
-    color: '#ff9800',
+    color: ARGUS_SEMANTIC.warning,
   },
   {
     value: 'user_count',
     label: t('argus.alerts.condUserCount'),
     desc: t('argus.alerts.condUserCountDesc'),
     icon: <UsersIcon sx={{ fontSize: 18 }} />,
-    color: '#2196f3',
+    color: ARGUS_SEMANTIC.info,
   },
   {
     value: 'regression',
     label: t('argus.alerts.condRegression'),
     desc: t('argus.alerts.condRegressionDesc'),
     icon: <RegressionIcon sx={{ fontSize: 18 }} />,
-    color: '#9c27b0',
+    color: ARGUS_SERIES[4],
   },
   {
     value: 'new_feedback',
@@ -83,7 +84,7 @@ export const getConditionTypes = (
     desc:
       t('argus.alerts.condMetricDesc') || 'Global error rate exceeds threshold',
     icon: <MetricIcon sx={{ fontSize: 18 }} />,
-    color: '#f44336',
+    color: ARGUS_SEMANTIC.negative,
   },
 ];
 

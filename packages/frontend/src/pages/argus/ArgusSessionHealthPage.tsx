@@ -7,6 +7,7 @@ import {
   useTheme,
   alpha,
   Tooltip,
+  LinearProgress,
 } from '@mui/material';
 import {
   Devices as DevicesIcon,
@@ -54,6 +55,8 @@ import {
   calcChange,
 } from './components/sessionHealthHelpers';
 import { formatCompactNumber } from '@/utils/numberFormat';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
+import ArgusSegmentFilter, { type SegmentFilterValues } from './components/ArgusSegmentFilter';
 
 ChartJS.register(
   CategoryScale,
@@ -97,6 +100,7 @@ const ArgusSessionHealthPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [displayMode, setDisplayMode] = useState<DisplayMode>('sessions');
   const [hideHealthy, setHideHealthy] = useState(false);
+  const [segmentFilter, setSegmentFilter] = useState<SegmentFilterValues>({});
 
   const [filters, setFilters] = useState<ArgusFilterState>(() => {
     if (urlState.period === 'custom' && urlState.start && urlState.end) {
@@ -141,7 +145,7 @@ const ArgusSessionHealthPage: React.FC = () => {
     try {
       const ap = argusDateRangeToApiParams(filters.dateRange);
       const [healthResult, issuesResult] = await Promise.all([
-        argusService.getSessionHealth(projectId, ap.period, ap.start, ap.end),
+        argusService.getSessionHealth(projectId, ap.period, ap.start, ap.end, segmentFilter),
         argusService
           .listIssues(projectId, {
             sort: 'event_count',
@@ -163,7 +167,7 @@ const ArgusSessionHealthPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, filters]);
+  }, [projectId, filters, segmentFilter]);
 
   useEffect(() => {
     fetchData();
@@ -211,11 +215,11 @@ const ArgusSessionHealthPage: React.FC = () => {
   const pp = data?.previous_period;
   const crashFreeRate = Number(s?.crash_free_rate || 0);
   const rateColor =
-    crashFreeRate >= 99
-      ? '#4caf50'
+     crashFreeRate >= 99
+      ? ARGUS_SEMANTIC.positive
       : crashFreeRate >= 95
-        ? '#ff9800'
-        : '#f44336';
+        ? ARGUS_SEMANTIC.warning
+        : ARGUS_SEMANTIC.negative;
 
   // Donut chart data
   const donutData = useMemo(
@@ -234,7 +238,7 @@ const ArgusSessionHealthPage: React.FC = () => {
             Number(s?.errored || 0),
             Number(s?.abnormal || 0),
           ],
-          backgroundColor: ['#4caf50', '#f44336', '#ff9800', '#9e9e9e'],
+          backgroundColor: [ARGUS_SEMANTIC.positive, ARGUS_SEMANTIC.negative, ARGUS_SEMANTIC.warning, '#9e9e9e'],
           borderColor: isDark ? '#1a1a2e' : '#ffffff',
           borderWidth: 3,
           cutout: '72%',
@@ -263,7 +267,7 @@ const ArgusSessionHealthPage: React.FC = () => {
       return [
         {
           icon: <PeopleIcon />,
-          color: '#2196f3',
+          color: ARGUS_SEMANTIC.info,
           label: t('argus.sessions.uniqueUsers'),
           value: s?.unique_users,
           prev: pp?.unique_users,
@@ -271,7 +275,7 @@ const ArgusSessionHealthPage: React.FC = () => {
         },
         {
           icon: <CrashIcon />,
-          color: '#f44336',
+          color: ARGUS_SEMANTIC.negative,
           label: t('argus.sessions.crashedUsers'),
           value: s?.crashed,
           prev: pp?.crashed,
@@ -287,7 +291,7 @@ const ArgusSessionHealthPage: React.FC = () => {
         },
         {
           icon: <TimerIcon />,
-          color: '#ff9800',
+          color: ARGUS_SEMANTIC.warning,
           label: t('argus.sessions.avgDuration'),
           value: s
             ? `${Math.round(Number(s.avg_duration) / 1000)}s`
@@ -308,7 +312,7 @@ const ArgusSessionHealthPage: React.FC = () => {
       },
       {
         icon: <PeopleIcon />,
-        color: '#2196f3',
+        color: ARGUS_SEMANTIC.info,
         label: t('argus.sessions.uniqueUsers'),
         value: s?.unique_users,
         prev: pp?.unique_users,
@@ -316,7 +320,7 @@ const ArgusSessionHealthPage: React.FC = () => {
       },
       {
         icon: <CrashIcon />,
-        color: '#f44336',
+        color: ARGUS_SEMANTIC.negative,
         label: t('argus.sessions.crashed'),
         value: s?.crashed,
         prev: pp?.crashed,
@@ -324,7 +328,7 @@ const ArgusSessionHealthPage: React.FC = () => {
       },
       {
         icon: <TimerIcon />,
-        color: '#ff9800',
+        color: ARGUS_SEMANTIC.warning,
         label: t('argus.sessions.avgDuration'),
         value: s ? `${Math.round(Number(s.avg_duration) / 1000)}s` : undefined,
         prev: undefined,
@@ -339,21 +343,21 @@ const ArgusSessionHealthPage: React.FC = () => {
         key: 'healthy',
         label: t('argus.sessions.healthy'),
         value: s?.healthy,
-        color: '#4caf50',
+        color: ARGUS_SEMANTIC.positive,
         defKey: SESSION_STATUS_DEFS.healthy,
       },
       {
         key: 'crashed',
         label: t('argus.sessions.crashed'),
         value: s?.crashed,
-        color: '#f44336',
+        color: ARGUS_SEMANTIC.negative,
         defKey: SESSION_STATUS_DEFS.crashed,
       },
       {
         key: 'errored',
         label: t('argus.sessions.errored'),
         value: s?.errored,
-        color: '#ff9800',
+        color: ARGUS_SEMANTIC.warning,
         defKey: SESSION_STATUS_DEFS.errored,
       },
       {
@@ -427,7 +431,18 @@ const ArgusSessionHealthPage: React.FC = () => {
         }
       />
 
-      <PageContentLoader loading={loading}>
+      {/* Segment Filter */}
+      <Box sx={{ px: 0, pb: 1 }}>
+        <ArgusSegmentFilter
+          value={segmentFilter}
+          onChange={setSegmentFilter}
+        />
+      </Box>
+
+      <PageContentLoader loading={loading && !data}>
+        {loading && !!data && (
+          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }} />
+        )}
         {/* Top Row: Donut + Stats */}
         <Box
           sx={{

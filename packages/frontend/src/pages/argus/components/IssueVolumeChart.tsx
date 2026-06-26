@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { formatWith } from '@/utils/dateFormat';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 import { ChartDataset } from '@/components/argus/InteractiveTimeSeriesChart';
 import argusService from '@/services/argusService';
@@ -69,13 +70,7 @@ const IssueVolumeChart: React.FC<IssueVolumeChartProps> = ({
       let label = d.day;
       try {
         const dt = new Date(d.day);
-        label = dt.toLocaleString(i18n.language || 'en-US', {
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        });
+        label = formatWith(d.day, 'M/D HH:mm');
       } catch {
         /* ignore */
       }

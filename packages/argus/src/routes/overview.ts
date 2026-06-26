@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
+import { buildSegmentConditions, type SegmentFilterQuery } from '../utils/segmentFilter';
 
 const logger = createLogger('overview-api');
 
@@ -27,10 +28,19 @@ export default async function overviewRoutes(app: FastifyInstance) {
     '/overview/:projectId',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
-      const { period = '24h' } = request.query as { period?: string };
+      const { period = '24h', country, platform, app_version } = request.query as {
+        period?: string; country?: string; platform?: string; app_version?: string;
+      };
 
       try {
         const prevRange = getPrevPeriodRange(period);
+        const segQuery: SegmentFilterQuery = { country, platform, app_version };
+
+        // Helper: merge segment conditions for a given dataset
+        const withSeg = (dataset: string, existing?: any[]) => {
+          const segConds = buildSegmentConditions(segQuery, dataset);
+          return existing ? [...existing, ...segConds] : segConds.length > 0 ? segConds : undefined;
+        };
 
         const [batch, prevBatch] = await Promise.all([
           // ?�?� Main queries ??all share same projectId + period ?�?�
@@ -39,6 +49,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
               dataset: 'errors',
               projectId,
               timeRange: { period },
+              conditions: withSeg('errors'),
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'count' },
@@ -53,6 +64,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
               dataset: 'errors',
               projectId,
               timeRange: { period },
+              conditions: withSeg('errors'),
               select: [
                 { field: 'count()', alias: 'total_errors' },
                 { field: 'uniq(user_id)', alias: 'affected_users' },
@@ -64,6 +76,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
               dataset: 'transactions',
               projectId,
               timeRange: { period },
+              conditions: withSeg('transactions'),
               select: [
                 { field: 'count()', alias: 'total_transactions' },
                 { field: 'avg(duration)', alias: 'avg_duration' },
@@ -81,6 +94,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
               dataset: 'transactions',
               projectId,
               timeRange: { period },
+              conditions: withSeg('transactions'),
               select: [
                 { field: '$bucket', alias: 'hour' },
                 { field: 'count()', alias: 'count' },
@@ -95,6 +109,7 @@ export default async function overviewRoutes(app: FastifyInstance) {
               dataset: 'sessions',
               projectId,
               timeRange: { period },
+              conditions: withSeg('sessions'),
               select: [
                 { field: 'count()', alias: 'total_sessions' },
                 {

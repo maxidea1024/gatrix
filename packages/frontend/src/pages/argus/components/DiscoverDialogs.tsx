@@ -21,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { ArgusSavedQuery } from '@/services/argusService';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Save Query Dialog ───
 
@@ -196,7 +197,7 @@ export const DiscoverSavedPanel: React.FC<DiscoverSavedPanelProps> = ({
                 onClick={() => onDelete(sq.id)}
                 sx={{
                   color: 'text.disabled',
-                  '&:hover': { color: '#f44336' },
+                  '&:hover': { color: ARGUS_SEMANTIC.negative },
                 }}
               >
                 <DeleteIcon sx={{ fontSize: 16 }} />

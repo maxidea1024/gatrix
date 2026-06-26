@@ -20,6 +20,7 @@ import {
   type ImpactAnalysisResult,
 } from '@/services/argus/argusAnalytics';
 import type { AnalyticsEventNameEntry } from '@/services/argus/argusTypes';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 // ─── Metric Card ─────────────────────────────────────────────────────────────
 
@@ -75,8 +76,8 @@ const ArgusImpactPage: React.FC = () => {
     finally { setLoading(false); }
   }, [projectId, causeEvent, effectEvent, windowDays, dateRange]);
 
-  const liftColor = result && result.lift > 0 ? '#4caf50'
-    : result && result.lift < 0 ? '#f44336' : theme.palette.text.primary;
+  const liftColor = result && result.lift > 0 ? ARGUS_SEMANTIC.positive
+    : result && result.lift < 0 ? ARGUS_SEMANTIC.negative : theme.palette.text.primary;
 
   return (
     <Box>

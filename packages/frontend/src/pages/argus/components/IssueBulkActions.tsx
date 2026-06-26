@@ -16,6 +16,7 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 interface IssueBulkActionsProps {
   /** Set of selected issue IDs */
@@ -83,11 +84,11 @@ const IssueBulkActions: React.FC<IssueBulkActionsProps> = ({
           textTransform: 'none',
           borderRadius: '6px',
           fontSize: '0.76rem',
-          borderColor: alpha('#4caf50', 0.5),
-          color: '#4caf50',
+          borderColor: alpha(ARGUS_SEMANTIC.positive, 0.5),
+          color: ARGUS_SEMANTIC.positive,
           '&:hover': {
-            borderColor: '#4caf50',
-            backgroundColor: alpha('#4caf50', 0.08),
+            borderColor: ARGUS_SEMANTIC.positive,
+            backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.08),
           },
         }}
       >
@@ -142,11 +143,11 @@ const IssueBulkActions: React.FC<IssueBulkActionsProps> = ({
           textTransform: 'none',
           borderRadius: '6px',
           fontSize: '0.76rem',
-          borderColor: alpha('#f44336', 0.5),
-          color: '#f44336',
+          borderColor: alpha(ARGUS_SEMANTIC.negative, 0.5),
+          color: ARGUS_SEMANTIC.negative,
           '&:hover': {
-            borderColor: '#f44336',
-            backgroundColor: alpha('#f44336', 0.08),
+            borderColor: ARGUS_SEMANTIC.negative,
+            backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.08),
           },
         }}
       >

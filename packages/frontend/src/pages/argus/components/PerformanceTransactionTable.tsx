@@ -25,6 +25,7 @@ import { formatCompactNumber } from '@/utils/numberFormat';
 import SimplePagination from '@/components/common/SimplePagination';
 import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { getMethodColor, parseTransaction } from './performanceHelpers';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 
 
@@ -51,7 +52,7 @@ const PerformanceTransactionTable: React.FC<
   }, [transactions]);
 
   return (
-    <PageContentLoader loading={loading}>
+    <PageContentLoader loading={loading && transactions.length === 0} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
       {/* Performance Summary Stats */}
       {transactions.length > 0 && (
         <Box
@@ -60,6 +61,7 @@ const PerformanceTransactionTable: React.FC<
             gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
             gap: 2,
             mb: 3,
+            flexShrink: 0,
           }}
         >
           {(() => {
@@ -95,23 +97,23 @@ const PerformanceTransactionTable: React.FC<
                 value: `${avgP95.toFixed(0)}ms`,
                 color:
                   avgP95 > 3000
-                    ? '#f44336'
+                    ? ARGUS_SEMANTIC.negative
                     : avgP95 > 1000
-                      ? '#ff9800'
-                      : '#4caf50',
+                      ? ARGUS_SEMANTIC.warning
+                      : ARGUS_SEMANTIC.positive,
                 icon: <TimelineIcon />,
               },
               {
                 label: t('argus.performance.avgDuration', 'Avg. Duration'),
                 value: `${avgDur.toFixed(0)}ms`,
-                color: '#2196f3',
+                color: ARGUS_SEMANTIC.info,
                 icon: <ScheduleIcon />,
               },
               {
                 label: t('argus.performance.avgErrorRate', 'Avg. Error Rate'),
                 value: `${avgErr.toFixed(2)}%`,
                 color:
-                  avgErr > 5 ? '#f44336' : avgErr > 1 ? '#ff9800' : '#4caf50',
+                  avgErr > 5 ? ARGUS_SEMANTIC.negative : avgErr > 1 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.positive,
                 icon: <SpeedIcon />,
               },
               {
@@ -120,7 +122,7 @@ const PerformanceTransactionTable: React.FC<
                   'Slowest Endpoint'
                 ),
                 value: `${parseTransaction(slowest.name).path.slice(0, 20)}`,
-                color: '#f44336',
+                color: ARGUS_SEMANTIC.negative,
                 icon: <SpeedIcon />,
                 subtitle: `P95: ${Number(slowest.p95).toFixed(0)}ms`,
               },
@@ -210,7 +212,13 @@ const PerformanceTransactionTable: React.FC<
           sx={{
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             borderRadius: 2,
-            overflow: 'hidden',
+            overflow: 'auto',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            opacity: loading ? 0.55 : 1,
+            transition: 'opacity 0.15s ease',
+            pointerEvents: loading ? 'none' : 'auto',
           }}
         >
           {/* Table Header */}
@@ -225,6 +233,10 @@ const PerformanceTransactionTable: React.FC<
                 ? 'rgba(255,255,255,0.02)'
                 : 'rgba(0,0,0,0.02)',
               borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+              position: 'sticky',
+              top: 0,
+              zIndex: 2,
+              bgcolor: isDark ? '#1e1e1e' : '#fafafa',
             }}
           >
             <Typography
@@ -416,7 +428,7 @@ const PerformanceTransactionTable: React.FC<
                           height: '100%',
                           borderRadius: 2,
                           width: `${(p50Val / maxP95) * 100}%`,
-                          backgroundColor: '#4caf50',
+                          backgroundColor: ARGUS_SEMANTIC.positive,
                           transition: 'width 0.3s',
                         }}
                       />
@@ -439,9 +451,9 @@ const PerformanceTransactionTable: React.FC<
                         fontSize: '0.82rem',
                         color:
                           p95Val > 3000
-                            ? '#f44336'
+                            ? ARGUS_SEMANTIC.negative
                             : p95Val > 1000
-                              ? '#ff9800'
+                              ? ARGUS_SEMANTIC.warning
                               : 'inherit',
                       }}
                     >
@@ -466,9 +478,9 @@ const PerformanceTransactionTable: React.FC<
                           width: `${(p95Val / maxP95) * 100}%`,
                           backgroundColor:
                             p95Val > 3000
-                              ? '#f44336'
+                              ? ARGUS_SEMANTIC.negative
                               : p95Val > 1000
-                                ? '#ff9800'
+                                ? ARGUS_SEMANTIC.warning
                                 : '#7c4dff',
                           transition: 'width 0.3s',
                         }}
@@ -512,10 +524,10 @@ const PerformanceTransactionTable: React.FC<
                             width: `${Math.min(errRate, 100)}%`,
                             backgroundColor:
                               errRate > 5
-                                ? '#f44336'
+                                ? ARGUS_SEMANTIC.negative
                                 : errRate > 1
-                                  ? '#ff9800'
-                                  : '#4caf50',
+                                  ? ARGUS_SEMANTIC.warning
+                                  : ARGUS_SEMANTIC.positive,
                             transition: 'width 0.3s',
                           }}
                         />
@@ -530,10 +542,10 @@ const PerformanceTransactionTable: React.FC<
                           textAlign: 'right',
                           color:
                             errRate > 5
-                              ? '#f44336'
+                              ? ARGUS_SEMANTIC.negative
                               : errRate > 1
-                                ? '#ff9800'
-                                : '#4caf50',
+                                ? ARGUS_SEMANTIC.warning
+                                : ARGUS_SEMANTIC.positive,
                         }}
                       >
                         {errRate.toFixed(1)}%
@@ -548,7 +560,7 @@ const PerformanceTransactionTable: React.FC<
 
       {/* Pagination */}
       {transactions.length > 0 && (
-        <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 2, flexShrink: 0 }}>
           <SimplePagination
             count={transactions.length}
             page={perfPage}

@@ -30,6 +30,7 @@ interface FeedbackStatsBarProps {
   statCards: StatCard[];
   /** Volume chart data: labels + datasets */
   chartLabels: string[];
+  chartRawPeriods?: string[];
   chartDatasets: ChartDataset[];
   /** Drag-select zoom callback */
   onZoom?: (startIndex: number, endIndex: number) => void;
@@ -41,6 +42,7 @@ const FeedbackStatsBar: React.FC<FeedbackStatsBarProps> = ({
   loading,
   statCards,
   chartLabels,
+  chartRawPeriods,
   chartDatasets,
   onZoom,
 }) => {
@@ -125,6 +127,7 @@ const FeedbackStatsBar: React.FC<FeedbackStatsBarProps> = ({
       {/* Volume Chart — unified ArgusVolumeChart */}
       <ArgusVolumeChart
         datasets={chartDatasets}
+        rawPeriods={chartRawPeriods}
         labels={chartLabels}
         loading={loading && chartLabels.length === 0}
         title={t('argus.feedback.volumeChart')}

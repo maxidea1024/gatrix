@@ -26,6 +26,7 @@ import { ArgusSessionHealth } from '@/services/argusService';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
 import { ArgusFilterState } from '@/components/argus/ArgusFilterBar';
 import { CrashDistribution, formatHour } from './sessionHealthHelpers';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 interface SessionHealthChartsProps {
   data: ArgusSessionHealth | null;
@@ -70,7 +71,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
       ds.push({
         label: t('argus.sessions.healthy'),
         data: data.status_timeline.map((d) => Number(d.healthy)),
-        color: '#4caf50',
+        color: ARGUS_SEMANTIC.positive,
         type: 'area',
       });
     }
@@ -78,13 +79,13 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
       {
         label: t('argus.sessions.errored'),
         data: data.status_timeline.map((d) => Number(d.errored)),
-        color: '#ff9800',
+        color: ARGUS_SEMANTIC.warning,
         type: 'area',
       },
       {
         label: t('argus.sessions.crashed'),
         data: data.status_timeline.map((d) => Number(d.crashed)),
-        color: '#f44336',
+        color: ARGUS_SEMANTIC.negative,
         type: 'area',
       }
     );
@@ -115,13 +116,13 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
       {
         label: t('argus.sessions.errored'),
         data: data.status_timeline.map((d) => Number(d.errored)),
-        color: '#ff9800',
+        color: ARGUS_SEMANTIC.warning,
         type: 'stacked-bar' as const,
       },
       {
         label: t('argus.sessions.crashed'),
         data: data.status_timeline.map((d) => Number(d.crashed)),
-        color: '#f44336',
+        color: ARGUS_SEMANTIC.negative,
         type: 'stacked-bar' as const,
       },
       {
@@ -210,7 +211,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
                   width: 3,
                   height: 16,
                   borderRadius: 1,
-                  backgroundColor: '#4caf50',
+                  backgroundColor: ARGUS_SEMANTIC.positive,
                   mr: 0.5,
                 }}
               />
@@ -252,10 +253,10 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
                 fontWeight: 600,
                 ...(hideHealthy
                   ? {
-                      backgroundColor: alpha('#ff9800', 0.15),
-                      color: '#ff9800',
+                      backgroundColor: alpha(ARGUS_SEMANTIC.warning, 0.15),
+                      color: ARGUS_SEMANTIC.warning,
                       borderColor: 'transparent',
-                      '& .MuiChip-icon': { color: '#ff9800' },
+                      '& .MuiChip-icon': { color: ARGUS_SEMANTIC.warning },
                     }
                   : {
                       borderColor: isDark
@@ -269,7 +270,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
         </Box>
         <Box sx={{ height: 220 }}>
           {loading ? (
-            <ArgusChartSkeleton type="line" height={220} color="#4caf50" />
+            <ArgusChartSkeleton type="line" height={220} color={ARGUS_SEMANTIC.positive} />
           ) : (
             <InteractiveTimeSeriesChart
               labels={timelineLabels}
@@ -339,7 +340,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
               fontWeight={600}
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
-              <WarningIcon fontSize="small" sx={{ color: '#f44336' }} />
+              <WarningIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.negative }} />
               {t('argus.sessions.crashRateByBrowser')}
             </Typography>
             <Tooltip title={t('argus.sessions.crashByBrowserDesc')} arrow>
@@ -385,7 +386,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
               fontWeight={600}
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
-              <WarningIcon fontSize="small" sx={{ color: '#ff9800' }} />
+              <WarningIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />
               {t('argus.sessions.crashRateByOS')}
             </Typography>
             <Tooltip title={t('argus.sessions.crashByOSDesc')} arrow>
@@ -438,7 +439,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
                 width: 3,
                 height: 16,
                 borderRadius: 1,
-                backgroundColor: '#f44336',
+                backgroundColor: ARGUS_SEMANTIC.negative,
                 mr: 0.5,
               }}
             />
@@ -452,7 +453,7 @@ const SessionHealthCharts: React.FC<SessionHealthChartsProps> = ({
         </Box>
         <Box sx={{ height: 200 }}>
           {loading ? (
-            <ArgusChartSkeleton type="bar" height={200} color="#f44336" />
+            <ArgusChartSkeleton type="bar" height={200} color={ARGUS_SEMANTIC.negative} />
           ) : (
             <InteractiveTimeSeriesChart
               labels={timelineLabels}

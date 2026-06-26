@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Box, Typography, useTheme, alpha, Tooltip } from '@mui/material';
 import { formatCompactNumber } from '@/utils/numberFormat';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from '../argusThemeTokens';
 
 interface TreemapNode {
   name: string;
@@ -28,10 +29,10 @@ const CHART_COLORS = [
   '#7c4dff',
   '#448aff',
   '#00bcd4',
-  '#ff9800',
-  '#f44336',
-  '#4caf50',
-  '#9c27b0',
+  ARGUS_SEMANTIC.warning,
+  ARGUS_SEMANTIC.negative,
+  ARGUS_SEMANTIC.positive,
+  ARGUS_SERIES[4],
 ];
 
 /**

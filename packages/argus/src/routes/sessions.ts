@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import { getBucketingConfig } from '../utils/timeBucket';
 import { createLogger } from '../utils/logger';
+import { buildSegmentConditions, type SegmentFilterQuery } from '../utils/segmentFilter';
 
 const logger = createLogger('sessions-api');
 
@@ -21,12 +22,20 @@ export default async function sessionsRoutes(app: FastifyInstance) {
         period = '24h',
         start,
         end,
-      } = request.query as { period?: string; start?: string; end?: string };
+        country,
+        platform,
+        app_version,
+      } = request.query as {
+        period?: string; start?: string; end?: string;
+        country?: string; platform?: string; app_version?: string;
+      };
 
       try {
         // Determine the timeRange for optic queries
         const isCustom = start && end;
         const timeRange = isCustom ? { start, end } : { period };
+        const segQuery: SegmentFilterQuery = { country, platform, app_version };
+        const segConds = buildSegmentConditions(segQuery, 'sessions');
 
         // Compute previous period range for comparison
         let prevRange: { start: string; end: string };
@@ -60,6 +69,7 @@ export default async function sessionsRoutes(app: FastifyInstance) {
               ...SESSION_DEFAULTS,
               projectId,
               timeRange,
+              conditions: segConds.length > 0 ? segConds : undefined,
               select: [
                 { field: 'count()', alias: 'total_sessions' },
                 { field: "countIf(status = 'crashed')", alias: 'crashed' },

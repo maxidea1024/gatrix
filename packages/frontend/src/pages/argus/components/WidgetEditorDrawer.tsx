@@ -43,6 +43,7 @@ import type {
   WidgetType,
   VizOptions,
 } from './renderers/widgetTypes';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Widget Type Catalog Data ───
 
@@ -775,11 +776,11 @@ const WidgetEditorDrawer: React.FC<WidgetEditorDrawerProps> = ({
                 height: 24,
                 backgroundColor:
                   editingWidget.viz_options?.legend?.show !== false
-                    ? alpha('#4caf50', 0.12)
+                    ? alpha(ARGUS_SEMANTIC.positive, 0.12)
                     : 'transparent',
                 color:
                   editingWidget.viz_options?.legend?.show !== false
-                    ? '#4caf50'
+                    ? ARGUS_SEMANTIC.positive
                     : 'text.disabled',
                 border: `1px solid ${borderColor}`,
               }}

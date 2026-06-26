@@ -20,6 +20,7 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import SafeTooltip from '@/components/common/SafeTooltip';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { formatCompactNumber } from '@/utils/numberFormat';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 export interface PatternEntry {
   pattern: string;
@@ -44,10 +45,10 @@ export interface LogsPatternsPanelProps {
 /* ── Severity color mapping ── */
 const LEVEL_COLORS: Record<string, string> = {
   fatal: '#d32f2f',
-  error: '#f44336',
-  warn: '#ff9800',
-  warning: '#ff9800',
-  info: '#2196f3',
+  error: ARGUS_SEMANTIC.negative,
+  warn: ARGUS_SEMANTIC.warning,
+  warning: ARGUS_SEMANTIC.warning,
+  info: ARGUS_SEMANTIC.info,
   debug: '#9e9e9e',
   trace: '#78909c',
 };
@@ -124,7 +125,7 @@ const DeltaBadge: React.FC<{
             borderRadius: '3px',
             fontSize: '0.58rem',
             fontWeight: 700,
-            color: '#4caf50',
+            color: ARGUS_SEMANTIC.positive,
             bgcolor: 'rgba(76,175,80,0.12)',
           }}
         >
@@ -150,7 +151,7 @@ const DeltaBadge: React.FC<{
     );
   }
 
-  const color = isUp ? '#f44336' : '#4caf50';
+  const color = isUp ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive;
   const Icon = isUp ? ArrowUpIcon : ArrowDownIcon;
 
   // Format: use multiplier (×) for large changes, percentage for small
@@ -234,9 +235,9 @@ const SummaryCards: React.FC<{
 
   const cards = [
     { label: 'Total', value: stats.total, color: theme.palette.primary.main },
-    { label: '🆕 New', value: stats.newCount, color: '#4caf50' },
-    { label: '📈 Surge', value: stats.surgeCount, color: '#ff9800' },
-    { label: '🔴 Error', value: stats.errorCount, color: '#f44336' },
+    { label: 'New', value: stats.newCount, color: ARGUS_SEMANTIC.positive },
+    { label: 'Surge', value: stats.surgeCount, color: ARGUS_SEMANTIC.warning },
+    { label: 'Error', value: stats.errorCount, color: ARGUS_SEMANTIC.negative },
   ];
 
   return (
@@ -687,7 +688,7 @@ const LogsPatternsPanel: React.FC<LogsPatternsPanelProps> = ({
                                 opacity: 0,
                                 transition: 'opacity 0.15s',
                                 'tr:hover &': { opacity: 0.7 },
-                                '&:hover': { opacity: 1, color: '#ff9800' },
+                                '&:hover': { opacity: 1, color: ARGUS_SEMANTIC.warning },
                               }}
                             >
                               <AlertIcon sx={{ fontSize: 13 }} />

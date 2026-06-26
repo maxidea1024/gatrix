@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogActions,
 } from '@mui/material';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Step Badge (floating label above card) ───
 
@@ -140,10 +141,10 @@ export const LogicToggleButton = styled(Button, {
   borderRadius: 0,
   ...(isActive
     ? {
-        backgroundColor: alpha('#f44336', 0.9),
+        backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.9),
         color: '#fff',
         '&:hover': {
-          backgroundColor: alpha('#f44336', 0.8),
+          backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.8),
         },
       }
     : {}),

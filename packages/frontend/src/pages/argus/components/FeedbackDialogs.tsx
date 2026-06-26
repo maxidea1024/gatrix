@@ -41,6 +41,7 @@ import {
   IssueStatusChip,
   TrackerChip,
 } from './FeedbackDialogs.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Spam Filter Dialog ───
 
@@ -141,7 +142,7 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterListIcon sx={{ fontSize: 20, color: '#ff9800' }} />
+          <FilterListIcon sx={{ fontSize: 20, color: ARGUS_SEMANTIC.warning }} />
           {t('argus.feedback.spamFilter')}
         </Box>
         <IconButton size="small" onClick={onClose}>
@@ -182,10 +183,10 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
                 fontWeight: 700,
                 cursor: 'pointer',
                 backgroundColor: newKeywordRegex
-                  ? alpha('#ff9800', 0.15)
+                  ? alpha(ARGUS_SEMANTIC.warning, 0.15)
                   : 'transparent',
-                color: newKeywordRegex ? '#ff9800' : 'text.disabled',
-                border: `1px solid ${newKeywordRegex ? '#ff9800' : 'rgba(128,128,128,0.3)'}`,
+                color: newKeywordRegex ? ARGUS_SEMANTIC.warning : 'text.disabled',
+                border: `1px solid ${newKeywordRegex ? ARGUS_SEMANTIC.warning : 'rgba(128,128,128,0.3)'}`,
               }}
             />
           </Tooltip>
@@ -223,7 +224,7 @@ export const SpamFilterDialog: React.FC<SpamFilterDialogProps> = ({
                   onClick={() => handleDeleteKeyword(kw.id)}
                   sx={{
                     color: 'text.disabled',
-                    '&:hover': { color: '#f44336' },
+                    '&:hover': { color: ARGUS_SEMANTIC.negative },
                   }}
                 >
                   <DeleteIcon sx={{ fontSize: 16 }} />
@@ -539,10 +540,10 @@ export const LinkIssueDialog: React.FC<LinkIssueDialogProps> = ({
             results.map((issue) => {
               const issueColor =
                 issue.status === 'resolved'
-                  ? '#4caf50'
+                  ? ARGUS_SEMANTIC.positive
                   : issue.status === 'ignored'
                     ? '#9e9e9e'
-                    : '#ff9800';
+                    : ARGUS_SEMANTIC.warning;
               return (
                 <IssueResultRow
                   key={issue.id}

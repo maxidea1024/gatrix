@@ -60,6 +60,7 @@ import useGlobalPageSize from '@/hooks/useGlobalPageSize';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import { evaluateAST } from './components/releasesHelpers';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 
 const DEEP_LINK_KEYS = ['page', 'search', 'sort'];
@@ -134,6 +135,7 @@ const ArgusReleasesPage: React.FC = () => {
   // ─── Local-only UI State ────────────────────────────────────────
   const [releases, setReleases] = useState<ArgusRelease[]>([]);
   const [loading, setLoading] = useState(true);
+  const hasLoaded = useRef(false);
   const [filters, setFilters] = useState<ArgusFilterState>(() =>
     defaultArgusFilterState(urlState.period)
   );
@@ -191,6 +193,7 @@ const ArgusReleasesPage: React.FC = () => {
       // Actually, releases don't have os/browser arrays on them.
       // The issue is just the checkbox not working visually.
       setReleases(data || []);
+      hasLoaded.current = true;
     } catch (error) {
       console.error('Failed to fetch releases:', error);
     } finally {
@@ -309,7 +312,7 @@ const ArgusReleasesPage: React.FC = () => {
   );
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
       <PageHeader
         icon={<ReleaseIcon />}
@@ -412,6 +415,7 @@ const ArgusReleasesPage: React.FC = () => {
           borderRadius: '8px',
           border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
           backgroundColor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(0,0,0,0.01)',
+          flexShrink: 0,
         }}
       >
         {[
@@ -425,19 +429,19 @@ const ArgusReleasesPage: React.FC = () => {
             icon: <BugReportIcon />,
             label: t('argus.releases.totalErrors'),
             value: totalErrors,
-            color: '#f44336',
+            color: ARGUS_SEMANTIC.negative,
           },
           {
             icon: <PeopleIcon />,
             label: t('argus.releases.affectedUsers'),
             value: totalUsers,
-            color: '#2196f3',
+            color: ARGUS_SEMANTIC.info,
           },
           {
             icon: <CheckIcon />,
             label: t('argus.releases.avgCrashFree'),
             value: `${avgCrashFree.toFixed(1)}%`,
-            color: '#4caf50',
+            color: ARGUS_SEMANTIC.positive,
           },
         ].map((card, idx, arr) => (
           <React.Fragment key={idx}>
@@ -498,7 +502,10 @@ const ArgusReleasesPage: React.FC = () => {
         ))}
       </Paper>
 
-      <PageContentLoader loading={loading}>
+      <PageContentLoader loading={loading && !hasLoaded.current} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {loading && hasLoaded.current && (
+          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6, flexShrink: 0 }} />
+        )}
         {releases.length === 0 ? (
           <EmptyPlaceholder
             icon={<ReleaseIcon sx={{ fontSize: 48 }} />}
@@ -506,7 +513,9 @@ const ArgusReleasesPage: React.FC = () => {
             minHeight={200}
           />
         ) : (
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'auto',
+            opacity: loading ? 0.55 : 1, transition: 'opacity 0.15s ease', pointerEvents: loading ? 'none' : 'auto',
+          }}>
             {filteredReleases.length === 0 ? (
               <Box sx={{ mt: 1 }}>
                 <EmptyPlaceholder
@@ -539,6 +548,10 @@ const ArgusReleasesPage: React.FC = () => {
                       : 'rgba(0,0,0,0.02)',
                     borderTopLeftRadius: 8,
                     borderTopRightRadius: 8,
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 2,
+                    bgcolor: isDark ? '#1e1e1e' : '#fafafa',
                   }}
                 >
                   <Typography
@@ -600,10 +613,10 @@ const ArgusReleasesPage: React.FC = () => {
                   const isHotfix = r.release.includes('hotfix');
                   const statusColor =
                     crashFree >= 99
-                      ? '#4caf50'
+                      ? ARGUS_SEMANTIC.positive
                       : crashFree >= 95
-                        ? '#ff9800'
-                        : '#f44336';
+                        ? ARGUS_SEMANTIC.warning
+                        : ARGUS_SEMANTIC.negative;
                   const errorCount = Number(r.error_count);
                   const fatalCount = Number(r.fatal_count || 0);
                   const unhandledCount = Number(r.unhandled_count || 0);
@@ -690,8 +703,8 @@ const ArgusReleasesPage: React.FC = () => {
                                 height: 18,
                                 fontSize: '0.6rem',
                                 fontWeight: 700,
-                                backgroundColor: alpha('#ff9800', 0.15),
-                                color: '#ff9800',
+                                backgroundColor: alpha(ARGUS_SEMANTIC.warning, 0.15),
+                                color: ARGUS_SEMANTIC.warning,
                                 border: 'none',
                               }}
                             />
@@ -699,7 +712,7 @@ const ArgusReleasesPage: React.FC = () => {
                           {(() => {
                             const stage = getAdoptionStage(r);
                             const stageColor =
-                              stage === 'adopted' ? '#4caf50' : '#ff9800';
+                              stage === 'adopted' ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.warning;
                             const stageLabel =
                               stage === 'adopted'
                                 ? t('argus.releases.adopted', 'Adopted')
@@ -787,11 +800,11 @@ const ArgusReleasesPage: React.FC = () => {
                                 fontSize: '0.65rem',
                                 fontWeight: 700,
                                 backgroundColor: alpha(
-                                  crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
+                                  crashFreeDelta >= 0 ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative,
                                   0.1
                                 ),
                                 color:
-                                  crashFreeDelta >= 0 ? '#4caf50' : '#f44336',
+                                  crashFreeDelta >= 0 ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative,
                                 border: 'none',
                                 '& .MuiChip-label': { px: 0.5 },
                               }}
@@ -808,10 +821,10 @@ const ArgusReleasesPage: React.FC = () => {
                           sx={{
                             color:
                               crashFreeUsers >= 99
-                                ? '#4caf50'
+                                ? ARGUS_SEMANTIC.positive
                                 : crashFreeUsers >= 95
-                                  ? '#ff9800'
-                                  : '#f44336',
+                                  ? ARGUS_SEMANTIC.warning
+                                  : ARGUS_SEMANTIC.negative,
                             lineHeight: 1.2,
                             fontSize: '0.85rem',
                           }}
@@ -821,10 +834,10 @@ const ArgusReleasesPage: React.FC = () => {
                         {(() => {
                           const userStatusColor =
                             crashFreeUsers >= 99
-                              ? '#4caf50'
+                              ? ARGUS_SEMANTIC.positive
                               : crashFreeUsers >= 95
-                                ? '#ff9800'
-                                : '#f44336';
+                                ? ARGUS_SEMANTIC.warning
+                                : ARGUS_SEMANTIC.negative;
                           return (
                             <Box sx={{ width: '100%', mt: 0.5 }}>
                               <LinearProgress
@@ -861,14 +874,14 @@ const ArgusReleasesPage: React.FC = () => {
                                 fontWeight: 700,
                                 backgroundColor: alpha(
                                   crashFreeUsersDelta >= 0
-                                    ? '#4caf50'
-                                    : '#f44336',
+                                    ? ARGUS_SEMANTIC.positive
+                                    : ARGUS_SEMANTIC.negative,
                                   0.1
                                 ),
                                 color:
                                   crashFreeUsersDelta >= 0
-                                    ? '#4caf50'
-                                    : '#f44336',
+                                    ? ARGUS_SEMANTIC.positive
+                                    : ARGUS_SEMANTIC.negative,
                                 border: 'none',
                                 '& .MuiChip-label': { px: 0.5 },
                               }}
@@ -895,10 +908,10 @@ const ArgusReleasesPage: React.FC = () => {
                               height: 22,
                               fontWeight: 700,
                               fontSize: '0.7rem',
-                              backgroundColor: alpha('#f44336', 0.1),
-                              color: '#f44336',
+                              backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.1),
+                              color: ARGUS_SEMANTIC.negative,
                               border: 'none',
-                              '& .MuiChip-icon': { color: '#f44336' },
+                              '& .MuiChip-icon': { color: ARGUS_SEMANTIC.negative },
                             }}
                           />
                         ) : (
@@ -930,7 +943,7 @@ const ArgusReleasesPage: React.FC = () => {
                                 width: 6,
                                 height: 6,
                                 borderRadius: '50%',
-                                backgroundColor: '#f44336',
+                                backgroundColor: ARGUS_SEMANTIC.negative,
                                 display: 'inline-block',
                               }}
                             />
@@ -960,7 +973,7 @@ const ArgusReleasesPage: React.FC = () => {
                               minWidth: 0,
                               height: '100%',
                               width: `${(errorCount / maxErrorCount) * 100}%`,
-                              backgroundColor: alpha('#f44336', 0.6),
+                              backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.6),
                               borderRadius: 1,
                             }}
                           />
@@ -1078,7 +1091,7 @@ const ArgusReleasesPage: React.FC = () => {
         )}
 
         {filteredTotal > 0 && (
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: 3, flexShrink: 0 }}>
             <SimplePagination
               count={filteredTotal}
               page={currentPage - 1}

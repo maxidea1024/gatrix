@@ -29,14 +29,15 @@ import type { ArgusIssue } from '@/services/argusService';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import type { PatternEntry } from './LogsPatternsPanel';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 /* ── Severity color mapping ── */
 const LEVEL_COLORS: Record<string, string> = {
   fatal: '#d32f2f',
-  error: '#f44336',
-  warn: '#ff9800',
-  warning: '#ff9800',
-  info: '#2196f3',
+  error: ARGUS_SEMANTIC.negative,
+  warn: ARGUS_SEMANTIC.warning,
+  warning: ARGUS_SEMANTIC.warning,
+  info: ARGUS_SEMANTIC.info,
   debug: '#9e9e9e',
   trace: '#78909c',
 };
@@ -402,9 +403,9 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                     fontWeight: 700,
                     color:
                       delta > 5
-                        ? '#f44336'
+                        ? ARGUS_SEMANTIC.negative
                         : delta < -5
-                          ? '#4caf50'
+                          ? ARGUS_SEMANTIC.positive
                           : 'text.secondary',
                   }}
                 >
@@ -427,7 +428,7 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                     fontSize: '0.65rem',
                     fontWeight: 700,
                     bgcolor: 'rgba(76,175,80,0.12)',
-                    color: '#4caf50',
+                    color: ARGUS_SEMANTIC.positive,
                   }}
                 />
               }
@@ -712,11 +713,11 @@ const PatternDetailPanel: React.FC<PatternDetailPanelProps> = ({
                 fontWeight: 600,
                 borderRadius: '8px',
                 justifyContent: 'flex-start',
-                color: '#ff9800',
-                borderColor: alpha('#ff9800', 0.3),
+                color: ARGUS_SEMANTIC.warning,
+                borderColor: alpha(ARGUS_SEMANTIC.warning, 0.3),
                 '&:hover': {
-                  borderColor: '#ff9800',
-                  bgcolor: alpha('#ff9800', 0.04),
+                  borderColor: ARGUS_SEMANTIC.warning,
+                  bgcolor: alpha(ARGUS_SEMANTIC.warning, 0.04),
                 },
               }}
             >

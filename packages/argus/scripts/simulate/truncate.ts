@@ -7,6 +7,7 @@ export async function truncateClickHouse(ch: any): Promise<void> {
   const chTables = [
     'errors', 'transactions', 'spans', 'sessions',
     'user_feedback', 'logs', 'metrics', 'activities',
+    'cron_checkins', 'uptime_checkins',
   ];
   for (const table of chTables) {
     try {
@@ -20,7 +21,17 @@ export async function truncateClickHouse(ch: any): Promise<void> {
 
 export async function truncateMySQL(pool: any): Promise<void> {
   const mysqlTables = [
-    'g_argus_issues', 'g_argus_releases', 'g_argus_releaseCommits',
+    // Order matters due to FK constraints
+    'g_argus_releaseCommits',
+    'g_argus_releases',
+    'g_argus_issue_activity',
+    'g_argus_feedback_issue_links',
+    'g_argus_feedback_activity',
+    'g_argus_cronCheckins',
+    'g_argus_uptimeCheckins',
+    'g_argus_cronMonitors',
+    'g_argus_uptimeMonitors',
+    'g_argus_issues',
   ];
   for (const table of mysqlTables) {
     try {

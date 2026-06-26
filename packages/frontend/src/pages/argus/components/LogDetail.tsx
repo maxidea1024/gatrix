@@ -13,13 +13,14 @@ import {
   getFieldNavTooltip,
 } from '@/components/argus/FieldDefinitions';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 const SEVERITY_COLORS: Record<string, string> = {
   fatal: '#d32f2f',
-  error: '#f44336',
-  warn: '#ff9800',
-  warning: '#ff9800',
-  info: '#2196f3',
+  error: ARGUS_SEMANTIC.negative,
+  warn: ARGUS_SEMANTIC.warning,
+  warning: ARGUS_SEMANTIC.warning,
+  info: ARGUS_SEMANTIC.info,
   debug: '#9e9e9e',
   trace: '#607d8b',
 };

@@ -14,6 +14,7 @@ import PageContentLoader from '@/components/common/PageContentLoader';
 import EmptyPagePlaceholder from '@/components/common/EmptyPagePlaceholder';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import { getDataGovernance, type DataGovernanceData } from '@/services/argus/argusAnalytics';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 // ─── Sparkline ──────────────────────────────────────────────────────────────
 
@@ -55,7 +56,7 @@ const ArgusDataGovernancePage: React.FC = () => {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const scoreColor = (data?.quality_score || 0) >= 80 ? '#4caf50' : (data?.quality_score || 0) >= 50 ? '#ff9800' : '#f44336';
+  const scoreColor = (data?.quality_score || 0) >= 80 ? ARGUS_SEMANTIC.positive : (data?.quality_score || 0) >= 50 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.negative;
 
   return (
     <Box>
@@ -89,16 +90,16 @@ const ArgusDataGovernancePage: React.FC = () => {
               </Paper>
 
               <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 3, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
-                <DupIcon sx={{ fontSize: 32, color: data.duplicates.length > 0 ? '#ff9800' : '#4caf50', mb: 0.5 }} />
+                <DupIcon sx={{ fontSize: 32, color: data.duplicates.length > 0 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.positive, mb: 0.5 }} />
                 <Typography variant="caption" color="text.secondary" display="block">{t('argus.dataGovernance.duplicates')}</Typography>
-                <Typography variant="h3" fontWeight={800} sx={{ color: data.duplicates.length > 0 ? '#ff9800' : '#4caf50' }}>{data.duplicates.length}</Typography>
+                <Typography variant="h3" fontWeight={800} sx={{ color: data.duplicates.length > 0 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.positive }}>{data.duplicates.length}</Typography>
                 <Typography variant="caption" color="text.secondary">{t('argus.dataGovernance.similarPairs')}</Typography>
               </Paper>
             </Box>
 
             {/* Duplicates Warning */}
             {data.duplicates.length > 0 && (
-              <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 3, borderColor: alpha('#ff9800', 0.3), bgcolor: alpha('#ff9800', 0.04) }}>
+              <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, mb: 3, borderColor: alpha(ARGUS_SEMANTIC.warning, 0.3), bgcolor: alpha(ARGUS_SEMANTIC.warning, 0.04) }}>
                 <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <DupIcon fontSize="small" color="warning" /> {t('argus.dataGovernance.potentialDuplicates')}
                 </Typography>
@@ -159,7 +160,7 @@ const ArgusDataGovernancePage: React.FC = () => {
                         <LinearProgress variant="determinate" value={p.coverage} sx={{
                           flex: 1, height: 8, borderRadius: 1,
                           bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                          '& .MuiLinearProgress-bar': { bgcolor: p.coverage >= 80 ? '#4caf50' : p.coverage >= 50 ? '#ff9800' : '#f44336', borderRadius: 1 },
+                          '& .MuiLinearProgress-bar': { bgcolor: p.coverage >= 80 ? ARGUS_SEMANTIC.positive : p.coverage >= 50 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.negative, borderRadius: 1 },
                         }} />
                         <Typography variant="caption" fontWeight={600} sx={{ minWidth: 40, textAlign: 'right' }}>{p.coverage}%</Typography>
                       </Box>

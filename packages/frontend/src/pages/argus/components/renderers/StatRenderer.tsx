@@ -7,6 +7,7 @@ import {
   formatValue,
   getThresholdColor,
 } from './widgetTypes';
+import { ARGUS_SEMANTIC } from '../../argusThemeTokens';
 
 interface StatRendererProps {
   data: any[];
@@ -135,9 +136,9 @@ const StatRenderer: React.FC<StatRendererProps> = ({
                 fontWeight: 600,
                 color:
                   changePercent > 0
-                    ? '#4caf50'
+                    ? ARGUS_SEMANTIC.positive
                     : changePercent < 0
-                      ? '#f44336'
+                      ? ARGUS_SEMANTIC.negative
                       : 'text.secondary',
               }}
             >

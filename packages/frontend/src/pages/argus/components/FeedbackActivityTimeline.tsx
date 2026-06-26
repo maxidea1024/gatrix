@@ -18,11 +18,12 @@ import { useSnackbar } from 'notistack';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import { stringToColor, getInitials } from '@/utils/argusHelpers';
 import argusService, { ArgusFeedbackActivity } from '@/services/argusService';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 const statusColor = (s: string) => {
-  if (s === 'resolved') return '#4caf50';
+  if (s === 'resolved') return ARGUS_SEMANTIC.positive;
   if (s === 'spam') return '#9e9e9e';
-  return '#ff9800';
+  return ARGUS_SEMANTIC.warning;
 };
 
 interface FeedbackActivityTimelineProps {
@@ -248,11 +249,11 @@ const FeedbackActivityTimeline: React.FC<FeedbackActivityTimelineProps> = ({
                             to: actData.assigned_to,
                           })
                         : t('argus.activity.unassigned');
-                      iconColor = '#2196f3';
+                      iconColor = ARGUS_SEMANTIC.info;
                       break;
                     case 'comment':
                       label = actData?.text || '';
-                      iconColor = '#ff9800';
+                      iconColor = ARGUS_SEMANTIC.warning;
                       break;
                     case 'mark_spam':
                       label = t('argus.feedback.markedAsSpam');
@@ -260,7 +261,7 @@ const FeedbackActivityTimeline: React.FC<FeedbackActivityTimelineProps> = ({
                       break;
                     case 'unmark_spam':
                       label = t('argus.feedback.unmarkedFromSpam');
-                      iconColor = '#4caf50';
+                      iconColor = ARGUS_SEMANTIC.positive;
                       break;
                   }
 

@@ -1380,7 +1380,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         '/argus/analytics/cohorts',
         '/argus/analytics/realtime',
         '/argus/analytics/impact',
-        '/argus/analytics/revenue',
+        '/argus/analytics/monetization',
         '/argus/analytics/lifecycle',
         '/argus/analytics/kpi-alerts',
         '/argus/analytics/data-governance',

@@ -69,6 +69,7 @@ import {
   AddItemButton,
   TagFilterChip,
 } from './AlertRuleEditorDialog.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Step Card ───
 
@@ -608,7 +609,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
         <StepCard
           step={t('argus.alerts.stepIf')}
           label={t('argus.alerts.conditionsDesc')}
-          color="#f44336"
+          color={ARGUS_SEMANTIC.negative}
           isDark={isDark}
         >
           {formConditions.length > 1 && (
@@ -691,7 +692,7 @@ const AlertRuleEditorDialog: React.FC<AlertRuleEditorDialogProps> = ({
         <StepCard
           step={t('argus.alerts.stepThen')}
           label={t('argus.alerts.actionsDesc')}
-          color="#4caf50"
+          color={ARGUS_SEMANTIC.positive}
           isDark={isDark}
         >
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>

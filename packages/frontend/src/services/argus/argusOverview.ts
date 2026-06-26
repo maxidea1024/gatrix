@@ -16,10 +16,11 @@ export async function getOverview(
   projectId: number | string,
   period?: string,
   start?: string,
-  end?: string
+  end?: string,
+  segmentFilter?: { country?: string; platform?: string; app_version?: string },
 ): Promise<ArgusOverviewData> {
   const response = await argusApi.get(`${ARGUS_BASE}/overview/${projectId}`, {
-    params: { period, start, end },
+    params: { period, start, end, ...segmentFilter },
   });
   return response.data?.data || response.data;
 }

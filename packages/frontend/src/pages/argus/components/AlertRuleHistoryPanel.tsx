@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatWith } from '@/utils/dateFormat';
 import {
   Box,
   Typography,
@@ -19,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { ArgusAlertRule, ArgusAlertHistory } from '@/services/argusService';
 import InteractiveTimeSeriesChart from '@/components/argus/InteractiveTimeSeriesChart';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 interface AlertRuleHistoryPanelProps {
   show: boolean;
@@ -74,7 +76,7 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
               fontWeight={700}
               sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
             >
-              <HistoryIcon sx={{ fontSize: 18, color: '#2196f3' }} />
+              <HistoryIcon sx={{ fontSize: 18, color: ARGUS_SEMANTIC.info }} />
               {t('argus.alerts.recentHistory')}
             </Typography>
             {rules.length > 0 && (
@@ -118,15 +120,10 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                 );
                 const dates = Array.from(dateMap.keys()).sort();
                 const chartData = dates.map((d) => {
-                  const dt = new Date(
-                    d + (d.length === 10 ? 'T00:00:00Z' : 'Z')
-                  );
-                  const label = dt.toLocaleString('en-US', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: d.length > 10 ? '2-digit' : undefined,
-                    hour12: false,
-                  });
+                  const bucket = d + (d.length === 10 ? 'T00:00:00Z' : 'Z');
+                  const label = d.length > 10
+                    ? formatWith(bucket, 'M/D HH:mm')
+                    : formatWith(bucket, 'M/D');
                   return { label, count: dateMap.get(d) || 0 };
                 });
 
@@ -155,7 +152,7 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                     borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
                   }}
                 >
-                  <WarningIcon sx={{ fontSize: 14, color: '#ff9800' }} />
+                  <WarningIcon sx={{ fontSize: 14, color: ARGUS_SEMANTIC.warning }} />
                   <Box sx={{ flex: 1 }}>
                     <Typography sx={{ fontSize: '0.78rem', fontWeight: 500 }}>
                       {h.rule_name ||
@@ -184,9 +181,9 @@ const AlertRuleHistoryPanel: React.FC<AlertRuleHistoryPanelProps> = ({
                           border: 'none',
                           backgroundColor:
                             h.status === 'success'
-                              ? alpha('#4caf50', 0.1)
-                              : alpha('#f44336', 0.1),
-                          color: h.status === 'success' ? '#4caf50' : '#f44336',
+                              ? alpha(ARGUS_SEMANTIC.positive, 0.1)
+                              : alpha(ARGUS_SEMANTIC.negative, 0.1),
+                          color: h.status === 'success' ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative,
                         }}
                       />
                     </Tooltip>

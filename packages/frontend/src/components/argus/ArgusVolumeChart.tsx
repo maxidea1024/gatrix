@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { formatWith } from '@/utils/dateFormat';
 import {
   Box,
   Paper,
@@ -6,6 +7,7 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   IconButton,
+  LinearProgress,
   useTheme,
   alpha,
 } from '@mui/material';
@@ -63,6 +65,13 @@ export interface ArgusVolumeChartProps {
   chartType?: VolumeChartType;
   /** Callback when chart type changes (controlled mode) */
   onChartTypeChange?: (type: VolumeChartType) => void;
+  /**
+   * Raw ISO period strings (e.g. '2026-06-01T00:00:00Z').
+   * When provided, the component auto-detects sub-daily granularity
+   * and formats labels accordingly (M/D for daily, M/D HH:mm for sub-daily).
+   * Takes priority over `labels` when both are provided.
+   */
+  rawPeriods?: string[];
 }
 
 const CHART_HEIGHT_NORMAL = 140;
@@ -88,6 +97,7 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
   mb = 2,
   chartType: controlledChartType,
   onChartTypeChange,
+  rawPeriods,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -107,8 +117,17 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
     false
   );
 
+  // Auto-format labels from rawPeriods if provided
+  const finalLabels = useMemo(() => {
+    if (!rawPeriods || rawPeriods.length === 0) return labels;
+    const parse = (s: string) => new Date(s.includes('T') ? s : s.replace(' ', 'T')).getTime();
+    const isSubDaily = rawPeriods.length >= 2 &&
+      (parse(rawPeriods[1]) - parse(rawPeriods[0])) < 86400000;
+    return rawPeriods.map(p => formatWith(p, isSubDaily ? 'M/D HH:mm' : 'M/D'));
+  }, [rawPeriods, labels]);
+
   const chartHeight = compact ? CHART_HEIGHT_COMPACT : CHART_HEIGHT_NORMAL;
-  const hasData = labels.length > 0 && datasets.length > 0;
+  const hasData = finalLabels.length > 0 && datasets.length > 0;
   const isEmpty = !loading && !hasData;
 
   // Apply current chartType to all datasets
@@ -309,8 +328,36 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
           </Box>
         )}
 
-        {/* State: Loading */}
-        {loading && (
+        {/* State: Loading overlay (has previous data) — keeps chart mounted, no layout shift */}
+        {loading && hasData && (
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 2,
+              bgcolor: isDark ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.5)',
+              borderRadius: 'inherit',
+              transition: 'opacity 0.15s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <LinearProgress
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                borderRadius: 1,
+              }}
+            />
+          </Box>
+        )}
+
+        {/* State: First load skeleton (no data yet) */}
+        {loading && !hasData && (
           <ArgusChartSkeleton
             type={
               chartType === 'bar' || chartType === 'stacked-bar'
@@ -333,10 +380,10 @@ const ArgusVolumeChart: React.FC<ArgusVolumeChartProps> = ({
           />
         )}
 
-        {/* State: Data */}
-        {!loading && hasData && (
+        {/* State: Data — always mounted when hasData, not gated by loading */}
+        {hasData && (
           <InteractiveTimeSeriesChart
-            labels={labels}
+            labels={finalLabels}
             datasets={typedDatasets}
             height={chartHeight}
             onZoom={onZoom}

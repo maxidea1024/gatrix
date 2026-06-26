@@ -5,6 +5,7 @@ import {
   buildTimeRangeConditions,
   getBucketingConfig,
 } from '../utils/timeBucket';
+import { buildSegmentFilter } from '../utils/segmentFilter';
 
 const TABLE = 'argus.activities';
 
@@ -32,13 +33,16 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
+      const { country, platform, app_version } = request.query as any;
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      Object.assign(params, segmentParams);
 
       const sql = `
         SELECT
           event_name AS name,
           count() AS count
         FROM ${TABLE}
-        WHERE ${conditions.join(' AND ')}
+        WHERE ${conditions.join(' AND ')} ${segmentWhere}
         GROUP BY event_name
         ORDER BY count DESC
         LIMIT 200
@@ -140,6 +144,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
+      const { country, platform, app_version } = request.query as any;
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      Object.assign(params, segmentParams);
       const whereClause = conditions.join(' AND ');
 
       try {
@@ -150,7 +157,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             uniqExact(user_id) AS unique_users,
             uniqExact(session_id) AS total_sessions
           FROM ${TABLE}
-          WHERE ${whereClause}
+          WHERE ${whereClause} ${segmentWhere}
         `;
         const kpiResult = await optic.rawQuery({ query: kpiSql, params });
         const kpiRow = (kpiResult.data as any[])?.[0] || {};
@@ -177,7 +184,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             count() AS events,
             uniqExact(user_id) AS users
           FROM ${TABLE}
-          WHERE ${whereClause}
+          WHERE ${whereClause} ${segmentWhere}
           GROUP BY date
           ORDER BY date ASC
           WITH FILL
@@ -201,7 +208,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             toHour(timestamp) AS hour,
             count() AS count
           FROM ${TABLE}
-          WHERE ${whereClause}
+          WHERE ${whereClause} ${segmentWhere}
           GROUP BY dow, hour
           ORDER BY dow, hour
         `;
@@ -270,6 +277,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
+      const { country, platform, app_version } = request.query as any;
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      Object.assign(params, segmentParams);
 
       // Only filter by event_name when provided
       if (event_name) {
@@ -281,7 +291,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       const stringKeysSql = `
         SELECT DISTINCT arrayJoin(mapKeys(properties)) AS key
         FROM ${TABLE}
-        WHERE ${conditions.join(' AND ')}
+        WHERE ${conditions.join(' AND ')} ${segmentWhere}
         ORDER BY key
         LIMIT 100
       `;
@@ -290,7 +300,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       const numericKeysSql = `
         SELECT DISTINCT arrayJoin(mapKeys(numeric_properties)) AS key
         FROM ${TABLE}
-        WHERE ${conditions.join(' AND ')}
+        WHERE ${conditions.join(' AND ')} ${segmentWhere}
         ORDER BY key
         LIMIT 100
       `;
@@ -352,6 +362,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
+      const { country, platform, app_version } = request.query as any;
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country, platform, app_version });
+      Object.assign(params, segmentParams);
 
       // Resolve column: builtin or custom property
       const builtinColumns = [
@@ -382,7 +395,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           ${valueExpr} AS value,
           count() AS count
         FROM ${TABLE}
-        WHERE ${conditions.join(' AND ')}
+        WHERE ${conditions.join(' AND ')} ${segmentWhere}
           AND ${valueExpr} != ''
         GROUP BY value
         ORDER BY count DESC
@@ -421,6 +434,13 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         body.end
       );
 
+      // Segment filter from request body
+      const { segmentWhere, segmentParams: _segParams } = buildSegmentFilter({
+        country: (body as any).country,
+        platform: (body as any).platform,
+        app_version: (body as any).app_version,
+      });
+
       const series: any[] = [];
 
       for (let eventIdx = 0; eventIdx < body.events.length; eventIdx++) {
@@ -428,6 +448,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
         const params: Record<string, any> = {
           ...timeParams,
           ...bucketing.queryParams,
+          ..._segParams,
           projectId,
           eventName: event.name,
         };
@@ -523,7 +544,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               ${breakdownCol} AS breakdown_value,
               ${aggExpr} AS value
             FROM ${TABLE}
-            WHERE ${conditions.join(' AND ')}
+            WHERE ${conditions.join(' AND ')} ${segmentWhere}
             GROUP BY bucket, breakdown_value
             ORDER BY bucket ASC ${bucketing.fillExpr}
           `;
@@ -558,7 +579,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               ${bucketing.selectExpr} AS bucket,
               ${aggExpr} AS value
             FROM ${TABLE}
-            WHERE ${conditions.join(' AND ')}
+            WHERE ${conditions.join(' AND ')} ${segmentWhere}
             GROUP BY bucket
             ORDER BY bucket ASC ${bucketing.fillExpr}
           `;
@@ -727,6 +748,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
       conditions.push('project_id = {projectId:String}');
       params.projectId = projectId;
+      const { country: _fc, platform: _fp, app_version: _fv } = (body as any) || {};
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country: _fc, platform: _fp, app_version: _fv });
+      Object.assign(params, segmentParams);
 
       // Build windowFunnel conditions
       const windowSeconds = body.conversion_window || 86400;
@@ -799,7 +823,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                   min(if(event_name = {funnelEvent${afterStep}:String}, timestamp, toDateTime64('2099-01-01', 3))) AS step_after_ts,
                   min(if(event_name = {funnelEvent${beforeStep}:String}, timestamp, toDateTime64('2099-01-01', 3))) AS step_before_ts
                 FROM ${TABLE}
-                WHERE ${whereClause}
+                WHERE ${whereClause} ${segmentWhere}
                 GROUP BY user_id
               ) AS funnel_ts ON excl.user_id = funnel_ts.user_id
               WHERE excl.event_name = {exclusionEvent${i}:String}
@@ -822,7 +846,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             user_id,
             windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
           FROM ${TABLE}
-          WHERE ${whereClause}
+          WHERE ${whereClause} ${segmentWhere}
           ${exclusionFilter}
           GROUP BY user_id
         )
@@ -890,7 +914,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 min(timestamp) AS min_ts,
                 windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) AS level
               FROM ${TABLE}
-              WHERE ${whereClause}
+              WHERE ${whereClause} ${segmentWhere}
               ${exclusionFilter}
               GROUP BY user_id
             )
@@ -947,7 +971,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                   timestamp,
                   windowFunnel(${windowSeconds})(toDateTime(timestamp), ${funnelConditions}) OVER (PARTITION BY user_id) AS level
                 FROM ${TABLE}
-                WHERE ${whereClause}
+                WHERE ${whereClause} ${segmentWhere}
               )
               WHERE level >= ${totalSteps}
               GROUP BY user_id
@@ -979,7 +1003,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                     max(if(event_name = {funnelEvent${totalSteps - 1}:String}, timestamp, toDateTime64('1970-01-01', 3)))
                   ) AS convert_seconds
                 FROM ${TABLE}
-                WHERE ${whereClause}
+                WHERE ${whereClause} ${segmentWhere}
                 GROUP BY user_id
                 HAVING convert_seconds > 0 AND convert_seconds < 999999999
               )
@@ -1012,7 +1036,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                   max(if(event_name = {funnelEvent${totalSteps - 1}:String}, timestamp, toDateTime64('1970-01-01', 3)))
                 ) AS convert_seconds
               FROM ${TABLE}
-              WHERE ${whereClause}
+              WHERE ${whereClause} ${segmentWhere}
               GROUP BY user_id
               HAVING convert_seconds > 0 AND convert_seconds < 999999999
             )
@@ -1186,7 +1210,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
           const topValuesSql = `
             SELECT ${bdCol} AS bd, count() AS cnt
             FROM ${TABLE}
-            WHERE ${whereClause} AND ${bdCol} != ''
+            WHERE ${whereClause} ${segmentWhere} AND ${bdCol} != ''
             GROUP BY bd
             ORDER BY cnt DESC
             LIMIT 10
@@ -1377,6 +1401,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       );
 
       params.projectId = projectId;
+      const { country: _rc, platform: _rp, app_version: _rv } = (body as any) || {};
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country: _rc, platform: _rp, app_version: _rv });
+      Object.assign(params, segmentParams);
       params.firstEvent = body.first_event.name;
       params.returnEvent = body.return_event.name;
       params.numPeriods = numPeriods;
@@ -1467,6 +1494,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               AND user_id != ''
               ${firstEventWhere}
               ${globalRetentionWhere}
+              ${segmentWhere}
               AND ${timeConditions.join(' AND ')}
             GROUP BY user_id
           ) f
@@ -1476,6 +1504,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
             AND r.project_id = {projectId:String}
             ${returnEventWhere}
             ${globalRetentionWhere}
+            ${segmentWhere}
             AND r.timestamp >= f.first_ts
             AND ${truncFunc}(r.timestamp) <= ${truncFunc}(f.first_ts) + INTERVAL {numPeriods:UInt32} ${intervalUnit}
         )
@@ -1545,6 +1574,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 AND user_id != ''
                 ${firstEventWhere}
                 ${globalRetentionWhere}
+                ${segmentWhere}
                 AND ${timeConditions.join(' AND ')}
               GROUP BY user_id
             ) f
@@ -1554,6 +1584,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
               AND r.project_id = {projectId:String}
               ${returnEventWhere}
               ${globalRetentionWhere}
+              ${segmentWhere}
               AND r.timestamp >= f.first_ts
               AND ${truncFunc}(r.timestamp) <= ${truncFunc}(f.first_ts) + INTERVAL {numPeriods:UInt32} ${intervalUnit}
           )
@@ -1647,6 +1678,9 @@ export default async function analyticsRoutes(app: FastifyInstance) {
       conditions.push('project_id = {projectId:String}');
       conditions.push("user_id != ''");
       params.projectId = projectId;
+      const { country: _fc, platform: _fp, app_version: _fv } = (body as any) || {};
+      const { segmentWhere, segmentParams } = buildSegmentFilter({ country: _fc, platform: _fp, app_version: _fv });
+      Object.assign(params, segmentParams);
       params.anchorEvent = body.anchor_event.name;
       params.seqLimit = depth + 1;
 
@@ -1680,7 +1714,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 ORDER BY timestamp ${orderDir}
               ) AS rn
             FROM ${TABLE}
-            WHERE ${conditions.join(' AND ')}
+            WHERE ${conditions.join(' AND ')} ${segmentWhere}
           )
           WHERE rn <= {seqLimit:UInt32}
           GROUP BY user_id
@@ -1746,7 +1780,7 @@ export default async function analyticsRoutes(app: FastifyInstance) {
                 ORDER BY timestamp ${orderDir}
               ) AS rn
             FROM ${TABLE}
-            WHERE ${conditions.join(' AND ')}
+            WHERE ${conditions.join(' AND ')} ${segmentWhere}
           )
           WHERE rn <= {seqLimit:UInt32}
           GROUP BY user_id

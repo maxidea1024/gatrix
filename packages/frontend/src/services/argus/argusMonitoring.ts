@@ -81,10 +81,11 @@ export async function getSessionHealth(
   projectId: number | string,
   period?: string,
   start?: string,
-  end?: string
+  end?: string,
+  segmentFilter?: { country?: string; platform?: string; app_version?: string },
 ): Promise<ArgusSessionHealth> {
   const response = await argusApi.get(`${ARGUS_BASE}/sessions/${projectId}`, {
-    params: { period, start, end },
+    params: { period, start, end, ...segmentFilter },
   });
   return response.data?.data || response.data;
 }

@@ -1,5 +1,6 @@
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Chip } from '@mui/material';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 /** Spam keyword row in spam filter dialog */
 export const SpamKeywordRow = styled(Box, {
@@ -23,8 +24,8 @@ export const RegexChip = styled(Chip)({
   height: 18,
   fontSize: '0.58rem',
   fontWeight: 700,
-  backgroundColor: alpha('#ff9800', 0.1),
-  color: '#ff9800',
+  backgroundColor: alpha(ARGUS_SEMANTIC.warning, 0.1),
+  color: ARGUS_SEMANTIC.warning,
   border: 'none',
 });
 

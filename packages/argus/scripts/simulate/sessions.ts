@@ -22,6 +22,13 @@ export async function generateAndInsertSessions(
       const os = weightedPick(OS_LIST, OS_LIST.map((o) => o.w));
       const dsnKeyId = randomPick(activeDsnKeys);
 
+      const hasUtm = Math.random() < 0.65;
+      const utmSource = hasUtm ? randomPick(['google', 'facebook', 'unity', 'naver', 'youtube']) : null;
+      const utmMedium = hasUtm ? randomPick(['cpc', 'cpa', 'social', 'display', 'organic']) : null;
+      const utmCampaign = hasUtm ? randomPick(['summer_sale_2026', 'brand_awareness', 'pre_registration', 're_engagement']) : null;
+      const utmTerm = hasUtm && Math.random() < 0.5 ? randomPick(['best_rpg_game', 'free_to_play', 'strategy_rpg']) : null;
+      const utmContent = hasUtm && Math.random() < 0.5 ? randomPick(['banner_a', 'video_ad_30s', 'text_ad_v2', 'main_banner']) : null;
+
       sessBatch.push({
         session_id: uuid(),
         project_id: PROJECT_ID,
@@ -38,6 +45,11 @@ export async function generateAndInsertSessions(
         ip_address: user.ip,
         country_code: user.country,
         dsn_key_id: dsnKeyId,
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_campaign: utmCampaign,
+        utm_term: utmTerm,
+        utm_content: utmContent,
       });
     }
     await ch.insert({ table: `${chDatabase}.sessions`, values: sessBatch, format: 'JSONEachRow' });

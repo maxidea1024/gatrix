@@ -32,7 +32,7 @@ import userProfileRoutes from './routes/user-profiles';
 import cohortsRoutes from './routes/cohorts';
 import realtimeRoutes from './routes/realtime';
 import impactRoutes from './routes/impact';
-import revenueRoutes from './routes/revenue';
+import monetizationRoutes from './routes/monetization';
 import lifecycleRoutes from './routes/lifecycle';
 import kpiAlertsRoutes from './routes/kpi-alerts';
 import dataGovernanceRoutes from './routes/data-governance';
@@ -117,7 +117,7 @@ export async function createApp(): Promise<FastifyInstance> {
   await app.register(cohortsRoutes, { prefix: '/argus/api' });
   await app.register(realtimeRoutes, { prefix: '/argus/api' });
   await app.register(impactRoutes, { prefix: '/argus/api' });
-  await app.register(revenueRoutes, { prefix: '/argus/api' });
+  await app.register(monetizationRoutes, { prefix: '/argus/api' });
   await app.register(lifecycleRoutes, { prefix: '/argus/api' });
   await app.register(kpiAlertsRoutes, { prefix: '/argus/api' });
   await app.register(dataGovernanceRoutes, { prefix: '/argus/api' });

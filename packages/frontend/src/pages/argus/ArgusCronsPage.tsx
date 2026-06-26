@@ -58,6 +58,7 @@ import {
   type CronMonitor,
   type CronCheckin,
 } from './components/CronsDetailDrawer';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 function formatRelativeTime(isoStr: string | null, t: any): string {
   if (!isoStr) return '-';
@@ -127,17 +128,17 @@ const ArgusCronsPage: React.FC = () => {
     { color: string; icon: React.ReactElement; label: string }
   > = {
     ok: {
-      color: '#4caf50',
+      color: ARGUS_SEMANTIC.positive,
       icon: <HealthyIcon sx={{ fontSize: 16 }} />,
       label: t('argus.crons.status.ok', 'Healthy'),
     },
     error: {
-      color: '#f44336',
+      color: ARGUS_SEMANTIC.negative,
       icon: <ErrorIcon sx={{ fontSize: 16 }} />,
       label: t('argus.crons.status.error', 'Error'),
     },
     missed: {
-      color: '#ff9800',
+      color: ARGUS_SEMANTIC.warning,
       icon: <WarningIcon sx={{ fontSize: 16 }} />,
       label: t('argus.crons.status.missed', 'Missed'),
     },
@@ -152,12 +153,12 @@ const ArgusCronsPage: React.FC = () => {
       label: t('argus.crons.status.disabled', 'Disabled'),
     },
     active: {
-      color: '#2196f3',
+      color: ARGUS_SEMANTIC.info,
       icon: <HealthyIcon sx={{ fontSize: 16 }} />,
       label: t('argus.crons.status.active', 'Active'),
     },
     in_progress: {
-      color: '#2196f3',
+      color: ARGUS_SEMANTIC.info,
       icon: <ScheduleIcon sx={{ fontSize: 16 }} />,
       label: 'In Progress',
     },

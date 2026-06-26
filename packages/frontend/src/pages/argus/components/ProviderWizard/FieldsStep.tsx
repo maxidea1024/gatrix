@@ -14,6 +14,7 @@ import { Check as CheckIcon, PlayArrow as TestIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { WizardFieldDef } from './types';
 import { WizardInput } from './WizardFields';
+import { ARGUS_SEMANTIC } from '../../argusThemeTokens';
 
 interface FieldsStepProps {
   fieldsToRender: WizardFieldDef[];
@@ -200,13 +201,13 @@ export const FieldsStep: React.FC<FieldsStepProps> = ({
                 px: 2,
                 py: 0.6,
                 borderColor: testResult?.ok
-                  ? '#4caf50'
+                  ? ARGUS_SEMANTIC.positive
                   : isDark
                     ? 'rgba(255,255,255,0.15)'
                     : 'rgba(0,0,0,0.12)',
-                color: testResult?.ok ? '#4caf50' : 'text.secondary',
+                color: testResult?.ok ? ARGUS_SEMANTIC.positive : 'text.secondary',
                 '&:hover': {
-                  borderColor: testResult?.ok ? '#4caf50' : accent,
+                  borderColor: testResult?.ok ? ARGUS_SEMANTIC.positive : accent,
                   backgroundColor: isDark
                     ? 'rgba(255,255,255,0.04)'
                     : 'rgba(0,0,0,0.03)',

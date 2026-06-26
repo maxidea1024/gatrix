@@ -27,6 +27,11 @@ interface NormalizedSession {
   release: string;
   distinct_id: string;
   user_agent: string;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_term: string | null;
+  utm_content: string | null;
 }
 
 export class SessionWorker {
@@ -190,6 +195,11 @@ export class SessionWorker {
       release: event.release || '',
       distinct_id: event.distinct_id || event.user?.id || '',
       user_agent: event.user_agent || '',
+      utm_source: event.utm_source || event.tags?.utm_source || null,
+      utm_medium: event.utm_medium || event.tags?.utm_medium || null,
+      utm_campaign: event.utm_campaign || event.tags?.utm_campaign || null,
+      utm_term: event.utm_term || event.tags?.utm_term || null,
+      utm_content: event.utm_content || event.tags?.utm_content || null,
     };
   }
 

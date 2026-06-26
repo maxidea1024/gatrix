@@ -1,8 +1,18 @@
 /**
- * Argus Data Simulator — Online Game (NodeJS / Lua / UE4) Production-Grade Data
+ * Argus Data Simulator — Full-Set Production-Grade Data
  *
- * Generates realistic error events, structured logs, transactions, sessions,
- * and user feedback for an online game MMO production environment.
+ * Generates ALL data needed for Argus in a single run:
+ *   - Error events + Issues (ClickHouse + MySQL)
+ *   - Structured logs (ClickHouse)
+ *   - Transactions & Spans (ClickHouse)
+ *   - Sessions (ClickHouse)
+ *   - Feedback with enriched columns + attachments (ClickHouse)
+ *   - Feedback-Issue links + Feedback activity (MySQL)
+ *   - Releases + Commits (MySQL)
+ *   - Issue enrichment: status distribution + activity (MySQL)
+ *   - Metrics (ClickHouse)
+ *   - Product Analytics Activities (ClickHouse)
+ *   - Cron & Uptime Monitors + Check-ins (MySQL + ClickHouse)
  *
  * Usage: npx tsx scripts/simulate-data.ts
  */
@@ -29,13 +39,18 @@ import {
   generateAndInsertLogs,
   generateAndInsertTransactions,
   generateAndInsertSessions,
-  generateAndInsertFeedback,
   generateAndInsertMetrics,
   generateAndInsertActivities,
+  // Full-set modules
+  generateAndInsertReleases,
+  generateAndInsertEnrichedFeedback,
+  seedFeedbackLinksAndActivity,
+  generateAndInsertMonitors,
+  enrichIssues,
 } from './simulate';
 
 async function main() {
-  console.log('🎮 Argus Data Simulator — Online Game (NodeJS / Lua / UE4)');
+  console.log('🎮 Argus Data Simulator — Full-Set Production Data');
   console.log('═'.repeat(60));
   console.log(
     `   Scale: ${(TOTAL_ERROR_EVENTS / 1000).toFixed(0)}K events, ${(TOTAL_TRANSACTIONS / 1000).toFixed(0)}K txns, ${(TOTAL_SESSIONS / 1000).toFixed(0)}K sessions, ${TOTAL_FEEDBACK} feedback`
@@ -59,13 +74,15 @@ async function main() {
     },
   });
 
+  const startTime = Date.now();
+
   // ──────── 1. TRUNCATE ALL DATA ────────
-  console.log('🗑️  Truncating all existing data...');
+  console.log('🗑️  Truncating ALL existing data...');
   await truncateClickHouse(ch);
   await truncateMySQL(pool);
 
-  // ──────── 2. FETCH DSN KEYS ────────
-  console.log('\n🔑 Fetching DSN keys from MySQL...');
+  // ──────── 2. FETCH DSN KEYS & INTERNAL PROJECT ID ────────
+  console.log('\n🔑 Fetching DSN keys...');
   let dsnKeyRows: any[] = [];
   try {
     const [rows] = await pool.query(
@@ -73,8 +90,8 @@ async function main() {
       [PROJECT_ID]
     );
     dsnKeyRows = rows as any[];
-  } catch (e) {
-    console.log('   ⚠ Error fetching DSN keys (table missing?).');
+  } catch {
+    console.log('   ⚠ g_argus_dsn_keys table not found.');
   }
   const activeDsnKeys: number[] = (dsnKeyRows as any[])
     .filter((k: any) => k.is_active)
@@ -89,14 +106,39 @@ async function main() {
   }
   const dsnKeyTimestamps = new Map<number, { min: Date; max: Date }>();
 
-  // ──────── 3. GENERATE EVENTS ────────
+  // Get internal project ID (numeric) for MySQL FK references
+  let internalProjectId = 1;
+  try {
+    const [rows] = await pool.query(
+      'SELECT id FROM g_argus_projects WHERE gatrix_project_id = ? LIMIT 1',
+      [PROJECT_ID]
+    );
+    if ((rows as any[]).length > 0) {
+      internalProjectId = (rows as any[])[0].id;
+    }
+  } catch {}
+  console.log(`   ✓ Internal project ID: ${internalProjectId}`);
+
+  // ──────── 3. GENERATE ERROR EVENTS ────────
   console.log('\n🎲 Generating error events...');
   const { allEvents, issueMap } = generateErrorEvents(activeDsnKeys, dsnKeyTimestamps, TOTAL_ERROR_EVENTS);
   console.log(`   ✓ ${allEvents.length.toLocaleString()} error events generated`);
   console.log(`   ✓ ${issueMap.size} unique issues`);
 
   // ──────── 4. INSERT ISSUES INTO MYSQL ────────
-  await insertIssuesIntoMySQL(pool, issueMap);
+  const fingerprintToId = await insertIssuesIntoMySQL(pool, issueMap);
+
+  // ──────── 4b. MAP issue_id INTO EVENTS ────────
+  console.log('\n🔗 Mapping issue_id into events...');
+  let mapped = 0;
+  for (const event of allEvents) {
+    const fp = event.fingerprint?.[0];
+    if (fp && fingerprintToId.has(fp)) {
+      event.issue_id = fingerprintToId.get(fp)!;
+      mapped++;
+    }
+  }
+  console.log(`   ✓ ${mapped.toLocaleString()} / ${allEvents.length.toLocaleString()} events mapped to issue_id`);
 
   // ──────── 5. INSERT EVENTS INTO CLICKHOUSE ────────
   await insertEventsIntoClickHouse(ch, allEvents, CH_CONFIG.database);
@@ -104,14 +146,16 @@ async function main() {
   // ──────── 6. GENERATE & INSERT LOGS ────────
   await generateAndInsertLogs(ch, CH_CONFIG.database, allEvents, issueMap);
 
-  // ──────── 7. GENERATE & INSERT TRANSACTIONS ────────
+  // ──────── 7. GENERATE & INSERT TRANSACTIONS & SPANS ────────
   await generateAndInsertTransactions(ch, CH_CONFIG.database, TOTAL_TRANSACTIONS, activeDsnKeys);
 
   // ──────── 8. GENERATE & INSERT SESSIONS ────────
   await generateAndInsertSessions(ch, CH_CONFIG.database, TOTAL_SESSIONS, activeDsnKeys);
 
-  // ──────── 9. GENERATE & INSERT FEEDBACK ────────
-  await generateAndInsertFeedback(ch, CH_CONFIG.database, TOTAL_FEEDBACK, activeDsnKeys, allEvents);
+  // ──────── 9. GENERATE & INSERT ENRICHED FEEDBACK ────────
+  const { feedbackIds } = await generateAndInsertEnrichedFeedback(
+    ch, CH_CONFIG.database, TOTAL_FEEDBACK, activeDsnKeys, allEvents
+  );
 
   // ──────── 10. GENERATE & INSERT METRICS ────────
   await generateAndInsertMetrics(ch, CH_CONFIG.database, 10000);
@@ -125,18 +169,43 @@ async function main() {
         `UPDATE g_argus_dsn_keys SET first_seen_at = ?, last_seen_at = ? WHERE id = ?`,
         [timestamps.min, timestamps.max, keyId]
       );
-    } catch {
-      // skip
-    }
+    } catch {}
   }
   console.log(`   ✓ Updated ${dsnKeyTimestamps.size} DSN keys`);
 
-  // ──────── 12. GENERATE & INSERT ACTIVITIES ────────
+  // ──────── 12. GENERATE & INSERT ACTIVITIES (Product Analytics) ────────
   await generateAndInsertActivities(ch);
 
+  // ──────── 13. INSERT RELEASES & COMMITS ────────
+  await generateAndInsertReleases(pool, internalProjectId);
+
+  // ──────── 14. ENRICH ISSUES (status, assignee, priority, activity) ────────
+  await enrichIssues(pool, internalProjectId);
+
+  // ──────── 15. SEED FEEDBACK-ISSUE LINKS & FEEDBACK ACTIVITY ────────
+  await seedFeedbackLinksAndActivity(pool, ch, feedbackIds, internalProjectId);
+
+  // ──────── 16. SEED CRON & UPTIME MONITORS ────────
+  await generateAndInsertMonitors(pool, ch, CH_CONFIG.database, internalProjectId);
+
+  // ──────── DONE ────────
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
   await pool.end();
   await ch.close();
-  console.log('\n🎮 Done! Refresh the Argus dashboard.');
+
+  console.log('\n' + '═'.repeat(60));
+  console.log(`🎮 Done! Full-set data inserted in ${elapsed}s.`);
+  console.log('   Refresh the Argus dashboard to see all data.');
+  console.log('');
+  console.log('   Summary:');
+  console.log(`   • ${TOTAL_ERROR_EVENTS.toLocaleString()} error events + ${issueMap.size} issues`);
+  console.log(`   • ${TOTAL_TRANSACTIONS.toLocaleString()} transactions with spans`);
+  console.log(`   • ${TOTAL_SESSIONS.toLocaleString()} sessions`);
+  console.log(`   • ${TOTAL_FEEDBACK.toLocaleString()} feedback (enriched + links + activity)`);
+  console.log(`   • Releases with commits`);
+  console.log(`   • Cron & uptime monitors with check-ins`);
+  console.log(`   • Product analytics activities`);
+  console.log(`   • Issue status distribution + activity`);
 }
 
 main().catch((e) => {

@@ -371,8 +371,8 @@ const ArgusRealtimePage = React.lazy(
 const ArgusImpactPage = React.lazy(
   () => import('./pages/argus/ArgusImpactPage')
 );
-const ArgusRevenuePage = React.lazy(
-  () => import('./pages/argus/ArgusRevenuePage')
+const ArgusMonetizationPage = React.lazy(
+  () => import('./pages/argus/ArgusMonetizationPage')
 );
 const ArgusLifecyclePage = React.lazy(
   () => import('./pages/argus/ArgusLifecyclePage')
@@ -1339,6 +1339,10 @@ const AppContent: React.FC = () => {
                                           element={<ArgusUserProfilesPage />}
                                         />
                                         <Route
+                                          path="analytics/users/:userId"
+                                          element={<ArgusUserProfilesPage />}
+                                        />
+                                        <Route
                                           path="analytics/cohorts"
                                           element={<ArgusCohortPage />}
                                         />
@@ -1351,8 +1355,8 @@ const AppContent: React.FC = () => {
                                           element={<ArgusImpactPage />}
                                         />
                                         <Route
-                                          path="analytics/revenue"
-                                          element={<ArgusRevenuePage />}
+                                          path="analytics/monetization"
+                                          element={<ArgusMonetizationPage />}
                                         />
                                         <Route
                                           path="analytics/lifecycle"

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, alpha } from '@mui/material';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,
@@ -58,7 +59,7 @@ export const ChangeIndicator: React.FC<{ value: number; invert?: boolean }> = ({
 }) => {
   const isUp = value > 0;
   const isGood = invert ? !isUp : isUp;
-  const color = isGood ? '#4caf50' : '#f44336';
+  const color = isGood ? ARGUS_SEMANTIC.positive : ARGUS_SEMANTIC.negative;
   return (
     <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.2 }}>
       {isUp ? (
@@ -131,10 +132,10 @@ export const CrashDistribution: React.FC<{
                   fontSize: '0.7rem',
                   color:
                     item.rate > 5
-                      ? '#f44336'
+                      ? ARGUS_SEMANTIC.negative
                       : item.rate > 1
-                        ? '#ff9800'
-                        : '#4caf50',
+                        ? ARGUS_SEMANTIC.warning
+                        : ARGUS_SEMANTIC.positive,
                 }}
               >
                 {item.rate.toFixed(1)}%
@@ -159,10 +160,10 @@ export const CrashDistribution: React.FC<{
                 width: `${Math.min(item.rate * 5, 100)}%`,
                 backgroundColor:
                   item.rate > 5
-                    ? alpha('#f44336', 0.7)
+                    ? alpha(ARGUS_SEMANTIC.negative, 0.7)
                     : item.rate > 1
-                      ? alpha('#ff9800', 0.6)
-                      : alpha('#4caf50', 0.5),
+                      ? alpha(ARGUS_SEMANTIC.warning, 0.6)
+                      : alpha(ARGUS_SEMANTIC.positive, 0.5),
                 transition: 'width 0.4s',
               }}
             />

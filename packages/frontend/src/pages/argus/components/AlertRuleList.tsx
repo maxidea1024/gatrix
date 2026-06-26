@@ -1,4 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
+import { formatWith } from '@/utils/dateFormat';
 import {
   Box,
   Typography,
@@ -33,6 +34,7 @@ import {
 } from '@/services/argusService';
 import { getConditionTypes, getActionTypes } from './alertRuleConfigs';
 import { BulkActionBar, RuleCard } from './AlertRuleList.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 interface AlertRuleListProps {
   rules: ArgusAlertRule[];
@@ -163,7 +165,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
             elevation={0}
             isDark={isDark}
             accentColor={
-              isMuted ? '#9e9e9e' : rule.enabled ? '#ff9800' : 'transparent'
+              isMuted ? '#9e9e9e' : rule.enabled ? ARGUS_SEMANTIC.warning : 'transparent'
             }
             dimmed={isMuted || !rule.enabled}
           >
@@ -236,8 +238,8 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                     height: 18,
                     fontSize: '0.58rem',
                     fontWeight: 800,
-                    backgroundColor: alpha('#f44336', 0.08),
-                    color: '#f44336',
+                    backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.08),
+                    color: ARGUS_SEMANTIC.negative,
                     border: 'none',
                   }}
                 />
@@ -281,8 +283,8 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                     height: 18,
                     fontSize: '0.58rem',
                     fontWeight: 800,
-                    backgroundColor: alpha('#4caf50', 0.08),
-                    color: '#4caf50',
+                    backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.08),
+                    color: ARGUS_SEMANTIC.positive,
                     border: 'none',
                   }}
                 />
@@ -358,24 +360,19 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                 );
                 const data = {
                   labels: sortedStats.map((s) => {
-                    const d = new Date(
-                      s.bucket + (s.bucket.length === 10 ? 'T00:00:00Z' : 'Z')
-                    );
-                    return d.toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: s.bucket.length > 10 ? '2-digit' : undefined,
-                      hour12: false,
-                    });
+                    const bucket = s.bucket + (s.bucket.length === 10 ? 'T00:00:00Z' : 'Z');
+                    return s.bucket.length > 10
+                      ? formatWith(bucket, 'M/D HH:mm')
+                      : formatWith(bucket, 'M/D');
                   }),
                   datasets: [
                     {
                       data: sortedStats.map((s) => s.count),
                       borderColor: isDark
-                        ? alpha('#ff9800', 0.8)
+                        ? alpha(ARGUS_SEMANTIC.warning, 0.8)
                         : alpha('#f57c00', 0.8),
                       backgroundColor: isDark
-                        ? alpha('#ff9800', 0.1)
+                        ? alpha(ARGUS_SEMANTIC.warning, 0.1)
                         : alpha('#f57c00', 0.1),
                       borderWidth: 1.5,
                       pointRadius: 0,
@@ -432,7 +429,7 @@ const AlertRuleList: React.FC<AlertRuleListProps> = ({
                   size="small"
                   sx={{
                     color: 'text.disabled',
-                    '&:hover': { color: '#f44336' },
+                    '&:hover': { color: ARGUS_SEMANTIC.negative },
                   }}
                   onClick={() => onDelete(rule.id)}
                 >

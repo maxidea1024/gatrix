@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from '@mui/material';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
+import { formatWith } from '@/utils/dateFormat';
 import {
   People as PeopleIcon,
   TouchApp as EventIcon,
@@ -25,6 +26,7 @@ import {
   getRealtimeAnalytics,
   type RealtimeData,
 } from '@/services/argus/argusAnalytics';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 // ─── KPI Card ────────────────────────────────────────────────────────────────
 
@@ -142,7 +144,7 @@ const LiveDot: React.FC = () => (
     <DotIcon
       sx={{
         fontSize: 12,
-        color: '#4caf50',
+        color: ARGUS_SEMANTIC.positive,
         animation: 'pulse 1.5s ease-in-out infinite',
         '@keyframes pulse': {
           '0%, 100%': { opacity: 1 },
@@ -189,8 +191,8 @@ const ArgusRealtimePage: React.FC = () => {
 
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
-  const successColor = '#4caf50';
-  const warningColor = '#ff9800';
+  const successColor = ARGUS_SEMANTIC.positive;
+  const warningColor = ARGUS_SEMANTIC.warning;
 
   return (
     <Box>
@@ -264,7 +266,7 @@ const ArgusRealtimePage: React.FC = () => {
           <ArgusVolumeChart
             title={t('argus.realtime.eventsPerMin')}
             labels={(data?.events_per_minute || []).map((d) =>
-              new Date(d.minute).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              formatWith(d.minute, 'HH:mm')
             )}
             datasets={[{
               label: t('argus.realtime.eventsPerMin'),

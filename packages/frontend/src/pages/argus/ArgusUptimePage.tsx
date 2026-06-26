@@ -47,6 +47,7 @@ import PageHeader from '@/components/common/PageHeader';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import argusService from '@/services/argusService';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 interface UptimeMonitor {
   id: string;
@@ -98,17 +99,17 @@ const ArgusUptimePage: React.FC = () => {
     { color: string; icon: React.ReactElement; label: string }
   > = {
     up: {
-      color: '#4caf50',
+      color: ARGUS_SEMANTIC.positive,
       icon: <UpIcon sx={{ fontSize: 16 }} />,
       label: t('argus.uptime.status.up', 'Up'),
     },
     down: {
-      color: '#f44336',
+      color: ARGUS_SEMANTIC.negative,
       icon: <DownIcon sx={{ fontSize: 16 }} />,
       label: t('argus.uptime.status.down', 'Down'),
     },
     degraded: {
-      color: '#ff9800',
+      color: ARGUS_SEMANTIC.warning,
       icon: <DegradedIcon sx={{ fontSize: 16 }} />,
       label: t('argus.uptime.status.degraded', 'Degraded'),
     },
@@ -346,10 +347,10 @@ const ArgusUptimePage: React.FC = () => {
                             fontWeight: 700,
                             color:
                               uptimePercent >= 99.9
-                                ? '#4caf50'
+                                ? ARGUS_SEMANTIC.positive
                                 : uptimePercent >= 99
-                                  ? '#ff9800'
-                                  : '#f44336',
+                                  ? ARGUS_SEMANTIC.warning
+                                  : ARGUS_SEMANTIC.negative,
                           }}
                         >
                           {uptimePercent.toFixed(2)}%

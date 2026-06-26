@@ -22,9 +22,16 @@ export const PERIOD_TO_SECONDS: Record<string, number> = {
 
 /** Maps a UI period string to a ClickHouse SQL INTERVAL literal. */
 export const PERIOD_TO_SQL_INTERVAL: Record<string, string> = {
+  '5min': '5 MINUTE',
+  '10min': '10 MINUTE',
+  '15min': '15 MINUTE',
+  '30min': '30 MINUTE',
   '1h': '1 HOUR',
+  '3h': '3 HOUR',
   '6h': '6 HOUR',
+  '12h': '12 HOUR',
   '24h': '24 HOUR',
+  '2d': '2 DAY',
   '7d': '7 DAY',
   '14d': '14 DAY',
   '30d': '30 DAY',

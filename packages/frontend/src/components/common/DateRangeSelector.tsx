@@ -71,7 +71,7 @@ export interface DateRangeSelectorProps {
 
 // ==================== Default Presets ====================
 
-const DEFAULT_PRESETS: DateRangePresetOption[] = [
+export const DEFAULT_PRESETS: DateRangePresetOption[] = [
   { value: '5min', labelKey: 'dateRange.preset.5min', fallback: '5 Minutes' },
   {
     value: '10min',

@@ -16,7 +16,6 @@ import {
   TextField,
   useTheme,
   alpha,
-  CircularProgress,
   Card,
   CardContent,
   CardActions,
@@ -63,6 +62,7 @@ import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import PageContentLoader from '@/components/common/PageContentLoader';
 import {
   WidgetCard,
   type WidgetConfig,
@@ -73,6 +73,7 @@ import WidgetEditorDrawer from './components/WidgetEditorDrawer';
 import WidgetCatalog from './components/WidgetCatalog';
 import DashboardShareDialog from './components/DashboardShareDialog';
 import type { WidgetType } from './components/renderers/widgetTypes';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -471,12 +472,7 @@ const ArgusDashboardsPage: React.FC = () => {
           }
         />
 
-        {loading ? (
-          <Box sx={{ py: 8, textAlign: 'center' }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <>
+        <PageContentLoader loading={loading}>
             {/* Custom Dashboards (shown first for accessibility) */}
             <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
               {t('argus.dashboards.custom', 'Custom Dashboards')}
@@ -833,7 +829,7 @@ const ArgusDashboardsPage: React.FC = () => {
                 <Button
                   size="small"
                   startIcon={
-                    <PresetIcon sx={{ fontSize: 16, color: '#ff9800' }} />
+                    <PresetIcon sx={{ fontSize: 16, color: ARGUS_SEMANTIC.warning }} />
                   }
                   endIcon={
                     templatesExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
@@ -930,8 +926,7 @@ const ArgusDashboardsPage: React.FC = () => {
                 </Collapse>
               </Box>
             )}
-          </>
-        )}
+        </PageContentLoader>
 
         {/* Create Dialog */}
         <Dialog

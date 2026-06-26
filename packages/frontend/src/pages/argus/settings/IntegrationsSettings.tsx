@@ -34,6 +34,7 @@ import {
 import { GlobalIntegrationWizardModal } from '../components/GlobalIntegrationWizardModal';
 import argusService, { ArgusIntegration } from '@/services/argusService';
 import PageContentLoader from '@/components/common/PageContentLoader';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 interface RepoProviderDef {
   id: string;
@@ -440,8 +441,8 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
                       height: 22,
                       fontWeight: 600,
                       fontSize: '0.72rem',
-                      backgroundColor: alpha('#4caf50', 0.12),
-                      color: '#4caf50',
+                      backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.12),
+                      color: ARGUS_SEMANTIC.positive,
                     }}
                   />
                 </Box>
@@ -569,10 +570,10 @@ export const IntegrationsSettings: React.FC<IntegrationsSettingsProps> = ({
                                   fontSize: '0.72rem',
                                   fontWeight: 600,
                                   backgroundColor: alpha(
-                                    intg.enabled ? '#4caf50' : '#9e9e9e',
+                                    intg.enabled ? ARGUS_SEMANTIC.positive : '#9e9e9e',
                                     0.12
                                   ),
-                                  color: intg.enabled ? '#4caf50' : '#9e9e9e',
+                                  color: intg.enabled ? ARGUS_SEMANTIC.positive : '#9e9e9e',
                                   border: 'none',
                                 }}
                               />

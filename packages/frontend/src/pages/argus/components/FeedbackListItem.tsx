@@ -9,11 +9,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import HighlightText from '@/components/common/HighlightText';
 import { ArgusFeedbackItem } from '@/services/argusService';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 const statusColor = (s: string) => {
-  if (s === 'resolved') return '#4caf50';
+  if (s === 'resolved') return ARGUS_SEMANTIC.positive;
   if (s === 'spam') return '#9e9e9e';
-  return '#ff9800';
+  return ARGUS_SEMANTIC.warning;
 };
 
 interface FeedbackListItemProps {
@@ -132,10 +133,10 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
             (() => {
               const issueColor =
                 item.issue_status === 'resolved'
-                  ? '#4caf50'
+                  ? ARGUS_SEMANTIC.positive
                   : item.issue_status === 'ignored'
                     ? '#9e9e9e'
-                    : '#ff9800';
+                    : ARGUS_SEMANTIC.warning;
               return (
                 <Chip
                   icon={<BugReportIcon sx={{ fontSize: '10px !important' }} />}
@@ -160,10 +161,10 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
               sx={{
                 height: 16,
                 fontSize: '0.55rem',
-                backgroundColor: alpha('#2196f3', 0.08),
-                color: '#2196f3',
+                backgroundColor: alpha(ARGUS_SEMANTIC.info, 0.08),
+                color: ARGUS_SEMANTIC.info,
                 border: 'none',
-                '& .MuiChip-icon': { color: '#2196f3' },
+                '& .MuiChip-icon': { color: ARGUS_SEMANTIC.info },
               }}
             />
           )}
@@ -180,8 +181,8 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
               sx={{
                 height: 16,
                 fontSize: '0.55rem',
-                backgroundColor: alpha('#4caf50', 0.08),
-                color: '#4caf50',
+                backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.08),
+                color: ARGUS_SEMANTIC.positive,
                 border: 'none',
               }}
             />
@@ -196,17 +197,17 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
                 border: 'none',
                 backgroundColor: alpha(
                   item.sentiment === 'positive'
-                    ? '#4caf50'
+                    ? ARGUS_SEMANTIC.positive
                     : item.sentiment === 'negative'
-                      ? '#f44336'
+                      ? ARGUS_SEMANTIC.negative
                       : '#9e9e9e',
                   0.08
                 ),
                 color:
                   item.sentiment === 'positive'
-                    ? '#4caf50'
+                    ? ARGUS_SEMANTIC.positive
                     : item.sentiment === 'negative'
-                      ? '#f44336'
+                      ? ARGUS_SEMANTIC.negative
                       : '#9e9e9e',
               }}
             />

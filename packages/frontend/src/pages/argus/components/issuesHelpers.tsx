@@ -1,4 +1,5 @@
 import { ArgusIssue } from '@/services/argusService';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Constants ───
 
@@ -50,18 +51,18 @@ export const getStatusOptions = (t: any) => [
   {
     value: 'unresolved',
     label: t('argus.issues.unresolved'),
-    color: '#f44336',
+    color: ARGUS_SEMANTIC.negative,
   },
-  { value: 'resolved', label: t('argus.issues.resolved'), color: '#4caf50' },
+  { value: 'resolved', label: t('argus.issues.resolved'), color: ARGUS_SEMANTIC.positive },
   { value: 'ignored', label: t('argus.issues.ignored'), color: '#9e9e9e' },
 ];
 
 export const getLevelOptions = (t: any) => [
   { value: '', label: t('common.all') },
-  { value: 'fatal', label: t('argus.issues.fatal'), color: '#f44336' },
+  { value: 'fatal', label: t('argus.issues.fatal'), color: ARGUS_SEMANTIC.negative },
   { value: 'error', label: t('argus.issues.error'), color: '#ff5722' },
-  { value: 'warning', label: t('argus.issues.warning'), color: '#ff9800' },
-  { value: 'info', label: t('argus.issues.info'), color: '#2196f3' },
+  { value: 'warning', label: t('argus.issues.warning'), color: ARGUS_SEMANTIC.warning },
+  { value: 'info', label: t('argus.issues.info'), color: ARGUS_SEMANTIC.info },
 ];
 
 export const getSortOptions = (t: any) => [

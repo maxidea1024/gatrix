@@ -1,5 +1,6 @@
 import { styled, alpha } from '@mui/material/styles';
 import { Paper } from '@mui/material';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ─── Bulk Action Bar ───
 
@@ -12,8 +13,8 @@ export const BulkActionBar = styled(Paper)({
   paddingTop: 6.4,
   paddingBottom: 6.4,
   borderRadius: 6,
-  backgroundColor: alpha('#ff9800', 0.06),
-  border: `1px solid ${alpha('#ff9800', 0.15)}`,
+  backgroundColor: alpha(ARGUS_SEMANTIC.warning, 0.06),
+  border: `1px solid ${alpha(ARGUS_SEMANTIC.warning, 0.15)}`,
 });
 
 // ─── Rule Card ───
@@ -36,7 +37,7 @@ export const RuleCard = styled(Paper, {
     borderLeft: `3px solid ${accentColor}`,
     opacity: dimmed ? (accentColor === 'transparent' ? 0.55 : 0.45) : 1,
     '&:hover': {
-      borderColor: alpha('#ff9800', 0.3),
+      borderColor: alpha(ARGUS_SEMANTIC.warning, 0.3),
     },
   })
 );

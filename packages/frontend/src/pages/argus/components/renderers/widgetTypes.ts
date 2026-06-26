@@ -1,5 +1,6 @@
 // ─── Argus Dashboard Widget Types ───
 // Shared type definitions for the widget system
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from '../../argusThemeTokens';
 
 // ── Widget Types ──
 export type WidgetType =
@@ -266,11 +267,11 @@ export const CHART_COLORS = [
   '#7c4dff',
   '#448aff',
   '#00bcd4',
-  '#4caf50',
-  '#ff9800',
-  '#f44336',
+  ARGUS_SEMANTIC.positive,
+  ARGUS_SEMANTIC.warning,
+  ARGUS_SEMANTIC.negative,
   '#e91e63',
-  '#9c27b0',
+  ARGUS_SERIES[4],
   '#3f51b5',
   '#009688',
   '#ff5722',
@@ -336,7 +337,7 @@ export function formatValue(
 export function getThresholdColor(
   value: number,
   thresholds?: Threshold[],
-  defaultColor = '#4caf50'
+  defaultColor: string = ARGUS_SEMANTIC.positive
 ): string {
   if (!thresholds || thresholds.length === 0) return defaultColor;
   const sorted = [...thresholds].sort((a, b) => a.value - b.value);

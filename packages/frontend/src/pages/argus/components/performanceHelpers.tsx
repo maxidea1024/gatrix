@@ -7,6 +7,7 @@ import {
   Send as SendIcon,
   Lock as LockIcon,
 } from '@mui/icons-material';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from '../argusThemeTokens';
 
 // ─── Operation Icons ───
 export const OP_ICONS: Record<string, React.ReactElement> = {
@@ -22,11 +23,11 @@ export const getOpIcon = (op: string) =>
 
 // ─── Method Colors ───
 const METHOD_COLORS: Record<string, string> = {
-  GET: '#4caf50',
-  POST: '#2196f3',
-  PUT: '#ff9800',
+  GET: ARGUS_SEMANTIC.positive,
+  POST: ARGUS_SEMANTIC.info,
+  PUT: ARGUS_SEMANTIC.warning,
   PATCH: '#7c4dff',
-  DELETE: '#f44336',
+  DELETE: ARGUS_SEMANTIC.negative,
   HEAD: '#9e9e9e',
   OPTIONS: '#607d8b',
   WS: '#00bcd4',
@@ -76,9 +77,9 @@ export function formatTime(ts: string): string {
 // ─── Operation Color ───
 export function getOpColor(op: string): string {
   if (!op) return '#9e9e9e';
-  if (op.startsWith('db')) return '#ff9800';
-  if (op.startsWith('http')) return '#2196f3';
-  if (op.startsWith('queue')) return '#9c27b0';
+  if (op.startsWith('db')) return ARGUS_SEMANTIC.warning;
+  if (op.startsWith('http')) return ARGUS_SEMANTIC.info;
+  if (op.startsWith('queue')) return ARGUS_SERIES[4];
   if (op.startsWith('cache')) return '#00bcd4';
   return '#9e9e9e';
 }

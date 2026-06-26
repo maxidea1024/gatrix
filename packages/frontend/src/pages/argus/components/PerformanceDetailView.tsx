@@ -32,6 +32,7 @@ import {
   formatTime,
   formatHour,
 } from './performanceHelpers';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 import {
   DetailPaper,
   StatCard,
@@ -70,8 +71,8 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
         {
           label: 'P95',
           data: detail.trend.map((d) => Number(d.p95)),
-          borderColor: '#ff9800',
-          backgroundColor: alpha('#ff9800', 0.1),
+          borderColor: ARGUS_SEMANTIC.warning,
+          backgroundColor: alpha(ARGUS_SEMANTIC.warning, 0.1),
           borderWidth: 2,
           tension: 0.4,
           fill: true,
@@ -213,23 +214,23 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
               value: `${Number(detail.summary.p95).toFixed(0)}ms`,
               color:
                 Number(detail.summary.p95) > 3000
-                  ? '#f44336'
+                  ? ARGUS_SEMANTIC.negative
                   : Number(detail.summary.p95) > 1000
-                    ? '#ff9800'
-                    : '#4caf50',
+                    ? ARGUS_SEMANTIC.warning
+                    : ARGUS_SEMANTIC.positive,
               icon: <TimelineIcon />,
             },
             {
               label: t('argus.performance.avgDuration', 'Avg'),
               value: `${Number(detail.summary.avg_duration).toFixed(0)}ms`,
-              color: '#2196f3',
+              color: ARGUS_SEMANTIC.info,
               icon: <ScheduleIcon />,
             },
             {
               label: t('argus.performance.errorRate', 'Error Rate'),
               value: `${Number(detail.summary.error_rate).toFixed(2)}%`,
               color:
-                Number(detail.summary.error_rate) > 5 ? '#f44336' : '#4caf50',
+                Number(detail.summary.error_rate) > 5 ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
               icon: <BugReportIcon />,
             },
           ].map((card, idx) => (
@@ -284,11 +285,15 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
             {t('argus.performance.latencyTrend')}
           </Typography>
           <Box sx={{ height: 260 }}>
-            <Line
-              data={trendChartData}
-              options={chartOpts}
-              plugins={[getCrosshairPlugin(isDark)]}
-            />
+            {detailLoading ? (
+              <ArgusChartSkeleton type="line" height={260} color="#7c4dff" />
+            ) : (
+              <Line
+                data={trendChartData}
+                options={chartOpts}
+                plugins={[getCrosshairPlugin(isDark)]}
+              />
+            )}
           </Box>
         </DetailPaper>
         <DetailPaper elevation={0} isDark={isDark}>
@@ -296,7 +301,11 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
             {t('argus.performance.durationDistribution')}
           </Typography>
           <Box sx={{ height: 220 }}>
-            <Bar data={histogramData} options={barOpts} />
+            {detailLoading ? (
+              <ArgusChartSkeleton type="bar" height={220} color={ARGUS_SEMANTIC.info} />
+            ) : (
+              <Bar data={histogramData} options={barOpts} />
+            )}
           </Box>
         </DetailPaper>
       </Box>
@@ -326,12 +335,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
             {detail?.summary &&
               detail.summary.p95 > detail.summary.p50 * 3 &&
               detail.summary.p50 > 50 && (
-                <InsightBox accentColor="#ff9800">
+                <InsightBox accentColor={ARGUS_SEMANTIC.warning}>
                   <Typography
                     variant="body2"
                     fontWeight={700}
                     sx={{
-                      color: '#ff9800',
+                      color: ARGUS_SEMANTIC.warning,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 0.5,
@@ -372,12 +381,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                   slowestTag.p95 > detail.summary.p95 * 1.5
                 ) {
                   return (
-                    <InsightBox accentColor="#2196f3">
+                    <InsightBox accentColor={ARGUS_SEMANTIC.info}>
                       <Typography
                         variant="body2"
                         fontWeight={700}
                         sx={{
-                          color: '#2196f3',
+                          color: ARGUS_SEMANTIC.info,
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
@@ -478,12 +487,12 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
               {detail.related_issues.map((issue, idx) => {
                 const levelColor =
                   issue.level === 'fatal'
-                    ? '#f44336'
+                    ? ARGUS_SEMANTIC.negative
                     : issue.level === 'error'
-                      ? '#ff5722'
+                      ? ARGUS_SEMANTIC.warning
                       : issue.level === 'warning'
-                        ? '#ff9800'
-                        : '#2196f3';
+                        ? ARGUS_SEMANTIC.info
+                        : ARGUS_SEMANTIC.positive;
                 return (
                   <IssueRow
                     key={idx}
@@ -650,7 +659,7 @@ const PerformanceDetailView: React.FC<PerformanceDetailViewProps> = ({
                           width: 3,
                           height: 28,
                           borderRadius: 1,
-                          backgroundColor: isErr ? '#f44336' : '#4caf50',
+                          backgroundColor: isErr ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
                           flexShrink: 0,
                         }}
                       />

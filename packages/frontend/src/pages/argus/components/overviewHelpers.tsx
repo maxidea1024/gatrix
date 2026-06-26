@@ -7,12 +7,11 @@ import {
   useTheme,
   alpha,
 } from '@mui/material';
-import {
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { formatCompactNumber } from '@/utils/numberFormat';
+
+// Re-export ChangeIndicator from shared components for backward compat
+export { ChangeIndicator } from './argusSharedComponents';
 
 // ─── formatHourLabel ───
 
@@ -29,31 +28,7 @@ export function formatHourLabel(hourStr: string): string {
   }
 }
 
-// ─── ChangeIndicator ───
 
-export const ChangeIndicator: React.FC<{ value: number; invert?: boolean }> = ({
-  value,
-  invert,
-}) => {
-  const isUp = value > 0;
-  const isGood = invert ? !isUp : isUp;
-  const color = isGood ? '#4caf50' : '#f44336';
-  return (
-    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.2 }}>
-      {isUp ? (
-        <TrendingUpIcon sx={{ fontSize: 14, color }} />
-      ) : (
-        <TrendingDownIcon sx={{ fontSize: 14, color }} />
-      )}
-      <Typography
-        variant="caption"
-        sx={{ fontSize: '0.65rem', fontWeight: 700, color }}
-      >
-        {Math.abs(Math.round(value)).toLocaleString()}%
-      </Typography>
-    </Box>
-  );
-};
 
 // ─── DistributionCard ───
 

@@ -49,6 +49,7 @@ import JsonViewer from '@/components/common/JsonViewer';
 import { ActionChip } from '@/components/common/ActionChip';
 import CollapsibleSection from '@/components/argus/CollapsibleSection';
 import { getBrowserIcon, getOsIcon, getDeviceIcon } from '@/utils/brandIcons';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // ── Context chips extraction ──────────────────────────────────────
 interface ContextChip {
@@ -1269,8 +1270,8 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
                             height: 16,
                             fontSize: '0.58rem',
                             fontWeight: 700,
-                            backgroundColor: alpha('#f44336', 0.1),
-                            color: '#f44336',
+                            backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.1),
+                            color: ARGUS_SEMANTIC.negative,
                             border: 'none',
                             flexShrink: 0,
                           }}
@@ -1321,7 +1322,7 @@ const IssueContextSection: React.FC<IssueContextSectionProps> = ({
       {/* ═══ Extra Data ═══ */}
       <CollapsibleSection
         title={t('argus.issues.extraData', 'Additional Data')}
-        icon={<DataObjectIcon fontSize="small" sx={{ color: '#ff9800' }} />}
+        icon={<DataObjectIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />}
         storageKey="extra"
         hidden={!extraData}
       >

@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatWith } from '@/utils/dateFormat';
 import {
   Box,
   Typography,
@@ -20,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { formatRelativeTime } from '@/utils/dateFormat';
 import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from '../argusThemeTokens';
 
 // ─── Constants ───
 
@@ -64,25 +66,25 @@ export const SESSION_STATUSES = [
     key: 'healthy',
     labelKey: 'argus.sessions.healthy',
     fallback: 'Healthy',
-    color: '#4caf50',
+    color: ARGUS_SEMANTIC.positive,
   },
   {
     key: 'errored',
     labelKey: 'argus.sessions.errored',
     fallback: 'Errored',
-    color: '#ff9800',
+    color: ARGUS_SEMANTIC.warning,
   },
   {
     key: 'crashed',
     labelKey: 'argus.sessions.crashed',
     fallback: 'Crashed',
-    color: '#f44336',
+    color: ARGUS_SEMANTIC.negative,
   },
   {
     key: 'abnormal',
     labelKey: 'argus.sessions.abnormal',
     fallback: 'Abnormal',
-    color: '#9c27b0',
+    color: ARGUS_SERIES[4],
   },
 ] as const;
 
@@ -159,7 +161,7 @@ export const ReleaseHealthChart: React.FC<{
     .join(' ');
   const areaPath = `${linePath} L ${dataPoints[dataPoints.length - 1].x} ${padding.top + innerH} L ${dataPoints[0].x} ${padding.top + innerH} Z`;
 
-  const lineColor = '#4caf50';
+  const lineColor = ARGUS_SEMANTIC.positive;
   const yTicks = [minVal, (minVal + maxVal) / 2, maxVal];
   const xLabels =
     trimmed.length > 6
@@ -212,12 +214,14 @@ export const ReleaseHealthChart: React.FC<{
           );
         })}
         {/* X-axis labels */}
-        {xLabels.map((idx) => {
+        {(() => {
+          const parseTs = (s: string) => new Date(s.includes('T') ? s : s.replace(' ', 'T')).getTime();
+          const isSubDaily = trimmed.length >= 2 &&
+            (parseTs(trimmed[1].timestamp) - parseTs(trimmed[0].timestamp)) < 86400000;
+          return xLabels.map((idx) => {
           const p = dataPoints[idx as number];
           if (!p) return null;
-          const label = new Date(
-            trimmed[idx as number].timestamp
-          ).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          const label = formatWith(trimmed[idx as number].timestamp, isSubDaily ? 'M/D HH:mm' : 'M/D');
           return (
             <text
               key={idx}
@@ -230,7 +234,8 @@ export const ReleaseHealthChart: React.FC<{
               {label}
             </text>
           );
-        })}
+        });
+        })()}
         {/* Area fill */}
         <path d={areaPath} fill={alpha(lineColor, 0.08)} />
         {/* Line */}
@@ -451,7 +456,7 @@ export const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({
         fontWeight={700}
         sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.5 }}
       >
-        <PersonIcon sx={{ fontSize: 16, color: '#2196f3' }} />
+        <PersonIcon sx={{ fontSize: 16, color: ARGUS_SEMANTIC.info }} />
         {t('argus.releaseDetail.commitAuthors', 'Commit Authors')}
       </Typography>
       {authors.length === 0 ? (
@@ -476,8 +481,8 @@ export const CommitAuthorBreakdown: React.FC<{ isDark: boolean }> = ({
                     width: 22,
                     height: 22,
                     fontSize: '0.65rem',
-                    bgcolor: alpha('#2196f3', 0.2),
-                    color: '#2196f3',
+                    bgcolor: alpha(ARGUS_SEMANTIC.info, 0.2),
+                    color: ARGUS_SEMANTIC.info,
                   }}
                 >
                   {a.name.charAt(0).toUpperCase()}
@@ -527,9 +532,9 @@ export const DeployHistory: React.FC<{ isDark: boolean }> = ({ isDark }) => {
   const deploys: { environment: string; deployed_at: string }[] = [];
 
   const envColors: Record<string, string> = {
-    production: '#f44336',
-    staging: '#ff9800',
-    development: '#4caf50',
+    production: ARGUS_SEMANTIC.negative,
+    staging: ARGUS_SEMANTIC.warning,
+    development: ARGUS_SEMANTIC.positive,
   };
 
   return (

@@ -67,11 +67,12 @@ import {
   TagChip,
   AttachmentThumbnail,
 } from './FeedbackDetailPanel.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 const statusColor = (s: string) => {
-  if (s === 'resolved') return '#4caf50';
+  if (s === 'resolved') return ARGUS_SEMANTIC.positive;
   if (s === 'spam') return '#9e9e9e';
-  return '#ff9800';
+  return ARGUS_SEMANTIC.warning;
 };
 
 interface FeedbackDetailPanelProps {
@@ -198,10 +199,10 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
   // ─── Issue linking helpers ───
   const issueClr =
     selectedItem.issue_status === 'resolved'
-      ? '#4caf50'
+      ? ARGUS_SEMANTIC.positive
       : selectedItem.issue_status === 'ignored'
         ? '#9e9e9e'
-        : '#ff9800';
+        : ARGUS_SEMANTIC.warning;
 
   const issueTextColor =
     selectedItem.issue_status === 'resolved'
@@ -506,7 +507,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                   <CardActionButton
                     size="small"
                     isDark={isDark}
-                    accentColor="#2196f3"
+                    accentColor={ARGUS_SEMANTIC.info}
                     startIcon={
                       <OpenIcon sx={{ fontSize: '14px !important' }} />
                     }
@@ -517,7 +518,7 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                   <CardActionButton
                     size="small"
                     isDark={isDark}
-                    accentColor="#f44336"
+                    accentColor={ARGUS_SEMANTIC.negative}
                     onClick={onUnlinkIssue}
                   >
                     {t('argus.feedback.unlinkIssue')}

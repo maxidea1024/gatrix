@@ -90,6 +90,7 @@ import {
   PaginationWrapper,
 } from './ArgusFeedbackPage.styles';
 import FacetSidebar, { FacetGroup } from '@/components/argus/FacetSidebar';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 ChartJS.register(
   CategoryScale,
@@ -779,15 +780,6 @@ const ArgusFeedbackPage: React.FC = () => {
     if (!data?.trend || data.trend.length === 0)
       return { chartLabels: [] as string[], chartDatasets: [] };
 
-    const labels = data.trend.map((d) => {
-      try {
-        const dt = new Date(d.day);
-        return `${dt.getMonth() + 1}/${dt.getDate()}`;
-      } catch {
-        return d.day;
-      }
-    });
-
     const datasets = [
       {
         label: t('argus.feedback.title'),
@@ -797,7 +789,7 @@ const ArgusFeedbackPage: React.FC = () => {
       },
     ];
 
-    return { chartLabels: labels, chartDatasets: datasets };
+    return { chartLabels: [] as string[], chartDatasets: datasets };
   }, [data, t]);
 
   const handleChartZoom = useCallback(
@@ -835,19 +827,19 @@ const ArgusFeedbackPage: React.FC = () => {
     },
     {
       icon: <PeopleIcon />,
-      color: '#2196f3',
+      color: ARGUS_SEMANTIC.info,
       label: t('argus.feedback.uniqueUsers'),
       value: summary ? Number(summary.unique_users) : undefined,
     },
     {
       icon: <ContactIcon />,
-      color: '#4caf50',
+      color: ARGUS_SEMANTIC.positive,
       label: t('argus.feedback.withContact'),
       value: summary ? Number(summary.with_contact) : undefined,
     },
     {
       icon: <TextIcon />,
-      color: '#ff9800',
+      color: ARGUS_SEMANTIC.warning,
       label: t('argus.feedback.avgMessageLength'),
       value: summary
         ? Math.round(Number(summary.avg_message_length))
@@ -973,6 +965,7 @@ const ArgusFeedbackPage: React.FC = () => {
         loading={loading}
         statCards={statCards}
         chartLabels={chartLabels}
+        chartRawPeriods={trendLabelsRaw}
         chartDatasets={chartDatasets}
         onZoom={handleChartZoom}
       />

@@ -31,6 +31,7 @@ import argusService, { ArgusLogEntry } from '@/services/argusService';
 import { formatDateTimeDetailed } from '@/utils/dateFormat';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { formatCompactNumber } from '@/utils/numberFormat';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 export interface LogsLiveTailPanelProps {
   projectId: string;
@@ -42,10 +43,10 @@ export interface LogsLiveTailPanelProps {
 
 const SEVERITY_COLORS: Record<string, string> = {
   fatal: '#d32f2f',
-  error: '#f44336',
-  warn: '#ff9800',
-  warning: '#ff9800',
-  info: '#2196f3',
+  error: ARGUS_SEMANTIC.negative,
+  warn: ARGUS_SEMANTIC.warning,
+  warning: ARGUS_SEMANTIC.warning,
+  info: ARGUS_SEMANTIC.info,
   debug: '#9e9e9e',
   trace: '#607d8b',
 };
@@ -620,7 +621,7 @@ const LogsLiveTailPanel: React.FC<LogsLiveTailPanelProps> = ({
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    backgroundColor: liveTailPaused ? '#ff9800' : '#4caf50',
+                    backgroundColor: liveTailPaused ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.positive,
                     animation: liveTailPaused ? 'none' : 'pulse 1.5s infinite',
                     '@keyframes pulse': {
                       '0%,100%': { opacity: 1 },

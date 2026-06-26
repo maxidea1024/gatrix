@@ -53,6 +53,7 @@ import {
   RightSideContainer,
   MetaChip,
 } from './IssueActionBar.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 export interface IssueActionBarProps {
   issue: ArgusIssueDetail;
@@ -269,10 +270,10 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           variant="tinted"
           tintColor={
             issue.status === 'resolved'
-              ? '#4caf50'
+              ? ARGUS_SEMANTIC.positive
               : issue.status === 'ignored'
                 ? '#9e9e9e'
-                : '#f44336'
+                : ARGUS_SEMANTIC.negative
           }
         />
 
@@ -328,7 +329,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               <ListItemIcon>
                 <CurrentReleaseIcon
                   fontSize="small"
-                  sx={{ color: '#4caf50' }}
+                  sx={{ color: ARGUS_SEMANTIC.positive }}
                 />
               </ListItemIcon>
               <ListItemText
@@ -348,7 +349,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               sx={{ fontSize: '0.8rem', py: 1 }}
             >
               <ListItemIcon>
-                <NextReleaseIcon fontSize="small" sx={{ color: '#2196f3' }} />
+                <NextReleaseIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.info }} />
               </ListItemIcon>
               <ListItemText
                 primary={t('argus.detail.resolveInNextRelease')}
@@ -366,7 +367,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
               sx={{ fontSize: '0.8rem', py: 1 }}
             >
               <ListItemIcon>
-                <IgnoreIcon fontSize="small" sx={{ color: '#ff9800' }} />
+                <IgnoreIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />
               </ListItemIcon>
               <ListItemText
                 primary={t('argus.issues.ignore')}
@@ -410,7 +411,7 @@ const IssueActionBar: React.FC<IssueActionBarProps> = ({
           icon={
             <PriorityDot
               dotColor={
-                PRIORITY_CONFIG[issue.priority || 'medium']?.color || '#ff9800'
+                PRIORITY_CONFIG[issue.priority || 'medium']?.color || ARGUS_SEMANTIC.warning
               }
             />
           }

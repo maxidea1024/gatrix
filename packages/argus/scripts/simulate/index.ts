@@ -25,3 +25,8 @@ export { METRICS_TEMPLATES, generateLogsForEvent, generateAndInsertMetrics } fro
 export { generateAndInsertLogs } from './logs';
 export { generateAndInsertSessions } from './sessions';
 export { generateErrorEvents, insertIssuesIntoMySQL, insertEventsIntoClickHouse } from './events';
+// Full-set modules
+export { generateAndInsertReleases } from './seed-releases';
+export { generateAndInsertEnrichedFeedback, seedFeedbackLinksAndActivity } from './seed-feedback-full';
+export { generateAndInsertMonitors } from './seed-monitors';
+export { enrichIssues } from './seed-issues';

@@ -562,7 +562,11 @@ export default async function discoverRoutes(app: FastifyInstance) {
         // Table might not exist yet ??return empty gracefully
         if (
           error?.code === 'ER_NO_SUCH_TABLE' ||
-          String(error?.message || '').includes("doesn't exist")
+          error?.code === 'SQLITE_ERROR' ||
+          String(error?.message || '').includes("doesn't exist") ||
+          String(error?.message || '').includes('no such table') ||
+          String(error?.message || '').includes('does not exist') ||
+          String(error?.message || '').includes('relation') 
         ) {
           logger.warn('g_argus_saved_queries table not found, returning empty');
           return reply.send({ data: [] });

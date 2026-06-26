@@ -14,6 +14,18 @@ const logger = createLogger('activity-worker');
 const CONSUMER_GROUP = CONSUMER_GROUPS.ACTIVITIES;
 const CONSUMER_NAME = `worker-${process.pid}`;
 
+const EXCHANGE_RATES_TO_USD: Record<string, number> = {
+  USD: 1.0,
+  KRW: 0.00077,  // 1,300 KRW = 1 USD
+  EUR: 1.08,     // 1 EUR = 1.08 USD
+  JPY: 0.0064,   // 156 JPY = 1 USD
+};
+
+function convertToUsd(amount: number, currency: string): number {
+  const rate = EXCHANGE_RATES_TO_USD[currency.toUpperCase()] || 1.0;
+  return amount * rate;
+}
+
 interface NormalizedActivity {
   event_id: string;
   project_id: string;
@@ -32,6 +44,8 @@ interface NormalizedActivity {
   properties: Record<string, string>;
   numeric_properties: Record<string, number>;
   dsn_key_id: number;
+  currency: string;
+  amount_usd: number;
 }
 
 export class ActivityWorker {
@@ -184,6 +198,14 @@ export class ActivityWorker {
   private normalizeActivity(
     event: ArgusActivityEvent & { project_id: string; dsn_key_id?: number }
   ): NormalizedActivity {
+    const rawCurrency = event.currency || event.properties?.currency || 'USD';
+    const rawAmount = event.amount_usd || event.numeric_properties?.amount || 0;
+    
+    let amountUsd = 0;
+    if (event.event_name === 'purchase' || event.event_name === 'item_purchased') {
+      amountUsd = convertToUsd(rawAmount, rawCurrency);
+    }
+
     return {
       event_id: event.event_id,
       project_id: event.project_id,
@@ -202,6 +224,8 @@ export class ActivityWorker {
       properties: event.properties || {},
       numeric_properties: event.numeric_properties || {},
       dsn_key_id: event.dsn_key_id || 0,
+      currency: rawCurrency,
+      amount_usd: amountUsd,
     };
   }
 

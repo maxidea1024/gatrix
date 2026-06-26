@@ -17,7 +17,7 @@ export async function generateAndInsertLogs(
 
     const user = { id: event.user_id, ip: event.user_ip };
     const eventLogs = generateLogsForEvent(
-      1234, // mock issue ID
+      event.issue_id || 0, // real issue ID from MySQL mapping
       event.event_id, // trace ID
       new Date(event.timestamp),
       s,

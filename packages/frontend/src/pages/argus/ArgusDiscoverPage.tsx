@@ -72,6 +72,7 @@ import {
 import { DiscoverSavedPanel } from './components/DiscoverDialogs';
 import SaveQueryDialog from '@/components/argus/SaveQueryDialog';
 import DeleteQueryConfirmDialog from '@/components/argus/DeleteQueryConfirmDialog';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 const ArgusDiscoverPage: React.FC = () => {
   const theme = useTheme();
@@ -1042,10 +1043,10 @@ const ArgusDiscoverPage: React.FC = () => {
           </Box>
 
           {error && (
-            <Box sx={{ p: 2, backgroundColor: alpha('#f44336', 0.04) }}>
+            <Box sx={{ p: 2, backgroundColor: alpha(ARGUS_SEMANTIC.negative, 0.04) }}>
               <Typography
                 variant="body2"
-                sx={{ color: '#f44336', fontSize: '0.82rem' }}
+                sx={{ color: ARGUS_SEMANTIC.negative, fontSize: '0.82rem' }}
               >
                 {error}
               </Typography>

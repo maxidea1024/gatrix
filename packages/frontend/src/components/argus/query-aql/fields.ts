@@ -444,6 +444,53 @@ export const ALL_QUERY_FIELDS: QueryField[] = [
     searchable: true,
     description: 'aql.field.userId.desc',
   },
+  // ── Revenue/Activity fields ──
+  {
+    key: 'event_name',
+    label: 'aql.field.eventName',
+    type: 'string',
+    category: 'event',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.eventName.desc',
+    staticValues: ['purchase', 'refund', 'grant', 'ad_impression'],
+  },
+  {
+    key: 'product_name',
+    label: 'aql.field.productName',
+    type: 'string',
+    category: 'custom',
+    operators: ['=', '!=', 'contains', '!contains', 'startsWith', 'endsWith'],
+    searchable: true,
+    description: 'aql.field.productName.desc',
+  },
+  {
+    key: 'amount',
+    label: 'aql.field.amount',
+    type: 'number',
+    category: 'custom',
+    operators: ['=', '!=', '>', '>=', '<', '<='],
+    searchable: true,
+    description: 'aql.field.amount.desc',
+  },
+  {
+    key: 'reason',
+    label: 'aql.field.reason',
+    type: 'string',
+    category: 'custom',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.reason.desc',
+  },
+  {
+    key: 'payment_method',
+    label: 'aql.field.paymentMethod',
+    type: 'string',
+    category: 'custom',
+    operators: ['=', '!='],
+    searchable: true,
+    description: 'aql.field.paymentMethod.desc',
+  },
 ];
 
 // ─── Field lookup cache (built lazily) ───────────────────────────────────────

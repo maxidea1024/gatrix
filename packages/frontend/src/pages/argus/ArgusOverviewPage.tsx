@@ -6,8 +6,8 @@ import {
   Chip,
   useTheme,
   alpha,
-  Skeleton,
   Tooltip,
+  LinearProgress,
   Button,
 } from '@mui/material';
 import {
@@ -55,7 +55,6 @@ import ArgusFilterBar, {
 } from '@/components/argus/ArgusFilterBar';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { dateRangeToApiParams as argusDateRangeToApiParams } from '@/components/common/DateRangeSelector';
-import ArgusChartSkeleton from '@/components/argus/ArgusChartSkeleton';
 import useArgusUrlState from '@/hooks/useArgusUrlState';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
 import PageHeader from '@/components/common/PageHeader';
@@ -67,6 +66,9 @@ import {
   MetricRow,
   formatHourLabel,
 } from './components/overviewHelpers';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from './argusThemeTokens';
+import { detectAlerts, AlertPanel } from './components/overviewAlerts';
+import ArgusSegmentFilter, { type SegmentFilterValues } from './components/ArgusSegmentFilter';
 
 ChartJS.register(
   CategoryScale,
@@ -113,6 +115,7 @@ const ArgusOverviewPage: React.FC = () => {
   const [filters, setFilters] = useState<ArgusFilterState>(() =>
     defaultArgusFilterState(urlState.period)
   );
+  const [segmentFilter, setSegmentFilter] = useState<SegmentFilterValues>({});
 
   useEffect(() => {
     setFilters((prev) => ({
@@ -164,7 +167,8 @@ const ArgusOverviewPage: React.FC = () => {
         projectId,
         apiParams.period,
         apiParams.start,
-        apiParams.end
+        apiParams.end,
+        segmentFilter,
       );
       setData(result);
     } catch (error) {
@@ -172,7 +176,7 @@ const ArgusOverviewPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [projectId, filters]);
+  }, [projectId, filters, segmentFilter]);
 
   useEffect(() => {
     fetchData();
@@ -314,28 +318,30 @@ const ArgusOverviewPage: React.FC = () => {
     {
       icon: <BugReportIcon />,
       gradient: isDark
-        ? `linear-gradient(135deg, ${alpha('#f44336', 0.15)}, ${alpha('#ff5252', 0.05)})`
-        : `linear-gradient(135deg, ${alpha('#f44336', 0.08)}, ${alpha('#ff5252', 0.02)})`,
-      borderColor: alpha('#f44336', 0.3),
-      color: '#f44336',
+        ? `linear-gradient(135deg, ${alpha(ARGUS_SEMANTIC.negative, 0.15)}, ${alpha(ARGUS_SEMANTIC.negative, 0.05)})`
+        : `linear-gradient(135deg, ${alpha(ARGUS_SEMANTIC.negative, 0.08)}, ${alpha(ARGUS_SEMANTIC.negative, 0.02)})`,
+      borderColor: alpha(ARGUS_SEMANTIC.negative, 0.3),
+      color: ARGUS_SEMANTIC.negative,
       label: t('argus.overview.totalErrors'),
       value: es?.total_errors != null ? Number(es.total_errors) : undefined,
       change: errorChange,
       sparkData: errorTrendData,
       invertChange: true,
+      href: '/argus/issues',
     },
     {
       icon: <PeopleIcon />,
       gradient: isDark
-        ? `linear-gradient(135deg, ${alpha('#ff9800', 0.15)}, ${alpha('#ffa726', 0.05)})`
-        : `linear-gradient(135deg, ${alpha('#ff9800', 0.08)}, ${alpha('#ffa726', 0.02)})`,
-      borderColor: alpha('#ff9800', 0.3),
-      color: '#ff9800',
+        ? `linear-gradient(135deg, ${alpha(ARGUS_SEMANTIC.warning, 0.15)}, ${alpha(ARGUS_SEMANTIC.warning, 0.05)})`
+        : `linear-gradient(135deg, ${alpha(ARGUS_SEMANTIC.warning, 0.08)}, ${alpha(ARGUS_SEMANTIC.warning, 0.02)})`,
+      borderColor: alpha(ARGUS_SEMANTIC.warning, 0.3),
+      color: ARGUS_SEMANTIC.warning,
       label: t('argus.overview.affectedUsers'),
       value: es?.affected_users != null ? Number(es.affected_users) : undefined,
       change: userChange,
       sparkData: errorTrendData,
       invertChange: true,
+      href: '/argus/issues',
     },
     {
       icon: <SpeedIcon />,
@@ -352,19 +358,21 @@ const ArgusOverviewPage: React.FC = () => {
       change: txnChange,
       sparkData: txnTrendData,
       invertChange: false,
+      href: '/argus/performance',
     },
     {
       icon: <CheckCircleIcon />,
       gradient: isDark
-        ? `linear-gradient(135deg, ${alpha('#4caf50', 0.15)}, ${alpha('#66bb6a', 0.05)})`
-        : `linear-gradient(135deg, ${alpha('#4caf50', 0.08)}, ${alpha('#66bb6a', 0.02)})`,
-      borderColor: alpha('#4caf50', 0.3),
-      color: '#4caf50',
+        ? `linear-gradient(135deg, ${alpha(ARGUS_SEMANTIC.positive, 0.15)}, ${alpha(ARGUS_SEMANTIC.positive, 0.05)})`
+        : `linear-gradient(135deg, ${alpha(ARGUS_SEMANTIC.positive, 0.08)}, ${alpha(ARGUS_SEMANTIC.positive, 0.02)})`,
+      borderColor: alpha(ARGUS_SEMANTIC.positive, 0.3),
+      color: ARGUS_SEMANTIC.positive,
       label: t('argus.overview.crashFreeRate'),
       value: ss ? `${Number(ss.crash_free_rate).toFixed(1)}%` : undefined,
       change: null,
       sparkData: [],
       invertChange: false,
+      href: '/argus/issues',
     },
     {
       icon: <UnhandledIcon />,
@@ -380,8 +388,12 @@ const ArgusOverviewPage: React.FC = () => {
       change: null,
       sparkData: [],
       invertChange: true,
+      href: '/argus/issues?level=fatal',
     },
   ];
+
+  // --- Detect anomalies ---
+  const overviewAlerts = data ? detectAlerts(data as any, t as any) : [];
 
   // --- Heatmap data ---
   const heatmapMax = Math.max(
@@ -444,7 +456,19 @@ const ArgusOverviewPage: React.FC = () => {
         }
       />
 
-      <PageContentLoader loading={loading}>
+      {/* Segment Filter (country / platform / version) */}
+      <Box sx={{ px: 0, pb: 1 }}>
+        <ArgusSegmentFilter
+          value={segmentFilter}
+          onChange={setSegmentFilter}
+        />
+      </Box>
+
+      <PageContentLoader loading={loading && !data}>
+        {/* Re-fetch overlay: thin progress bar while keeping existing content */}
+        {loading && !!data && (
+          <LinearProgress sx={{ mb: 1, borderRadius: 1, height: 2, opacity: 0.6 }} />
+        )}
         {/* Onboarding Banner — 트래커 미연동 시 표시 */}
         {!bannerDismissed && onboardingLoaded && trackerCount === 0 && (
           <ArgusOnboardingBanner
@@ -468,6 +492,7 @@ const ArgusOverviewPage: React.FC = () => {
           {statCards.map((card, idx) => (
             <Paper
               key={idx}
+              onClick={() => card.href && navigate(card.href)}
               elevation={0}
               sx={{
                 p: 2,
@@ -479,25 +504,28 @@ const ArgusOverviewPage: React.FC = () => {
                 justifyContent: 'space-between',
                 overflow: 'hidden',
                 transition: 'all 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: `0 4px 20px ${alpha(card.color, 0.15)}`,
-                },
+                cursor: card.href ? 'pointer' : 'default',
+                '&:hover': card.href
+                  ? {
+                      transform: 'translateY(-2px)',
+                      boxShadow: `0 4px 20px ${alpha(card.color, 0.15)}`,
+                    }
+                  : {},
               }}
             >
               <Box
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1.5,
+                  gap: 1,
                   minWidth: 0,
                 }}
               >
                 <Box
                   sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 2,
+                    width: 32,
+                    height: 32,
+                    borderRadius: 1.5,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -506,18 +534,15 @@ const ArgusOverviewPage: React.FC = () => {
                     flexShrink: 0,
                   }}
                 >
-                  {React.cloneElement(card.icon, { sx: { fontSize: 20 } })}
+                  {React.cloneElement(card.icon, { sx: { fontSize: 16 } })}
                 </Box>
                 <Box sx={{ minWidth: 0 }}>
-                  {loading ? (
-                    <Skeleton width={60} height={28} />
-                  ) : (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'baseline',
-                        gap: 0.8,
-                        flexWrap: 'wrap',
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      gap: 0.8,
+                      flexWrap: 'wrap',
                       }}
                     >
                       <Tooltip
@@ -552,7 +577,6 @@ const ArgusOverviewPage: React.FC = () => {
                         </Box>
                       )}
                     </Box>
-                  )}
                   <Typography
                     variant="caption"
                     noWrap
@@ -572,8 +596,8 @@ const ArgusOverviewPage: React.FC = () => {
                 <Box sx={{ flexShrink: 0, ml: 1 }}>
                   <ArgusSparkline
                     data={card.sparkData}
-                    width={60}
-                    height={24}
+                    width={48}
+                    height={22}
                     color={card.color}
                   />
                 </Box>
@@ -581,6 +605,9 @@ const ArgusOverviewPage: React.FC = () => {
             </Paper>
           ))}
         </Box>
+
+        {/* Alert Panel — auto-detected anomalies */}
+        <AlertPanel alerts={overviewAlerts} onNavigate={(href) => navigate(href)} />
 
         {/* Charts Row */}
         <Box
@@ -597,6 +624,8 @@ const ArgusOverviewPage: React.FC = () => {
               p: 2.5,
               border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
               borderRadius: 2,
+              minWidth: 0,
+              overflow: 'hidden',
             }}
           >
             <Typography
@@ -615,24 +644,17 @@ const ArgusOverviewPage: React.FC = () => {
               />
               {t('argus.overview.errorTrend')}
             </Typography>
-            <Box sx={{ height: 220 }}>
-              {loading ? (
-                <ArgusChartSkeleton
-                  type="line"
-                  height={220}
-                  color={theme.palette.error.main}
-                />
-              ) : (
-                <Line
-                  data={errorChartData}
-                  options={chartOptions}
-                  plugins={[
-                    getCrosshairPlugin(isDark),
-                    getDragSelectPlugin(isDark, (si, ei) => {
-                      const trend = data?.error_trend;
-                      if (!trend) return;
-                      const startHour = trend[si]?.hour;
-                      const endHour = trend[ei]?.hour;
+            <Box sx={{ height: 220, position: 'relative' }}>
+              <Line
+                data={errorChartData}
+                options={chartOptions}
+                plugins={[
+                  getCrosshairPlugin(isDark),
+                  getDragSelectPlugin(isDark, (si, ei) => {
+                    const trend = data?.error_trend;
+                    if (!trend) return;
+                    const startHour = trend[si]?.hour;
+                    const endHour = trend[ei]?.hour;
                       if (startHour && endHour) {
                         const start = new Date(startHour).toISOString();
                         const end = new Date(
@@ -645,7 +667,6 @@ const ArgusOverviewPage: React.FC = () => {
                     }),
                   ]}
                 />
-              )}
             </Box>
           </Paper>
 
@@ -655,6 +676,8 @@ const ArgusOverviewPage: React.FC = () => {
               p: 2.5,
               border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
               borderRadius: 2,
+              minWidth: 0,
+              overflow: 'hidden',
             }}
           >
             <Typography
@@ -673,23 +696,16 @@ const ArgusOverviewPage: React.FC = () => {
               />
               {t('argus.overview.transactionThroughput')}
             </Typography>
-            <Box sx={{ height: 220 }}>
-              {loading ? (
-                <ArgusChartSkeleton
-                  type="bar"
-                  height={220}
-                  color={theme.palette.primary.main}
-                />
-              ) : (
-                <Bar
-                  data={txnChartData}
-                  options={chartOptions}
-                  plugins={[
-                    getDragSelectPlugin(isDark, (si, ei) => {
-                      const trend = data?.transaction_trend;
-                      if (!trend) return;
-                      const startHour = trend[si]?.hour;
-                      const endHour = trend[ei]?.hour;
+            <Box sx={{ height: 220, position: 'relative' }}>
+              <Bar
+                data={txnChartData}
+                options={chartOptions}
+                plugins={[
+                  getDragSelectPlugin(isDark, (si, ei) => {
+                    const trend = data?.transaction_trend;
+                    if (!trend) return;
+                    const startHour = trend[si]?.hour;
+                    const endHour = trend[ei]?.hour;
                       if (startHour && endHour) {
                         const start = new Date(startHour).toISOString();
                         const end = new Date(
@@ -702,7 +718,6 @@ const ArgusOverviewPage: React.FC = () => {
                     }),
                   ]}
                 />
-              )}
             </Box>
           </Paper>
         </Box>
@@ -745,10 +760,7 @@ const ArgusOverviewPage: React.FC = () => {
           >
             {t('argus.overview.heatmapDesc')}
           </Typography>
-          {loading ? (
-            <Skeleton variant="rounded" height={180} />
-          ) : (
-            <Box sx={{ overflowX: 'auto' }}>
+          <Box sx={{ overflowX: 'auto' }}>
               <Box
                 sx={{
                   display: 'grid',
@@ -814,7 +826,7 @@ const ArgusOverviewPage: React.FC = () => {
                                       ? 'rgba(255,255,255,0.03)'
                                       : 'rgba(0,0,0,0.03)'
                                     : alpha(
-                                        '#f44336',
+                                        ARGUS_SEMANTIC.negative,
                                         Math.max(0.1, Math.min(intensity, 1))
                                       ),
                                 transition: 'all 0.15s',
@@ -865,7 +877,7 @@ const ArgusOverviewPage: React.FC = () => {
                       width: 12,
                       height: 12,
                       borderRadius: 0.3,
-                      backgroundColor: alpha('#f44336', v),
+                      backgroundColor: alpha(ARGUS_SEMANTIC.negative, v),
                     }}
                   />
                 ))}
@@ -880,8 +892,7 @@ const ArgusOverviewPage: React.FC = () => {
                   {t('argus.overview.more')}
                 </Typography>
               </Box>
-            </Box>
-          )}
+          </Box>
         </Paper>
 
         {/* NEW: Distribution Row — Environment / Browser / OS */}
@@ -911,7 +922,7 @@ const ArgusOverviewPage: React.FC = () => {
           />
           <DistributionCard
             title={t('argus.overview.errorByBrowser')}
-            icon={<DevicesIcon fontSize="small" sx={{ color: '#2196f3' }} />}
+            icon={<DevicesIcon fontSize="small" sx={{ color: ARGUS_SERIES[0] }} />}
             data={
               data?.error_by_browser?.map((d) => ({
                 label: d.browser,
@@ -920,14 +931,14 @@ const ArgusOverviewPage: React.FC = () => {
             }
             loading={loading}
             isDark={isDark}
-            color="#2196f3"
+            color={ARGUS_SERIES[0]}
             onItemClick={(label) =>
               navigate(`/argus/issues?browser=${encodeURIComponent(label)}`)
             }
           />
           <DistributionCard
             title={t('argus.overview.errorByOS')}
-            icon={<DevicesIcon fontSize="small" sx={{ color: '#ff9800' }} />}
+            icon={<DevicesIcon fontSize="small" sx={{ color: ARGUS_SEMANTIC.warning }} />}
             data={
               data?.error_by_os?.map((d) => ({
                 label: d.os,
@@ -936,7 +947,7 @@ const ArgusOverviewPage: React.FC = () => {
             }
             loading={loading}
             isDark={isDark}
-            color="#ff9800"
+            color={ARGUS_SEMANTIC.warning}
             onItemClick={(label) =>
               navigate(`/argus/issues?os=${encodeURIComponent(label)}`)
             }
@@ -949,6 +960,7 @@ const ArgusOverviewPage: React.FC = () => {
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 2fr' },
             gap: 2,
+            '& > *': { minWidth: 0 },
           }}
         >
           {/* Performance Metrics */}
@@ -1027,9 +1039,7 @@ const ArgusOverviewPage: React.FC = () => {
               <ReleaseIcon fontSize="small" sx={{ color: '#7c4dff' }} />
               {t('argus.overview.errorByRelease')}
             </Typography>
-            {loading ? (
-              <Skeleton variant="rounded" height={160} />
-            ) : !data?.error_by_release?.length ? (
+            {!data?.error_by_release?.length ? (
               <Box sx={{ py: 4, textAlign: 'center' }}>
                 <Typography variant="body2" color="text.secondary">
                   {t('argus.overview.noData')}
@@ -1063,7 +1073,7 @@ const ArgusOverviewPage: React.FC = () => {
                           <Typography
                             variant="caption"
                             fontWeight={700}
-                            sx={{ color: '#f44336' }}
+                            sx={{ color: ARGUS_SEMANTIC.negative }}
                           >
                             {formatCompactNumber(Number(r.count))}
                           </Typography>
@@ -1159,12 +1169,12 @@ const ArgusOverviewPage: React.FC = () => {
                 {data.top_issues.map((issue: any, idx: number) => {
                   const levelColor =
                     issue.level === 'fatal'
-                      ? '#f44336'
+                      ? ARGUS_SEMANTIC.negative
                       : issue.level === 'error'
                         ? '#ff5722'
                         : issue.level === 'warning'
-                          ? '#ff9800'
-                          : '#2196f3';
+                          ? ARGUS_SEMANTIC.warning
+                          : ARGUS_SEMANTIC.info;
                   return (
                     <Box
                       key={`${issue.fingerprint || 'issue'}-${idx}`}

@@ -14,7 +14,6 @@ import {
   useTheme,
 } from '@mui/material';
 import {
-  Article as LogIcon,
   Search as SearchIcon,
   Fullscreen as FullscreenIcon,
   FullscreenExit as FullscreenExitIcon,
@@ -24,6 +23,7 @@ import {
   WrapText as WrapTextIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Description as LogIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { CopyButton } from '@/components/common/CopyButton';
@@ -127,8 +127,6 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({
             fontWeight={600}
             sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
           >
-            <LogIcon fontSize="small" sx={{ color: theme.palette.info.main }} />
-            {t('argus.issues.logs', 'Logs')}
             {logs.length > 0 && (
               <Chip
                 label={(() => {
@@ -154,7 +152,6 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({
                   height: 18,
                   fontSize: '0.65rem',
                   fontWeight: 700,
-                  ml: 0.5,
                 }}
               />
             )}
@@ -384,7 +381,7 @@ const IssueLogsSection: React.FC<IssueLogsSectionProps> = ({
                   <Box
                     ref={logContainerRef}
                     sx={{
-                      maxHeight: logsFullscreen ? 'none' : 650,
+                      maxHeight: logsFullscreen ? 'none' : 780,
                       flex: logsFullscreen ? 1 : 'none',
                       overflowY: 'auto',
                       fontSize: '0.73rem',

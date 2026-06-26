@@ -131,6 +131,11 @@ export interface ArgusSessionEvent extends ArgusBaseEvent {
   errors?: number;
   distinct_id?: string;
   user_agent?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
 }
 
 // =====================================================
@@ -189,6 +194,8 @@ export interface ArgusActivityEvent extends ArgusBaseEvent {
   app_version?: string;
   properties?: Record<string, string>;
   numeric_properties?: Record<string, number>;
+  currency?: string;
+  amount_usd?: number;
 }
 
 // =====================================================

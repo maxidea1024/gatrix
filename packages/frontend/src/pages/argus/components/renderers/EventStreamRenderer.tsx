@@ -15,6 +15,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { type WidgetConfig, type VizOptions, formatValue } from './widgetTypes';
+import { ARGUS_SEMANTIC } from '../../argusThemeTokens';
 
 interface EventStreamRendererProps {
   widget: WidgetConfig;
@@ -28,10 +29,10 @@ interface EventStreamRendererProps {
 // Color by log level
 const LEVEL_COLORS: Record<string, string> = {
   fatal: '#d32f2f',
-  error: '#f44336',
-  warning: '#ff9800',
-  warn: '#ff9800',
-  info: '#2196f3',
+  error: ARGUS_SEMANTIC.negative,
+  warning: ARGUS_SEMANTIC.warning,
+  warn: ARGUS_SEMANTIC.warning,
+  info: ARGUS_SEMANTIC.info,
   debug: '#9e9e9e',
   trace: '#78909c',
 };

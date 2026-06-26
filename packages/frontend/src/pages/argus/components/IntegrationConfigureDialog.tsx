@@ -39,6 +39,7 @@ import {
   RepoCard,
   EmptyReposBox,
 } from './IntegrationConfigureDialog.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 interface IntegrationConfigureDialogProps {
   open: boolean;
@@ -231,7 +232,7 @@ export const IntegrationConfigureDialog: React.FC<
                   {connectedRepos.map((intg) => (
                     <RepoCard key={intg.id} elevation={0} isDark={isDark}>
                       <CheckCircleIcon
-                        sx={{ fontSize: 18, color: '#4caf50' }}
+                        sx={{ fontSize: 18, color: ARGUS_SEMANTIC.positive }}
                       />
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
@@ -258,9 +259,9 @@ export const IntegrationConfigureDialog: React.FC<
                             height: 20,
                             fontSize: '0.7rem',
                             backgroundColor: intg.enabled
-                              ? alpha('#4caf50', 0.15)
+                              ? alpha(ARGUS_SEMANTIC.positive, 0.15)
                               : undefined,
-                            color: intg.enabled ? '#4caf50' : undefined,
+                            color: intg.enabled ? ARGUS_SEMANTIC.positive : undefined,
                           }}
                         />
                         <Tooltip title={t('common.delete', 'Delete')}>
@@ -395,8 +396,8 @@ export const IntegrationConfigureDialog: React.FC<
                                 sx={{
                                   height: 24,
                                   fontSize: '0.75rem',
-                                  backgroundColor: alpha('#4caf50', 0.1),
-                                  color: '#4caf50',
+                                  backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.1),
+                                  color: ARGUS_SEMANTIC.positive,
                                 }}
                               />
                             ) : (

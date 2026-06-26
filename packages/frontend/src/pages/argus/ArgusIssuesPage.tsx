@@ -1221,8 +1221,8 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
             />
 
             <PageContentLoader
-              loading={loading}
-              sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+              loading={loading && issues.length === 0}
+              sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}
             >
               {issues.length === 0 ? (
                 <EmptyPlaceholder
@@ -1240,10 +1240,13 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                   <Paper
                     elevation={0}
                     sx={{
-                      mb: 2,
                       border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                       borderRadius: 2,
-                      overflow: 'hidden',
+                      overflow: 'auto',
+                      flex: 1,
+                      opacity: loading ? 0.55 : 1,
+                      transition: 'opacity 0.15s ease',
+                      pointerEvents: loading ? 'none' : 'auto',
                     }}
                   >
                     {issues.map((issue, idx) => (
@@ -1267,7 +1270,7 @@ const ArgusIssuesPage: React.FC<ArgusIssuesPageProps> = ({
                   </Paper>
 
                   {total > 0 && (
-                    <Box sx={{ mt: 3 }}>
+                    <Box sx={{ mt: 2, flexShrink: 0 }}>
                       <SimplePagination
                         count={total}
                         page={currentPage - 1}

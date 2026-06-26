@@ -528,9 +528,9 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         requiredPermission: P.MONITORING_READ,
       },
       {
-        text: 'argus.revenue',
+        text: 'argus.monetization',
         icon: 'AttachMoney',
-        path: '/argus/analytics/revenue',
+        path: '/argus/analytics/monetization',
         requiredPermission: P.MONITORING_READ,
       },
       {

@@ -15,6 +15,7 @@ import EmptyPlaceholder from '@/components/common/EmptyPlaceholder';
 import { formatCompactNumber } from '@/utils/numberFormat';
 import { ArgusSessionHealth } from '@/services/argusService';
 import { RELEASE_COLORS } from './sessionHealthHelpers';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 import {
   SectionPaper,
   SectionAccent,
@@ -202,7 +203,7 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                     width: 3,
                     height: 16,
                     borderRadius: 1,
-                    background: 'linear-gradient(180deg, #4caf50, #ff9800)',
+                    background: `linear-gradient(180deg, ${ARGUS_SEMANTIC.positive}, ${ARGUS_SEMANTIC.warning})`,
                     mr: 0.5,
                   }}
                 />
@@ -263,10 +264,10 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                     format: (v: number) => `${Number(v).toFixed(1)}%`,
                     colorFn: (v: number) =>
                       Number(v) >= 99
-                        ? '#4caf50'
+                        ? ARGUS_SEMANTIC.positive
                         : Number(v) >= 95
-                          ? '#ff9800'
-                          : '#f44336',
+                          ? ARGUS_SEMANTIC.warning
+                          : ARGUS_SEMANTIC.negative,
                   },
                   {
                     label: t('argus.sessions.sessions'),
@@ -285,7 +286,7 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                     key: 'crashed',
                     format: (v: number) => formatCompactNumber(Number(v)),
                     colorFn: (v: number) =>
-                      Number(v) > 0 ? '#f44336' : '#4caf50',
+                      Number(v) > 0 ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
                   },
                 ].map((row) => (
                   <React.Fragment key={row.key}>
@@ -400,7 +401,7 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
           {data.by_release.map((r, idx) => {
             const rate = Number(r.crash_free_rate);
             const barColor =
-              rate >= 99 ? '#4caf50' : rate >= 95 ? '#ff9800' : '#f44336';
+              rate >= 99 ? ARGUS_SEMANTIC.positive : rate >= 95 ? ARGUS_SEMANTIC.warning : ARGUS_SEMANTIC.negative;
             return (
               <ReleaseRow
                 key={`${r.release}-${idx}`}
@@ -463,9 +464,9 @@ const SessionHealthReleases: React.FC<SessionHealthReleasesProps> = ({
                     cursor: 'pointer',
                     backgroundColor:
                       Number(r.crashed) > 0
-                        ? alpha('#f44336', 0.1)
-                        : alpha('#4caf50', 0.1),
-                    color: Number(r.crashed) > 0 ? '#f44336' : '#4caf50',
+                        ? alpha(ARGUS_SEMANTIC.negative, 0.1)
+                        : alpha(ARGUS_SEMANTIC.positive, 0.1),
+                    color: Number(r.crashed) > 0 ? ARGUS_SEMANTIC.negative : ARGUS_SEMANTIC.positive,
                     border: 'none',
                   }}
                 />

@@ -132,58 +132,58 @@ export async function generateAndInsertTransactions(
       const tpl = randomPick(TXN_TEMPLATES);
       const ts = randomDateWeighted(DAYS_BACK);
       const user = randomPick(USERS);
-      const traceId = uuid();
-      const spanId = uuid().substring(0, 16);
       const dur = randomFloat(tpl.durMin, tpl.durMax);
       const env = randomPick(['production', 'staging']);
       const release = randomPick(SERVER_RELEASES);
-      const server = randomPick(['game-api-01', 'game-api-02', 'game-api-03']);
-      const dsnKeyId = randomPick(activeDsnKeys);
+
+      const spanTemplates = getSpanTemplates(tpl.name);
 
       txnBatch.push({
-        event_id: uuid(),
+        event_id: uuid().replace(/-/g, ''),
+        trace_id: uuid().replace(/-/g, ''),
+        span_id: uuid().replace(/-/g, '').substring(0, 16),
+        parent_span_id: '0000000000000000',
         project_id: PROJECT_ID,
-        trace_id: traceId,
-        span_id: spanId,
-        timestamp: formatDate(ts),
-        name: tpl.name,
-        op: tpl.op,
-        duration_ms: Math.round(dur),
-        status: randomPick(['ok', 'ok', 'ok', 'ok', 'ok', 'internal_error', 'deadline_exceeded', 'not_found']),
+        timestamp: formatDate(new Date(ts.getTime() + Math.round(dur))),
+        start_timestamp: formatDate(ts),
+        duration: Math.round(dur),
+        transaction: tpl.name,
+        transaction_op: tpl.op,
+        transaction_status: randomPick(['ok', 'ok', 'ok', 'ok', 'ok', 'internal_error', 'deadline_exceeded', 'not_found']),
+        http_method: tpl.name.split(' ')[0] || 'GET',
+        http_status_code: randomPick([200, 200, 200, 201, 400, 500]),
+        platform: 'node',
         environment: env,
         release,
-        server_name: server,
         user_id: user.id,
-        user_email: user.email,
-        user_ip: user.ip,
-        browser_name: 'N/A',
-        browser_version: 'N/A',
-        os_name: 'Linux',
-        os_version: '6.8',
-        http_method: tpl.name.split(' ')[0] || 'GET',
-        http_url: tpl.name.split(' ')[1] || '/',
-        http_status_code: randomPick([200, 200, 200, 201, 400, 500]),
+        measurements: {},
         tags: {},
-        dsn_key_id: dsnKeyId,
+        span_count: spanTemplates.length,
       });
 
       // Spans
-      const spanTemplates = getSpanTemplates(tpl.name);
+      const txnEventId = txnBatch[txnBatch.length - 1].event_id;
+      const txnSpanId = txnBatch[txnBatch.length - 1].span_id;
+      const txnTraceId = txnBatch[txnBatch.length - 1].trace_id;
       let offset = 0;
       for (const st of spanTemplates) {
         const sDur = randomFloat(st.durMin, st.durMax);
         spanBatch.push({
-          span_id: uuid().substring(0, 16),
-          trace_id: traceId,
-          parent_span_id: spanId,
+          span_id: uuid().replace(/-/g, '').substring(0, 16),
+          trace_id: txnTraceId,
+          parent_span_id: txnSpanId,
+          transaction_id: txnEventId,
           project_id: PROJECT_ID,
-          timestamp: formatDate(new Date(ts.getTime() + offset)),
+          timestamp: formatDate(new Date(ts.getTime() + offset + Math.round(sDur))),
+          start_timestamp: formatDate(new Date(ts.getTime() + offset)),
+          duration: Math.round(sDur),
           op: st.op,
           description: st.description,
-          duration_ms: Math.round(sDur),
           status: 'ok',
+          action: '',
+          domain: '',
+          data: {},
           tags: {},
-          dsn_key_id: dsnKeyId,
         });
         offset += Math.round(sDur);
       }

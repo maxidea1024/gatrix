@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Argus Product Analytics and Lexicon API.
  */
 import { argusApi, ARGUS_BASE } from './argusApi';
@@ -714,6 +714,7 @@ export interface RevenueData {
   grant_count: number;
   grant_users: number;
   grants_by_reason: { reason: string; total_granted: number; grant_count: number; grant_users: number }[];
+  grants_over_time: { period: string; grants: number; grant_count: number }[];
   // Ad Revenue
   total_ad_revenue: number;
   prev_total_ad_revenue: number;
@@ -731,6 +732,29 @@ export interface RevenueData {
   revenue_by_ad_type: { ad_type: string; revenue: number; impressions: number; ecpm: number }[];
   revenue_by_placement: { placement: string; revenue: number; impressions: number; ecpm: number }[];
   revenue_by_sdk: { sdk: string; revenue: number; impressions: number; ecpm: number }[];
+  // Auto-generated insights (from backend)
+  insights?: {
+    severity: 'positive' | 'warning' | 'critical' | 'info';
+    icon: string;
+    title: string;
+    detail: string;
+    action?: string;
+    drilldown?: { type: 'scroll' | 'ledger'; target?: string; ledgerFilter?: { type?: string; reason?: string } };
+  }[];
+  segment_verdicts?: {
+    by_country: {
+      name: string; revenue: number; prevRevenue: number;
+      change: number; changePct: number;
+      verdict: 'invest' | 'maintain' | 'opportunity' | 'review';
+      verdictLabel: string; verdictIcon: string;
+    }[];
+    by_platform: {
+      name: string; revenue: number; prevRevenue: number;
+      change: number; changePct: number;
+      verdict: 'invest' | 'maintain' | 'opportunity' | 'review';
+      verdictLabel: string; verdictIcon: string;
+    }[];
+  };
 }
 
 export interface ProductRevenue {
@@ -814,6 +838,10 @@ type RevenueParams = {
   start?: string;
   end?: string;
   granularity?: string;
+  // Segment filters
+  country?: string;
+  platform?: string;
+  app_version?: string;
 };
 
 const defaultRevenueData: RevenueData = {
@@ -833,7 +861,7 @@ const defaultRevenueData: RevenueData = {
   // Payment method
   revenue_by_payment_method: [],
   // Grants
-  total_granted: 0, grant_count: 0, grant_users: 0, grants_by_reason: [],
+  total_granted: 0, grant_count: 0, grant_users: 0, grants_by_reason: [], grants_over_time: [],
   // Ad Revenue
   total_ad_revenue: 0, prev_total_ad_revenue: 0,
   total_impressions: 0, total_ad_clicks: 0, avg_ecpm: 0, ad_users: 0,
@@ -847,10 +875,63 @@ export async function getRevenueAnalytics(
   params?: RevenueParams
 ): Promise<RevenueData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization`,
     { params }
   );
   return response.data?.data || defaultRevenueData;
+}
+
+export interface AcquisitionSummary {
+  total_sessions: number;
+  total_users: number;
+  total_revenue: number;
+  total_paying_users: number;
+  conversion_rate: number;
+}
+
+export interface AcquisitionChartPoint {
+  period: string;
+  sessions: number;
+  revenue: number;
+}
+
+export interface AcquisitionTableRow {
+  dimension: string;
+  sessions: number;
+  users: number;
+  revenue: number;
+  paying_users: number;
+  avg_duration: number;
+}
+
+export interface AcquisitionResponse {
+  summary: AcquisitionSummary;
+  summary_prev?: AcquisitionSummary;
+  chart: AcquisitionChartPoint[];
+  table: AcquisitionTableRow[];
+}
+
+export async function getRevenueAcquisition(
+  projectId: number | string,
+  params?: RevenueParams & { groupBy?: 'source' | 'medium' | 'campaign' | 'platform'; attributionModel?: 'last' | 'first' | 'linear' }
+): Promise<AcquisitionResponse> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/acquisition`,
+    { params }
+  );
+  const empty: AcquisitionSummary = {
+    total_sessions: 0,
+    total_users: 0,
+    total_revenue: 0,
+    total_paying_users: 0,
+    conversion_rate: 0,
+  };
+  return response.data?.data || {
+    summary: empty,
+    summary_prev: empty,
+    chart: [],
+    table: [],
+  };
 }
 
 export interface ProductsResponse {
@@ -864,7 +945,7 @@ export async function getRevenueProducts(
   params?: RevenueParams
 ): Promise<ProductsResponse> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/products`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/products`,
     { params }
   );
   const data = response.data?.data;
@@ -878,7 +959,7 @@ export async function getRevenueProductsTrend(
   params?: RevenueParams
 ): Promise<ProductTrendData[]> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/products/trend`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/products/trend`,
     { params }
   );
   return response.data?.data || [];
@@ -896,7 +977,7 @@ export async function getRevenueProductDetail(
   params: RevenueParams & { product_name: string; offset?: number; limit?: number }
 ): Promise<ProductDetailData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/products/detail`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/products/detail`,
     { params }
   );
   return response.data?.data || { trend: [], summary: { total_revenue: 0, total_transactions: 0 }, buyers: [], has_more: false };
@@ -907,7 +988,7 @@ export async function getRevenueEconomy(
   params?: RevenueParams & { currency_type?: string }
 ): Promise<EconomyData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/economy`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/economy`,
     { params }
   );
   return response.data?.data || { flow_over_time: [], by_currency: [], top_sinks: [] };
@@ -918,7 +999,7 @@ export async function getRevenueTopSpenders(
   params?: RevenueParams
 ): Promise<TopSpendersData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/top-spenders`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/top-spenders`,
     { params }
   );
   return response.data?.data || { segments: [], top_users: [], total_revenue: 0, total_spenders: 0, distribution: [], whale_trend: [] };
@@ -929,7 +1010,7 @@ export async function getRevenueLtv(
   params?: RevenueParams
 ): Promise<LtvData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/ltv`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/ltv`,
     { params }
   );
   return response.data?.data || { ltv_curve: [], pltv_predictions: [], pltv_curve: [], pltv_confidence: 0, pltv_coefficients: { a: 0, b: 0 } };
@@ -950,7 +1031,7 @@ export async function getRevenueCohort(
   params?: RevenueParams
 ): Promise<CohortData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/cohort`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/cohort`,
     { params }
   );
   return response.data?.data || { cohorts: [], bucket_days: [] };
@@ -967,7 +1048,7 @@ export async function getRevenueFunnel(
   params?: RevenueParams
 ): Promise<FunnelData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/funnel`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/funnel`,
     { params }
   );
   return response.data?.data || { stages: [] };
@@ -989,7 +1070,7 @@ export async function getRevenueLtvCohorts(
   params?: RevenueParams & { cohort_by?: string }
 ): Promise<CohortLtvData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/ltv-cohorts`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/ltv-cohorts`,
     { params }
   );
   return response.data?.data || { cohorts: [], cohort_by: 'week' };
@@ -1015,7 +1096,7 @@ export async function getRevenueSegmentComparison(
   params?: RevenueParams
 ): Promise<SegmentComparisonData> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/segment-comparison`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/segment-comparison`,
     { params }
   );
   return response.data?.data || { segments: [] };
@@ -1082,6 +1163,7 @@ export interface TransactionQueryParams extends RevenueParams {
   group_by?: LedgerGroupBy;
   user_ids?: string; products?: string;
   reasons?: string; payment_methods?: string;
+  search?: string;
 }
 
 export async function getRevenueTransactions(
@@ -1089,7 +1171,7 @@ export async function getRevenueTransactions(
   params: TransactionQueryParams
 ): Promise<TransactionResponse | TransactionGroupedResponse> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/transactions`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/transactions`,
     { params }
   );
   return response.data?.data || { mode: 'flat', transactions: [], total_count: 0, summary: { purchase_total: 0, purchase_count: 0, refund_total: 0, refund_count: 0, grant_total: 0, grant_count: 0, ad_total: 0, ad_count: 0 }, has_more: false };
@@ -1102,7 +1184,7 @@ export async function getTransactionFacets(
   params: RevenueParams & { facet: string }
 ): Promise<FacetValue[]> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/transactions/facets`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/transactions/facets`,
     { params }
   );
   return response.data?.data?.values || [];
@@ -1142,7 +1224,7 @@ export async function getRevenueUserSummary(
   params: RevenueParams & { user_id: string }
 ): Promise<UserFinancialResponse> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/user-summary`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/user-summary`,
     { params }
   );
   return response.data?.data || { summary: { total_purchases: 0, purchase_count: 0, total_refunds: 0, refund_count: 0, total_grants: 0, grant_count: 0, net_revenue: 0, refund_rate: 0, first_purchase: null, last_purchase: null }, purchases: [], refunds: [], grants: [] };
@@ -1166,7 +1248,7 @@ export async function getRevenueProductHourly(
   params: RevenueParams & { product_name: string; tz?: string }
 ): Promise<HourlyHeatmapResponse> {
   const response = await argusApi.get(
-    `${ARGUS_BASE}/projects/${projectId}/analytics/revenue/products/hourly`,
+    `${ARGUS_BASE}/projects/${projectId}/analytics/monetization/products/hourly`,
     { params }
   );
   return response.data?.data || { heatmap: [] };
@@ -1329,3 +1411,4 @@ export async function getDataGovernance(
     }
   );
 }
+

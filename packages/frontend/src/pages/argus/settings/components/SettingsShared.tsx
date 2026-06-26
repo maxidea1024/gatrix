@@ -46,6 +46,7 @@ import {
   vscDarkPlus,
   oneLight,
 } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { ARGUS_SEMANTIC } from '../../argusThemeTokens';
 
 SyntaxHighlighter.registerLanguage('javascript', javascript);
 SyntaxHighlighter.registerLanguage('bash', bash);
@@ -216,8 +217,8 @@ export const ProviderCard: React.FC<{
                 height: 18,
                 fontSize: '0.58rem',
                 fontWeight: 600,
-                backgroundColor: alpha('#4caf50', 0.1),
-                color: '#4caf50',
+                backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.1),
+                color: ARGUS_SEMANTIC.positive,
                 border: 'none',
                 mt: 0.3,
               }}
@@ -436,11 +437,11 @@ export const ConnectedItem: React.FC<{
                 fontSize: '0.7rem',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                backgroundColor: alpha(active ? '#4caf50' : '#9e9e9e', 0.12),
-                color: active ? '#4caf50' : '#9e9e9e',
+                backgroundColor: alpha(active ? ARGUS_SEMANTIC.positive : '#9e9e9e', 0.12),
+                color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
                 border: 'none',
                 '&:hover': {
-                  backgroundColor: alpha(active ? '#4caf50' : '#9e9e9e', 0.2),
+                  backgroundColor: alpha(active ? ARGUS_SEMANTIC.positive : '#9e9e9e', 0.2),
                 },
               }}
             />
@@ -493,7 +494,7 @@ export const ConnectedItem: React.FC<{
           >
             <TestConnectionIcon
               fontSize="small"
-              sx={{ fontSize: 16, color: '#4caf50' }}
+              sx={{ fontSize: 16, color: ARGUS_SEMANTIC.positive }}
             />
             {t('argus.settings.testConnection', '연결 테스트')}
           </MenuItem>
@@ -795,10 +796,10 @@ export const StatusBadge: React.FC<{ active: boolean; t: any }> = ({
       height: 22,
       fontWeight: 600,
       fontSize: '0.7rem',
-      backgroundColor: alpha(active ? '#4caf50' : '#9e9e9e', 0.12),
-      color: active ? '#4caf50' : '#9e9e9e',
+      backgroundColor: alpha(active ? ARGUS_SEMANTIC.positive : '#9e9e9e', 0.12),
+      color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e',
       border: 'none',
-      '& .MuiChip-icon': { color: active ? '#4caf50' : '#9e9e9e' },
+      '& .MuiChip-icon': { color: active ? ARGUS_SEMANTIC.positive : '#9e9e9e' },
     }}
   />
 );

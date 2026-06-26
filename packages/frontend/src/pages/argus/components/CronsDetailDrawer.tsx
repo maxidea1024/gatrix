@@ -35,6 +35,7 @@ import {
   EmptyCheckinBox,
   StatusValuesBox,
 } from './CronsDetailDrawer.styles';
+import { ARGUS_SEMANTIC } from '../argusThemeTokens';
 
 // Types
 interface CronMonitor {
@@ -466,18 +467,18 @@ fi`}
                 </SectionLabel>
                 <StatusValuesBox isDark={isDark}>
                   <Box>
-                    <code style={{ color: '#4caf50' }}>ok</code> —{' '}
+                    <code style={{ color: ARGUS_SEMANTIC.positive }}>ok</code> —{' '}
                     {t(
                       'argus.crons.statusOkDesc',
                       'Job completed successfully'
                     )}
                   </Box>
                   <Box>
-                    <code style={{ color: '#f44336' }}>error</code> —{' '}
+                    <code style={{ color: ARGUS_SEMANTIC.negative }}>error</code> —{' '}
                     {t('argus.crons.statusErrorDesc', 'Job failed')}
                   </Box>
                   <Box>
-                    <code style={{ color: '#2196f3' }}>in_progress</code> —{' '}
+                    <code style={{ color: ARGUS_SEMANTIC.info }}>in_progress</code> —{' '}
                     {t(
                       'argus.crons.statusInProgressDesc',
                       'Job started (will timeout if no follow-up)'

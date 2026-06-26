@@ -272,7 +272,7 @@ const ArgusPerformancePage: React.FC = () => {
   const handleSortClose = useCallback(() => setSortAnchor(null), []);
 
   return (
-    <Box>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Header */}
       <PageHeader
         icon={<SpeedIcon />}
@@ -332,11 +332,13 @@ const ArgusPerformancePage: React.FC = () => {
 
       {/* === TRANSACTION LIST === */}
       {viewMode === 'list' && (
-        <PerformanceTransactionTable
-          transactions={transactions}
-          loading={loading}
-          onTxnClick={handleTxnClick}
-        />
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <PerformanceTransactionTable
+            transactions={transactions}
+            loading={loading}
+            onTxnClick={handleTxnClick}
+          />
+        </Box>
       )}
     </Box>
   );

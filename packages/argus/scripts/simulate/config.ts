@@ -27,7 +27,7 @@ export const CH_CONFIG = {
 // ═══════════════════ SCALE CONSTANTS ═══════════════════
 
 export const PROJECT_ID = '01KVVVJEGKQ10X59AZW7P0ASCH';
-export const DAYS_BACK = 14;
+export const DAYS_BACK = 90;
 export const NOW = new Date();
 
 export const TOTAL_ERROR_EVENTS = 600_000;

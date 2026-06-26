@@ -18,6 +18,7 @@ import {
   ChevronLeft as PrevIcon,
   ChevronRight as NextIcon,
 } from '@mui/icons-material';
+import { ARGUS_SEMANTIC, ARGUS_SERIES } from '../argusThemeTokens';
 import { useTranslation } from 'react-i18next';
 import ArgusVolumeChart from '@/components/argus/ArgusVolumeChart';
 
@@ -58,7 +59,7 @@ export const PREBUILT_QUERIES: PrebuiltQuery[] = [
     descKey: 'argus.discover.prebuilt.errorsByTitleDesc',
     defaultDesc: 'Top errors by occurrence count',
     icon: <ErrorIcon sx={{ fontSize: 20 }} />,
-    color: '#f44336',
+    color: ARGUS_SEMANTIC.negative,
     fields: ['type', 'count()', 'uniq(user_id)'],
     groupBy: ['type'],
     orderBy: '-count',
@@ -71,7 +72,7 @@ export const PREBUILT_QUERIES: PrebuiltQuery[] = [
     descKey: 'argus.discover.prebuilt.errorsByUrlDesc',
     defaultDesc: 'Which pages generate the most errors',
     icon: <UrlIcon sx={{ fontSize: 20 }} />,
-    color: '#2196f3',
+    color: ARGUS_SEMANTIC.info,
     fields: ['http_url', 'count()', 'uniq(user_id)'],
     groupBy: ['http_url'],
     orderBy: '-count',
@@ -84,7 +85,7 @@ export const PREBUILT_QUERIES: PrebuiltQuery[] = [
     descKey: 'argus.discover.prebuilt.topUsersDesc',
     defaultDesc: 'Users with the most errors',
     icon: <UserIcon sx={{ fontSize: 20 }} />,
-    color: '#4caf50',
+    color: ARGUS_SEMANTIC.positive,
     fields: ['user_id', 'user_email', 'count()'],
     groupBy: ['user_id', 'user_email'],
     orderBy: '-count',
@@ -97,7 +98,7 @@ export const PREBUILT_QUERIES: PrebuiltQuery[] = [
     descKey: 'argus.discover.prebuilt.errorsByReleaseDesc',
     defaultDesc: 'Error distribution across releases',
     icon: <ReleaseIcon sx={{ fontSize: 20 }} />,
-    color: '#ff9800',
+    color: ARGUS_SEMANTIC.warning,
     fields: ['release', 'count()', 'uniq(user_id)'],
     groupBy: ['release'],
     orderBy: '-count',
@@ -299,11 +300,11 @@ export const DATASET_OPTIONS: {
   label: string;
   color: string;
 }[] = [
-  { value: 'errors', label: 'Errors', color: '#f44336' },
+  { value: 'errors', label: 'Errors', color: ARGUS_SEMANTIC.negative },
   { value: 'spans', label: 'Spans', color: '#7c4dff' },
-  { value: 'logs', label: 'Logs', color: '#4caf50' },
-  { value: 'transactions', label: 'Transactions', color: '#2196f3' },
-  { value: 'sessions', label: 'Sessions', color: '#ff9800' },
+  { value: 'logs', label: 'Logs', color: ARGUS_SEMANTIC.positive },
+  { value: 'transactions', label: 'Transactions', color: ARGUS_SEMANTIC.info },
+  { value: 'sessions', label: 'Sessions', color: ARGUS_SEMANTIC.warning },
 ];
 
 export const DatasetSwitcher: React.FC<{
@@ -437,11 +438,10 @@ export const VolumeChart: React.FC<{
 }> = ({ data, loading = false, onZoom }) => {
   const { t, i18n } = useTranslation();
 
-  const { sortedBuckets, chartLabels, chartDatasets } = useMemo(() => {
+  const { sortedBuckets, chartDatasets } = useMemo(() => {
     if (data.length === 0)
       return {
         sortedBuckets: [] as string[],
-        chartLabels: [] as string[],
         chartDatasets: [],
       };
 
@@ -463,23 +463,13 @@ export const VolumeChart: React.FC<{
       a.localeCompare(b)
     );
 
-    const labels = sortedKeys.map((b) => {
-      const d = parseChDate(b);
-      if (isNaN(d.getTime())) return b; // fallback to raw string
-      return d.toLocaleString(i18n.language || 'en', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-    });
+
 
     const LEVEL_COLORS: Record<string, string> = {
       fatal: '#d32f2f',
-      error: '#f44336',
-      warning: '#ff9800',
-      info: '#2196f3',
+      error: ARGUS_SEMANTIC.negative,
+      warning: ARGUS_SEMANTIC.warning,
+      info: ARGUS_SEMANTIC.info,
       debug: '#9e9e9e',
       all: '#7c4dff',
     };
@@ -516,7 +506,6 @@ export const VolumeChart: React.FC<{
 
     return {
       sortedBuckets: sortedKeys,
-      chartLabels: labels,
       chartDatasets: datasets,
     };
   }, [data, i18n.language, t]);
@@ -546,7 +535,8 @@ export const VolumeChart: React.FC<{
   return (
     <ArgusVolumeChart
       datasets={chartDatasets}
-      labels={chartLabels}
+      rawPeriods={sortedBuckets}
+      labels={[]}
       loading={loading}
       emptyMessage={t('argus.discover.noEventData')}
       title={t('argus.discover.volumeTitle', 'count(events)')}

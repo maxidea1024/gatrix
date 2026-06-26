@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -77,6 +78,7 @@ import type {
 import CohortChip from '@/components/argus/CohortChip';
 import type { CohortMembership } from '@/components/argus/CohortChip';
 import { downloadCsv, type CsvColumn } from '@/utils/csvExport';
+import { ARGUS_SEMANTIC } from './argusThemeTokens';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -826,24 +828,24 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 1.5 }}>
                       <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{t('argus.userProfiles.totalPurchases', 'Purchases')}</Typography>
-                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#4caf50' }}>{fmt(finData.summary.total_purchases)}</Typography>
+                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: ARGUS_SEMANTIC.positive }}>{fmt(finData.summary.total_purchases)}</Typography>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{finData.summary.purchase_count} {t('argus.userProfiles.items', 'items')}</Typography>
                       </Paper>
                       <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{t('argus.userProfiles.totalRefunds', 'Refunds')}</Typography>
-                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#f44336' }}>-{fmt(finData.summary.total_refunds)}</Typography>
+                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: ARGUS_SEMANTIC.negative }}>-{fmt(finData.summary.total_refunds)}</Typography>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{finData.summary.refund_count} {t('argus.userProfiles.items', 'items')}</Typography>
                       </Paper>
                       <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{t('argus.userProfiles.totalGrants', 'Grants')}</Typography>
-                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: '#ff9800' }}>{fmt(finData.summary.total_grants)}</Typography>
+                        <Typography sx={{ fontSize: 16, fontWeight: 700, color: ARGUS_SEMANTIC.warning }}>{fmt(finData.summary.total_grants)}</Typography>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{finData.summary.grant_count} {t('argus.userProfiles.items', 'items')}</Typography>
                       </Paper>
                       <Paper variant="outlined" sx={{ p: 1.5, borderRadius: 2, textAlign: 'center', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff' }}>
                         <Typography sx={{ fontSize: 10, color: 'text.secondary' }}>{t('argus.userProfiles.netRevenue', 'Net Revenue')}</Typography>
                         <Typography sx={{ fontSize: 16, fontWeight: 700 }}>{fmt(finData.summary.net_revenue)}</Typography>
                         {finData.summary.refund_rate > 20 && (
-                          <Chip size="small" label={`⚠ ${finData.summary.refund_rate.toFixed(0)}% refund`} sx={{ fontSize: 9, height: 18, bgcolor: 'rgba(244,67,54,0.1)', color: '#f44336', fontWeight: 700 }} />
+                          <Chip size="small" label={`⚠ ${finData.summary.refund_rate.toFixed(0)}% refund`} sx={{ fontSize: 9, height: 18, bgcolor: 'rgba(244,67,54,0.1)', color: ARGUS_SEMANTIC.negative, fontWeight: 700 }} />
                         )}
                       </Paper>
                     </Box>
@@ -883,7 +885,7 @@ const UserProfileDrawer: React.FC<UserProfileDrawerProps> = ({
                                     {new Date(row.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                   </TableCell>
                                   <TableCell sx={{ fontSize: 12, fontWeight: 600 }}>{row.product_name || '—'}</TableCell>
-                                  <TableCell align="right" sx={{ fontSize: 12, fontWeight: 700, color: finSubTab === 1 ? '#f44336' : 'text.primary' }}>
+                                  <TableCell align="right" sx={{ fontSize: 12, fontWeight: 700, color: finSubTab === 1 ? ARGUS_SEMANTIC.negative : 'text.primary' }}>
                                     {finSubTab === 1 ? '-' : ''}{fmt(row.amount)}
                                   </TableCell>
                                   <TableCell sx={{ fontSize: 11, color: 'text.secondary', textTransform: 'capitalize' }}>
@@ -933,6 +935,8 @@ const ArgusUserProfilesPage: React.FC = () => {
   const { t } = useTranslation();
   const { currentProject } = useOrgProject();
   const projectId = String(currentProject?.id || '1');
+  const { userId: urlUserId } = useParams<{ userId?: string }>();
+  const navigate = useNavigate();
 
   const [users, setUsers] = useState<ArgusUserProfile[]>([]);
   const [total, setTotal] = useState(0);
@@ -951,6 +955,14 @@ const ArgusUserProfilesPage: React.FC = () => {
 
   const [pageSize, setPageSize] = useGlobalPageSize();
   const initialLoadDone = useRef(false);
+
+  // Deep-link: auto-open drawer when URL contains userId
+  useEffect(() => {
+    if (urlUserId) {
+      setDrawerUserId(decodeURIComponent(urlUserId));
+      setDrawerOpen(true);
+    }
+  }, [urlUserId]);
 
   // Debounce search
   useEffect(() => {
@@ -1287,7 +1299,12 @@ const ArgusUserProfilesPage: React.FC = () => {
       {/* User Profile Drawer */}
       <UserProfileDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
+        onClose={() => {
+          setDrawerOpen(false);
+          if (urlUserId) {
+            navigate('/argus/analytics/users', { replace: true });
+          }
+        }}
         projectId={projectId}
         userId={drawerUserId}
       />

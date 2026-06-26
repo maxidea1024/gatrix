@@ -9,8 +9,19 @@
  * - Cohorts page: behavioral segmentation
  */
 import { PROJECT_ID, DAYS_BACK, NOW, CH_CONFIG, CHUNK_SIZE } from './config';
-import { uuid, randomInt, randomPick, weightedPick } from './helpers';
+import { uuid, randomInt, randomPick, weightedPick, formatDate } from './helpers';
 import { USERS, BROWSERS } from './user-pool';
+
+const EXCHANGE_RATES_TO_USD: Record<string, number> = {
+  USD: 1.0,
+  KRW: 0.00077,
+  EUR: 1.08,
+  JPY: 0.0064,
+};
+
+function convertToUsd(amount: number, currency: string): number {
+  return amount * (EXCHANGE_RATES_TO_USD[currency.toUpperCase()] || 1.0);
+}
 
 // ═══════════════════ ACTIVITY EVENT DEFINITIONS ═══════════════════
 
@@ -152,14 +163,25 @@ export const ACTIVITY_EVENT_DEFS = {
         { name: 'Mount - Infernal Steed', price: 19.99 },
       ];
       const product = randomPick(products);
+      const currency = randomPick(['USD', 'KRW', 'EUR', 'JPY']);
+      let amount = product.price;
+
+      if (currency === 'KRW') {
+        amount = Math.round(product.price * 1300 / 100) * 100;
+      } else if (currency === 'EUR') {
+        amount = parseFloat((product.price * 0.93).toFixed(2));
+      } else if (currency === 'JPY') {
+        amount = Math.round(product.price * 156 / 10) * 10;
+      }
+
       return {
         properties: {
           product_name: product.name,
           payment_method: randomPick(['credit_card', 'paypal', 'steam_wallet', 'apple_pay', 'google_pay']),
-          currency: 'USD',
+          currency,
         },
         numeric_properties: {
-          amount: product.price,
+          amount,
           quantity: 1,
         },
       };
@@ -403,9 +425,17 @@ export type ActivityEventName = keyof typeof ACTIVITY_EVENT_DEFS;
 
 export async function generateAndInsertActivities(ch: any): Promise<number> {
   console.log('\n📊 Generating Product Analytics Activities...');
+  
+  // Truncate sessions first to keep consistent IDs
+  console.log('   🗑️  Truncating sessions table for alignment...');
+  try {
+    await ch.exec({ query: `TRUNCATE TABLE IF EXISTS ${CH_CONFIG.database}.sessions` });
+  } catch {}
+
   const activeUsers = USERS.slice(0, 3000);
   let activityCount = 0;
   let batchBuffer: any[] = [];
+  let sessionsBuffer: any[] = [];
 
   // Expanded gameplay pool with new events
   const gameplayPool: ActivityEventName[] = [
@@ -457,6 +487,37 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
         dayStart.setUTCHours(randomInt(9, 18), randomInt(0, 59), randomInt(0, 59));
         let ts = dayStart.getTime();
 
+        const hasUtm = Math.random() < 0.65;
+        const utmSource = hasUtm ? randomPick(['google', 'facebook', 'unity', 'naver', 'youtube']) : null;
+        const utmMedium = hasUtm ? randomPick(['cpc', 'cpa', 'social', 'display', 'organic']) : null;
+        const utmCampaign = hasUtm ? randomPick(['summer_sale_2026', 'brand_awareness', 'pre_registration', 're_engagement']) : null;
+        const utmTerm = hasUtm && Math.random() < 0.5 ? randomPick(['best_rpg_game', 'free_to_play', 'strategy_rpg']) : null;
+        const utmContent = hasUtm && Math.random() < 0.5 ? randomPick(['banner_a', 'video_ad_30s', 'text_ad_v2', 'main_banner']) : null;
+
+        sessionsBuffer.push({
+          session_id: sessionId,
+          project_id: PROJECT_ID,
+          timestamp: formatDate(new Date(ts)),
+          started: formatDate(new Date(ts)),
+          duration: randomInt(60, 7200),
+          status: randomPick(['exited', 'exited', 'exited', 'crashed', 'abnormal']),
+          errors: Math.random() < 0.15 ? randomInt(1, 5) : 0,
+          environment: randomPick(['production', 'staging']),
+          release: randomPick(['1.14.0', '1.13.2']),
+          distinct_id: user.id,
+          user_agent: `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36`,
+          os_name: randomPick(['Windows', 'macOS', 'iOS']),
+          os_version: '10',
+          ip_address: user.ip || '127.0.0.1',
+          country_code: user.country || 'US',
+          dsn_key_id: 0,
+          utm_source: utmSource,
+          utm_medium: utmMedium,
+          utm_campaign: utmCampaign,
+          utm_term: utmTerm,
+          utm_content: utmContent,
+        });
+
         const sessionEvents: ActivityEventName[] = [];
         sessionEvents.push('$session_start', 'user_login');
 
@@ -477,6 +538,12 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
         for (const eventName of sessionEvents) {
           ts += randomInt(2000, 60000);
           const generated = ACTIVITY_EVENT_DEFS[eventName].props();
+          const rawCurrency = (generated as any).properties?.currency || 'USD';
+          const rawAmount = (generated as any).numeric_properties?.amount || 0;
+          let amountUsd = 0;
+          if (eventName === 'purchase' || eventName === 'item_purchased') {
+            amountUsd = convertToUsd(rawAmount, rawCurrency);
+          }
 
           batchBuffer.push({
             event_id: uuid(),
@@ -501,6 +568,8 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
             },
             numeric_properties: (generated as any).numeric_properties || {},
             dsn_key_id: 0,
+            currency: rawCurrency,
+            amount_usd: amountUsd,
           });
         }
       }
@@ -512,6 +581,14 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
         values: batchBuffer,
         format: 'JSONEachRow',
       });
+      if (sessionsBuffer.length > 0) {
+        await ch.insert({
+          table: `${CH_CONFIG.database}.sessions`,
+          values: sessionsBuffer,
+          format: 'JSONEachRow',
+        });
+        sessionsBuffer = [];
+      }
       activityCount += batchBuffer.length;
       process.stdout.write(`\r   ⏳ ${activityCount.toLocaleString()} activities...`);
       batchBuffer = [];
@@ -527,9 +604,18 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
     activityCount += batchBuffer.length;
   }
 
+  if (sessionsBuffer.length > 0) {
+    await ch.insert({
+      table: `${CH_CONFIG.database}.sessions`,
+      values: sessionsBuffer,
+      format: 'JSONEachRow',
+    });
+  }
+
   // ── REALTIME: Generate ~500 events in the last 30 minutes ──
   console.log('\n   ⏳ Generating realtime events (last 30 min)...');
   const realtimeBatch: any[] = [];
+  const realtimeSessions: any[] = [];
   const now = Date.now();
   const thirtyMinAgo = now - 30 * 60 * 1000;
   const realtimeUsers = activeUsers.slice(0, 200);
@@ -539,6 +625,37 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
     const eventName = weightedPick(gameplayPool, gameplayWeights);
     const generated = ACTIVITY_EVENT_DEFS[eventName].props();
     const ts = thirtyMinAgo + Math.random() * (now - thirtyMinAgo);
+    const rawCurrency = (generated as any).properties?.currency || 'USD';
+    const rawAmount = (generated as any).numeric_properties?.amount || 0;
+    let amountUsd = 0;
+    if (eventName === 'purchase' || eventName === 'item_purchased') {
+      amountUsd = convertToUsd(rawAmount, rawCurrency);
+    }
+    const sessionId = uuid();
+
+    realtimeSessions.push({
+      session_id: sessionId,
+      project_id: PROJECT_ID,
+      timestamp: formatDate(new Date(ts)),
+      started: formatDate(new Date(ts)),
+      duration: randomInt(60, 7200),
+      status: 'exited',
+      errors: 0,
+      environment: 'production',
+      release: '1.14.0',
+      distinct_id: user.id,
+      user_agent: 'Chrome',
+      os_name: 'Windows',
+      os_version: '10',
+      ip_address: user.ip || '127.0.0.1',
+      country_code: user.country || 'US',
+      dsn_key_id: 0,
+      utm_source: null,
+      utm_medium: null,
+      utm_campaign: null,
+      utm_term: null,
+      utm_content: null,
+    });
 
     realtimeBatch.push({
       event_id: uuid(),
@@ -547,7 +664,7 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
       event_name: eventName,
       user_id: user.id,
       device_id: `device_${user.id}`,
-      session_id: uuid(),
+      session_id: sessionId,
       platform: randomPick(['Steam', 'PlayStation', 'iOS']),
       environment: 'production',
       release: '1.14.0',
@@ -563,15 +680,26 @@ export async function generateAndInsertActivities(ch: any): Promise<number> {
       },
       numeric_properties: (generated as any).numeric_properties || {},
       dsn_key_id: 0,
+      currency: rawCurrency,
+      amount_usd: amountUsd,
     });
   }
 
-  await ch.insert({
-    table: `${CH_CONFIG.database}.activities`,
-    values: realtimeBatch,
-    format: 'JSONEachRow',
-  });
-  activityCount += realtimeBatch.length;
+  if (realtimeBatch.length > 0) {
+    await ch.insert({
+      table: `${CH_CONFIG.database}.activities`,
+      values: realtimeBatch,
+      format: 'JSONEachRow',
+    });
+    activityCount += realtimeBatch.length;
+  }
+  if (realtimeSessions.length > 0) {
+    await ch.insert({
+      table: `${CH_CONFIG.database}.sessions`,
+      values: realtimeSessions,
+      format: 'JSONEachRow',
+    });
+  }
 
   console.log(`   ✓ ${activityCount.toLocaleString()} activities inserted (incl. ${realtimeBatch.length} realtime)`);
   return activityCount;

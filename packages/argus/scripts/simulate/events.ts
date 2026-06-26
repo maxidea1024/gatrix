@@ -9,35 +9,41 @@ import { dynamicTags, dynamicExtra } from './dynamic-tags';
 export interface EventRecord {
   event_id: string;
   project_id: string;
+  issue_id: number;
   timestamp: string;
-  received: string;
-  type: string;
-  title: string;
-  message: string;
-  level: string;
+  received_at: string;
   platform: string;
-  culprit: string;
-  transaction: string;
+  level: string;
+  type: string;
+  value: string;
+  mechanism: string;
   fingerprint: string[];
-  environment: string;
-  release: string;
-  server_name: string;
+  primary_hash: string;
+  exception: string;
+  stacktrace_frames: string;
+  breadcrumbs: string;
   user_id: string;
   user_email: string;
   user_ip: string;
-  user_username: string;
-  browser_name: string;
-  browser_version: string;
+  user_name: string;
+  environment: string;
+  release: string;
+  server_name: string;
+  transaction: string;
   os_name: string;
   os_version: string;
+  browser_name: string;
+  browser_version: string;
   runtime_name: string;
   runtime_version: string;
   tags: Record<string, string>;
   extra: Record<string, string>;
   contexts: string;
-  exception: string;
-  breadcrumbs: string;
   dsn_key_id: number;
+  // Non-CH fields used by other generators
+  title: string;
+  message: string;
+  culprit: string;
 }
 
 export interface IssueTracker {
@@ -115,30 +121,44 @@ export function generateErrorEvents(
     if (ts < tracker.firstSeen) tracker.firstSeen = ts;
     if (ts > tracker.lastSeen) tracker.lastSeen = ts;
 
+    const exceptionJson = JSON.stringify({
+      values: [
+        {
+          type: s.type,
+          value: s.value,
+          stacktrace: { frames },
+        },
+      ],
+    });
+
     allEvents.push({
-      event_id: uuid(),
+      event_id: uuid().replace(/-/g, ''),
       project_id: PROJECT_ID,
+      issue_id: 0, // Will be filled after MySQL insert
       timestamp: formatDate(ts),
-      received: formatDate(new Date(ts.getTime() + randomInt(100, 3000))),
-      type: s.type,
-      title: s.title,
-      message: s.value,
-      level: s.level,
+      received_at: formatDate(new Date(ts.getTime() + randomInt(100, 3000))),
       platform: s.platform,
-      culprit: s.culprit,
-      transaction: s.transaction,
+      level: s.level,
+      type: s.type,
+      value: s.value,
+      mechanism: randomPick(['generic', 'onerror', 'onunhandledrejection', 'instrument', '']),
       fingerprint: [fingerprint],
-      environment: env,
-      release,
-      server_name: server,
+      primary_hash: fingerprint,
+      exception: exceptionJson,
+      stacktrace_frames: JSON.stringify(frames),
+      breadcrumbs: JSON.stringify(breadcrumbs),
       user_id: user.id,
       user_email: user.email,
       user_ip: user.ip,
-      user_username: user.name,
-      browser_name: browser.name,
-      browser_version: browser.version,
+      user_name: user.name,
+      environment: env,
+      release,
+      server_name: server,
+      transaction: s.transaction,
       os_name: os.name,
       os_version: os.version,
+      browser_name: browser.name,
+      browser_version: browser.version,
       runtime_name: s.runtime === 'nodejs' ? 'node' : s.runtime === 'lua' ? 'lua' : 'unreal',
       runtime_version:
         s.runtime === 'nodejs'
@@ -149,17 +169,11 @@ export function generateErrorEvents(
       tags,
       extra,
       contexts: JSON.stringify(s.contexts || {}),
-      exception: JSON.stringify({
-        values: [
-          {
-            type: s.type,
-            value: s.value,
-            stacktrace: { frames },
-          },
-        ],
-      }),
-      breadcrumbs: JSON.stringify(breadcrumbs),
       dsn_key_id: dsnKeyId,
+      // Non-CH fields for other generators
+      title: s.title,
+      message: s.value,
+      culprit: s.culprit,
     });
   }
 
@@ -169,41 +183,57 @@ export function generateErrorEvents(
 export async function insertIssuesIntoMySQL(
   pool: mysql.Pool,
   issueMap: Map<string, IssueTracker>
-): Promise<void> {
+): Promise<Map<string, number>> {
   console.log('\n💾 Inserting issues into MySQL...');
+  const fingerprintToId = new Map<string, number>();
+  let shortId = 1;
   for (const [, tracker] of issueMap) {
     const s = tracker.scenario;
     try {
-      await pool.query(
+      const [result] = await pool.query(
         `INSERT INTO g_argus_issues
-         (id, project_id, fingerprint, type, title, value, level, platform,
-          culprit, \`transaction\`, first_seen, last_seen, times_seen, status,
-          priority, is_subscribed, assigned_to)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'unresolved', 'medium', 0, NULL)
+         (project_id, short_id, primary_hash, fingerprint, type, title, level, platform,
+          culprit, first_seen, last_seen, times_seen, status,
+          priority, assigned_to)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'unresolved', 'medium', NULL)
          ON DUPLICATE KEY UPDATE
            times_seen = times_seen + VALUES(times_seen),
            last_seen = GREATEST(last_seen, VALUES(last_seen))`,
         [
-          uuid(),
           PROJECT_ID,
+          shortId++,
           tracker.fingerprint,
+          JSON.stringify([tracker.fingerprint]),
           s.type,
           s.title,
-          s.value,
           s.level,
           s.platform,
           s.culprit,
-          s.transaction,
           tracker.firstSeen,
           tracker.lastSeen,
           tracker.count,
         ]
       );
+      const insertId = (result as any).insertId;
+      if (insertId > 0) {
+        fingerprintToId.set(tracker.fingerprint, insertId);
+      }
     } catch (err) {
       // Ignore duplicate key errors
     }
   }
-  console.log(`   ✓ ${issueMap.size} issues inserted`);
+  // Also fetch any that were ON DUPLICATE KEY UPDATE (insertId=0)
+  try {
+    const [rows] = await pool.query(
+      'SELECT id, primary_hash FROM g_argus_issues WHERE project_id = ?',
+      [PROJECT_ID]
+    );
+    for (const row of rows as any[]) {
+      fingerprintToId.set(row.primary_hash, row.id);
+    }
+  } catch {}
+  console.log(`   ✓ ${issueMap.size} issues inserted (${fingerprintToId.size} mapped)`);
+  return fingerprintToId;
 }
 
 export async function insertEventsIntoClickHouse(
