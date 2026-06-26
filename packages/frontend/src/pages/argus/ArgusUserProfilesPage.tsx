@@ -120,12 +120,12 @@ function computeLifecycleStage(profile: ArgusUserProfile, netRevenue: number): L
   return                           { label: isVip ? 'REGULAR VIP' : 'REGULAR', bg: '#37474f', fg: '#b0bec5' };
 }
 
-type ChurnRisk = { kind: 'purchase' | 'refund'; msg: string } | null;
+type PurchaseChurnRisk = { kind: 'purchase' | 'refund'; msg: string } | null;
 function computeChurnRisk(
   lastPurchase: string | null,
   refundRate: number,
   netRevenue: number
-): ChurnRisk {
+): PurchaseChurnRisk {
   if (netRevenue > 0 && lastPurchase) {
     const days = Math.floor((Date.now() - new Date(lastPurchase).getTime()) / 86400000);
     if (days > 30) return { kind: 'purchase', msg: `${days}일째 미구매 — 이탈 위험` };
@@ -169,6 +169,33 @@ function computeSessionStats(ss: ArgusUserSession[]): SessionStats {
     trend = recent > older * 1.1 ? 'up' : recent < older * 0.9 ? 'down' : 'stable';
   }
   return { avgDurSec, avgGapDays, trend };
+}
+
+// ─── Churn UI Config ─────────────────────────────────────────────────────────
+
+const CHURN_CONFIG: Record<string, { label: string; color: string; bg: string; desc: string }> = {
+  none:    { label: '활성',      color: '#4caf50', bg: 'rgba(76,175,80,0.12)',   desc: '정상 활동 중' },
+  low:     { label: '주의',      color: '#ff9800', bg: 'rgba(255,152,0,0.12)',   desc: '활동이 소폭 감소' },
+  medium:  { label: '위험',      color: '#f44336', bg: 'rgba(244,67,54,0.12)',   desc: '이탈 가능성 있음' },
+  high:    { label: '이탈 위험', color: '#b71c1c', bg: 'rgba(183,28,28,0.15)',   desc: '평균 주기 3배 이상 비활성' },
+  churned: { label: '이탈',      color: '#757575', bg: 'rgba(117,117,117,0.12)', desc: '60일 이상 비활성' },
+};
+
+/** 스파크라인 데이터에서 재활성화 패턴 감지
+ *  (활동 → 5일+ 공백 → 다시 활동) */
+function detectReactivation(sparkline: number[]): boolean {
+  if (!sparkline || sparkline.length < 10) return false;
+  const recent = sparkline.slice(-5);
+  const hasRecentActivity = recent.some(v => v > 0);
+  if (!hasRecentActivity) return false;
+  // 중간에 5일 이상 연속 0이 있어야 함
+  let gapLen = 0;
+  let maxGap = 0;
+  for (let i = 0; i < sparkline.length - 5; i++) {
+    if (sparkline[i] === 0) { gapLen++; maxGap = Math.max(maxGap, gapLen); }
+    else gapLen = 0;
+  }
+  return maxGap >= 5;
 }
 
 // ─── Copyable Cell Helper ────────────────────────────────────────────────────
@@ -1395,6 +1422,7 @@ const ArgusUserProfilesPage: React.FC = () => {
                     {t('argus.userProfiles.sessions', 'Sessions')}
                   </TableSortLabel>
                 </TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: 'nowrap' }}>{t('argus.userProfiles.churnRisk', 'Churn')}</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>{t('argus.userProfiles.platform', 'Platform')}</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>{t('argus.userProfiles.browser', 'Browser')}</TableCell>
                 <TableCell sx={{ fontWeight: 700 }}>{t('argus.userProfiles.country', 'Country')}</TableCell>
@@ -1405,7 +1433,7 @@ const ArgusUserProfilesPage: React.FC = () => {
               {loading && users.length === 0
                 ? Array.from({ length: 8 }).map((_, i) => (
                     <TableRow key={`skeleton-${i}`}>
-                      {Array.from({ length: 11 }).map((_, j) => (
+                      {Array.from({ length: 12 }).map((_, j) => (
                         <TableCell key={j}><Skeleton /></TableCell>
                       ))}
                     </TableRow>
@@ -1486,6 +1514,46 @@ const ArgusUserProfilesPage: React.FC = () => {
                             )}
                           </TableCell>
                           <TableCell align="right"><Typography variant="body2" fontSize={13}>{user.total_sessions}</Typography></TableCell>
+                          <TableCell sx={{ py: 0.5 }}>
+                            {(() => {
+                              const risk = user.churn_risk ?? 'none';
+                              const cfg = CHURN_CONFIG[risk];
+                              const reactivated = detectReactivation(user.activity_sparkline ?? []);
+                              if (risk === 'none' && !reactivated) return null;
+                              return (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.4 }}>
+                                  {risk !== 'none' && (
+                                    <Tooltip title={`${cfg.desc}${user.days_inactive != null ? ` (${user.days_inactive}일 비활성)` : ''}`} placement="top">
+                                      <Box sx={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 0.5,
+                                        px: 0.8, py: 0.2, borderRadius: 1,
+                                        bgcolor: cfg.bg, width: 'fit-content',
+                                      }}>
+                                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: cfg.color, flexShrink: 0 }} />
+                                        <Typography sx={{ fontSize: 11, fontWeight: 700, color: cfg.color, lineHeight: 1, whiteSpace: 'nowrap' }}>
+                                          {cfg.label}
+                                        </Typography>
+                                      </Box>
+                                    </Tooltip>
+                                  )}
+                                  {reactivated && (
+                                    <Tooltip title={t('argus.userProfiles.reactivatedDesc', '비활성 후 복귀한 사용자')} placement="top">
+                                      <Box sx={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 0.5,
+                                        px: 0.8, py: 0.2, borderRadius: 1,
+                                        bgcolor: 'rgba(33,150,243,0.12)', width: 'fit-content',
+                                      }}>
+                                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#2196f3', flexShrink: 0 }} />
+                                        <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#2196f3', lineHeight: 1, whiteSpace: 'nowrap' }}>
+                                          {t('argus.userProfiles.reactivated', '재활성')}
+                                        </Typography>
+                                      </Box>
+                                    </Tooltip>
+                                  )}
+                                </Box>
+                              );
+                            })()}
+                          </TableCell>
                           <TableCell>{user.platform && <Chip label={user.platform} size="small" sx={{ height: 22, fontSize: 11 }} />}</TableCell>
                           <TableCell><Typography variant="body2" fontSize={13}>{user.browser || '—'}</Typography></TableCell>
                           <TableCell><Typography variant="body2" fontSize={13}>{user.country || '—'}</Typography></TableCell>

@@ -95,7 +95,13 @@ export default async function userProfileRoutes(app: FastifyInstance) {
             anyLast(country)         AS country,
             anyLast(os)              AS os,
             anyLast(app_version)     AS app_version,
-            anyLast(properties['browser']) AS browser
+            anyLast(properties['browser']) AS browser,
+            dateDiff('day', toDateTime(toInt64(max(timestamp))), now()) AS days_inactive,
+            if(
+              uniqExact(session_id) > 1,
+              toFloat32(dateDiff('day', min(timestamp), max(timestamp))) / greatest(toInt32(uniqExact(session_id)) - 1, 1),
+              0
+            ) AS avg_session_gap_days
           FROM ${TABLE}
           WHERE ${whereClause}
             AND user_id != ''
@@ -105,21 +111,44 @@ export default async function userProfileRoutes(app: FastifyInstance) {
           OFFSET ${offset}
         `;
         const result = await optic.rawQuery({ query: sql, params });
-        const users = ((result.data as any[]) || []).map((r: any) => ({
-          user_id: r.user_id,
-          first_seen: r.first_seen,
-          last_seen: r.last_seen,
-          total_events: Number(r.total_events) || 0,
-          total_sessions: Number(r.total_sessions) || 0,
-          platform: r.platform || null,
-          country: r.country || null,
-          os: r.os || null,
-          app_version: r.app_version || null,
-          avatar_url: null as string | null,
-          email: null as string | null,
-          browser: r.browser || null,
-          activity_sparkline: null as number[] | null,
-        }));
+        const users = ((result.data as any[]) || []).map((r: any) => {
+          const daysInactive = Number(r.days_inactive) || 0;
+          const avgGapDays   = Number(r.avg_session_gap_days) || 0;
+          const effectiveGap = Math.max(avgGapDays, 1);
+
+          // Churn risk: compare days_inactive to the user's own session cadence
+          let churn_risk: 'none' | 'low' | 'medium' | 'high' | 'churned';
+          if (daysInactive >= 60) {
+            churn_risk = 'churned';
+          } else if (daysInactive >= Math.max(effectiveGap * 3, 21)) {
+            churn_risk = 'high';
+          } else if (daysInactive >= Math.max(effectiveGap * 2, 10)) {
+            churn_risk = 'medium';
+          } else if (daysInactive >= Math.max(effectiveGap * 1.5, 3)) {
+            churn_risk = 'low';
+          } else {
+            churn_risk = 'none';
+          }
+
+          return {
+            user_id: r.user_id,
+            first_seen: r.first_seen,
+            last_seen: r.last_seen,
+            total_events: Number(r.total_events) || 0,
+            total_sessions: Number(r.total_sessions) || 0,
+            platform: r.platform || null,
+            country: r.country || null,
+            os: r.os || null,
+            app_version: r.app_version || null,
+            avatar_url: null as string | null,
+            email: null as string | null,
+            browser: r.browser || null,
+            activity_sparkline: null as number[] | null,
+            days_inactive: daysInactive,
+            avg_session_gap_days: avgGapDays,
+            churn_risk,
+          };
+        });
 
         // Enrich with profile data from argus.profiles (efficient lookup)
         if (users.length > 0) {

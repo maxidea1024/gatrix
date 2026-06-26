@@ -680,6 +680,8 @@ export interface ArgusLexiconProperty {
 
 // ==================== User Profiles ====================
 
+export type ChurnRisk = 'none' | 'low' | 'medium' | 'high' | 'churned';
+
 export interface ArgusUserProfile {
   user_id: string;
   first_seen: string;
@@ -698,6 +700,10 @@ export interface ArgusUserProfile {
   email?: string | null;
   browser?: string | null;
   activity_sparkline?: number[] | null;
+  days_inactive?: number;
+  avg_session_gap_days?: number;
+  churn_risk?: ChurnRisk;
+  was_reactivated?: boolean; // derived client-side from sparkline
 }
 
 export interface ArgusUserEvent {
