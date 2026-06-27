@@ -1,8 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { optic, QueryParser, getDataset } from '@gatrix/argus-optic';
+import { optic, QueryParser, getDataset, parseSearchToSQL } from '@gatrix/argus-optic';
 import type { ASTNode } from '@gatrix/argus-optic';
 import db from '../config/knex';
-import { buildTimeRangeConditions } from '../utils/timeBucket';
+import { buildTimeRangeConditions, getBucketingConfig } from '../utils/timeBucket';
 import { buildCohortQuery, CohortDefinition } from './cohorts';
 
 const TABLE = 'argus.activities';
@@ -631,12 +631,12 @@ export default async function userProfileRoutes(app: FastifyInstance) {
     async (
       request: FastifyRequest<{
         Params: { projectId: string; userId: string };
-        Querystring: { limit?: string; offset?: string; period?: string; start?: string; end?: string };
+        Querystring: { limit?: string; offset?: string; period?: string; start?: string; end?: string; search?: string };
       }>,
       reply: FastifyReply
     ) => {
       const { projectId, userId } = request.params;
-      const { limit: limitStr, offset: offsetStr, period, start, end } = request.query;
+      const { limit: limitStr, offset: offsetStr, period, start, end, search } = request.query;
 
       const limit = Math.min(parseInt(limitStr || '50', 10), 200);
       const offset = parseInt(offsetStr || '0', 10);
@@ -652,6 +652,13 @@ export default async function userProfileRoutes(app: FastifyInstance) {
         conditions.push(...tr.conditions);
         Object.assign(params, tr.params);
       }
+
+      // AQL search filter
+      if (search) {
+        const { where: searchCond } = parseSearchToSQL('activities', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
+      }
+
       const whereClause = conditions.join(' AND ');
 
       try {
@@ -689,6 +696,60 @@ export default async function userProfileRoutes(app: FastifyInstance) {
     }
   );
 
+  // ─── GET /projects/:projectId/analytics/users/:userId/events/volume ────────
+  app.get(
+    '/projects/:projectId/analytics/users/:userId/events/volume',
+    async (
+      request: FastifyRequest<{
+        Params: { projectId: string; userId: string };
+        Querystring: { period?: string; start?: string; end?: string; search?: string };
+      }>,
+      reply: FastifyReply
+    ) => {
+      const { projectId, userId } = request.params;
+      const { period, start, end, search } = request.query;
+
+      const conditions: string[] = [
+        'project_id = {projectId:String}',
+        'user_id = {userId:String}',
+      ];
+      const params: Record<string, any> = { projectId, userId };
+
+      if (period || (start && end)) {
+        const tr = buildTimeRangeConditions(period || '30d', start, end);
+        conditions.push(...tr.conditions);
+        Object.assign(params, tr.params);
+      }
+
+      if (search) {
+        const { where: searchCond } = parseSearchToSQL('activities', search, params);
+        if (searchCond) conditions.push(`(${searchCond})`);
+      }
+
+      const whereClause = conditions.join(' AND ');
+      const bucket = getBucketingConfig(period || '30d', start, end);
+      Object.assign(params, bucket.queryParams);
+
+      try {
+        const sql = `
+          SELECT ${bucket.selectExpr} AS bucket, count() AS cnt
+          FROM ${TABLE}
+          WHERE ${whereClause}
+          GROUP BY bucket
+          ORDER BY bucket ASC ${bucket.fillExpr}
+        `;
+        const result = await optic.rawQuery({ query: sql, params });
+        const rows = (result.data as any[]) || [];
+        const buckets = rows.map((r: any) => r.bucket);
+        const counts = rows.map((r: any) => Number(r.cnt) || 0);
+
+        return reply.send({ success: true, data: { buckets, counts } });
+      } catch {
+        return reply.send({ success: true, data: { buckets: [], counts: [] } });
+      }
+    }
+  );
+
   // ─── GET /projects/:projectId/analytics/users/:userId/sessions ────────────
   app.get(
     '/projects/:projectId/analytics/users/:userId/sessions',
@@ -704,27 +765,37 @@ export default async function userProfileRoutes(app: FastifyInstance) {
       const offset = parseInt(request.query.offset || '0', 10);
 
       try {
-        const sql = `
-          SELECT
-            session_id,
-            min(timestamp)        AS start_time,
-            max(timestamp)        AS end_time,
-            count()               AS event_count,
-            uniqExact(event_name) AS unique_events,
-            anyLast(platform)     AS platform,
-            anyLast(country)      AS country,
-            anyLast(os)           AS os,
-            anyLast(properties['browser']) AS browser,
-            dateDiff('second', min(timestamp), max(timestamp)) AS duration_seconds
-          FROM ${TABLE}
-          WHERE project_id = {projectId:String}
-            AND user_id = {userId:String}
-            AND session_id != ''
-          GROUP BY session_id
-          ORDER BY start_time DESC
-          LIMIT ${limit} OFFSET ${offset}
-        `;
-        const result = await optic.rawQuery({ query: sql, params: { projectId, userId } });
+        const baseWhere = `project_id = {projectId:String} AND user_id = {userId:String} AND session_id != ''`;
+        const baseParams = { projectId, userId };
+
+        const [result, countResult] = await Promise.all([
+          optic.rawQuery({
+            query: `
+              SELECT
+                session_id,
+                min(timestamp)        AS start_time,
+                max(timestamp)        AS end_time,
+                count()               AS event_count,
+                uniqExact(event_name) AS unique_events,
+                anyLast(platform)     AS platform,
+                anyLast(country)      AS country,
+                anyLast(os)           AS os,
+                anyLast(properties['browser']) AS browser,
+                dateDiff('second', min(timestamp), max(timestamp)) AS duration_seconds
+              FROM ${TABLE}
+              WHERE ${baseWhere}
+              GROUP BY session_id
+              ORDER BY start_time DESC
+              LIMIT ${limit} OFFSET ${offset}
+            `,
+            params: baseParams,
+          }),
+          optic.rawQuery({
+            query: `SELECT uniqExact(session_id) AS total FROM ${TABLE} WHERE ${baseWhere}`,
+            params: baseParams,
+          }),
+        ]);
+
         const sessions = ((result.data as any[]) || []).map((r: any) => ({
           session_id:      r.session_id,
           start_time:      r.start_time,
@@ -738,9 +809,11 @@ export default async function userProfileRoutes(app: FastifyInstance) {
           duration_seconds: Number(r.duration_seconds) || 0,
         }));
 
-        return reply.send({ success: true, data: sessions });
+        const total = Number((countResult.data as any[])?.[0]?.total) || sessions.length;
+
+        return reply.send({ success: true, data: sessions, total });
       } catch {
-        return reply.send({ success: true, data: [] });
+        return reply.send({ success: true, data: [], total: 0 });
       }
     }
   );

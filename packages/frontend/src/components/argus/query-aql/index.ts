@@ -28,6 +28,7 @@ export {
   SESSIONS_CONFIG,
   RELEASES_CONFIG,
   USER_PROFILES_CONFIG,
+  USER_EVENTS_CONFIG,
   pickFields,
   getFieldByKey,
   isFieldInDomain,

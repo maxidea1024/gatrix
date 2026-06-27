@@ -490,6 +490,7 @@ export async function getUserEvents(
     period?: string;
     start?: string;
     end?: string;
+    search?: string;
   }
 ): Promise<{ data: ArgusUserEvent[]; total: number; hasMore: boolean }> {
   const response = await argusApi.get(
@@ -503,16 +504,36 @@ export async function getUserEvents(
   };
 }
 
+export async function getUserEventVolume(
+  projectId: number | string,
+  userId: string,
+  params?: {
+    period?: string;
+    start?: string;
+    end?: string;
+    search?: string;
+  }
+): Promise<{ buckets: string[]; counts: number[] }> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/projects/${projectId}/analytics/users/${encodeURIComponent(userId)}/events/volume`,
+    { params }
+  );
+  return response.data?.data || { buckets: [], counts: [] };
+}
+
 export async function getUserSessions(
   projectId: number | string,
   userId: string,
   params?: { limit?: number; offset?: number }
-): Promise<ArgusUserSession[]> {
+): Promise<{ data: ArgusUserSession[]; total: number }> {
   const response = await argusApi.get(
     `${ARGUS_BASE}/projects/${projectId}/analytics/users/${encodeURIComponent(userId)}/sessions`,
     { params }
   );
-  return response.data?.data || [];
+  return {
+    data: response.data?.data || [],
+    total: response.data?.total || 0,
+  };
 }
 
 export async function getUserProperties(
@@ -636,6 +657,17 @@ export interface RealtimeData {
     country: string | null;
     platform: string | null;
   }[];
+  // Comparison & insight fields
+  prev_active_users: number;
+  prev_total_events: number;
+  prev_events_per_minute: { minute: string; count: number }[];
+  error_rate: number;
+  error_count: number;
+  anomalies: {
+    active_users: 'normal' | 'low' | 'high';
+    error_rate: 'normal' | 'warning' | 'critical';
+    event_volume: 'normal' | 'low' | 'high';
+  };
 }
 
 export async function getRealtimeAnalytics(
@@ -652,6 +684,84 @@ export async function getRealtimeAnalytics(
       top_events: [],
       top_countries: [],
       recent_events: [],
+      prev_active_users: 0,
+      prev_total_events: 0,
+      prev_events_per_minute: [],
+      error_rate: 0,
+      error_count: 0,
+      anomalies: { active_users: 'normal', error_rate: 'normal', event_volume: 'normal' },
+    }
+  );
+}
+
+// === Tracking Realtime ===
+
+export interface TrackingRealtimeData {
+  error_count: number;
+  prev_error_count: number;
+  errors_per_minute: { minute: string; count: number }[];
+  prev_errors_per_minute: { minute: string; count: number }[];
+  p50: number;
+  p95: number;
+  txn_count: number;
+  prev_p50: number;
+  prev_p95: number;
+  perf_timeseries: { minute: string; p50: number; p95: number; cnt: number }[];
+  error_types: { type: string; count: number }[];
+  log_levels: { level: string; count: number }[];
+  recent_errors: {
+    type: string;
+    value: string;
+    timestamp: string;
+    platform: string | null;
+    release: string | null;
+    environment: string | null;
+  }[];
+  slow_transactions: { transaction: string; p95: number; count: number }[];
+  log_count: number;
+  prev_log_count: number;
+  anomalies: {
+    errors: 'normal' | 'low' | 'high';
+    p95: 'normal' | 'low' | 'high';
+  };
+  errors_by_release: { release: string; minute: string; count: number }[];
+  feedback_summary: {
+    total: number;
+    negative: number;
+    positive: number;
+    neutral: number;
+    bugs: number;
+  };
+  recent_feedback: {
+    message: string;
+    sentiment: string;
+    category: string;
+    email: string;
+    timestamp: string;
+    release: string;
+  }[];
+}
+
+export async function getTrackingRealtimeData(
+  projectId: number | string
+): Promise<TrackingRealtimeData> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/projects/${projectId}/tracking/realtime`
+  );
+  return (
+    response.data?.data || {
+      error_count: 0, prev_error_count: 0,
+      errors_per_minute: [], prev_errors_per_minute: [],
+      p50: 0, p95: 0, txn_count: 0,
+      prev_p50: 0, prev_p95: 0,
+      perf_timeseries: [],
+      error_types: [], log_levels: [],
+      recent_errors: [], slow_transactions: [],
+      log_count: 0, prev_log_count: 0,
+      anomalies: { errors: 'normal', p95: 'normal' },
+      errors_by_release: [],
+      feedback_summary: { total: 0, negative: 0, positive: 0, neutral: 0, bugs: 0 },
+      recent_feedback: [],
     }
   );
 }

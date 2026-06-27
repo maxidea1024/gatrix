@@ -22,19 +22,20 @@ import PageHeader from '@/components/common/PageHeader';
 import PageContentLoader from '@/components/common/PageContentLoader';
 import ArgusBreadcrumbs from '@/components/argus/ArgusBreadcrumbs';
 import { useOrgProject } from '@/contexts/OrgProjectContext';
+import { useResizableSplit } from '@/hooks/useResizableSplit';
 
 import {
   getUserProfile,
-  getUserEvents,
   getUserCohortMemberships,
   getRevenueUserSummary,
   getUserProperties,
+  getUserEvents,
   type UserFinancialResponse,
 } from '@/services/argus/argusAnalytics';
 import type {
   ArgusUserProfile,
-  ArgusUserEvent,
   ArgusUserProperty,
+  ArgusUserEvent,
 } from '@/services/argus/argusTypes';
 import type { CohortMembership } from '@/components/argus/CohortChip';
 
@@ -42,6 +43,9 @@ import UserProfileDetailLeft from '@/components/userProfiles/UserProfileDetailLe
 import UserProfileEventFeed from '@/components/userProfiles/UserProfileEventFeed';
 import UserProfileSessionsTab from '@/components/userProfiles/UserProfileSessionsTab';
 import UserProfileFinanceTab from '@/components/userProfiles/UserProfileFinanceTab';
+
+const MIN_SPLIT_WIDTH = 250;
+const MAX_SPLIT_WIDTH = 800;
 
 type LifecycleStage = { label: string; bg: string; fg: string };
 function computeLifecycleStage(profile: ArgusUserProfile, netRevenue: number): LifecycleStage {
@@ -110,13 +114,27 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
     setSearchParams(params, { replace: true });
   };
   const [profile, setProfile] = useState<ArgusUserProfile | null>(null);
-  const [events, setEvents] = useState<ArgusUserEvent[]>([]);
+
   const [userCohorts, setUserCohorts] = useState<CohortMembership[]>([]);
   const [finData, setFinData] = useState<UserFinancialResponse | null>(null);
   const [properties, setProperties] = useState<ArgusUserProperty[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(true);
+  const [sidebarEvents, setSidebarEvents] = useState<ArgusUserEvent[]>([]);
   
   const [loading, setLoading] = useState(true);
+
+  // --- Resizable Splitter ---
+  const {
+    splitWidth,
+    isDragging: isSplitDragging,
+    handleMouseDown: handleSplitterMouseDown,
+    panelRef: splitPanelRef,
+  } = useResizableSplit({
+    storageKey: 'argus_user_profile_split_width',
+    defaultWidth: 320,
+    minWidth: MIN_SPLIT_WIDTH,
+    maxWidth: MAX_SPLIT_WIDTH,
+  });
 
   useEffect(() => {
     if (!userId || !projectId) return;
@@ -125,7 +143,6 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
 
     Promise.all([
       getUserProfile(projectId, userId).then((p) => setProfile(p)),
-      getUserEvents(projectId, userId, { limit: 150 }).then((r) => setEvents(r.data)),
       getUserCohortMemberships(projectId, [userId]).then((memberships) => {
         setUserCohorts(memberships[userId] || []);
       }),
@@ -141,6 +158,9 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
           setProperties([]);
           setPropertiesLoading(false);
         }),
+      getUserEvents(projectId, userId, { limit: 200, period: '30d' })
+        .then((res) => setSidebarEvents(res.data))
+        .catch(() => setSidebarEvents([])),
     ])
       .catch((error) => {
         console.error('Failed to load user detail profile:', error);
@@ -206,14 +226,30 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
         }
       />
 
-      <Box sx={{ flex: 1, display: 'flex', minHeight: 0, overflow: 'hidden' }}>
-        {/* Left Column (Details / sidebar) */}
-        <Box sx={{ width: 300, flexShrink: 0, borderRight: `1px solid ${theme.palette.divider}`, height: '100%' }}>
+      <Box
+        sx={{
+          flex: 1,
+          display: 'flex',
+          overflow: 'hidden',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          borderRadius: 2,
+        }}
+      >
+        {/* Left Column: Profile Sidebar */}
+        <Box
+          ref={splitPanelRef as React.Ref<HTMLDivElement>}
+          sx={{
+            width: { xs: '100%', md: splitWidth },
+            minWidth: { md: MIN_SPLIT_WIDTH },
+            flexShrink: 0,
+            overflow: 'auto',
+          }}
+        >
           <UserProfileDetailLeft
             profile={profile}
             userCohorts={userCohorts}
             netRevenue={finData?.summary.net_revenue ?? 0}
-            events={events}
+            events={sidebarEvents}
             lifecycleStage={lifecycleStage}
             churnRisk={churnRisk}
             properties={properties}
@@ -221,8 +257,40 @@ export const ArgusUserProfileDetailPage: React.FC = () => {
           />
         </Box>
 
-        {/* Right Column (Tabs timeline / logs) */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, bgcolor: 'background.default' }}>
+        {/* Splitter Handle */}
+        <Box
+          onMouseDown={handleSplitterMouseDown}
+          sx={{
+            width: '1px',
+            flexShrink: 0,
+            cursor: 'col-resize',
+            bgcolor: isSplitDragging ? 'primary.main' : 'divider',
+            position: 'relative',
+            zIndex: 10,
+            transition: 'background-color 0.15s, transform 0.15s',
+            transformOrigin: 'center',
+            ...(isSplitDragging && {
+              bgcolor: 'primary.main',
+              transform: 'scaleX(4)',
+            }),
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: '-5px',
+              right: '-5px',
+              cursor: 'col-resize',
+            },
+            '&:hover, &:active': {
+              bgcolor: 'primary.main',
+              transform: 'scaleX(4)',
+            },
+          }}
+        />
+
+        {/* Right Column: Tabs / Main Content */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, bgcolor: 'background.default' }}>
           <Box sx={{ borderBottom: `1px solid ${theme.palette.divider}`, bgcolor: 'background.paper', px: 2 }}>
             <Tabs
               value={tab}

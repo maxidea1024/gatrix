@@ -29,6 +29,8 @@ interface ArgusFilterBarProps {
   hideEnvironment?: boolean;
   /** Extra controls to render before the spacer (e.g., sort chip) */
   extraControls?: React.ReactNode;
+  /** Remove outer border/background styling */
+  noBorder?: boolean;
 }
 
 // ==================== Default State ====================
@@ -50,6 +52,7 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
   loading = false,
   hideEnvironment = false,
   extraControls,
+  noBorder = false,
 }) => {
   const theme = useTheme();
   const { t } = useTranslation();
@@ -88,17 +91,19 @@ const ArgusFilterBar: React.FC<ArgusFilterBarProps> = ({
         alignItems: 'center',
         gap: 0.75,
         mb: 1.25,
-        px: 1.5,
+        px: noBorder ? 0 : 1.5,
         py: 0.8,
-        borderRadius: '10px',
-        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
-        background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
-        backdropFilter: 'blur(8px)',
+        ...(noBorder ? {} : {
+          borderRadius: '10px',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.015)',
+          backdropFilter: 'blur(8px)',
+        }),
         flexWrap: 'wrap',
         position: 'relative',
         zIndex: 20,
         transition: 'border-color 0.2s',
-        ...(hasActiveFilters && {
+        ...(hasActiveFilters && !noBorder && {
           borderColor: alpha(theme.palette.primary.main, 0.2),
         }),
       }}

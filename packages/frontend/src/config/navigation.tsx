@@ -447,6 +447,12 @@ export const MENU_CONFIG: MenuCategoryConfig[] = [
         sectionHeader: 'sidebar.argusSection.tracking',
       },
       {
+        text: 'sidebar.argusTrackingRealtime',
+        icon: 'Timeline',
+        path: '/argus/tracking-realtime',
+        requiredPermission: P.MONITORING_READ,
+      },
+      {
         text: 'sidebar.argusIssues',
         icon: 'BugReport',
         path: '/argus/issues',

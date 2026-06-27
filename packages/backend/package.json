@@ -45,7 +45,8 @@
     "planning-data:convert": "ts-node scripts/convert-planning-data.ts",
     "planning-data:convert:help": "ts-node scripts/convert-planning-data.ts --help",
     "clean": "rimraf dist",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "simulate": "ts-node scripts/simulate-realtime.ts"
   },
   "dependencies": {
     "@bull-board/api": "^6.12.6",

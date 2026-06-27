@@ -1127,3 +1127,54 @@ export const USER_PROFILES_CONFIG: DomainConfig = {
   ],
 };
 
+export const USER_EVENTS_CONFIG: DomainConfig = {
+  name: 'user_events',
+  fields: [
+    {
+      key: 'event_name',
+      label: 'Event Name',
+      type: 'string',
+      operators: ['=', '!=', 'contains'],
+      searchable: true,
+      category: 'event',
+      description: 'Name of the event',
+    },
+    {
+      key: 'session_id',
+      label: 'Session ID',
+      type: 'string',
+      operators: ['=', '!='],
+      searchable: true,
+      category: 'event',
+      description: 'Session identifier',
+    },
+    {
+      key: 'platform',
+      label: 'Platform',
+      type: 'string',
+      operators: ['=', '!='],
+      searchable: true,
+      category: 'event',
+      staticValues: ['iOS', 'Android', 'Steam', 'PlayStation', 'PC', 'Web'],
+      description: 'Device platform',
+    },
+    {
+      key: 'country',
+      label: 'Country',
+      type: 'string',
+      operators: ['=', '!='],
+      searchable: true,
+      category: 'event',
+      description: 'Country code',
+    },
+    {
+      key: 'os',
+      label: 'OS',
+      type: 'string',
+      operators: ['=', '!='],
+      searchable: true,
+      category: 'event',
+      description: 'Operating system',
+    },
+  ],
+};

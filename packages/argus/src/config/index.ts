@@ -73,7 +73,7 @@ export const config = {
 
   // Rate Limiting
   rateLimit: {
-    max: parseInt(process.env.ARGUS_RATE_LIMIT_MAX || '1000', 10),
+    max: parseInt(process.env.ARGUS_RATE_LIMIT_MAX || '50000', 10),
     timeWindow: parseInt(process.env.ARGUS_RATE_LIMIT_WINDOW || '60000', 10),
   },
 

@@ -371,6 +371,9 @@ const ArgusCohortPage = React.lazy(
 const ArgusRealtimePage = React.lazy(
   () => import('./pages/argus/ArgusRealtimePage')
 );
+const ArgusTrackingRealtimePage = React.lazy(
+  () => import('./pages/argus/ArgusTrackingRealtimePage')
+);
 const ArgusImpactPage = React.lazy(
   () => import('./pages/argus/ArgusImpactPage')
 );
@@ -1352,6 +1355,10 @@ const AppContent: React.FC = () => {
                                         <Route
                                           path="analytics/realtime"
                                           element={<ArgusRealtimePage />}
+                                        />
+                                        <Route
+                                          path="tracking-realtime"
+                                          element={<ArgusTrackingRealtimePage />}
                                         />
                                         <Route
                                           path="analytics/impact"

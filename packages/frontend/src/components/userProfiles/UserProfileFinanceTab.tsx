@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import {
   Box,
   Typography,
-  CircularProgress,
   Paper,
   Chip,
   Tabs,
@@ -14,12 +13,16 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TableContainer,
   useTheme,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { getRevenueUserSummary, type UserFinancialResponse, type UserFinancialTransaction } from '@/services/argus/argusAnalytics';
 import { downloadCsv, type CsvColumn } from '@/utils/csvExport';
 import { ARGUS_SEMANTIC } from '@/pages/argus/argusThemeTokens';
+import SimplePagination from '@/components/common/SimplePagination';
+import useGlobalPageSize from '@/hooks/useGlobalPageSize';
+import PageContentLoader from '@/components/common/PageContentLoader';
 
 interface UserProfileFinanceTabProps {
   projectId: string;
@@ -59,6 +62,10 @@ export const UserProfileFinanceTab: React.FC<UserProfileFinanceTabProps> = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const subTabParam = searchParams.get('subTab');
 
+  // Client-side pagination
+  const [pageSize, setPageSize] = useGlobalPageSize();
+  const [page, setPage] = useState(0);
+
   const finSubTab = useMemo(() => {
     switch (subTabParam) {
       case 'refunds': return 1;
@@ -84,6 +91,7 @@ export const UserProfileFinanceTab: React.FC<UserProfileFinanceTabProps> = ({
         break;
     }
     setSearchParams(params, { replace: true });
+    setPage(0);
   };
 
   useEffect(() => {
@@ -147,13 +155,8 @@ export const UserProfileFinanceTab: React.FC<UserProfileFinanceTabProps> = ({
         ? `$${(n / 1000).toFixed(1)}K`
         : `$${n.toFixed(2)}`;
 
-  if (loading) {
-    return (
-      <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
-        <CircularProgress size={32} />
-      </Box>
-    );
-  }
+
+
 
   if (!finData) {
     return (
@@ -165,7 +168,7 @@ export const UserProfileFinanceTab: React.FC<UserProfileFinanceTabProps> = ({
     );
   }
 
-  const rows =
+  const allRows =
     finSubTab === 0
       ? finData.purchases
       : finSubTab === 1
@@ -174,314 +177,278 @@ export const UserProfileFinanceTab: React.FC<UserProfileFinanceTabProps> = ({
   const typeLabel =
     finSubTab === 0 ? 'purchases' : finSubTab === 1 ? 'refunds' : 'grants';
 
+  // Client-side pagination
+  const paginatedRows = allRows.slice(page * pageSize, (page + 1) * pageSize);
+  const totalRows = allRows.length;
+
   return (
-    <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {/* Summary cards */}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
-          gap: 1.5,
-        }}
-      >
-        <Paper
-          variant="outlined"
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <PageContentLoader loading={loading} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      {/* Summary cards — flexShrink: 0 */}
+      <Box sx={{ flexShrink: 0, px: 1.5, pt: 1.5 }}>
+        <Box
           sx={{
-            p: 1.5,
-            borderRadius: 2,
-            textAlign: 'center',
-            bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+            gap: 1.5,
           }}
         >
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
-            {t('argus.userProfiles.totalPurchases', 'Purchases')}
-          </Typography>
-          <Typography
+          <Paper
+            variant="outlined"
             sx={{
-              fontSize: 16,
-              fontWeight: 800,
-              color: ARGUS_SEMANTIC.positive,
-              mt: 0.5,
+              p: 1.5,
+              borderRadius: 2,
+              textAlign: 'center',
+              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
             }}
           >
-            {fmt(finData.summary.total_purchases)}
-          </Typography>
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 0.25 }}>
-            {finData.summary.purchase_count} {t('argus.userProfiles.items', 'items')}
-          </Typography>
-        </Paper>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 1.5,
-            borderRadius: 2,
-            textAlign: 'center',
-            bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-          }}
-        >
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
-            {t('argus.userProfiles.totalRefunds', 'Refunds')}
-          </Typography>
-          <Typography
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
+              {t('argus.userProfiles.totalPurchases', 'Purchases')}
+            </Typography>
+            <Typography sx={{ fontSize: 16, fontWeight: 800, color: ARGUS_SEMANTIC.positive, mt: 0.5 }}>
+              {fmt(finData.summary.total_purchases)}
+            </Typography>
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 0.25 }}>
+              {finData.summary.purchase_count} {t('argus.userProfiles.items', 'items')}
+            </Typography>
+          </Paper>
+          <Paper
+            variant="outlined"
             sx={{
-              fontSize: 16,
-              fontWeight: 800,
-              color: ARGUS_SEMANTIC.negative,
-              mt: 0.5,
+              p: 1.5,
+              borderRadius: 2,
+              textAlign: 'center',
+              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
             }}
           >
-            -{fmt(finData.summary.total_refunds)}
-          </Typography>
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 0.25 }}>
-            {finData.summary.refund_count} {t('argus.userProfiles.items', 'items')}
-          </Typography>
-        </Paper>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 1.5,
-            borderRadius: 2,
-            textAlign: 'center',
-            bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-          }}
-        >
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
-            {t('argus.userProfiles.totalGrants', 'Grants')}
-          </Typography>
-          <Typography
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
+              {t('argus.userProfiles.totalRefunds', 'Refunds')}
+            </Typography>
+            <Typography sx={{ fontSize: 16, fontWeight: 800, color: ARGUS_SEMANTIC.negative, mt: 0.5 }}>
+              -{fmt(finData.summary.total_refunds)}
+            </Typography>
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 0.25 }}>
+              {finData.summary.refund_count} {t('argus.userProfiles.items', 'items')}
+            </Typography>
+          </Paper>
+          <Paper
+            variant="outlined"
             sx={{
-              fontSize: 16,
-              fontWeight: 800,
-              color: ARGUS_SEMANTIC.warning,
-              mt: 0.5,
+              p: 1.5,
+              borderRadius: 2,
+              textAlign: 'center',
+              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
             }}
           >
-            {fmt(finData.summary.total_grants)}
-          </Typography>
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 0.25 }}>
-            {finData.summary.grant_count} {t('argus.userProfiles.items', 'items')}
-          </Typography>
-        </Paper>
-        <Paper
-          variant="outlined"
-          sx={{
-            p: 1.5,
-            borderRadius: 2,
-            textAlign: 'center',
-            bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-          }}
-        >
-          <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
-            {t('argus.userProfiles.netRevenue', 'Net Revenue')}
-          </Typography>
-          <Typography sx={{ fontSize: 16, fontWeight: 800, mt: 0.5 }}>
-            {fmt(finData.summary.net_revenue)}
-          </Typography>
-          {finData.summary.refund_rate > 20 && (
-            <Chip
-              size="small"
-              label={`⚠ ${finData.summary.refund_rate.toFixed(0)}% refund`}
-              sx={{
-                fontSize: 9,
-                height: 18,
-                bgcolor: 'rgba(244,67,54,0.1)',
-                color: ARGUS_SEMANTIC.negative,
-                fontWeight: 700,
-                mt: 0.5,
-              }}
-            />
-          )}
-        </Paper>
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
+              {t('argus.userProfiles.totalGrants', 'Grants')}
+            </Typography>
+            <Typography sx={{ fontSize: 16, fontWeight: 800, color: ARGUS_SEMANTIC.warning, mt: 0.5 }}>
+              {fmt(finData.summary.total_grants)}
+            </Typography>
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', mt: 0.25 }}>
+              {finData.summary.grant_count} {t('argus.userProfiles.items', 'items')}
+            </Typography>
+          </Paper>
+          <Paper
+            variant="outlined"
+            sx={{
+              p: 1.5,
+              borderRadius: 2,
+              textAlign: 'center',
+              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fff',
+              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+            }}
+          >
+            <Typography sx={{ fontSize: 10, color: 'text.secondary', fontWeight: 600 }}>
+              {t('argus.userProfiles.netRevenue', 'Net Revenue')}
+            </Typography>
+            <Typography sx={{ fontSize: 16, fontWeight: 800, mt: 0.5 }}>
+              {fmt(finData.summary.net_revenue)}
+            </Typography>
+            {finData.summary.refund_rate > 20 && (
+              <Chip
+                size="small"
+                label={`⚠ ${finData.summary.refund_rate.toFixed(0)}% refund`}
+                sx={{
+                  fontSize: 9,
+                  height: 18,
+                  bgcolor: 'rgba(244,67,54,0.1)',
+                  color: ARGUS_SEMANTIC.negative,
+                  fontWeight: 700,
+                  mt: 0.5,
+                }}
+              />
+            )}
+          </Paper>
+        </Box>
       </Box>
 
-      {/* Top Products */}
+      {/* Top Products — flexShrink: 0 */}
       {topProducts.length > 0 && (() => {
         const maxCount = topProducts[0].count;
         return (
-          <Box
-            sx={{
-              p: 1.8,
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-              bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fafafa',
-            }}
-          >
-            <Typography
+          <Box sx={{ flexShrink: 0, px: 1.5, pt: 1.5 }}>
+            <Box
               sx={{
-                fontSize: 10,
-                fontWeight: 700,
-                color: 'text.secondary',
-                textTransform: 'uppercase',
-                letterSpacing: 0.5,
-                mb: 1.5,
+                p: 1.8,
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                bgcolor: isDark ? 'rgba(255,255,255,0.02)' : '#fafafa',
               }}
             >
-              {t('argus.userProfiles.topProducts', 'Top {{n}} Preferred Products', {
-                n: topProducts.length,
-              })}
-            </Typography>
-            {topProducts.map((p, i) => (
-              <Box key={p.name} sx={{ mb: i < topProducts.length - 1 ? 1.5 : 0 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                  <Typography
-                    sx={{
-                      fontSize: 12,
-                      fontWeight: 600,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                      flex: 1,
-                      mr: 1,
-                    }}
-                  >
-                    #{i + 1} {p.name}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
-                    <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
-                      {t('argus.userProfiles.purchaseCount', '{{n}} purchases', { n: p.count })}
+              <Typography sx={{ fontSize: 10, fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1.5 }}>
+                {t('argus.userProfiles.topProducts', 'Top {{n}} Preferred Products', { n: topProducts.length })}
+              </Typography>
+              {topProducts.map((p, i) => (
+                <Box key={p.name} sx={{ mb: i < topProducts.length - 1 ? 1.5 : 0 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, mr: 1 }}>
+                      #{i + 1} {p.name}
                     </Typography>
-                    <Typography sx={{ fontSize: 11, fontWeight: 700 }}>
-                      {fmt(p.total)}
-                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexShrink: 0 }}>
+                      <Typography sx={{ fontSize: 11, color: 'text.secondary' }}>
+                        {t('argus.userProfiles.purchaseCount', '{{n}} purchases', { n: p.count })}
+                      </Typography>
+                      <Typography sx={{ fontSize: 11, fontWeight: 700 }}>
+                        {fmt(p.total)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ height: 4, borderRadius: 2, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+                    <Box sx={{ height: '100%', width: `${(p.count / maxCount) * 100}%`, bgcolor: theme.palette.primary.main, borderRadius: 2, transition: 'width 0.4s ease' }} />
                   </Box>
                 </Box>
-                <Box
-                  sx={{
-                    height: 4,
-                    borderRadius: 2,
-                    bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: '100%',
-                      width: `${(p.count / maxCount) * 100}%`,
-                      bgcolor: theme.palette.primary.main,
-                      borderRadius: 2,
-                      transition: 'width 0.4s ease',
-                    }}
-                  />
-                </Box>
-              </Box>
-            ))}
+              ))}
+            </Box>
           </Box>
         );
       })()}
 
-      {/* Sub-tabs */}
-      <Tabs
-        value={finSubTab}
-        onChange={(_, v) => setFinSubTab(v)}
-        sx={{
-          minHeight: 32,
-          '& .MuiTab-root': {
-            minHeight: 32,
-            fontSize: 12,
-            textTransform: 'none',
-            py: 0.5,
-            fontWeight: 600,
-          },
-          borderBottom: `1px solid ${theme.palette.divider}`,
-        }}
-      >
-        <Tab
-          label={`🛒 ${t('argus.userProfiles.purchaseHistory', 'Purchases')} (${finData.purchases.length})`}
-        />
-        <Tab
-          label={`↩️ ${t('argus.userProfiles.refundHistory', 'Refunds')} (${finData.refunds.length})`}
-        />
-        <Tab
-          label={`🎁 ${t('argus.userProfiles.grantHistory', 'Grants')} (${finData.grants.length})`}
-        />
-      </Tabs>
-
-      {/* Transaction table */}
-      {rows.length > 0 ? (
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+      {/* Sub-tabs — flexShrink: 0 */}
+      <Box sx={{ flexShrink: 0, px: 1.5, pt: 1.5 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Tabs
+            value={finSubTab}
+            onChange={(_, v) => setFinSubTab(v)}
+            sx={{
+              minHeight: 32,
+              '& .MuiTab-root': {
+                minHeight: 32,
+                fontSize: 12,
+                textTransform: 'none',
+                py: 0.5,
+                fontWeight: 600,
+              },
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            }}
+          >
+            <Tab label={`🛒 ${t('argus.userProfiles.purchaseHistory', 'Purchases')} (${finData.purchases.length})`} />
+            <Tab label={`↩️ ${t('argus.userProfiles.refundHistory', 'Refunds')} (${finData.refunds.length})`} />
+            <Tab label={`🎁 ${t('argus.userProfiles.grantHistory', 'Grants')} (${finData.grants.length})`} />
+          </Tabs>
+          {allRows.length > 0 && (
             <Button
               size="small"
               variant="outlined"
-              onClick={() => downloadCsv(rows, finCsvCols, `user_${userId}_${typeLabel}`)}
-              sx={{ fontSize: 11, textTransform: 'none', minWidth: 'auto', px: 1.5 }}
+              onClick={() => downloadCsv(allRows, finCsvCols, `user_${userId}_${typeLabel}`)}
+              sx={{ fontSize: 11, textTransform: 'none', minWidth: 'auto', px: 1.5, ml: 2 }}
             >
               📥 CSV
             </Button>
-          </Box>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700, fontSize: 12 }}>
-                  {t('argus.userProfiles.time', 'Time')}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 700, fontSize: 12 }}>
-                  {t('argus.userProfiles.product', 'Product')}
-                </TableCell>
-                <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12 }}>
-                  {t('argus.userProfiles.amount', 'Amount')}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 700, fontSize: 12 }}>
-                  {finSubTab >= 1
-                    ? t('argus.userProfiles.reason', 'Reason')
-                    : t('argus.userProfiles.payment', 'Payment')}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row, i) => (
-                <TableRow key={`${row.event_id}-${i}`}>
-                  <TableCell sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
-                    {new Date(row.timestamp).toLocaleString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 12, fontWeight: 600 }}>
-                    {row.product_name || '—'}
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color:
-                        finSubTab === 1
-                          ? ARGUS_SEMANTIC.negative
-                          : 'text.primary',
-                    }}
-                  >
-                    {finSubTab === 1 ? '-' : ''}
-                    {fmt(row.amount)}
-                  </TableCell>
-                  <TableCell
-                    sx={{
-                      fontSize: 12,
-                      color: 'text.secondary',
-                      textTransform: 'capitalize',
-                    }}
-                  >
-                    {finSubTab >= 1
-                      ? (row.reason || '—').replace(/_/g, ' ')
-                      : row.payment_method || '—'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          )}
         </Box>
-      ) : (
-        <Typography fontSize={13} color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-          {t('argus.userProfiles.noFinanceData', 'No records found')}
-        </Typography>
-      )}
+      </Box>
+
+      {/* Transaction Table — flex: 1 */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, px: 1.5, pt: 1 }}>
+        {allRows.length > 0 ? (
+          <>
+            <TableContainer
+              sx={{
+                flex: 1,
+                overflow: 'auto',
+              }}
+            >
+              <Table stickyHeader size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 700, fontSize: 12, bgcolor: 'background.paper' }}>
+                      {t('argus.userProfiles.time', 'Time')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: 12, bgcolor: 'background.paper' }}>
+                      {t('argus.userProfiles.product', 'Product')}
+                    </TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 700, fontSize: 12, bgcolor: 'background.paper' }}>
+                      {t('argus.userProfiles.amount', 'Amount')}
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 700, fontSize: 12, bgcolor: 'background.paper' }}>
+                      {finSubTab >= 1
+                        ? t('argus.userProfiles.reason', 'Reason')
+                        : t('argus.userProfiles.payment', 'Payment')}
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {paginatedRows.map((row, i) => (
+                    <TableRow key={`${row.event_id}-${i}`} hover>
+                      <TableCell sx={{ fontSize: 12, whiteSpace: 'nowrap' }}>
+                        {new Date(row.timestamp).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 12, fontWeight: 600 }}>
+                        {row.product_name || '—'}
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        sx={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: finSubTab === 1 ? ARGUS_SEMANTIC.negative : 'text.primary',
+                        }}
+                      >
+                        {finSubTab === 1 ? '-' : ''}
+                        {fmt(row.amount)}
+                      </TableCell>
+                      <TableCell sx={{ fontSize: 12, color: 'text.secondary', textTransform: 'capitalize' }}>
+                        {finSubTab >= 1
+                          ? (row.reason || '—').replace(/_/g, ' ')
+                          : row.payment_method || '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Box sx={{ mt: 1, flexShrink: 0, pb: 1 }}>
+              <SimplePagination
+                count={totalRows}
+                page={page}
+                rowsPerPage={pageSize}
+                onPageChange={(_, newPage) => setPage(newPage)}
+                onRowsPerPageChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(0);
+                }}
+              />
+            </Box>
+          </>
+        ) : (
+          <Typography fontSize={13} color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+            {t('argus.userProfiles.noFinanceData', 'No records found')}
+          </Typography>
+        )}
+      </Box>
+      </PageContentLoader>
     </Box>
   );
 };
