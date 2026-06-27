@@ -86,15 +86,23 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
         }}
       />
       <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.2 }}>
+        {/* Row 1: Feedback message (hero) + timestamp */}
+        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
           <Typography
             variant="body2"
-            fontWeight={item.is_read ? 600 : 800}
-            noWrap
-            sx={{ fontSize: '0.8rem', flex: 1 }}
+            sx={{
+              fontSize: '0.8rem',
+              fontWeight: item.is_read ? 500 : 700,
+              flex: 1,
+              lineHeight: 1.4,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
           >
             <HighlightText
-              text={displayName}
+              text={item.message}
               highlight={searchHighlight}
               isDark={isDark}
             />
@@ -105,128 +113,162 @@ const FeedbackListItem: React.FC<FeedbackListItemProps> = ({
               color: isDark ? '#666' : '#999',
               fontSize: '0.62rem',
               flexShrink: 0,
+              mt: 0.1,
             }}
           >
             {formatRelativeTime(item.submitted_at)}
           </Typography>
         </Box>
-        <Typography
-          variant="caption"
-          noWrap
-          sx={{
-            color: isDark ? '#999' : '#666',
-            fontSize: '0.72rem',
-            display: 'block',
-            lineHeight: 1.4,
-            maxHeight: '2.8em',
-            overflow: 'hidden',
-          }}
-        >
-          <HighlightText
-            text={item.message}
-            highlight={searchHighlight}
-            isDark={isDark}
-          />
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 0.5, mt: 0.4, flexWrap: 'wrap' }}>
-          {item.issue_id &&
-            (() => {
-              const issueColor =
-                item.issue_status === 'resolved'
-                  ? ARGUS_SEMANTIC.positive
-                  : item.issue_status === 'ignored'
-                    ? '#9e9e9e'
-                    : ARGUS_SEMANTIC.warning;
-              return (
-                <Chip
-                  icon={<BugReportIcon sx={{ fontSize: '10px !important' }} />}
-                  label={`#${item.issue_id} ${item.issue_status || ''}`}
-                  size="small"
-                  sx={{
-                    height: 16,
-                    fontSize: '0.55rem',
-                    backgroundColor: alpha(issueColor, 0.08),
-                    color: issueColor,
-                    border: 'none',
-                    '& .MuiChip-icon': { color: issueColor },
-                  }}
-                />
-              );
-            })()}
-          {item.attachments?.length > 0 && (
-            <Chip
-              icon={<ImageIcon sx={{ fontSize: '10px !important' }} />}
-              label={item.attachments.length}
-              size="small"
-              sx={{
-                height: 16,
-                fontSize: '0.55rem',
-                backgroundColor: alpha(ARGUS_SEMANTIC.info, 0.08),
-                color: ARGUS_SEMANTIC.info,
-                border: 'none',
-                '& .MuiChip-icon': { color: ARGUS_SEMANTIC.info },
-              }}
-            />
-          )}
-          {item.assigned_to && (
-            <Chip
-              label={
-                user &&
-                (item.assigned_to === user.name ||
-                  item.assigned_to === user.email)
-                  ? t('argus.issues.assigneeMe', { name: item.assigned_to })
-                  : item.assigned_to
-              }
-              size="small"
-              sx={{
-                height: 16,
-                fontSize: '0.55rem',
-                backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.08),
-                color: ARGUS_SEMANTIC.positive,
-                border: 'none',
-              }}
-            />
-          )}
-          {item.sentiment && item.sentiment !== '' && (
-            <Chip
-              label={item.sentiment}
-              size="small"
-              sx={{
-                height: 16,
-                fontSize: '0.55rem',
-                border: 'none',
-                backgroundColor: alpha(
-                  item.sentiment === 'positive'
+
+        {/* Row 2: Tags (left) + Player avatar+name (right) */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 0.6, gap: 1 }}>
+          {/* Tags */}
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
+            {item.issue_id &&
+              (() => {
+                const issueColor =
+                  item.issue_status === 'resolved'
                     ? ARGUS_SEMANTIC.positive
-                    : item.sentiment === 'negative'
-                      ? ARGUS_SEMANTIC.negative
-                      : '#9e9e9e',
-                  0.08
-                ),
-                color:
-                  item.sentiment === 'positive'
-                    ? ARGUS_SEMANTIC.positive
-                    : item.sentiment === 'negative'
-                      ? ARGUS_SEMANTIC.negative
-                      : '#9e9e9e',
-              }}
-            />
-          )}
-          {item.category &&
-            item.category !== '' &&
-            item.category !== 'other' && (
+                    : item.issue_status === 'ignored'
+                      ? '#9e9e9e'
+                      : ARGUS_SEMANTIC.warning;
+                return (
+                  <Chip
+                    icon={<BugReportIcon sx={{ fontSize: '10px !important' }} />}
+                    label={`#${item.issue_id} ${item.issue_status || ''}`}
+                    size="small"
+                    sx={{
+                      height: 16,
+                      fontSize: '0.55rem',
+                      backgroundColor: alpha(issueColor, 0.08),
+                      color: issueColor,
+                      border: 'none',
+                      '& .MuiChip-icon': { color: issueColor },
+                    }}
+                  />
+                );
+              })()}
+            {item.attachments?.length > 0 && (
               <Chip
-                label={item.category.replace('_', ' ')}
+                icon={<ImageIcon sx={{ fontSize: '10px !important' }} />}
+                label={item.attachments.length}
                 size="small"
                 sx={{
                   height: 16,
                   fontSize: '0.55rem',
-                  backgroundColor: alpha('#7c4dff', 0.08),
-                  color: '#7c4dff',
+                  backgroundColor: alpha(ARGUS_SEMANTIC.info, 0.08),
+                  color: ARGUS_SEMANTIC.info,
+                  border: 'none',
+                  '& .MuiChip-icon': { color: ARGUS_SEMANTIC.info },
+                }}
+              />
+            )}
+            {item.assigned_to && (
+              <Chip
+                label={
+                  user &&
+                  (item.assigned_to === user.name ||
+                    item.assigned_to === user.email)
+                    ? t('argus.issues.assigneeMe', { name: item.assigned_to })
+                    : item.assigned_to
+                }
+                size="small"
+                sx={{
+                  height: 16,
+                  fontSize: '0.55rem',
+                  backgroundColor: alpha(ARGUS_SEMANTIC.positive, 0.08),
+                  color: ARGUS_SEMANTIC.positive,
                   border: 'none',
                 }}
               />
             )}
+            {item.sentiment && item.sentiment !== '' && (
+              <Chip
+                label={item.sentiment}
+                size="small"
+                sx={{
+                  height: 16,
+                  fontSize: '0.55rem',
+                  border: 'none',
+                  backgroundColor: alpha(
+                    item.sentiment === 'positive'
+                      ? ARGUS_SEMANTIC.positive
+                      : item.sentiment === 'negative'
+                        ? ARGUS_SEMANTIC.negative
+                        : '#9e9e9e',
+                    0.08
+                  ),
+                  color:
+                    item.sentiment === 'positive'
+                      ? ARGUS_SEMANTIC.positive
+                      : item.sentiment === 'negative'
+                        ? ARGUS_SEMANTIC.negative
+                        : '#9e9e9e',
+                }}
+              />
+            )}
+            {item.category &&
+              item.category !== '' &&
+              item.category !== 'other' && (
+                <Chip
+                  label={item.category.replace('_', ' ')}
+                  size="small"
+                  sx={{
+                    height: 16,
+                    fontSize: '0.55rem',
+                    backgroundColor: alpha('#7c4dff', 0.08),
+                    color: '#7c4dff',
+                    border: 'none',
+                  }}
+                />
+              )}
+          </Box>
+
+          {/* Player avatar + name (right-aligned) */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4, flexShrink: 0 }}>
+            <Box
+              sx={{
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                backgroundColor: item.avatar_url ? 'transparent' : alpha('#7c4dff', 0.15),
+                color: '#7c4dff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.5rem',
+                fontWeight: 700,
+                flexShrink: 0,
+                overflow: 'hidden',
+              }}
+            >
+              {item.avatar_url ? (
+                <Box
+                  component="img"
+                  src={item.avatar_url}
+                  alt={displayName}
+                  sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                displayName.charAt(0).toUpperCase()
+              )}
+            </Box>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{
+                color: isDark ? '#777' : '#888',
+                fontSize: '0.6rem',
+                maxWidth: 72,
+              }}
+            >
+              <HighlightText
+                text={displayName}
+                highlight={searchHighlight}
+                isDark={isDark}
+              />
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -482,6 +482,8 @@ export interface ArgusFeedbackItem {
   issue_id: number | null;
   issue_title: string | null;
   issue_status: string | null;
+  // Avatar
+  avatar_url: string;
 }
 
 export interface ArgusFeedbackSummary {
