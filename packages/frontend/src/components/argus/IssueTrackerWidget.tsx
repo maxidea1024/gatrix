@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,6 +12,11 @@ import {
   CircularProgress,
   Link,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +26,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import AddIcon from '@mui/icons-material/Add';
+import SyncIcon from '@mui/icons-material/Sync';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import { ArgusIssueDetail, ArgusIssueTracker } from '@/services/argusService';
 import argusService from '@/services/argusService';
@@ -98,12 +104,81 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [creatingId, setCreatingId] = useState<number | null>(null);
   const [unlinking, setUnlinking] = useState(false);
+  const [externalStatus, setExternalStatus] = useState<{
+    state: 'open' | 'closed' | 'unknown';
+    synced?: boolean;
+  } | null>(null);
+  const [syncingStatus, setSyncingStatus] = useState(false);
+  const [unlinkDialogOpen, setUnlinkDialogOpen] = useState(false);
 
   // Fetch configured trackers
   const { data: trackers, isLoading: loadingTrackers } = useSWR(
     projectId ? ['argus-issue-trackers', projectId] : null,
     ([_, pid]) => argusService.listIssueTrackers(pid)
   );
+
+  const hasLinkedIssue = !!(issue?.external_url && issue?.external_key);
+  const activeTrackers = trackers?.filter((t) => t.enabled) || [];
+
+  // Derive provider name from external URL
+  const providerName = (() => {
+    const url = issue?.external_url || '';
+    if (url.includes('github.com')) return 'GitHub';
+    if (url.includes('linear.app')) return 'Linear';
+    if (url.includes('atlassian.net') || url.includes('jira')) return 'Jira';
+    if (url.includes('clickup.com')) return 'ClickUp';
+    if (url.includes('app.asana.com')) return 'Asana';
+    if (url.includes('notion.so')) return 'Notion';
+    if (url.includes('dev.azure.com')) return 'Azure DevOps';
+    if (url.includes('youtrack')) return 'YouTrack';
+    if (url.includes('shortcut.com')) return 'Shortcut';
+    if (url.includes('trello.com')) return 'Trello';
+    if (url.includes('redmine')) return 'Redmine';
+    return t('argus.issues.externalTracker', 'External');
+  })();
+
+  // Auto-fetch & sync external issue status when linked
+  useEffect(() => {
+    if (hasLinkedIssue && projectId && issueId) {
+      argusService
+        .fetchExternalIssueStatus(projectId, issueId, true) // sync=true: auto-resolve if closed
+        .then((status) => {
+          setExternalStatus(status);
+          if (status.synced && revalidateIssue) revalidateIssue();
+        })
+        .catch(() => setExternalStatus(null));
+    } else {
+      setExternalStatus(null);
+    }
+  }, [hasLinkedIssue, projectId, issueId, issue?.external_url]);
+
+  const handleSyncStatus = async () => {
+    setSyncingStatus(true);
+    try {
+      const status = await argusService.fetchExternalIssueStatus(
+        projectId,
+        issueId,
+        true // sync=true → auto-resolve if external is closed
+      );
+      setExternalStatus(status);
+      if (status.synced) {
+        enqueueSnackbar(
+          t('argus.issues.statusSynced', '{{provider}}에서 상태가 동기화되었습니다', { provider: providerName }),
+          { variant: 'success' }
+        );
+        if (revalidateIssue) revalidateIssue();
+      } else if (status.state === 'open') {
+        enqueueSnackbar(
+          t('argus.issues.externalStillOpen', '{{provider}} 이슈가 아직 열려 있습니다', { provider: providerName }),
+          { variant: 'info' }
+        );
+      }
+    } catch {
+      enqueueSnackbar(t('common.error'), { variant: 'error' });
+    } finally {
+      setSyncingStatus(false);
+    }
+  };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -170,6 +245,7 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
   };
 
   const handleUnlink = async () => {
+    setUnlinkDialogOpen(false);
     setUnlinking(true);
     try {
       if (updateIssueOptimistic) {
@@ -198,9 +274,6 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
       setUnlinking(false);
     }
   };
-
-  const hasLinkedIssue = !!(issue?.external_url && issue?.external_key);
-  const activeTrackers = trackers?.filter((t) => t.enabled) || [];
 
   return (
     <Box>
@@ -232,8 +305,8 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
+            flexDirection: 'column',
+            gap: 1,
             p: 1.5,
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
             borderRadius: 2,
@@ -242,40 +315,89 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
               : 'rgba(0,0,0,0.02)',
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Link
-              href={issue.external_url!}
-              target="_blank"
-              rel="noopener noreferrer"
+          {/* Link + unlink row */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Link
+                href={issue.external_url!}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  color: theme.palette.primary.main,
+                  textDecoration: 'none',
+                  '&:hover': { textDecoration: 'underline' },
+                }}
+              >
+                {issue.external_key}
+                <OpenInNewIcon sx={{ fontSize: 14 }} />
+              </Link>
+            </Box>
+            <Tooltip title={t('argus.issues.unlink', 'Unlink Issue')}>
+              <IconButton
+                size="small"
+                onClick={() => setUnlinkDialogOpen(true)}
+                disabled={unlinking}
+                sx={{ color: 'text.secondary' }}
+              >
+                {unlinking ? (
+                  <CircularProgress size={16} color="inherit" />
+                ) : (
+                  <LinkOffIcon sx={{ fontSize: 16 }} />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          {/* External status row */}
+          {externalStatus && externalStatus.state !== 'unknown' && (
+            <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 0.5,
-                fontWeight: 600,
-                fontSize: '0.85rem',
-                color: theme.palette.primary.main,
-                textDecoration: 'none',
-                '&:hover': { textDecoration: 'underline' },
+                justifyContent: 'space-between',
+                px: 1,
+                py: 0.5,
+                borderRadius: 1,
+                backgroundColor: externalStatus.state === 'closed'
+                  ? isDark ? 'rgba(171,71,188,0.12)' : 'rgba(142,36,170,0.08)'
+                  : isDark ? 'rgba(102,187,106,0.12)' : 'rgba(46,125,50,0.08)',
               }}
             >
-              {issue.external_key}
-              <OpenInNewIcon sx={{ fontSize: 14 }} />
-            </Link>
-          </Box>
-          <Tooltip title={t('argus.issues.unlink', 'Unlink Issue')}>
-            <IconButton
-              size="small"
-              onClick={handleUnlink}
-              disabled={unlinking}
-              sx={{ color: 'text.secondary' }}
-            >
-              {unlinking ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : (
-                <LinkOffIcon sx={{ fontSize: 16 }} />
-              )}
-            </IconButton>
-          </Tooltip>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  color: externalStatus.state === 'closed'
+                    ? isDark ? '#ce93d8' : '#8e24aa'
+                    : isDark ? '#66bb6a' : '#2e7d32',
+                }}
+              >
+                {externalStatus.state === 'closed'
+                  ? t('argus.issues.externalClosed', '{{provider}}에서 닫힘', { provider: providerName })
+                  : t('argus.issues.externalOpen', '{{provider}}에서 열려 있음', { provider: providerName })}
+              </Typography>
+              <Tooltip title={t('argus.issues.syncStatus', '{{provider}}에서 상태 동기화', { provider: providerName })}>
+                <IconButton
+                  size="small"
+                  onClick={handleSyncStatus}
+                  disabled={syncingStatus}
+                  sx={{ color: 'text.secondary', p: 0.25 }}
+                >
+                  {syncingStatus ? (
+                    <CircularProgress size={14} color="inherit" />
+                  ) : (
+                    <SyncIcon sx={{ fontSize: 14 }} />
+                  )}
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
         </Box>
       )}
 
@@ -381,6 +503,28 @@ const IssueTrackerWidget: React.FC<IssueTrackerWidgetProps> = ({
           </MenuItem>
         ))}
       </Menu>
+
+      {/* Unlink confirmation dialog */}
+      <Dialog
+        open={unlinkDialogOpen}
+        onClose={() => setUnlinkDialogOpen(false)}
+        maxWidth="xs"
+      >
+        <DialogTitle>{t('argus.issues.unlinkConfirmTitle', '이슈 연결 해제')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('argus.issues.unlinkConfirm', '외부 이슈 연결을 해제하시겠습니까?')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setUnlinkDialogOpen(false)}>
+            {t('common.cancel', '취소')}
+          </Button>
+          <Button onClick={handleUnlink} color="error" variant="contained" autoFocus>
+            {t('argus.issues.unlinkAction', '연결 해제')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

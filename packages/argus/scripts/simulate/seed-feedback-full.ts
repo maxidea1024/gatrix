@@ -167,6 +167,7 @@ export async function generateAndInsertEnrichedFeedback(
         sentiment: randomPick(SENTIMENTS),
         service: randomPick(SERVICES),
         dsn_key_id: dsnKeyId,
+        avatar_url: user.avatarUrl || `https://i.pravatar.cc/150?u=${encodeURIComponent(user.name)}`,
       });
     }
 

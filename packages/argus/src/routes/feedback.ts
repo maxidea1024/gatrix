@@ -353,7 +353,7 @@ export default async function feedbackRoutes(app: FastifyInstance) {
             status, assigned_to, is_spam, attachments,
             environment, release, source, tags,
             browser, browser_version, os, os_version, device,
-            user_id, locale, is_read, category, sentiment
+            user_id, locale, is_read, category, sentiment, avatar_url
           FROM argus.user_feedback
           WHERE project_id = {projectId:String} AND feedback_id = {feedbackId:String}
           LIMIT 1`,

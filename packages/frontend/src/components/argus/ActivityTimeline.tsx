@@ -18,6 +18,9 @@ import {
   PriorityHigh as PriorityIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Link as LinkIcon,
+  LinkOff as LinkOffIcon,
+  Sync as SyncIcon,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import argusService, { ArgusIssueActivity } from '@/services/argusService';
@@ -65,9 +68,42 @@ const ACTION_CONFIG: Record<
     color: '#00bcd4',
     label: 'Merged',
   },
+  external_link: {
+    icon: <LinkIcon sx={{ fontSize: 14 }} />,
+    color: '#1976d2',
+    label: 'External issue linked',
+  },
+  external_unlink: {
+    icon: <LinkOffIcon sx={{ fontSize: 14 }} />,
+    color: '#ef5350',
+    label: 'External issue unlinked',
+  },
+  external_sync: {
+    icon: <SyncIcon sx={{ fontSize: 14 }} />,
+    color: '#ab47bc',
+    label: 'Status synced',
+  },
 };
 
 // ==================== Helpers ====================
+
+function getProviderFromData(data: Record<string, any> | null): string {
+  if (!data) return 'External';
+  if (data.provider) {
+    const map: Record<string, string> = {
+      github: 'GitHub', jira: 'Jira', linear: 'Linear',
+      clickup: 'ClickUp', asana: 'Asana', notion: 'Notion',
+      azure_devops: 'Azure DevOps', youtrack: 'YouTrack',
+      shortcut: 'Shortcut', trello: 'Trello', redmine: 'Redmine',
+    };
+    return map[data.provider] || data.provider;
+  }
+  const url = data.url || '';
+  if (url.includes('github.com')) return 'GitHub';
+  if (url.includes('linear.app')) return 'Linear';
+  if (url.includes('atlassian.net') || url.includes('jira')) return 'Jira';
+  return 'External';
+}
 
 function getActivityDescription(activity: ArgusIssueActivity, t: any): string {
   const data = activity.data;
@@ -84,6 +120,25 @@ function getActivityDescription(activity: ArgusIssueActivity, t: any): string {
       return t('argus.activity.priorityChanged', { to: data?.to || '?' });
     case 'merge':
       return t('argus.activity.merged');
+    case 'external_link': {
+      const provider = getProviderFromData(data);
+      return t('argus.activity.externalLinked', {
+        key: data?.key || data?.url || '?',
+        provider,
+      });
+    }
+    case 'external_unlink':
+      return t('argus.activity.externalUnlinked');
+    case 'external_sync': {
+      const provider = getProviderFromData(data);
+      const statusLabel = data?.external_state === 'closed'
+        ? t('argus.issues.statusResolved', 'resolved')
+        : t('argus.issues.statusUnresolved', 'unresolved');
+      return t('argus.activity.externalSynced', {
+        provider,
+        status: statusLabel,
+      });
+    }
     default:
       return activity.action;
   }
@@ -138,18 +193,20 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
     true
   );
 
+  const PAGE_SIZE = 5;
+
   const fetchActivities = useCallback(
-    async (silent = false, customLimit = 5) => {
+    async (silent = false) => {
       if (!silent) setLoading(true);
       try {
         const data = await argusService.getIssueActivity(
           projectId,
           issueId,
-          customLimit,
+          PAGE_SIZE + 1, // fetch 1 extra to detect if more exist
           0
         );
-        setActivities(data);
-        setHasMore(data.length === customLimit);
+        setHasMore(data.length > PAGE_SIZE);
+        setActivities(data.slice(0, PAGE_SIZE));
       } catch (error) {
         console.error('Failed to fetch activities:', error);
       } finally {
@@ -160,7 +217,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
   );
 
   useEffect(() => {
-    fetchActivities(false, 5);
+    fetchActivities(false);
   }, [issueId, fetchActivities]);
 
   const fetchMoreActivities = async () => {
@@ -171,16 +228,13 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
       const data = await argusService.getIssueActivity(
         projectId,
         issueId,
-        5,
+        PAGE_SIZE + 1,
         offset
       );
-      if (data.length > 0) {
-        setActivities((prev) => [...prev, ...data]);
-        if (data.length < 5) {
-          setHasMore(false);
-        }
-      } else {
-        setHasMore(false);
+      setHasMore(data.length > PAGE_SIZE);
+      const newItems = data.slice(0, PAGE_SIZE);
+      if (newItems.length > 0) {
+        setActivities((prev) => [...prev, ...newItems]);
       }
     } catch (error) {
       console.error('Failed to fetch more activities:', error);

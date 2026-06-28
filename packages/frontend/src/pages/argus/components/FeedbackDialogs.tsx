@@ -303,6 +303,21 @@ export const CreateIssueDialog: React.FC<CreateIssueDialogProps> = ({
         culprit: selectedItem.url || 'user-feedback',
         tracker_id: selectedTrackerId ? Number(selectedTrackerId) : undefined,
       });
+
+      // Auto-link feedback to the newly created issue
+      if (result.id) {
+        try {
+          await argusService.linkFeedbackToIssue(
+            projectId,
+            selectedItem.feedback_id,
+            result.id
+          );
+        } catch (linkErr) {
+          // Issue was created, but link failed — still show success
+          console.warn('Failed to auto-link feedback to issue:', linkErr);
+        }
+      }
+
       if (result.external_url) {
         enqueueSnackbar(
           t('argus.feedback.issueCreatedExternal', {

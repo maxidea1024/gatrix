@@ -4,7 +4,7 @@ import { optic, parseSearchToSQL } from '@gatrix/argus-optic';
 import { redis } from '../config/redis';
 import { createLogger } from '../utils/logger';
 import { ConfigBroadcaster } from '../utils/config-broadcaster';
-import { CONFIG_TYPES } from '../config/redis-keys';
+import { CONFIG_TYPES, COUNTERS } from '../config/redis-keys';
 import {
   PERIOD_TO_SQL_INTERVAL,
   buildTimeRangeConditions,
@@ -378,27 +378,23 @@ export default async function issuesRoutes(app: FastifyInstance) {
       }
 
       try {
-        // Generate a fingerprint from title
+        // Generate a unique fingerprint for manual issues (title + timestamp to avoid dedup conflicts)
         const crypto = require('crypto');
         const fingerprint = crypto
           .createHash('md5')
-          .update(body.title)
+          .update(`${body.title}::manual::${Date.now()}`)
           .digest('hex');
 
-        // Ensure external columns exist (idempotent)
-        try {
-          await db.raw(
-            `ALTER TABLE g_argus_issues ADD COLUMN IF NOT EXISTS external_url VARCHAR(512) DEFAULT NULL`
-          );
-          await db.raw(
-            `ALTER TABLE g_argus_issues ADD COLUMN IF NOT EXISTS external_key VARCHAR(100) DEFAULT NULL`
-          );
-        } catch {
-          /* columns may already exist */
-        }
+        // Atomic short_id via Redis (consistent with issue-grouper)
+        const nextShortId = await redis.hincrby(
+          COUNTERS.ISSUE_SHORT_ID(String(projectId)),
+          'seq',
+          1
+        );
 
         const [insertId] = await db('g_argus_issues').insert({
           project_id: projectId,
+          short_id: nextShortId,
           title: body.title.trim(),
           culprit: body.culprit || '',
           level: body.level || 'info',
@@ -461,6 +457,20 @@ export default async function issuesRoutes(app: FastifyInstance) {
                 provider: tracker.provider,
                 externalUrl,
                 externalKey,
+              });
+
+              // Record activity
+              const userName = (request.headers['x-user-name'] as string) || null;
+              await db('g_argus_issue_activity').insert({
+                project_id: projectId,
+                issue_id: insertId,
+                user_name: userName,
+                action: 'external_link',
+                data: JSON.stringify({
+                  url: externalUrl,
+                  key: externalKey,
+                  provider: tracker.provider,
+                }),
               });
             }
           } catch (trackerError) {
@@ -606,6 +616,115 @@ export default async function issuesRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to get issue' });
+      }
+    }
+  );
+
+  // Check external issue status (e.g. is the GitHub issue closed?)
+  app.get(
+    '/:projectId/issues/:issueId/external-status',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId } = request.params as {
+        projectId: string;
+        issueId: string;
+      };
+      const { sync } = request.query as { sync?: string };
+
+      try {
+        const [issue] = await db('g_argus_issues').where({
+          id: issueId,
+          project_id: projectId,
+        });
+        if (!issue || !issue.external_url) {
+          return reply.send({ data: { state: 'unknown', message: 'No external issue linked' } });
+        }
+
+        // Find a matching tracker config to get the API token
+        const trackers = await db('g_argus_issue_trackers')
+          .where({ project_id: projectId, enabled: true });
+
+        // Determine provider from URL
+        let trackerConfig = null;
+        if (issue.external_url.includes('github.com')) {
+          const ghTracker = trackers.find((t: any) => t.provider === 'github');
+          if (ghTracker) {
+            trackerConfig = {
+              provider: ghTracker.provider,
+              apiUrl: ghTracker.api_url,
+              apiToken: ghTracker.api_token,
+              config: typeof ghTracker.config === 'string'
+                ? JSON.parse(ghTracker.config)
+                : ghTracker.config || {},
+            };
+          }
+        }
+
+        if (!trackerConfig) {
+          return reply.send({ data: { state: 'unknown', message: 'No matching tracker config found' } });
+        }
+
+        const { fetchExternalIssueStatus } = require('../services/trackerAdapter');
+        const status = await fetchExternalIssueStatus(issue.external_url, trackerConfig);
+
+        // Auto-sync: bidirectional status mapping
+        if (sync === 'true' && (status.state === 'closed' || status.state === 'open')) {
+          const targetStatus = status.state === 'closed' ? 'resolved' : 'unresolved';
+          const needsStatusUpdate = issue.status !== targetStatus;
+
+          // Update Argus issue status if different
+          if (needsStatusUpdate) {
+            const updateData: Record<string, any> = { status: targetStatus };
+            if (targetStatus === 'resolved') {
+              updateData.resolved_at = db.fn.now();
+            }
+            await db('g_argus_issues').where({ id: issueId, project_id: projectId }).update(updateData);
+          }
+
+          // Record activity (deduplicate by comparing last external_state)
+          try {
+            const [lastSync] = await db('g_argus_issue_activity')
+              .where({ project_id: projectId, issue_id: issueId, action: 'external_sync' })
+              .orderBy('created_at', 'desc')
+              .limit(1);
+
+            const lastState = lastSync?.data?.external_state;
+            if (lastState !== status.state) {
+              const userName = (request.headers['x-user-name'] as string) || null;
+              await db('g_argus_issue_activity').insert({
+                project_id: projectId,
+                issue_id: issueId,
+                user_name: userName,
+                action: 'external_sync',
+                data: JSON.stringify({
+                  from: issue.status,
+                  to: targetStatus,
+                  source: 'external_tracker',
+                  external_state: status.state,
+                  url: issue.external_url,
+                }),
+              });
+            }
+          } catch (actErr) {
+            logger.warn('Failed to record sync activity', {
+              error: actErr instanceof Error ? actErr.message : String(actErr),
+            });
+          }
+
+          logger.info('Auto-synced issue status from external tracker', {
+            issueId,
+            externalState: status.state,
+            targetStatus,
+          });
+          status.synced = true;
+        }
+
+        return reply.send({ data: status });
+      } catch (error) {
+        logger.error('Failed to check external status', {
+          issueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to check external status' });
       }
     }
   );
@@ -894,6 +1013,18 @@ export default async function issuesRoutes(app: FastifyInstance) {
               user_name: userName,
               action: 'priority_change',
               data: JSON.stringify({ to: body.priority }),
+            });
+          }
+          if (body.external_url !== undefined) {
+            await db('g_argus_issue_activity').insert({
+              project_id: projectId,
+              issue_id: issueId,
+              user_name: userName,
+              action: body.external_url ? 'external_link' : 'external_unlink',
+              data: JSON.stringify({
+                url: body.external_url,
+                key: body.external_key,
+              }),
             });
           }
         } catch (actErr) {

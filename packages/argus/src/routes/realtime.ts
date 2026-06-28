@@ -20,8 +20,6 @@ export default async function realtimeRoutes(app: FastifyInstance) {
       try {
         const params = { projectId };
 
-        const ERROR_EVENTS = ['client_error', 'high_ping_warning', 'crash', 'out_of_memory'];
-
         // ── Run all queries in parallel ──────────────────────────────────
         const [
           activeResult,

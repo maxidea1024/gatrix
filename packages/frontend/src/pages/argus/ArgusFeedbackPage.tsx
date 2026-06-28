@@ -676,21 +676,31 @@ const ArgusFeedbackPage: React.FC = () => {
     [selectedIds, projectId, t, enqueueSnackbar, handleRefresh]
   );
 
-  const handleUnlinkIssue = useCallback(async () => {
-    if (!selectedItem) return;
-    try {
-      await argusService.unlinkFeedbackFromIssue(
-        projectId,
-        selectedItem.feedback_id
-      );
-      enqueueSnackbar(t('argus.feedback.issueUnlinked'), {
-        variant: 'success',
-      });
-      setLinkedIssueDetail(null);
-      handleRefresh();
-    } catch {
-      enqueueSnackbar(t('common.error'), { variant: 'error' });
-    }
+  const handleUnlinkIssueConfirm = useCallback(() => {
+    setConfirmConfig({
+      open: true,
+      title: t('argus.issues.unlinkConfirmTitle', '이슈 연결 해제'),
+      message: t('argus.issues.unlinkConfirm', '외부 이슈 연결을 해제하시겠습니까?'),
+      confirmText: t('argus.issues.unlinkAction', '연결 해제'),
+      confirmColor: 'error' as const,
+      onConfirm: async () => {
+        setConfirmConfig((p) => ({ ...p, open: false }));
+        if (!selectedItem) return;
+        try {
+          await argusService.unlinkFeedbackFromIssue(
+            projectId,
+            selectedItem.feedback_id
+          );
+          enqueueSnackbar(t('argus.feedback.issueUnlinked'), {
+            variant: 'success',
+          });
+          setLinkedIssueDetail(null);
+          handleRefresh();
+        } catch {
+          enqueueSnackbar(t('common.error'), { variant: 'error' });
+        }
+      },
+    });
   }, [projectId, t, enqueueSnackbar, handleRefresh, selectedItem]);
 
   const toggleSelect = useCallback((id: string) => {
@@ -1099,7 +1109,7 @@ const ArgusFeedbackPage: React.FC = () => {
                 onUpdateStatus={handleUpdateStatus}
                 onMarkSpam={handleMarkSpam}
                 onAssignFeedback={handleAssignFeedback}
-                onUnlinkIssue={handleUnlinkIssue}
+                onUnlinkIssue={handleUnlinkIssueConfirm}
                 onOpenCreateIssue={handleOpenCreateIssue}
                 onOpenLinkIssue={handleOpenLinkIssue}
                 onAddFilter={handleAddFilter}

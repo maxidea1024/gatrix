@@ -229,12 +229,22 @@ function generateLog(): Record<string, any> {
 
 const FEEDBACK_MESSAGES = {
   positive: [
+    '이번 업데이트 정말 좋아요! 새 퀘스트 시스템 최고!',
+    '성능 개선 체감돼요, 훨씬 부드러워졌어요.',
+    '길드 기능 추가 정말 필요했는데 감사합니다!',
+    'UI가 깔끔해져서 좋아요.',
     'Great update! The new quest system is amazing.',
     'Love the performance improvements, much smoother now.',
     'The new guild features are exactly what we needed!',
     'UI looks much cleaner in this release.',
   ],
   negative: [
+    '항해 중 갑자기 튕겼어요. 전투 중이라 손해가 커요.',
+    '결제했는데 아이템이 안 들어왔어요. 주문번호 확인 부탁드립니다.',
+    '최근 패치 이후 렉이 심해졌어요. 특히 리스본 항구에서요.',
+    '캐릭터 장비 탭 열면 크래시 납니다.',
+    '해전 중 프레임 드랍이 심해요. 10fps 이하로 떨어져요.',
+    '매칭이 2분 넘게 걸리다 실패해요.',
     'Game crashes every time I open the market.',
     'Login takes forever since the last update.',
     'My character data was lost after the patch!',
@@ -242,6 +252,11 @@ const FEEDBACK_MESSAGES = {
     'Lag spikes make PvP unplayable.',
   ],
   neutral: [
+    '다크 모드 추가해주세요.',
+    '캐릭터 커스터마이징 좀 더 다양했으면 좋겠어요.',
+    '다음 확장팩은 언제 나오나요?',
+    '튜토리얼이 좀 더 자세했으면 좋겠어요.',
+    'NPC 대화가 도중에 끊겨요. 퀘스트 진행이 안 됩니다.',
     'Would be nice to have a dark mode option.',
     'Can you add more character customization?',
     'When will the next expansion be released?',
@@ -249,6 +264,12 @@ const FEEDBACK_MESSAGES = {
   ],
 };
 
+const FEEDBACK_NAMES_KO = ['김민준', '이서연', '박지호', '최유진', '정하은', '강도현', '송민서', '한지우'];
+const FEEDBACK_NAMES_EN = ['CaptainJack', 'Player_Alpha', 'TestUser01', 'StarNavigator'];
+const FEEDBACK_NAMES = [...FEEDBACK_NAMES_KO, ...FEEDBACK_NAMES_EN];
+const FEEDBACK_BROWSERS = ['Chrome', 'Firefox', 'Safari', 'Edge', 'GameClient'];
+const FEEDBACK_OSES = ['Windows', 'macOS', 'Android', 'iOS', 'Linux'];
+const FEEDBACK_DEVICES = ['PC', 'PC', 'PC', 'iPhone 15', 'Galaxy S24', 'iPad Pro', 'Steam Deck', ''];
 const FEEDBACK_CATEGORIES = ['bug', 'feature', 'performance', 'ux', 'other'];
 const FEEDBACK_SENTIMENTS = [
   { sentiment: 'negative', weight: 40 },
@@ -271,26 +292,51 @@ function generateFeedback(): Record<string, any> {
   const messages = FEEDBACK_MESSAGES[sentiment as keyof typeof FEEDBACK_MESSAGES] || FEEDBACK_MESSAGES.neutral;
   const now = new Date();
   const category = sentiment === 'negative' && Math.random() < 0.6 ? 'bug' : pick(FEEDBACK_CATEGORIES);
+  const name = pick(FEEDBACK_NAMES);
+  const email = `${name.replace(/\s/g, '').toLowerCase()}@test.com`;
+  const browser = pick(FEEDBACK_BROWSERS);
+  const os = pick(FEEDBACK_OSES);
+
+  const attachments: string[] = [];
+  if (Math.random() < 0.3) {
+    const count = randomInt(1, 3);
+    for (let a = 0; a < count; a++) {
+      const w = pick([800, 1024, 1280, 1920]);
+      const h = pick([600, 768, 720, 1080]);
+      attachments.push(
+        `https://picsum.photos/seed/${hash32().substring(0, 8)}/${w}/${h}`
+      );
+    }
+  }
 
   return {
     feedback_id: hash32(),
     project_id: PROJECT_ID,
     event_id: hash32(),
     timestamp: now.toISOString(),
-    name: `Player${randomInt(1, 10000)}`,
-    email: `user${randomInt(1, 10000)}@example.com`,
+    name,
+    email,
     message: pick(messages),
-    contact_email: Math.random() < 0.3 ? `contact${randomInt(1, 1000)}@example.com` : '',
-    url: '',
+    contact_email: Math.random() < 0.3 ? email : '',
+    url: pick(['/game/play', '/game/port', '/game/battle', '/settings', '/inventory', '/guild', '/market']),
     environment: pick(ENVIRONMENTS),
     release: pick(RELEASES),
-    source: 'widget',
+    source: pick(['widget', 'dialog', 'api', 'sdk']),
     tags: {},
     category,
     sentiment,
     status: 'unresolved',
     is_spam: 0,
     is_read: 0,
+    attachments,
+    browser,
+    browser_version: `${randomInt(90, 130)}.0.${randomInt(1000, 9999)}.${randomInt(10, 99)}`,
+    os,
+    os_version: pick(['10', '11', '14.5', '17.2', '6.8', '15.1']),
+    device: pick(FEEDBACK_DEVICES),
+    user_id: `user_${randomInt(1, 10000)}`,
+    locale: pick(['ko-KR', 'en-US', 'ja-JP', 'zh-CN', '']),
+    avatar_url: `https://i.pravatar.cc/150?u=${encodeURIComponent(name)}`,
   };
 }
 

@@ -888,3 +888,66 @@ export async function testTrackerConnection(
   }
   return adapter.testConnection(config);
 }
+
+// ─── External Issue Status Check ───
+
+export interface ExternalIssueStatus {
+  state: 'open' | 'closed' | 'unknown';
+  title?: string;
+  updatedAt?: string;
+  closedAt?: string;
+  url: string;
+}
+
+/**
+ * Parse external_url to extract provider-specific info.
+ * GitHub: https://github.com/owner/repo/issues/123
+ * Linear: https://linear.app/team/issue/TEAM-123
+ */
+function parseGitHubUrl(url: string): { owner: string; repo: string; number: number } | null {
+  const m = url.match(/github\.com\/([^/]+)\/([^/]+)\/issues\/(\d+)/);
+  if (!m) return null;
+  return { owner: m[1], repo: m[2], number: parseInt(m[3], 10) };
+}
+
+export async function fetchExternalIssueStatus(
+  externalUrl: string,
+  trackerConfig?: TrackerConfig
+): Promise<ExternalIssueStatus> {
+  // GitHub
+  const gh = parseGitHubUrl(externalUrl);
+  if (gh && trackerConfig?.provider === 'github') {
+    try {
+      const apiBase = trackerConfig.apiUrl?.replace(/\/$/, '') || 'https://api.github.com';
+      const response = await fetch(
+        `${apiBase}/repos/${gh.owner}/${gh.repo}/issues/${gh.number}`,
+        {
+          headers: {
+            Authorization: `Bearer ${trackerConfig.apiToken}`,
+            Accept: 'application/vnd.github+json',
+          },
+        }
+      );
+      if (response.ok) {
+        const data = (await response.json()) as {
+          state: string;
+          title: string;
+          updated_at: string;
+          closed_at: string | null;
+        };
+        return {
+          state: data.state === 'closed' ? 'closed' : 'open',
+          title: data.title,
+          updatedAt: data.updated_at,
+          closedAt: data.closed_at || undefined,
+          url: externalUrl,
+        };
+      }
+      logger.warn('GitHub status check failed', { status: response.status });
+    } catch (error) {
+      logger.warn('GitHub status check error', { error: (error as Error).message });
+    }
+  }
+
+  return { state: 'unknown', url: externalUrl };
+}

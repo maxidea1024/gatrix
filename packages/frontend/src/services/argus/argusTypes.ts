@@ -113,7 +113,7 @@ export interface ArgusIssueActivity {
   project_id: number;
   issue_id: number;
   user_name: string | null;
-  action: 'status_change' | 'assign' | 'comment' | 'priority_change' | 'merge';
+  action: 'status_change' | 'assign' | 'comment' | 'priority_change' | 'merge' | 'external_link' | 'external_unlink' | 'external_sync';
   data: Record<string, any> | null;
   created_at: string;
 }

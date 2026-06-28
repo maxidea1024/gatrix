@@ -108,6 +108,24 @@ export async function updateIssueExternalLink(
   });
 }
 
+export async function fetchExternalIssueStatus(
+  projectId: number | string,
+  issueId: number | string,
+  sync: boolean = false
+): Promise<{
+  state: 'open' | 'closed' | 'unknown';
+  title?: string;
+  updatedAt?: string;
+  closedAt?: string;
+  synced?: boolean;
+}> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/${projectId}/issues/${issueId}/external-status`,
+    { params: sync ? { sync: 'true' } : undefined }
+  );
+  return response.data?.data || response.data;
+}
+
 export async function bulkUpdateIssues(
   projectId: number | string,
   issueIds: number[],

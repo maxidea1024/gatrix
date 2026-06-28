@@ -223,14 +223,17 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
         {/* ─── Detail Header ─── */}
         <DetailHeader isDark={isDark}>
           <Avatar
+            src={selectedItem.avatar_url || undefined}
             sx={{
               width: 36,
               height: 36,
               fontSize: '0.8rem',
               fontWeight: 700,
-              backgroundColor: stringToColor(
-                selectedItem.name || selectedItem.email || 'A'
-              ),
+              backgroundColor: selectedItem.avatar_url
+                ? 'transparent'
+                : stringToColor(
+                    selectedItem.name || selectedItem.email || 'A'
+                  ),
             }}
           >
             {getInitials(
@@ -501,6 +504,46 @@ const FeedbackDetailPanel: React.FC<FeedbackDetailPanelProps> = ({
                     </>
                   )}
                 </Box>
+
+                {/* External tracker link */}
+                {linkedIssueDetail?.external_url && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                      mb: 1.5,
+                      p: 1,
+                      borderRadius: 1,
+                      backgroundColor: isDark
+                        ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(0,0,0,0.03)',
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                    }}
+                  >
+                    <BugReportIcon
+                      sx={{ fontSize: 14, color: 'text.secondary' }}
+                    />
+                    <Typography
+                      component="a"
+                      href={linkedIssueDetail.external_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      variant="caption"
+                      sx={{
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        color: isDark ? '#64b5f6' : '#1565c0',
+                        textDecoration: 'none',
+                        '&:hover': { textDecoration: 'underline' },
+                      }}
+                    >
+                      {linkedIssueDetail.external_key ||
+                        t('argus.issues.openExternal')}
+                      {' ↗'}
+                    </Typography>
+                  </Box>
+                )}
 
                 {/* Actions */}
                 <Box sx={{ display: 'flex', gap: 0.75 }}>
