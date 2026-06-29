@@ -11,45 +11,12 @@ import {
 const logger = createLogger('issue-trackers-api');
 
 export default async function issueTrackersRoutes(app: FastifyInstance) {
-  // Ensure table exists
-  const ensureTable = async () => {
-    await db.raw(`
-      CREATE TABLE IF NOT EXISTS g_argus_issue_trackers (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        project_id VARCHAR(64) NOT NULL,
-        provider ENUM('jira', 'github', 'linear', 'clickup', 'asana', 'notion', 'shortcut', 'azure_devops', 'redmine', 'youtrack', 'trello') NOT NULL,
-        name VARCHAR(255) NOT NULL,
-        api_url VARCHAR(512) NOT NULL,
-        api_token VARCHAR(512) NOT NULL,
-        config JSON DEFAULT NULL,
-        enabled TINYINT(1) DEFAULT 1,
-        created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
-        updated_at DATETIME DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_project (project_id)
-      )
-    `);
-
-    // Attempt to alter the table to update the ENUM if it was created with fewer providers.
-    // This is safe to run multiple times, though it might throw a warning.
-    try {
-      await db.raw(`
-        ALTER TABLE g_argus_issue_trackers 
-        MODIFY COLUMN provider ENUM('jira', 'github', 'linear', 'clickup', 'asana', 'notion', 'shortcut', 'azure_devops', 'redmine', 'youtrack', 'trello') NOT NULL
-      `);
-    } catch (e) {
-      logger.warn('Failed to alter provider ENUM', {
-        error: (e as Error).message,
-      });
-    }
-  };
-
   // List issue trackers for a project
   app.get(
     '/:projectId/issue-trackers',
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { projectId } = request.params as { projectId: string };
       try {
-        await ensureTable();
         const [rows] = await db.raw(
           'SELECT id, project_id, provider, name, api_url, config, enabled, created_at, updated_at FROM g_argus_issue_trackers WHERE project_id = ? ORDER BY created_at DESC',
           [projectId]
@@ -102,7 +69,6 @@ export default async function issueTrackersRoutes(app: FastifyInstance) {
       }
 
       try {
-        await ensureTable();
         const [result] = await db.raw(
           `INSERT INTO g_argus_issue_trackers (project_id, provider, name, api_url, api_token, config)
            VALUES (?, ?, ?, ?, ?, ?)`,

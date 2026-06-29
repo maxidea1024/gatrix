@@ -5,28 +5,6 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('argus-global-integrations');
 
 export default async function globalIntegrationsRoutes(app: FastifyInstance) {
-  // Initialize table
-  try {
-    await db.raw(`
-      CREATE TABLE IF NOT EXISTS g_argus_global_integrations (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        provider VARCHAR(50) NOT NULL,
-        name VARCHAR(100) DEFAULT NULL,
-        url VARCHAR(255) DEFAULT NULL,
-        credentials JSON DEFAULT NULL,
-        is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        UNIQUE KEY idx_provider_url (provider, url)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
-    logger.info('g_argus_global_integrations table ensured');
-  } catch (error) {
-    logger.error('Failed to ensure g_argus_global_integrations table', {
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-
   // Check if provider is configured
   app.get(
     '/global-integrations/:provider/config',

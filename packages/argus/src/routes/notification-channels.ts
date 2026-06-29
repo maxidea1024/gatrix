@@ -5,28 +5,6 @@ import { createLogger } from '../utils/logger';
 const logger = createLogger('argus-notification-channels');
 
 export default async function notificationChannelsRoutes(app: FastifyInstance) {
-  // Ensure table exists
-  try {
-    await db.raw(`
-      CREATE TABLE IF NOT EXISTS g_argus_notification_channels (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        project_id VARCHAR(64) NOT NULL,
-        provider VARCHAR(50) NOT NULL,
-        name VARCHAR(100) DEFAULT NULL,
-        config JSON DEFAULT NULL,
-        enabled BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_project (project_id)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
-    logger.info('g_argus_notification_channels table ensured');
-  } catch (error) {
-    logger.error('Failed to ensure notification_channels table', {
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-
   // List notification channels for a project
   app.get(
     '/:projectId/notification-channels',

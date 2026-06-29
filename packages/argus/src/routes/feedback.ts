@@ -711,17 +711,6 @@ export default async function feedbackRoutes(app: FastifyInstance) {
         return reply.send({ data: rows });
       } catch (error: any) {
         if (error?.code === 'ER_NO_SUCH_TABLE') {
-          // Auto-create the table if it doesn't exist
-          await db.raw(`
-            CREATE TABLE IF NOT EXISTS g_argus_spam_keywords (
-              id INT AUTO_INCREMENT PRIMARY KEY,
-              project_id VARCHAR(64) NOT NULL,
-              keyword VARCHAR(255) NOT NULL,
-              is_regex TINYINT(1) DEFAULT 0,
-              created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
-              INDEX idx_project (project_id)
-            )
-          `);
           return reply.send({ data: [] });
         }
         logger.error('Failed to get spam keywords', {
@@ -748,17 +737,6 @@ export default async function feedbackRoutes(app: FastifyInstance) {
       }
 
       try {
-        // Ensure table exists
-        await db.raw(`
-          CREATE TABLE IF NOT EXISTS g_argus_spam_keywords (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            project_id VARCHAR(64) NOT NULL,
-            keyword VARCHAR(255) NOT NULL,
-            is_regex TINYINT(1) DEFAULT 0,
-            created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
-            INDEX idx_project (project_id)
-          )
-        `);
 
         const [insertId] = await db('g_argus_spam_keywords').insert({
           project_id: projectId,
@@ -1197,51 +1175,9 @@ export default async function feedbackRoutes(app: FastifyInstance) {
   );
 }
 
-let activityTableChecked = false;
-async function ensureActivityTable(): Promise<void> {
-  if (activityTableChecked) return;
-  try {
-    await db.raw(`
-      CREATE TABLE IF NOT EXISTS g_argus_feedback_activity (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        project_id VARCHAR(64) NOT NULL,
-        feedback_id VARCHAR(64) NOT NULL,
-        user_name VARCHAR(255) DEFAULT NULL,
-        action ENUM('status_change','assign','comment','mark_spam','unmark_spam') NOT NULL,
-        data JSON DEFAULT NULL,
-        created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
-        INDEX idx_feedback (project_id, feedback_id),
-        INDEX idx_created (created_at)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-    activityTableChecked = true;
-  } catch (e) {
-    logger.warn('Failed to ensure activity table', {
-      error: (e as Error).message,
-    });
-  }
-}
-
-let issueLinkTableChecked = false;
-async function ensureIssueLinkTable(): Promise<void> {
-  if (issueLinkTableChecked) return;
-  try {
-    await db.raw(`
-      CREATE TABLE IF NOT EXISTS g_argus_feedback_issue_links (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        project_id VARCHAR(64) NOT NULL,
-        feedback_id VARCHAR(64) NOT NULL,
-        issue_id INT NOT NULL,
-        created_at DATETIME DEFAULT (UTC_TIMESTAMP()),
-        updated_at DATETIME DEFAULT (UTC_TIMESTAMP()) ON UPDATE CURRENT_TIMESTAMP,
-        UNIQUE KEY uq_feedback (project_id, feedback_id),
-        INDEX idx_issue (issue_id)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    `);
-    issueLinkTableChecked = true;
-  } catch (e) {
-    logger.warn('Failed to ensure issue link table', {
-      error: (e as Error).message,
-    });
-  }
-}
+// Table creation now handled by migrations 088 & 089
+// These no-op functions are kept for call-site compatibility
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+async function ensureActivityTable(): Promise<void> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+async function ensureIssueLinkTable(): Promise<void> {}

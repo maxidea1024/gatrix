@@ -6,26 +6,6 @@ import { GithubAppService } from '../services/githubAppService';
 const logger = createLogger('github-app-routes');
 
 export default async function githubAppRoutes(app: FastifyInstance) {
-  // Ensure installations table
-  try {
-    await db.raw(`
-      CREATE TABLE IF NOT EXISTS g_argus_github_installations (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        installation_id VARCHAR(100) NOT NULL,
-        account_name VARCHAR(255) NOT NULL,
-        target_type VARCHAR(50) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        UNIQUE KEY idx_installation_id (installation_id)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    `);
-    logger.info('g_argus_github_installations table ensured');
-  } catch (error) {
-    logger.error('Failed to ensure g_argus_github_installations table', {
-      error,
-    });
-  }
-
   // Webhook Receiver
   app.post(
     '/webhooks/github',
