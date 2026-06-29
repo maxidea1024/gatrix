@@ -29,66 +29,74 @@ exports.up = async function (connection) {
   }
 
   // Migrate existing external_url/external_key data from g_argus_issues
-  console.log('[082] Migrating existing external links...');
-  const [existingLinks] = await connection.execute(
-    `SELECT i.id AS issue_id, i.project_id, i.external_url, i.external_key
-     FROM g_argus_issues i
-     WHERE i.external_url IS NOT NULL AND i.external_key IS NOT NULL`
-  );
-
-  let migrated = 0;
-  for (const row of existingLinks) {
-    // Determine provider from URL
-    let provider = null;
-    if (row.external_url.includes('github.com')) provider = 'github';
-    else if (row.external_url.includes('atlassian.net') || row.external_url.includes('jira')) provider = 'jira';
-    else if (row.external_url.includes('linear.app')) provider = 'linear';
-    else if (row.external_url.includes('clickup.com')) provider = 'clickup';
-    else if (row.external_url.includes('app.asana.com')) provider = 'asana';
-    else if (row.external_url.includes('youtrack')) provider = 'youtrack';
-    else if (row.external_url.includes('dev.azure.com')) provider = 'azure_devops';
-    else if (row.external_url.includes('shortcut.com')) provider = 'shortcut';
-    else if (row.external_url.includes('trello.com')) provider = 'trello';
-    else if (row.external_url.includes('redmine')) provider = 'redmine';
-    else if (row.external_url.includes('notion.so')) provider = 'notion';
-
-    if (!provider) {
-      console.log(`[082]   Skipping issue ${row.issue_id}: unknown provider for URL ${row.external_url}`);
-      continue;
-    }
-
-    // Find matching tracker config
-    const [trackers] = await connection.execute(
-      `SELECT id FROM g_argus_issue_trackers
-       WHERE project_id = ? AND provider = ? AND enabled = 1
-       LIMIT 1`,
-      [row.project_id, provider]
+  // Wrapped in try-catch: on fresh install, g_argus_issue_trackers may not exist yet
+  // (it's created by migration 084). This is fine — fresh DB has no data to migrate.
+  try {
+    console.log('[082] Migrating existing external links...');
+    const [existingLinks] = await connection.execute(
+      `SELECT i.id AS issue_id, i.project_id, i.external_url, i.external_key
+       FROM g_argus_issues i
+       WHERE i.external_url IS NOT NULL AND i.external_key IS NOT NULL`
     );
 
-    if (trackers.length === 0) {
-      console.log(`[082]   Skipping issue ${row.issue_id}: no ${provider} tracker configured for project ${row.project_id}`);
-      continue;
-    }
+    let migrated = 0;
+    for (const row of existingLinks) {
+      // Determine provider from URL
+      let provider = null;
+      if (row.external_url.includes('github.com')) provider = 'github';
+      else if (row.external_url.includes('atlassian.net') || row.external_url.includes('jira')) provider = 'jira';
+      else if (row.external_url.includes('linear.app')) provider = 'linear';
+      else if (row.external_url.includes('clickup.com')) provider = 'clickup';
+      else if (row.external_url.includes('app.asana.com')) provider = 'asana';
+      else if (row.external_url.includes('youtrack')) provider = 'youtrack';
+      else if (row.external_url.includes('dev.azure.com')) provider = 'azure_devops';
+      else if (row.external_url.includes('shortcut.com')) provider = 'shortcut';
+      else if (row.external_url.includes('trello.com')) provider = 'trello';
+      else if (row.external_url.includes('redmine')) provider = 'redmine';
+      else if (row.external_url.includes('notion.so')) provider = 'notion';
 
-    const trackerId = trackers[0].id;
+      if (!provider) {
+        console.log(`[082]   Skipping issue ${row.issue_id}: unknown provider for URL ${row.external_url}`);
+        continue;
+      }
 
-    // Check if link already exists (idempotent)
-    const [existing] = await connection.execute(
-      `SELECT id FROM g_argus_issue_links WHERE issue_id = ? AND tracker_id = ?`,
-      [row.issue_id, trackerId]
-    );
-
-    if (existing.length === 0) {
-      await connection.execute(
-        `INSERT INTO g_argus_issue_links (project_id, issue_id, tracker_id, external_url, external_key)
-         VALUES (?, ?, ?, ?, ?)`,
-        [row.project_id, row.issue_id, trackerId, row.external_url, row.external_key]
+      // Find matching tracker config
+      const [trackers] = await connection.execute(
+        `SELECT id FROM g_argus_issue_trackers
+         WHERE project_id = ? AND provider = ? AND enabled = 1
+         LIMIT 1`,
+        [row.project_id, provider]
       );
-      migrated++;
-    }
-  }
 
-  console.log(`[082] ✓ Migrated ${migrated} existing links (${existingLinks.length} total found)`);
+      if (trackers.length === 0) {
+        console.log(`[082]   Skipping issue ${row.issue_id}: no ${provider} tracker configured for project ${row.project_id}`);
+        continue;
+      }
+
+      const trackerId = trackers[0].id;
+
+      // Check if link already exists (idempotent)
+      const [existing] = await connection.execute(
+        `SELECT id FROM g_argus_issue_links WHERE issue_id = ? AND tracker_id = ?`,
+        [row.issue_id, trackerId]
+      );
+
+      if (existing.length === 0) {
+        await connection.execute(
+          `INSERT INTO g_argus_issue_links (project_id, issue_id, tracker_id, external_url, external_key)
+           VALUES (?, ?, ?, ?, ?)`,
+          [row.project_id, row.issue_id, trackerId, row.external_url, row.external_key]
+        );
+        migrated++;
+      }
+    }
+
+    console.log(`[082] ✓ Migrated ${migrated} existing links (${existingLinks.length} total found)`);
+  } catch (e) {
+    // On fresh install, g_argus_issues or g_argus_issue_trackers may not exist yet.
+    // This is expected — no data to migrate anyway.
+    console.log(`[082] ⚠ Skipped data migration (table may not exist yet): ${e.message}`);
+  }
 };
 
 exports.down = async function (connection) {
