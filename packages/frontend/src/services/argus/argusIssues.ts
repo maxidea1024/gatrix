@@ -5,6 +5,7 @@ import { argusApi, ARGUS_BASE } from './argusApi';
 import type {
   ArgusIssue,
   ArgusIssueDetail,
+  ArgusIssueLink,
   ArgusErrorEvent,
   ArgusIssueActivity,
   ArgusIssueTagGroup,
@@ -108,6 +109,7 @@ export async function updateIssueExternalLink(
   });
 }
 
+/** @deprecated Use fetchIssueLinkStatus instead */
 export async function fetchExternalIssueStatus(
   projectId: number | string,
   issueId: number | string,
@@ -121,6 +123,65 @@ export async function fetchExternalIssueStatus(
 }> {
   const response = await argusApi.get(
     `${ARGUS_BASE}/${projectId}/issues/${issueId}/external-status`,
+    { params: sync ? { sync: 'true' } : undefined }
+  );
+  return response.data?.data || response.data;
+}
+
+// ===================== Issue Links (1:N) =====================
+
+export async function getIssueLinks(
+  projectId: number | string,
+  issueId: number | string
+): Promise<ArgusIssueLink[]> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/${projectId}/issues/${issueId}/links`
+  );
+  return response.data?.data || response.data || [];
+}
+
+export async function addIssueLink(
+  projectId: number | string,
+  issueId: number | string,
+  trackerId: number,
+  externalUrl: string,
+  externalKey: string
+): Promise<ArgusIssueLink> {
+  const response = await argusApi.post(
+    `${ARGUS_BASE}/${projectId}/issues/${issueId}/links`,
+    {
+      tracker_id: trackerId,
+      external_url: externalUrl,
+      external_key: externalKey,
+    }
+  );
+  return response.data?.data || response.data;
+}
+
+export async function removeIssueLink(
+  projectId: number | string,
+  issueId: number | string,
+  linkId: number
+): Promise<void> {
+  await argusApi.delete(
+    `${ARGUS_BASE}/${projectId}/issues/${issueId}/links/${linkId}`
+  );
+}
+
+export async function fetchIssueLinkStatus(
+  projectId: number | string,
+  issueId: number | string,
+  linkId: number,
+  sync: boolean = false
+): Promise<{
+  state: 'open' | 'closed' | 'unknown';
+  title?: string;
+  updatedAt?: string;
+  closedAt?: string;
+  synced?: boolean;
+}> {
+  const response = await argusApi.get(
+    `${ARGUS_BASE}/${projectId}/issues/${issueId}/links/${linkId}/status`,
     { params: sync ? { sync: 'true' } : undefined }
   );
   return response.data?.data || response.data;

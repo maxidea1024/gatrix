@@ -74,8 +74,7 @@ export const USERS: SimUser[] = Array.from(
       COUNTRIES_WEIGHTED.map((c) => c.code),
       COUNTRIES_WEIGHTED.map((c) => c.weight)
     );
-    const avatarUrl =
-      i % 5 < 2 ? `https://i.pravatar.cc/150?u=user_${10000 + i}` : undefined;
+    const avatarUrl = `https://i.pravatar.cc/150?u=user_${10000 + i}`;
 
     return {
       id: `user_${10000 + i}`,

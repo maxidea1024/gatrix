@@ -70,14 +70,26 @@ export interface ArgusIssue {
   priority?: 'critical' | 'high' | 'medium' | 'low';
   stats_24h?: number[];
   external_url?: string | null;
+  /** @deprecated Use links[] instead */
   external_key?: string | null;
   short_id?: string;
   is_subscribed?: boolean;
   is_bookmarked?: boolean;
 }
 
+export interface ArgusIssueLink {
+  id: number;
+  tracker_id: number;
+  provider: string;
+  tracker_name: string;
+  external_url: string;
+  external_key: string;
+  created_at: string;
+}
+
 export interface ArgusIssueDetail extends ArgusIssue {
   latest_event?: ArgusErrorEvent;
+  links?: ArgusIssueLink[];
 }
 
 export interface ArgusErrorEvent {

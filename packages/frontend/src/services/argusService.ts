@@ -27,6 +27,7 @@ export type {
   ArgusSavedQuery,
   ArgusIntegration,
   ArgusIssueTracker,
+  ArgusIssueLink,
   ArgusCommit,
   ArgusOwnershipRule,
   ArgusIssueListParams,

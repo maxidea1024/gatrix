@@ -1635,13 +1635,27 @@ export interface LifecycleStage {
   avg_events: number;
 }
 
+export interface LifecycleStageTrend {
+  period: string;
+  stage: string;
+  user_count: number;
+}
+
 export interface LifecycleData {
   stages: LifecycleStage[];
   new_users_over_time: { period: string; new_users: number }[];
+  prev_new_users_over_time: { period: string; new_users: number }[];
+  stages_over_time: LifecycleStageTrend[];
+  prev_stages_over_time: LifecycleStageTrend[];
+  dau_over_time: { period: string; dau: number; wau: number; mau: number }[];
   dau: number;
   wau: number;
   mau: number;
   stickiness: number;
+  prev_dau: number;
+  prev_wau: number;
+  prev_mau: number;
+  prev_stickiness: number;
 }
 
 export async function getLifecycleAnalytics(
@@ -1661,10 +1675,18 @@ export async function getLifecycleAnalytics(
     response.data?.data || {
       stages: [],
       new_users_over_time: [],
+      prev_new_users_over_time: [],
+      stages_over_time: [],
+      prev_stages_over_time: [],
+      dau_over_time: [],
       dau: 0,
       wau: 0,
       mau: 0,
       stickiness: 0,
+      prev_dau: 0,
+      prev_wau: 0,
+      prev_mau: 0,
+      prev_stickiness: 0,
     }
   );
 }

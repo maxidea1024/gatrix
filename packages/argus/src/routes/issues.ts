@@ -446,8 +446,17 @@ export default async function issuesRoutes(app: FastifyInstance) {
               externalUrl = externalResult.url;
               externalKey = externalResult.key;
 
-              // Store external link on the issue
+              // Store external link on the issue (legacy columns)
               await db('g_argus_issues').where('id', insertId).update({
+                external_url: externalUrl,
+                external_key: externalKey,
+              });
+
+              // Store in new links table
+              await db('g_argus_issue_links').insert({
+                project_id: projectId,
+                issue_id: insertId,
+                tracker_id: tracker.id,
                 external_url: externalUrl,
                 external_key: externalKey,
               });
@@ -607,6 +616,20 @@ export default async function issuesRoutes(app: FastifyInstance) {
           });
           // Continue without latest_event ??MySQL data is still returned
         }
+        // Fetch linked external issues
+        const links = await db('g_argus_issue_links as l')
+          .leftJoin('g_argus_issue_trackers as t', 'l.tracker_id', 't.id')
+          .where({ 'l.project_id': projectId, 'l.issue_id': issueId })
+          .select(
+            'l.id',
+            'l.tracker_id',
+            't.provider',
+            't.name as tracker_name',
+            'l.external_url',
+            'l.external_key',
+            'l.created_at'
+          );
+        issue.links = links;
 
         return reply.send({ data: issue });
       } catch (error) {
@@ -725,6 +748,318 @@ export default async function issuesRoutes(app: FastifyInstance) {
           error: error instanceof Error ? error.message : String(error),
         });
         return reply.code(500).send({ error: 'Failed to check external status' });
+      }
+    }
+  );
+
+  // ===================== Issue Links CRUD =====================
+
+  // GET all links for an issue
+  app.get(
+    '/:projectId/issues/:issueId/links',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId } = request.params as {
+        projectId: string;
+        issueId: string;
+      };
+
+      try {
+        const links = await db('g_argus_issue_links as l')
+          .leftJoin('g_argus_issue_trackers as t', 'l.tracker_id', 't.id')
+          .where({ 'l.project_id': projectId, 'l.issue_id': issueId })
+          .select(
+            'l.id',
+            'l.tracker_id',
+            't.provider',
+            't.name as tracker_name',
+            'l.external_url',
+            'l.external_key',
+            'l.created_at'
+          );
+        return reply.send({ data: links });
+      } catch (error) {
+        logger.error('Failed to get issue links', {
+          issueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to get issue links' });
+      }
+    }
+  );
+
+  // POST add a new link
+  app.post(
+    '/:projectId/issues/:issueId/links',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId } = request.params as {
+        projectId: string;
+        issueId: string;
+      };
+      const body = request.body as {
+        tracker_id: number;
+        external_url: string;
+        external_key: string;
+      };
+
+      if (!body.tracker_id || !body.external_url || !body.external_key) {
+        return reply.code(400).send({ error: 'tracker_id, external_url, and external_key are required' });
+      }
+
+      try {
+        // Check issue exists
+        const [issue] = await db('g_argus_issues').where({ id: issueId, project_id: projectId });
+        if (!issue) {
+          return reply.code(404).send({ error: 'Issue not found' });
+        }
+
+        // Check tracker exists
+        const [tracker] = await db('g_argus_issue_trackers').where({ id: body.tracker_id, project_id: projectId });
+        if (!tracker) {
+          return reply.code(404).send({ error: 'Tracker not found' });
+        }
+
+        // Check duplicate (UNIQUE constraint: issue_id + tracker_id)
+        const [existing] = await db('g_argus_issue_links').where({
+          issue_id: issueId,
+          tracker_id: body.tracker_id,
+        });
+        if (existing) {
+          return reply.code(409).send({ error: 'This tracker is already linked to this issue' });
+        }
+
+        const [insertId] = await db('g_argus_issue_links').insert({
+          project_id: projectId,
+          issue_id: issueId,
+          tracker_id: body.tracker_id,
+          external_url: body.external_url,
+          external_key: body.external_key,
+        });
+
+        // Also update legacy columns for backward compatibility (first link wins)
+        const linkCount = await db('g_argus_issue_links')
+          .where({ issue_id: issueId })
+          .count('* as count')
+          .first();
+        if (Number(linkCount?.count) === 1) {
+          await db('g_argus_issues').where({ id: issueId, project_id: projectId }).update({
+            external_url: body.external_url,
+            external_key: body.external_key,
+          });
+        }
+
+        // Record activity
+        const userName = (request.headers['x-user-name'] as string) || null;
+        try {
+          await db('g_argus_issue_activity').insert({
+            project_id: projectId,
+            issue_id: issueId,
+            user_name: userName,
+            action: 'external_link',
+            data: JSON.stringify({
+              url: body.external_url,
+              key: body.external_key,
+              provider: tracker.provider,
+              link_id: insertId,
+            }),
+          });
+        } catch (actErr) {
+          logger.warn('Failed to record link activity', {
+            error: actErr instanceof Error ? actErr.message : String(actErr),
+          });
+        }
+
+        return reply.code(201).send({
+          data: {
+            id: insertId,
+            tracker_id: body.tracker_id,
+            provider: tracker.provider,
+            tracker_name: tracker.name,
+            external_url: body.external_url,
+            external_key: body.external_key,
+          },
+        });
+      } catch (error) {
+        logger.error('Failed to add issue link', {
+          issueId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to add issue link' });
+      }
+    }
+  );
+
+  // DELETE remove a link
+  app.delete(
+    '/:projectId/issues/:issueId/links/:linkId',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId, linkId } = request.params as {
+        projectId: string;
+        issueId: string;
+        linkId: string;
+      };
+
+      try {
+        const [link] = await db('g_argus_issue_links').where({
+          id: linkId,
+          project_id: projectId,
+          issue_id: issueId,
+        });
+        if (!link) {
+          return reply.code(404).send({ error: 'Link not found' });
+        }
+
+        await db('g_argus_issue_links').where({ id: linkId }).delete();
+
+        // Update legacy columns: if no links remain, clear; otherwise set to first remaining link
+        const remaining = await db('g_argus_issue_links')
+          .where({ issue_id: issueId })
+          .orderBy('created_at', 'asc')
+          .first();
+
+        await db('g_argus_issues').where({ id: issueId, project_id: projectId }).update({
+          external_url: remaining?.external_url || null,
+          external_key: remaining?.external_key || null,
+        });
+
+        // Record activity
+        const userName = (request.headers['x-user-name'] as string) || null;
+        try {
+          await db('g_argus_issue_activity').insert({
+            project_id: projectId,
+            issue_id: issueId,
+            user_name: userName,
+            action: 'external_unlink',
+            data: JSON.stringify({
+              url: link.external_url,
+              key: link.external_key,
+              link_id: parseInt(linkId, 10),
+            }),
+          });
+        } catch (actErr) {
+          logger.warn('Failed to record unlink activity', {
+            error: actErr instanceof Error ? actErr.message : String(actErr),
+          });
+        }
+
+        return reply.send({ success: true });
+      } catch (error) {
+        logger.error('Failed to remove issue link', {
+          issueId,
+          linkId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to remove issue link' });
+      }
+    }
+  );
+
+  // GET status for a specific link (with optional sync)
+  app.get(
+    '/:projectId/issues/:issueId/links/:linkId/status',
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { projectId, issueId, linkId } = request.params as {
+        projectId: string;
+        issueId: string;
+        linkId: string;
+      };
+      const { sync } = request.query as { sync?: string };
+
+      try {
+        const [link] = await db('g_argus_issue_links as l')
+          .leftJoin('g_argus_issue_trackers as t', 'l.tracker_id', 't.id')
+          .where({ 'l.id': linkId, 'l.project_id': projectId, 'l.issue_id': issueId })
+          .select('l.*', 't.provider', 't.api_url', 't.api_token', 't.config');
+
+        if (!link) {
+          return reply.send({ data: { state: 'unknown', message: 'Link not found' } });
+        }
+
+        // Guard: tracker may have been deleted (orphan link)
+        if (!link.provider || !link.api_token) {
+          return reply.send({ data: { state: 'unknown', message: 'Tracker configuration not found (may have been deleted)' } });
+        }
+
+        const trackerConfig = {
+          provider: link.provider,
+          apiUrl: link.api_url,
+          apiToken: link.api_token,
+          config: typeof link.config === 'string' ? JSON.parse(link.config) : link.config || {},
+        };
+
+        const { fetchExternalIssueStatus } = require('../services/trackerAdapter');
+        const status = await fetchExternalIssueStatus(link.external_url, trackerConfig);
+
+        // Auto-sync if requested
+        let needsStatusUpdate = false;
+        if (sync === 'true' && (status.state === 'closed' || status.state === 'open')) {
+          const [issue] = await db('g_argus_issues').where({ id: issueId, project_id: projectId });
+          let targetStatus = status.state === 'closed' ? 'resolved' : 'unresolved';
+
+          // Race condition protection: when resolving, check other links
+          // Only resolve if ALL linked issues are closed (not just this one)
+          if (targetStatus === 'resolved') {
+            const otherLinks = await db('g_argus_issue_links')
+              .where({ issue_id: issueId })
+              .whereNot({ id: linkId });
+            // If there are other links, don't auto-resolve — let user decide
+            if (otherLinks.length > 0) {
+              targetStatus = issue?.status || 'unresolved'; // keep current status
+            }
+          }
+
+          needsStatusUpdate = !!(issue && issue.status !== targetStatus);
+          if (needsStatusUpdate) {
+            const updateData: Record<string, any> = { status: targetStatus };
+            if (targetStatus === 'resolved') {
+              updateData.resolved_at = db.fn.now();
+            }
+            await db('g_argus_issues').where({ id: issueId, project_id: projectId }).update(updateData);
+          }
+
+          // Record sync activity (deduplicate by last external_state for this link)
+          try {
+            const [lastSync] = await db('g_argus_issue_activity')
+              .where({ project_id: projectId, issue_id: issueId, action: 'external_sync' })
+              .whereRaw("JSON_EXTRACT(data, '$.link_id') = ?", [parseInt(linkId, 10)])
+              .orderBy('created_at', 'desc')
+              .limit(1);
+
+            const lastState = lastSync?.data?.external_state;
+            if (lastState !== status.state) {
+              const userName = (request.headers['x-user-name'] as string) || null;
+              await db('g_argus_issue_activity').insert({
+                project_id: projectId,
+                issue_id: issueId,
+                user_name: userName,
+                action: 'external_sync',
+                data: JSON.stringify({
+                  from: issue?.status || 'unknown',
+                  to: targetStatus,
+                  source: 'external_tracker',
+                  external_state: status.state,
+                  url: link.external_url,
+                  provider: link.provider,
+                  link_id: parseInt(linkId, 10),
+                }),
+              });
+            }
+          } catch (actErr) {
+            logger.warn('Failed to record sync activity', {
+              error: actErr instanceof Error ? actErr.message : String(actErr),
+            });
+          }
+
+          status.synced = needsStatusUpdate;
+        }
+
+        return reply.send({ data: status });
+      } catch (error) {
+        logger.error('Failed to check link status', {
+          issueId,
+          linkId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return reply.code(500).send({ error: 'Failed to check link status' });
       }
     }
   );
@@ -984,6 +1319,13 @@ export default async function issuesRoutes(app: FastifyInstance) {
           `UPDATE g_argus_issues SET ${updates.join(', ')} WHERE id = ? AND project_id = ?`,
           params
         );
+
+        // Sync links table when legacy external_url is cleared via PATCH
+        if (body.external_url === null) {
+          await db('g_argus_issue_links')
+            .where({ issue_id: issueId, project_id: projectId })
+            .delete();
+        }
 
         // Record activity
         const userName = (request.headers['x-user-name'] as string) || null;

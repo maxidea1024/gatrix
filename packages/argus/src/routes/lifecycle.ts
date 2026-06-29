@@ -1,14 +1,17 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { optic } from '@gatrix/argus-optic';
 import { createLogger } from '../utils/logger';
-import { buildTimeRangeConditions } from '../utils/timeBucket';
+import {
+  buildTimeRangeConditions,
+  PERIOD_TO_SECONDS,
+} from '../utils/timeBucket';
 
 const TABLE = 'argus.activities';
 const logger = createLogger('lifecycle-api');
 
 export default async function lifecycleRoutes(app: FastifyInstance) {
   // ─── GET /projects/:projectId/analytics/lifecycle ───────────────────────
-  // Classify users into lifecycle stages: New, Active, Returning, Dormant, Resurrected
+  // Classify users into lifecycle stages: New, Active, Returning, Dormant, Churned
   app.get(
     '/projects/:projectId/analytics/lifecycle',
     async (request: FastifyRequest, reply: FastifyReply) => {
@@ -36,8 +39,13 @@ export default async function lifecycleRoutes(app: FastifyInstance) {
               ? 'toStartOfMonth'
               : 'toDate';
 
-        // For lifecycle, we need to classify users by their activity patterns.
-        // We use a simplified approach based on first_seen and activity windows.
+        // ── Period duration (seconds) for prev-period calculations ─────────
+        const periodSeconds = start && end
+          ? (new Date(end).getTime() - new Date(start).getTime()) / 1000
+          : (PERIOD_TO_SECONDS[period || '30d'] || 2592000);
+        const numDays = Math.ceil(periodSeconds / 86400);
+        const useWeekly = numDays > 21;
+        const grainFn = useWeekly ? 'toStartOfWeek' : 'toDate';
 
         // 1) Lifecycle stage breakdown (current period)
         const lifecycleSql = `
@@ -73,19 +81,8 @@ export default async function lifecycleRoutes(app: FastifyInstance) {
               ELSE 5
             END
         `;
-        const lifecycleResult = await optic.rawQuery({
-          query: lifecycleSql,
-          params,
-        });
-        const stages = ((lifecycleResult.data as any[]) || []).map(
-          (r: any) => ({
-            stage: r.stage,
-            user_count: Number(r.user_count) || 0,
-            avg_events: Math.round((Number(r.avg_events) || 0) * 10) / 10,
-          })
-        );
 
-        // 2) New users over time
+        // 2) New users over time (current period)
         const newUsersSql = `
           SELECT
             ${grain}(first_seen) AS period,
@@ -101,60 +98,228 @@ export default async function lifecycleRoutes(app: FastifyInstance) {
           GROUP BY period
           ORDER BY period ASC
         `;
-        const newUsersResult = await optic.rawQuery({
-          query: newUsersSql,
-          params,
-        });
-        const newUsersOverTime = ((newUsersResult.data as any[]) || []).map(
-          (r: any) => ({
-            period: r.period,
-            new_users: Number(r.new_users) || 0,
-          })
-        );
 
-        // 3) DAU/WAU/MAU
-        const dauSql = `
-          SELECT uniqExact(user_id) AS dau
-          FROM ${TABLE}
-          WHERE project_id = {projectId:String}
-            AND user_id != ''
-            AND timestamp >= now() - INTERVAL 1 DAY
-        `;
-        const wauSql = `
-          SELECT uniqExact(user_id) AS wau
-          FROM ${TABLE}
-          WHERE project_id = {projectId:String}
-            AND user_id != ''
-            AND timestamp >= now() - INTERVAL 7 DAY
-        `;
-        const mauSql = `
-          SELECT uniqExact(user_id) AS mau
-          FROM ${TABLE}
-          WHERE project_id = {projectId:String}
-            AND user_id != ''
-            AND timestamp >= now() - INTERVAL 30 DAY
+        // 3) New users over time (previous period)
+        const prevNewUsersSql = `
+          SELECT
+            ${grain}(first_seen) AS period,
+            count() AS new_users
+          FROM (
+            SELECT user_id, min(timestamp) AS first_seen
+            FROM ${TABLE}
+            WHERE project_id = {projectId:String}
+              AND user_id != ''
+              AND timestamp >= now() - INTERVAL ${numDays * 2} DAY
+              AND timestamp < now() - INTERVAL ${numDays} DAY
+            GROUP BY user_id
+          )
+          GROUP BY period
+          ORDER BY period ASC
         `;
 
-        const [dauResult, wauResult, mauResult] = await Promise.all([
+        // 4) DAU/WAU/MAU (current + previous)
+        const dauSql = `SELECT uniqExact(user_id) AS v FROM ${TABLE} WHERE project_id = {projectId:String} AND user_id != '' AND timestamp >= now() - INTERVAL 1 DAY`;
+        const wauSql = `SELECT uniqExact(user_id) AS v FROM ${TABLE} WHERE project_id = {projectId:String} AND user_id != '' AND timestamp >= now() - INTERVAL 7 DAY`;
+        const mauSql = `SELECT uniqExact(user_id) AS v FROM ${TABLE} WHERE project_id = {projectId:String} AND user_id != '' AND timestamp >= now() - INTERVAL 30 DAY`;
+        const prevDauSql = `SELECT uniqExact(user_id) AS v FROM ${TABLE} WHERE project_id = {projectId:String} AND user_id != '' AND timestamp >= now() - INTERVAL 2 DAY AND timestamp < now() - INTERVAL 1 DAY`;
+        const prevWauSql = `SELECT uniqExact(user_id) AS v FROM ${TABLE} WHERE project_id = {projectId:String} AND user_id != '' AND timestamp >= now() - INTERVAL 14 DAY AND timestamp < now() - INTERVAL 7 DAY`;
+        const prevMauSql = `SELECT uniqExact(user_id) AS v FROM ${TABLE} WHERE project_id = {projectId:String} AND user_id != '' AND timestamp >= now() - INTERVAL 60 DAY AND timestamp < now() - INTERVAL 30 DAY`;
+
+        // 5) Lifecycle stages over time (current period)
+        const stagesOverTimeSql = `
+          WITH
+            user_summary AS (
+              SELECT
+                user_id,
+                toDate(min(timestamp)) AS first_seen,
+                toDate(max(timestamp)) AS last_seen
+              FROM ${TABLE}
+              WHERE project_id = {projectId:String}
+                AND user_id != ''
+              GROUP BY user_id
+            ),
+            date_series AS (
+              SELECT DISTINCT ${grainFn}(
+                toDate(now()) - ${numDays} + number
+              ) AS ref_date
+              FROM numbers(${numDays + 1})
+            )
+          SELECT
+            toString(ds.ref_date) AS period,
+            multiIf(
+              us.first_seen >= ds.ref_date - 6, 'new',
+              us.last_seen >= ds.ref_date, 'active',
+              us.last_seen >= ds.ref_date - 6, 'returning',
+              us.last_seen >= ds.ref_date - 29, 'dormant',
+              'churned'
+            ) AS stage,
+            count() AS user_count
+          FROM date_series ds
+          CROSS JOIN user_summary us
+          WHERE us.first_seen <= ds.ref_date
+          GROUP BY period, stage
+          ORDER BY period ASC,
+            CASE stage
+              WHEN 'new' THEN 1
+              WHEN 'active' THEN 2
+              WHEN 'returning' THEN 3
+              WHEN 'dormant' THEN 4
+              ELSE 5
+            END
+        `;
+
+        // 6) Lifecycle stages over time (previous period)
+        const prevStagesOverTimeSql = `
+          WITH
+            user_summary AS (
+              SELECT
+                user_id,
+                toDate(min(timestamp)) AS first_seen,
+                toDate(max(timestamp)) AS last_seen
+              FROM ${TABLE}
+              WHERE project_id = {projectId:String}
+                AND user_id != ''
+              GROUP BY user_id
+            ),
+            date_series AS (
+              SELECT DISTINCT ${grainFn}(
+                toDate(now()) - ${numDays * 2} + number
+              ) AS ref_date
+              FROM numbers(${numDays + 1})
+            )
+          SELECT
+            toString(ds.ref_date) AS period,
+            multiIf(
+              us.first_seen >= ds.ref_date - 6, 'new',
+              us.last_seen >= ds.ref_date, 'active',
+              us.last_seen >= ds.ref_date - 6, 'returning',
+              us.last_seen >= ds.ref_date - 29, 'dormant',
+              'churned'
+            ) AS stage,
+            count() AS user_count
+          FROM date_series ds
+          CROSS JOIN user_summary us
+          WHERE us.first_seen <= ds.ref_date
+          GROUP BY period, stage
+          ORDER BY period ASC,
+            CASE stage
+              WHEN 'new' THEN 1
+              WHEN 'active' THEN 2
+              WHEN 'returning' THEN 3
+              WHEN 'dormant' THEN 4
+              ELSE 5
+            END
+        `;
+
+        // 7) DAU/WAU/MAU over time (daily rolling window)
+        const dauOverTimeSql = `
+          WITH
+            date_series AS (
+              SELECT toDate(now()) - ${numDays} + number AS ref_date
+              FROM numbers(${numDays + 1})
+            )
+          SELECT
+            toString(ds.ref_date) AS period,
+            uniqExactIf(a.user_id, toDate(a.timestamp) = ds.ref_date) AS dau,
+            uniqExactIf(a.user_id, toDate(a.timestamp) >= ds.ref_date - 6) AS wau,
+            uniqExactIf(a.user_id, toDate(a.timestamp) >= ds.ref_date - 29) AS mau
+          FROM date_series ds
+          CROSS JOIN ${TABLE} a
+          WHERE a.project_id = {projectId:String}
+            AND a.user_id != ''
+            AND toDate(a.timestamp) >= ds.ref_date - 29
+            AND toDate(a.timestamp) <= ds.ref_date
+          GROUP BY period
+          ORDER BY period ASC
+        `;
+
+        // ── Execute all queries in parallel ────────────────────────────────
+        const [
+          lifecycleResult,
+          newUsersResult,
+          prevNewUsersResult,
+          dauResult, wauResult, mauResult,
+          prevDauResult, prevWauResult, prevMauResult,
+          stagesOverTimeResult,
+          prevStagesOverTimeResult,
+          dauOverTimeResult,
+        ] = await Promise.all([
+          optic.rawQuery({ query: lifecycleSql, params }),
+          optic.rawQuery({ query: newUsersSql, params }),
+          optic.rawQuery({ query: prevNewUsersSql, params }),
           optic.rawQuery({ query: dauSql, params }),
           optic.rawQuery({ query: wauSql, params }),
           optic.rawQuery({ query: mauSql, params }),
+          optic.rawQuery({ query: prevDauSql, params }),
+          optic.rawQuery({ query: prevWauSql, params }),
+          optic.rawQuery({ query: prevMauSql, params }),
+          optic.rawQuery({ query: stagesOverTimeSql, params }),
+          optic.rawQuery({ query: prevStagesOverTimeSql, params }),
+          optic.rawQuery({ query: dauOverTimeSql, params }),
         ]);
 
-        const dau = Number((dauResult.data as any[])?.[0]?.dau) || 0;
-        const wau = Number((wauResult.data as any[])?.[0]?.wau) || 0;
-        const mau = Number((mauResult.data as any[])?.[0]?.mau) || 0;
+        // ── Parse results ──────────────────────────────────────────────────
+        const stages = ((lifecycleResult.data as any[]) || []).map(
+          (r: any) => ({
+            stage: r.stage,
+            user_count: Number(r.user_count) || 0,
+            avg_events: Math.round((Number(r.avg_events) || 0) * 10) / 10,
+          })
+        );
+
+        const mapTimeSeries = (data: any[]) =>
+          (data || []).map((r: any) => ({
+            period: r.period,
+            new_users: Number(r.new_users) || 0,
+          }));
+        const newUsersOverTime = mapTimeSeries(newUsersResult.data as any[]);
+        const prevNewUsersOverTime = mapTimeSeries(prevNewUsersResult.data as any[]);
+
+        const val = (r: any) => Number((r.data as any[])?.[0]?.v) || 0;
+        const dau = val(dauResult);
+        const wau = val(wauResult);
+        const mau = val(mauResult);
+        const prevDau = val(prevDauResult);
+        const prevWau = val(prevWauResult);
+        const prevMau = val(prevMauResult);
         const stickiness = mau > 0 ? Math.round((dau / mau) * 10000) / 100 : 0;
+        const prevStickiness = prevMau > 0 ? Math.round((prevDau / prevMau) * 10000) / 100 : 0;
+
+        const mapStageSeries = (data: any[]) =>
+          (data || []).map((r: any) => ({
+            period: r.period,
+            stage: r.stage,
+            user_count: Number(r.user_count) || 0,
+          }));
+        const stagesOverTime = mapStageSeries(stagesOverTimeResult.data as any[]);
+        const prevStagesOverTime = mapStageSeries(prevStagesOverTimeResult.data as any[]);
+
+        const dauOverTime = ((dauOverTimeResult.data as any[]) || []).map(
+          (r: any) => ({
+            period: r.period,
+            dau: Number(r.dau) || 0,
+            wau: Number(r.wau) || 0,
+            mau: Number(r.mau) || 0,
+          })
+        );
 
         return reply.send({
           success: true,
           data: {
             stages,
             new_users_over_time: newUsersOverTime,
+            prev_new_users_over_time: prevNewUsersOverTime,
+            stages_over_time: stagesOverTime,
+            prev_stages_over_time: prevStagesOverTime,
+            dau_over_time: dauOverTime,
             dau,
             wau,
             mau,
             stickiness,
+            prev_dau: prevDau,
+            prev_wau: prevWau,
+            prev_mau: prevMau,
+            prev_stickiness: prevStickiness,
           },
         });
       } catch (err) {

@@ -6,7 +6,6 @@ import { buildTimeRangeConditions, getBucketingConfig } from '../utils/timeBucke
 import { buildCohortQuery, CohortDefinition } from './cohorts';
 
 const TABLE = 'argus.activities';
-const REVENUE_TABLE = 'argus.revenue_events';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -351,26 +350,10 @@ export default async function userProfileRoutes(app: FastifyInstance) {
 
       const whereClause = conditions.join(' AND ');
 
-      // Determine whether revenue table is available (cached per instance if needed)
-      let revenueJoin = '';
-      let revenueSelect = '0 AS net_revenue, 0 AS purchase_count';
-      try {
-        await optic.rawQuery({
-          query: `SELECT 1 FROM ${REVENUE_TABLE} WHERE project_id = {projectId:String} LIMIT 1`,
-          params: { projectId },
-        });
-        revenueJoin = `
-          LEFT JOIN (
-            SELECT user_id,
-              sum(amount) AS net_revenue,
-              count()     AS purchase_count
-            FROM ${REVENUE_TABLE}
-            WHERE project_id = {projectId:String}
-            GROUP BY user_id
-          ) r ON r.user_id = a.user_id`;
-        revenueSelect =
-          'COALESCE(any(r.net_revenue), 0) AS net_revenue, COALESCE(any(r.purchase_count), 0) AS purchase_count';
-      } catch { /* revenue table not available */ }
+      // Revenue is computed inline from activities.amount_usd (purchase events)
+      const revenueSelect =
+        "sumIf(a.amount_usd, a.event_name = 'purchase') AS net_revenue, " +
+        "countIf(a.event_name = 'purchase') AS purchase_count";
 
       // Build HAVING clause
       const havingConditions: string[] = [];
@@ -395,7 +378,6 @@ export default async function userProfileRoutes(app: FastifyInstance) {
           FROM (
             SELECT a.user_id, ${CHURN_RISK_SQL_EXPR} AS churn_risk, ${revenueSelect}
             FROM ${TABLE} a
-            ${revenueJoin}
             WHERE ${whereClause}
             GROUP BY a.user_id
             ${havingClause}
@@ -426,7 +408,6 @@ export default async function userProfileRoutes(app: FastifyInstance) {
             ${CHURN_RISK_SQL_EXPR}                   AS churn_risk,
             ${revenueSelect}
           FROM ${TABLE} a
-          ${revenueJoin}
           WHERE ${whereClause}
           GROUP BY a.user_id
           ${havingClause}
