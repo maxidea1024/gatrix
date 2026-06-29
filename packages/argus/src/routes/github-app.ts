@@ -64,7 +64,56 @@ export default async function githubAppRoutes(app: FastifyInstance) {
         }
       }
 
-      // TODO: Handle push (commits), pull_request, and release events here by looking up the repository in g_argus_integrations
+      // Handle GitHub issue events (comment, state change) → record in activity timeline
+      if (event === 'issue_comment' || event === 'issues') {
+        const ghIssueUrl = body.issue?.html_url;
+        if (ghIssueUrl) {
+          try {
+            // Find Gatrix issues linked to this GitHub issue
+            const links = await db('g_argus_issue_links as l')
+              .join('g_argus_issues as i', 'l.issue_id', 'i.id')
+              .select('l.project_id', 'l.issue_id', 'l.tracker_id')
+              .where('l.external_url', ghIssueUrl);
+
+            for (const link of links) {
+              if (event === 'issue_comment' && body.action === 'created') {
+                await db('g_argus_issue_activity').insert({
+                  project_id: link.project_id,
+                  issue_id: link.issue_id,
+                  user_name: body.comment?.user?.login || null,
+                  action: 'external_comment',
+                  data: JSON.stringify({
+                    provider: 'github',
+                    body: (body.comment?.body || '').substring(0, 500),
+                    url: body.comment?.html_url,
+                    user_avatar: body.comment?.user?.avatar_url,
+                  }),
+                });
+              } else if (event === 'issues' && (body.action === 'closed' || body.action === 'reopened')) {
+                await db('g_argus_issue_activity').insert({
+                  project_id: link.project_id,
+                  issue_id: link.issue_id,
+                  user_name: body.sender?.login || null,
+                  action: 'external_status_change',
+                  data: JSON.stringify({
+                    provider: 'github',
+                    state: body.action === 'closed' ? 'closed' : 'open',
+                    url: ghIssueUrl,
+                  }),
+                });
+              }
+            }
+
+            if (links.length > 0) {
+              logger.info(`GitHub ${event} processed for ${links.length} linked issue(s)`);
+            }
+          } catch (err) {
+            logger.warn('Failed to process GitHub issue event', {
+              error: (err as Error).message,
+            });
+          }
+        }
+      }
 
       return reply.code(200).send({ success: true });
     }

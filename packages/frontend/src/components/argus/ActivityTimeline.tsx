@@ -35,6 +35,8 @@ interface ActivityTimelineProps {
   isDark: boolean;
   /** When true, renders without Paper card wrapper for embedding in sidebar */
   embedded?: boolean;
+  /** Increment to force-refresh the activity list */
+  refreshKey?: number;
 }
 
 // ==================== Config ====================
@@ -82,6 +84,16 @@ const ACTION_CONFIG: Record<
     icon: <SyncIcon sx={{ fontSize: 14 }} />,
     color: '#ab47bc',
     label: 'Status synced',
+  },
+  external_comment: {
+    icon: <CommentIcon sx={{ fontSize: 14 }} />,
+    color: '#ff9800',
+    label: 'External comment',
+  },
+  external_status_change: {
+    icon: <SyncIcon sx={{ fontSize: 14 }} />,
+    color: '#ab47bc',
+    label: 'External status changed',
   },
 };
 
@@ -139,6 +151,15 @@ function getActivityDescription(activity: ArgusIssueActivity, t: any): string {
         status: statusLabel,
       });
     }
+    case 'external_comment': {
+      const provider = getProviderFromData(data);
+      return `[${provider}] ${data?.body || ''}`;
+    }
+    case 'external_status_change': {
+      const provider = getProviderFromData(data);
+      const state = data?.state === 'closed' ? 'closed' : 'reopened';
+      return `${provider} issue ${state}`;
+    }
     default:
       return activity.action;
   }
@@ -179,6 +200,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
   issueId,
   isDark,
   embedded = false,
+  refreshKey,
 }) => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
@@ -218,7 +240,7 @@ const ActivityTimeline: React.FC<ActivityTimelineProps> = ({
 
   useEffect(() => {
     fetchActivities(false);
-  }, [issueId, fetchActivities]);
+  }, [issueId, fetchActivities, refreshKey]);
 
   const fetchMoreActivities = async () => {
     if (loadingMore) return;

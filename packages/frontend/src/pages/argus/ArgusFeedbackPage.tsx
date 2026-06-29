@@ -680,7 +680,7 @@ const ArgusFeedbackPage: React.FC = () => {
     setConfirmConfig({
       open: true,
       title: t('argus.issues.unlinkConfirmTitle', '이슈 연결 해제'),
-      message: t('argus.issues.unlinkConfirm', '외부 이슈 연결을 해제하시겠습니까?'),
+      message: t('argus.feedback.unlinkConfirm', '이슈 연결을 해제하시겠습니까?'),
       confirmText: t('argus.issues.unlinkAction', '연결 해제'),
       confirmColor: 'error' as const,
       onConfirm: async () => {

@@ -367,21 +367,39 @@ export default async function feedbackRoutes(app: FastifyInstance) {
 
         const item = rows[0];
 
-        // Enrich with issue info
+        // Enrich with issue info (manual link + auto-detect via event_id)
         let issueInfo: { id: number; title: string; status: string } | null =
           null;
         try {
+          // 1) Manual link from MySQL
           await ensureIssueLinkTable();
           const linkRow = await db('g_argus_feedback_issue_links')
             .select('issue_id')
             .where({ project_id: projectId, feedback_id: feedbackId })
             .first();
 
-          const issueId = linkRow?.issue_id;
-          if (issueId) {
+          let resolvedIssueId = linkRow?.issue_id || null;
+
+          // 2) Auto-detect via event_id → errors table (fallback)
+          if (!resolvedIssueId && item.event_id) {
+            try {
+              const eventResult = await optic.rawQuery({
+                query: `SELECT issue_id FROM argus.errors
+                  WHERE project_id = {projectId:String} AND event_id = {eventId:String}
+                  LIMIT 1`,
+                params: { projectId: String(projectId), eventId: item.event_id },
+              });
+              const eventRow = (eventResult.data as any[])?.[0];
+              if (eventRow?.issue_id) {
+                resolvedIssueId = Number(eventRow.issue_id);
+              }
+            } catch { /* ignore */ }
+          }
+
+          if (resolvedIssueId) {
             const issueRow = await db('g_argus_issues')
               .select('id', 'title', 'status')
-              .where('id', issueId)
+              .where('id', resolvedIssueId)
               .first();
             if (issueRow) {
               issueInfo = {

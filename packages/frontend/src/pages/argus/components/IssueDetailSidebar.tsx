@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Divider, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +35,12 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
   const theme = useTheme();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const [activityRefreshKey, setActivityRefreshKey] = useState(0);
+
+  const handleRevalidateIssue = useCallback(() => {
+    revalidateIssue?.();
+    setActivityRefreshKey((k) => k + 1);
+  }, [revalidateIssue]);
 
   const releaseLink = latestEvent?.release
     ? `/argus/releases/${projectId}/${encodeURIComponent(latestEvent.release)}`
@@ -242,7 +248,7 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
             issue={issue}
             isDark={isDark}
             updateIssueOptimistic={updateIssueOptimistic}
-            revalidateIssue={revalidateIssue}
+            revalidateIssue={handleRevalidateIssue}
           />
         </Box>
       )}
@@ -267,6 +273,7 @@ const IssueDetailSidebar: React.FC<IssueDetailSidebarProps> = ({
             issueId={issueId}
             isDark={isDark}
             embedded
+            refreshKey={activityRefreshKey}
           />
         </Box>
       )}
